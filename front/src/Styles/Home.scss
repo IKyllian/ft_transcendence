@@ -1,0 +1,34 @@
+.home-container {
+    width: 100vw;
+    height: 100vh;
+    background-color: #0D1B2A;
+    // background: url('../Images-Icons//Backgrounds/background-42.jpg') no-repeat center fixed;
+    // background-size: cover;
+
+    .home-menu {
+        margin-top: 3em;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 1.5em;
+        color: #E0E1DD;
+    }
+
+    .home-button {
+        all: unset;
+        cursor: pointer;
+        width: 25em;
+        height: 3.5em;
+        background-color: #415A77;
+        border-radius: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #E0E1DD;
+    }
+
+    .home-button:hover {
+        background-color: #4d6b8e;
+    }
+}
