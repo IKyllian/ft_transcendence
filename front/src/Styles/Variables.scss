@@ -1,0 +1,21 @@
+$DarkPalette: #0D1B2A;
+$LightDarkPalette: #1B263B;
+$BlueDarkPalette: #415A77;
+$LightBluePalette: #778DA9;
+$WhitePalette: #E0E1DD;
+
+$OrangeProfile: orange;
+
+$HeaderMarge: 80px;
+$ProfileBlockMarge: 30px $HeaderMarge;
+
+
+@font-face {
+    font-family: Montserrat;
+    src: url("../../public/Font/Montserrat/static/Montserrat-Regular.ttf");
+}
+
+@font-face {
+    font-family: Silkscreen;
+    src: url("../../public/Font/Silkscreen/Silkscreen-Regular.ttf");
+}

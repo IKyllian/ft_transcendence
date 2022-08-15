@@ -1,18 +1,53 @@
+@use "./Variables.scss" as *;
+
 .header {
-    background-color: #415A77;
-    width: 100%;
-    height: 10%;
+    background-color: $DarkPalette;
+    min-width: 100%;
+    min-height: 10%;
+    max-height: 10%;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 1em;
+    padding: 0 $HeaderMarge;
     box-sizing: border-box;
-    color: #E0E1DD;
+    color: $WhitePalette;
 
-    .header-picture {
-        background-color: aqua;
-        height: 3em;
-        width: 3em;
-        border-radius: 50%;
+    a {
+        color: $WhitePalette;
+        text-decoration: none;
+        font-family: Silkscreen;
+        text-transform: uppercase;
+        font-size: 40px;
     }
+
+    .header-right {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+
+        .header-picture {
+            background-color: aqua;
+            margin-right: 10px;
+            height: 3em;
+            width: 3em;
+            border-radius: 50%;
+        }
+
+        p {
+            cursor: pointer;
+            font-size: 20px;
+            margin-right: 30px;
+        }
+
+        svg {
+            cursor: pointer;
+
+            &:first-child {
+                margin-right: 30px;
+                width: 25px;
+                height: 25px;
+            }
+        }
+    }
+    
 }

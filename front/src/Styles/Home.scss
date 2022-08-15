@@ -1,34 +1,41 @@
+@use "./Variables.scss" as *;
+
 .home-container {
-    width: 100vw;
-    height: 100vh;
-    background-color: #0D1B2A;
-    // background: url('../Images-Icons//Backgrounds/background-42.jpg') no-repeat center fixed;
-    // background-size: cover;
+    // min-width: 100%;
+    min-height: 90%;
+    background-color: $LightDarkPalette;
+    font-family: Silkscreen;
 
     .home-menu {
-        margin-top: 3em;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
         gap: 1.5em;
-        color: #E0E1DD;
-    }
+        color: $WhitePalette;
 
-    .home-button {
-        all: unset;
-        cursor: pointer;
-        width: 25em;
-        height: 3.5em;
-        background-color: #415A77;
-        border-radius: 30px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #E0E1DD;
-    }
+        h1 {
+            font-size: 90px;
+        }
 
-    .home-button:hover {
-        background-color: #4d6b8e;
-    }
+        .home-button {
+            all: unset;
+            cursor: pointer;
+            width: 25em;
+            height: 3.5em;
+            background-color: $BlueDarkPalette;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: $WhitePalette;
+            transition-duration: 0.5s;
+        }
+    
+        .home-button:hover {
+            // background-color: #4d6b8e;
+            transform: scale(1.2);
+            transition-timing-function: cubic-bezier(0.47, 2.02, 0.31, -0.36);
+        }
+    }   
 }

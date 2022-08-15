@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Home from './Components/Home/Home';
 import Sign from './Components/Sign';
+import Profile from './Components/Profile/Profile';
 
 function App() {
   return (
@@ -10,6 +11,7 @@ function App() {
       <Routes>
         <Route path='/' element={ <Sign /> }/>
         <Route path='/home' element={ <Home /> }/>
+        <Route path='/profile' element={ <Profile /> }/>
       </Routes>
     </BrowserRouter>
   );

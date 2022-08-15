@@ -1,6 +1,8 @@
+@use "./Variables.scss" as *;
+
 .sign-container {
-    width: 100vw;
-    height: 100vh;
+    min-width: 100%;
+    min-height: 100%;
     background-color: black;
     display: flex;
     flex-direction: column;
@@ -9,7 +11,7 @@
     padding-top: 10em;
     box-sizing: border-box;
     text-align: center;
-    color: #E0E1DD;
+    color: $WhitePalette;
     background: url('../Images-Icons//Backgrounds/background-42.jpg') no-repeat center fixed;
     background-size: cover;
 
@@ -18,14 +20,14 @@
         cursor: pointer;
         width: 10em;
         height: 3em;
-        background-color: #778DA9;
+        background-color: $LightBluePalette;
         border-radius: 5px;
         display: flex;
         align-items: center;
         justify-content: center;
-    }
 
-    a:hover {
-        background-color: #6a83a3;
-    }
+        &:hover {
+            background-color: #6a83a3;
+        }
+    }   
 }
