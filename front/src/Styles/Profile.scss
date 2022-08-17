@@ -1,7 +1,7 @@
 @use "./Variables.scss" as *;
 
 .profile2-container {
-    min-height: 90%;
+    min-height: 90vh;
     background-color: $LightBluePalette;
     font-family: Montserrat;
 
@@ -43,8 +43,8 @@
             }
         }
 
-        .profile-wrapper {
-            // z-index: 1;
+        .card-info {
+            z-index: 0;
             position: absolute;
             bottom: -60px;
             display: flex;
@@ -61,18 +61,7 @@
             }
 
             .player-status {
-                height: 13px;
-                width: 13px;
-                border-radius: 50%;
-                margin: 0 10px 0 20px;
-
-                &-online {
-                    background-color: rgb(15, 187, 15);
-                }
-
-                &-offline {
-                    background-color: rgb(194, 29, 29);
-                }
+                @include player-status;
             }
 
             p {
@@ -88,8 +77,8 @@
 
             .friend-icone {
                 margin-left: 20px;
-                width: 20px;
-                height: 20px;
+                width: 22px;
+                height: 22px;
 
                 &-add {
                     color: white;
@@ -100,20 +89,47 @@
                 }
             }
 
-            .send-message-button {
+            .send-message-icon {
+                height: 22px;
+                width: 22px;
+                margin-left: 10px;
+                svg {
+                    color: white;
+                    height: 22px;
+                    width: 22px;
+                }
+            }
+
+            .fight-button {
                 text-decoration: none;
-                color: white;
-                margin-left: 20px;
-                background-color: $LightDarkPalette;
-                height: 30px;
+                display: flex;
                 align-items: center;
+                justify-content: center;
+                flex-direction: row;
+                gap: 5px;
+                color: $OrangeProfile;
+                margin-left: 20px;
+                min-width: 90px;
+                height: 30px;
+                border-radius: 10px;
+                background-color: $LightDarkPalette;
+                padding: 1em;
+                box-sizing: border-box;
+
+                &:hover {
+                    background-color: $LightDarkPalette;
+                    color: $OrangeProfile;
+                    background-color: $OrangeProfile;
+                    color: $LightDarkPalette;
+                }
             }
         }
     }
 
     .profile-main {
         width: 100%;
-        // z-index: 0;
+        z-index: 1;
+        position: relative;
 
         &-menu {
             display: flex;
@@ -311,9 +327,7 @@
                             }
                         }
                     }
-                }
-
-                
+                }   
             }
         }
     }

@@ -3,8 +3,8 @@
 .header {
     background-color: $DarkPalette;
     min-width: 100%;
-    min-height: 10%;
-    max-height: 10%;
+    min-height: 10vh;
+    max-height: 10vh;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -12,7 +12,7 @@
     box-sizing: border-box;
     color: $WhitePalette;
 
-    a {
+    .header-logo {
         color: $WhitePalette;
         text-decoration: none;
         font-family: Silkscreen;
@@ -25,29 +25,69 @@
         flex-direction: row;
         align-items: center;
 
-        .header-picture {
-            background-color: aqua;
-            margin-right: 10px;
-            height: 3em;
-            width: 3em;
-            border-radius: 50%;
-        }
-
-        p {
-            cursor: pointer;
-            font-size: 20px;
-            margin-right: 30px;
-        }
-
         svg {
             cursor: pointer;
+        }
 
-            &:first-child {
-                margin-right: 30px;
+        .icons-header {
+            margin-right: 15px;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 10px;
+
+            svg {
                 width: 25px;
                 height: 25px;
             }
         }
+
+        .header-profile {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            text-decoration: none;
+            color: $WhitePalette;
+            font-size: 20px;
+            margin-right: 30px;
+            .header-picture {
+                margin-right: 10px;
+                height: 50px;
+                width: 50px;
+                border-radius: 50%;
+            }
+        }
     }
-    
+}
+
+.add-friend-modal {
+    z-index: 100;
+    position: absolute;
+    left:0;
+    right:0;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+    width: 500px;
+    height: 400px;
+    border-radius: 10px;
+    background-color: $LightDarkPalette;
+
+    div {
+        &:first-child {
+            width: 100%;
+            text-align: center;
+            margin-top: 10px;
+            input {
+                all: unset;
+                padding: 8px 20px;
+                margin: 0px auto;
+                border-radius: 7px;
+                text-align: center;
+                cursor: pointer;
+                color: $WhitePalette;
+                background-color: $BlueDarkPalette;
+            }
+        }
+    }
 }

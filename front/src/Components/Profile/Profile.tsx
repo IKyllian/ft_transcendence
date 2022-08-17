@@ -1,12 +1,9 @@
 import React, { useState } from "react";
-import { IconEdit, IconUserX, IconUserPlus, IconMessage } from '@tabler/icons';
 
 import Header from "../Header/Header";
 import StatsInfoItem from "./Items/Stats-Info-Item";
 import RenderProfileBlock from "./Render-Profile-Block";
-
-import ProfilePic from "../../Images-Icons/pp.jpg"
-import { Link } from "react-router-dom";
+import CardInfo from "./Card-Info";
 
 interface profileMenuButtons {
     title: string;
@@ -35,20 +32,11 @@ function Profile2() {
             <div className="profile2-container">
                 <div className="profile-header">
                     <div className='stats-infos'>
-                        <StatsInfoItem label="Parties jouées" value="100" />
+                        <StatsInfoItem label="Games Played" value="100" />
                         <StatsInfoItem label="Win Rate" value="50%" />
                         <StatsInfoItem label="Rank" value="3" />
                     </div>
-                    <div className="profile-wrapper">
-                        <img className='profile-avatar' src={ProfilePic} alt="profil pic" />
-                        <div className="player-status player-status-online"> </div>
-                        <p> Kyllian </p>
-                        <IconEdit />
-                        {/* <IconUserPlus className="friend-icone friend-icone-add" /> */}
-                        {/* <Link className="send-message-button" to="/Profile">
-                            Send Message
-                        </Link> */}
-                    </div>
+                    <CardInfo />
                 </div>
                 <div className="profile-main">
                     <div className="profile-main-menu">

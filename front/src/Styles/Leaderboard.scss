@@ -1,0 +1,62 @@
+@use "./Variables.scss" as *;
+
+.leaderboard-page-container {
+    min-height: 90vh;
+    background-color: $LightBluePalette;
+    padding-top: 5px;
+    box-sizing: border-box;
+    h2 {
+        margin: 0;
+        font-size: 40px;
+        color: $WhitePalette;
+        text-align: center;
+        font-family: Silkscreen;
+    }
+
+    table {
+        border-collapse: collapse;
+        text-align: left;
+        margin: 30px $HeaderMarge;
+        width: 90%;
+        background-color: $DarkPalette;
+
+        thead {
+            th {
+                padding: 25px;
+                color: $WhitePalette;
+                font-size: 14px;
+                font-weight: bold;
+            }
+        }
+
+        tbody {
+            tr {
+                color: $WhitePalette;
+
+                &:hover td {
+                    background-color: #202d45;
+                }
+
+                .leaderboard-status .player-status {
+                    @include player-status;
+                }
+
+                .leaderboard-spec a{
+                    color: $WhitePalette;
+                }
+
+                td {
+                    padding: 15px 25px;
+                    background: $LightDarkPalette;
+                    font-size: 16px;
+                    border-bottom: 5px solid $DarkPalette;
+                    
+                    &:nth-child(2) a {
+                        text-decoration: none;
+                        color: $WhitePalette;
+                    }
+                }
+            }
+        }
+    }
+}
