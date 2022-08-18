@@ -1,0 +1,33 @@
+@use "./Variables.scss" as *;
+
+.sign-container {
+    min-width: 100%;
+    min-height: 100%;
+    background-color: black;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2em;
+    padding-top: 10em;
+    box-sizing: border-box;
+    text-align: center;
+    color: $WhitePalette;
+    background: url('../Images-Icons//Backgrounds/background-42.jpg') no-repeat center fixed;
+    background-size: cover;
+
+    a {
+        all: unset;
+        cursor: pointer;
+        width: 10em;
+        height: 3em;
+        background-color: $LightBluePalette;
+        border-radius: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        &:hover {
+            background-color: #6a83a3;
+        }
+    }   
+}
