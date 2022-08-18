@@ -1,6 +1,6 @@
 @use "./Variables.scss" as *;
 
-.profile2-container {
+.profile-container {
     min-height: 90vh;
     background-color: $LightBluePalette;
     font-family: Montserrat;
@@ -14,6 +14,7 @@
 
         .stats-infos {
             height: 90%;
+            // @include flex-row(center, center, wrap);
             display: flex;
             flex-direction: row;
             flex-wrap: wrap;
@@ -54,10 +55,7 @@
             color: $WhitePalette;
 
             .profile-avatar {
-                width: 10em;
-                height: 10em;
-                border-radius: 50%;
-                background-color: red;
+                @include avatar-player(10em);
             }
 
             .player-status {
@@ -196,12 +194,8 @@
                     cursor: pointer;
                 }
         
-                .avatar-player {
-                    min-height: 40px;
-                    min-width: 40px;
-                    max-height: 40px;
-                    max-width: 40px;
-                    border-radius: 50%;
+                .avatar-player {  
+                    @include avatar-player(40px);
                 }
             }
         }
@@ -278,12 +272,8 @@
                     gap: 5px;
                     margin-left: 10px;
 
-                    .friend-avatar {
-                        min-height: 40px;
-                        min-width: 40px;
-                        max-height: 40px;
-                        max-width: 40px;
-                        border-radius: 50%;
+                    .friend-avatar {   
+                        @include avatar-player(40px);
                     }
 
                     p {

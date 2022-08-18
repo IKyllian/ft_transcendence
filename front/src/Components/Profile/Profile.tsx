@@ -10,8 +10,8 @@ interface profileMenuButtons {
     isActive: string;
 }
 
-function Profile2() {
-
+function Profile(props: any) {
+    const {modalIsOpen, blurClass} = props
     const [attributes, setAttributes] = useState<profileMenuButtons[]>([
         { title: "Achievements", isActive: "true" },
         { title: "Matches", isActive: "false" },
@@ -28,8 +28,8 @@ function Profile2() {
 
     return (
         <>
-            <Header />
-            <div className="profile2-container">
+            <Header modalIsOpen={modalIsOpen} blurClass={blurClass} />
+            <div className={`profile-container ${blurClass}`}>
                 <div className="profile-header">
                     <div className='stats-infos'>
                         <StatsInfoItem label="Games Played" value="100" />
@@ -53,4 +53,4 @@ function Profile2() {
     );
 }
 
-export default Profile2;
+export default Profile;

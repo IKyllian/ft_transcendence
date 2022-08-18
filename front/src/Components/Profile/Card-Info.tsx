@@ -6,7 +6,7 @@ import ProfilePic from "../../Images-Icons/pp.jpg"
 import { Link } from "react-router-dom";
 
 function CardInfo() {
-    const isConnectedUser: boolean = false;
+    const isConnectedUser: boolean = true;
     return (
         <div className="card-info">
             <img className='profile-avatar' src={ProfilePic} alt="profil pic" />

@@ -7,16 +7,18 @@ import { Link } from 'react-router-dom';
 
 import AddFriendModal from '../Add-Friend-Modal';
 
-function Header() {
+function Header(props: any) {
+    const {modalIsOpen, blurClass} = props;
     return (
         <>
-            <header className='header'>
+            <header className={`header ${blurClass}`} >
+            {/* <header className="header" > */}
                 <Link className='header-logo' to="/home">
                     pong
                 </Link>
                 <div className='header-right'>
                     <div className='icons-header'>
-                        <IconUserPlus />
+                        <IconUserPlus onClick={() => modalIsOpen(true)} />
                         <IconMessages />
                     </div>
                     <Link className='header-profile' to="/profile">
@@ -26,7 +28,6 @@ function Header() {
                     <IconLogout />
                 </div>
             </header>
-            {/* <AddFriendModal /> */}
         </>
     );
 }

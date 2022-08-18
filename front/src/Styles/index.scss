@@ -3,6 +3,7 @@
 @use "./Sign.scss";
 @use "./Profile.scss";
 @use "./Leaderboard.scss";
+@use "./Add-Friend-Modal.scss";
 
 body {
   margin: 0;
@@ -19,4 +20,8 @@ html, body, #root{
   border: 0;
   height: 100%;
   width: 100%;
+}
+
+.blur-background {
+  filter: blur(5px);
 }

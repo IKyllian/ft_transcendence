@@ -58,11 +58,12 @@ const leaderboardDatas: leaderboardInterface[] = [
     },
 ]
 
-function Leaderboard() {
+function Leaderboard(props: any) {
+    const {modalIsOpen, blurClass} = props
     return(
         <>
-            <Header />
-            <div className="leaderboard-page-container">
+            <Header modalIsOpen={modalIsOpen} blurClass={blurClass} />
+            <div className={`leaderboard-page-container ${blurClass}`}>
                 <h2> Leaderboard </h2>
                 <table> 
                     <thead>

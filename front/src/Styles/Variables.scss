@@ -25,6 +25,24 @@ $ProfileBlockMarge: 30px $HeaderMarge;
     }
 }
 
+@mixin avatar-player($size) {
+    height: $size;
+    width: $size;
+    border-radius: 50%;
+}
+
+// @mixin flex-row($align-items, $justify-content, $wrap) {
+//     display: flex;
+//     flex-direction: row;
+//     justify-content: $justify-content;
+
+//     @if $align-items != "none" {
+//         align-items: $align-items;
+//     }
+
+//     flex-wrap: $wrap;
+// }
+
 @font-face {
     font-family: Montserrat;
     src: url("../../public/Font/Montserrat/static/Montserrat-Regular.ttf");
