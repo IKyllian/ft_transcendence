@@ -167,26 +167,35 @@
                 height: 50px;
                 background-color: $LightDarkPalette;
                 border-radius: 10px;
+
+                .player-container {
+                    display: flex;
+                    flex-direction: row;
+                    align-items: center;
+                    gap: 10px;
+                    width: 100px;
+                }
         
                 .history-score {
                     font-size: 35px;
                     margin: 0 15px;
                     display: flex;
                     align-items: center;
-        
-                    span:first-child {
+
+                    .higher-score {
                         color: $OrangeProfile;
+                    }
+
+                    span:not(span:nth-child(2)) {
                         font-weight: bolder;
+                        width: 40px;
+                        text-align: center;
                     }
         
                     span:nth-child(2) {
                         font-size: 18px;
                         margin: 5px 10px 0 10px;
                         font-weight: 500;
-                    }
-        
-                    span:last-child {
-                        font-weight: bolder;
                     }
                 }
 
