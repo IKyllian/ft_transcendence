@@ -20,14 +20,15 @@ function Header() {
     return (
         <>
             <header className={`header ${modalStatus.isOpen ? modalStatus.blurClass: ""}`} >
-            {/* <header className="header" > */}
                 <Link className='header-logo' to="/home">
                     pong
                 </Link>
                 <div className='header-right'>
                     <div className='icons-header'>
                         <IconUserPlus onClick={() => handleModalClick()} />
-                        <IconMessages />
+                        <Link to="/chat">
+                            <IconMessages />
+                        </Link>
                     </div>
                     <Link className='header-profile' to="/profile">
                         <img className='header-picture' src={ProfilPic} alt="profil pic" />

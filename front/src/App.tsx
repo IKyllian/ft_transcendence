@@ -6,6 +6,7 @@ import Sign from './Components/Sign';
 import Profile from './Components/Profile/Profile';
 import Leaderboard from './Components/Leaderboard/Leaderboard';
 import AddFriendModal from './Components/Add-Friend-Modal';
+import Chat from './Components/Chat/Chat';
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
           <Route path='/home' element={ <Home /> }/>
           <Route path='/profile' element={ <Profile /> }/>
           <Route path='/leaderboard' element={ <Leaderboard /> }/>
+          <Route path='/chat' element={<Chat />} />
         </Routes>
       </BrowserRouter>
     </>

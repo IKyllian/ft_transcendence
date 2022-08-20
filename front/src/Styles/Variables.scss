@@ -31,6 +31,12 @@ $ProfileBlockMarge: 30px $HeaderMarge;
     border-radius: 50%;
 }
 
+@mixin flex-row-alignCenter {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
 // @mixin flex-row($align-items, $justify-content, $wrap) {
 //     display: flex;
 //     flex-direction: row;
