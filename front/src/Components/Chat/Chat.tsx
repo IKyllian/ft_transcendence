@@ -1,5 +1,5 @@
 import React from "react"
-import {IconSend} from "@tabler/icons";
+import { IconSend, IconSettings } from "@tabler/icons";
 
 import Header from "../Header/Header";
 import Sidebar from "./Sidebar";
@@ -15,6 +15,7 @@ function Chat() {
                     <div className="message-wrapper">
                         <div className="message-header">
                             <p> # Géneral </p>
+                            <IconSettings />
                         </div>
                         <div className="ul-container">
                             <ul>
