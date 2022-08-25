@@ -31,23 +31,35 @@ $ProfileBlockMarge: 30px $HeaderMarge;
     border-radius: 50%;
 }
 
+@mixin modal-container($height, $width, $bgColor) {
+    z-index: 100;
+    height: $height;
+    width: $width;
+    position: absolute;
+    left:0;
+    right:0;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+    border-radius: 10px;
+    background-color: $bgColor;
+
+    .modal-exit {
+        position: absolute;
+        right: 0;
+        top: -55px;
+        width: 40px;
+        height: 40px;
+        color: $WhitePalette;
+        cursor: pointer;
+    }
+}
+
 @mixin flex-row-alignCenter {
     display: flex;
     flex-direction: row;
     align-items: center;
 }
-
-// @mixin flex-row($align-items, $justify-content, $wrap) {
-//     display: flex;
-//     flex-direction: row;
-//     justify-content: $justify-content;
-
-//     @if $align-items != "none" {
-//         align-items: $align-items;
-//     }
-
-//     flex-wrap: $wrap;
-// }
 
 @font-face {
     font-family: Montserrat;

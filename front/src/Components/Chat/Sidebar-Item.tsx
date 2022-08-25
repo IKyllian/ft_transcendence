@@ -1,11 +1,22 @@
-import React, { useState } from "react";
+import { useState } from "react";
 
 import {IconChevronDown, IconPlus, IconChevronRight} from "@tabler/icons";
+import { ChannelInterface, PrivateMessageInterface } from "../../Interfaces/Datas-Examples"
 
-function SidebarItem(props: any) {
+import { Link } from "react-router-dom"
+
+interface SidebarItemProps {
+    title: string,
+    datasArray: ChannelInterface[] | PrivateMessageInterface[],
+    setShowChannelModal: Function,
+    showModal: boolean,
+    setChatItem: Function,
+}
+
+function SidebarItem(props: SidebarItemProps) {
     const [sidebarOpen, setSidebarOpen] = useState<boolean>(true);
 
-    const {title} = props;
+    const {title, datasArray, setShowChannelModal, showModal, setChatItem} = props;
 
     const handleClick = () => {
         if (sidebarOpen)
@@ -13,8 +24,16 @@ function SidebarItem(props: any) {
         else
             setSidebarOpen(true);
     }
+
+    const modalStatus = () => {
+        if (showModal)
+            setShowChannelModal(false);
+        else
+            setShowChannelModal(true);
+    }
+
     return (
-        <li className="ul-wrapper-elem-1">
+        <li className="ul-wrapper-elem">
             <div className="collapse-button">
                 <div className="collapse-button-name">
                     {
@@ -22,16 +41,34 @@ function SidebarItem(props: any) {
                     }
                     <p> {title} </p>
                 </div>
-                <IconPlus className="plus-icon" />
+                <IconPlus className="plus-icon" onClick={modalStatus} />
             </div>
             {
-                sidebarOpen &&
-                <ul className="ul-collapse">
-                    <li> # Général </li>
-                    <li> # Conv 1 </li>
-                    <li> # Random </li>
+               sidebarOpen && 
+               <ul className="ul-collapse">
+                    {
+                        datasArray.map((elem, index) => {
+                            if ("channelName" in elem) {
+                                return (
+                                    <li key={index} onClick={() => setChatItem(elem)}>
+                                        <Link to={`/chat/${index}`}>
+                                            # {elem.channelName}
+                                        </Link>
+                                    </li>
+                                );
+                            } else {
+                                return (
+                                    <li key={index} onClick={() => setChatItem(elem)}>
+                                        <Link to={`/chat/${index}`}>
+                                            {elem.user.name}
+                                        </Link>
+                                    </li>
+                                );
+                            }
+                        })
+                    }
                 </ul>
-            }
+            } 
         </li>
     );
 }

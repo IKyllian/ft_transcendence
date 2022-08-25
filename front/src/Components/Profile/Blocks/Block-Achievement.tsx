@@ -1,5 +1,3 @@
-import React from "react";
-
 import AchievementItem from "../Items/Achievement-Item";
 
 function BlockAchievement() {

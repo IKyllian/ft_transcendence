@@ -1,7 +1,6 @@
-import React from 'react'
 import { Link } from 'react-router-dom';
 
-function HomeButton(props: any) {
+function HomeButton(props: {text: string, link: string}) {
     const {text, link} = props;
     
     return (

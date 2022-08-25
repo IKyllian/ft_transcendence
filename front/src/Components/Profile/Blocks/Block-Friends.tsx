@@ -1,4 +1,3 @@
-import React from "react";
 import { friendsDatas } from "../../../Interfaces/Datas-Examples"
 
 import FriendItem from "../Items/Friend-Item";

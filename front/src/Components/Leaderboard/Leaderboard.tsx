@@ -1,4 +1,3 @@
-import React from "react";
 import { RootState } from '../../Redux/Store'
 import { useAppSelector } from '../../Redux/Hooks'
 import { ModalState } from "../../Interfaces/Interface-Modal";
@@ -27,7 +26,7 @@ function Leaderboard() {
                     </thead>
                     <tbody>
                         {
-                            leaderboardDatas.map((elem, index) =>   
+                            leaderboardDatas.sort((a, b) => { return b.points - a.points; }).map((elem, index) =>   
                                 <LeaderboardItem
                                     key={index}
                                     pos={index + 1}

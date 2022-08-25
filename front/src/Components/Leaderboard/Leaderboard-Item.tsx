@@ -1,8 +1,17 @@
-import React from "react";
 import { Link } from "react-router-dom";
 import { IconEye } from "@tabler/icons";
 
-function LeaderboardItem(props: any) {
+interface LeaderboardItemProps {
+    pos: number,
+    name: string,
+    gamesPlayed: number,
+    winRate: number,
+    points: number,
+    isOnline: boolean,
+    isInGame: boolean
+}
+
+function LeaderboardItem(props: LeaderboardItemProps) {
     const { pos, name, gamesPlayed, winRate, points, isOnline, isInGame } = props;
 
     return (

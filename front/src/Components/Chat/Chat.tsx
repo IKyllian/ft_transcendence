@@ -1,44 +1,22 @@
-import React from "react"
-import { IconSend, IconSettings } from "@tabler/icons";
+import { useState } from "react";
 
 import Header from "../Header/Header";
 import Sidebar from "./Sidebar";
-import MessageItem from "./Message-Item";
+import AddChannelModal from "./Add-Channel-Modal";
+import ChatElement from "./Chat-Element";
+import { ChannelInterface, PrivateMessageInterface } from "../../Interfaces/Datas-Examples";
+
 
 function Chat() {
+    const [showChannelModal, setShowChannelModal] = useState<boolean>(false);
+    const [chatItem, setChatItem] = useState<ChannelInterface | PrivateMessageInterface | undefined>(undefined);
     return (
         <>
+            <AddChannelModal setShowModal={setShowChannelModal} show={showChannelModal} />
             <Header />
             <div className="chat-page-container">
-                <Sidebar />
-                <div className="message-container">
-                    <div className="message-wrapper">
-                        <div className="message-header">
-                            <p> # Géneral </p>
-                            <IconSettings />
-                        </div>
-                        <div className="ul-container">
-                            <ul>
-                                <MessageItem userIsSender={false} />
-                                <MessageItem userIsSender={true} />
-                                <MessageItem userIsSender={false} />
-                                <MessageItem userIsSender={true} />
-                                <MessageItem userIsSender={false} />
-                                <MessageItem userIsSender={true} />
-                                {/* <MessageItem userIsSender={false} />
-                                <MessageItem userIsSender={true} />
-                                <MessageItem userIsSender={false} />
-                                <MessageItem userIsSender={true} />
-                                <MessageItem userIsSender={false} />
-                                <MessageItem userIsSender={true} /> */}
-                            </ul>
-                        </div>
-                    </div>
-                    <div className="message-input-container">
-                        <input type="text" placeholder="Type Your Message..." />
-                        <IconSend />
-                    </div>
-                </div>
+                <Sidebar setShowChannelModal={setShowChannelModal} showModal={showChannelModal} setChatItem={setChatItem} />
+                <ChatElement chatItem={chatItem} />
             </div>
         </>
     );

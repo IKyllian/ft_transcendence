@@ -1,4 +1,3 @@
-import React from "react";
 import {matchHistory} from "../../../Interfaces/Datas-Examples"
 
 import MatchHistoryItem from "../Items/Match-History-Item";

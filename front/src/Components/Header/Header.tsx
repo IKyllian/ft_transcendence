@@ -1,4 +1,3 @@
-import React from 'react'
 import { RootState } from '../../Redux/Store'
 import { useAppSelector, useAppDispatch } from '../../Redux/Hooks'
 import { ModalState } from "../../Interfaces/Interface-Modal";

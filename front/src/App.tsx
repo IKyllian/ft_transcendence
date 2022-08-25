@@ -18,7 +18,9 @@ function App() {
           <Route path='/home' element={ <Home /> }/>
           <Route path='/profile' element={ <Profile /> }/>
           <Route path='/leaderboard' element={ <Leaderboard /> }/>
-          <Route path='/chat' element={<Chat />} />
+          <Route path='/chat' element={<Chat />}>
+            <Route path=":chatId" element={<Chat />}/>
+          </Route>
         </Routes>
       </BrowserRouter>
     </>

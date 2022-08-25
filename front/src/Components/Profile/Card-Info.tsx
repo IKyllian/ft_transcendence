@@ -1,5 +1,3 @@
-import React from "react";
-
 import { IconEdit, IconUserPlus, IconMessage } from '@tabler/icons';
 
 import ProfilePic from "../../Images-Icons/pp.jpg"

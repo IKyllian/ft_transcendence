@@ -1,5 +1,3 @@
-import React from "react";
-
 import { IconMilitaryAward } from '@tabler/icons';
 
 function AchievementItem() {

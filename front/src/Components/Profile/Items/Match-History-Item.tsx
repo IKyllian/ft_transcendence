@@ -1,14 +1,20 @@
-import React from "react";
-
 import ProfilPic from "../../../Images-Icons/pp.jpg"
+import { ExampleUser } from "../../../Interfaces/Interface-User";
 
-function MatchHistoryItem(props: any) {
+interface historyItemProps {
+    player: ExampleUser,
+    enemyPlayer: ExampleUser,
+    playerScore: number,
+    enemyScore: number,
+}
+
+function MatchHistoryItem(props: historyItemProps) {
     const {player, enemyPlayer, playerScore, enemyScore} = props;
 
     return (
         <div className="history-item">
             <div className="player-container">
-                <p> {player} </p>
+                <p> {player.name } </p>
                 <img className='avatar-player' src={ProfilPic} alt="profil pic" />
             </div>
             <p className="history-score">
@@ -18,7 +24,7 @@ function MatchHistoryItem(props: any) {
             </p>
             <div className="player-container">
                 <img className='avatar-player' src={ProfilPic} alt="profil pic" />
-                <p> {enemyPlayer} </p>
+                <p> {enemyPlayer.name} </p>
             </div>
             
         </div>

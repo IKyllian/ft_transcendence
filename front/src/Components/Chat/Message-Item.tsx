@@ -1,19 +1,19 @@
-import React from "react";
 import { Link } from "react-router-dom";
 import ProfilPic from "../../Images-Icons/pp.jpg"; 
 
-function MessageItem(props: any) {
-    const {userIsSender} = props;
+import {ExampleUser} from "../../Interfaces/Interface-User";
+
+function MessageItem(props: {sender: ExampleUser, message: string}) {
+    const {sender, message} = props;
     return (
-        <li className={`message-item message-item-${userIsSender ? "right" : "left"}`}> 
-            { !userIsSender && <img src={ProfilPic} alt="profil pic" /> }
+        <li className={`message-item message-item-${sender.name === "Kyllian" ? "right" : "left"}`}> 
+            { sender.name !== "Kyllian" && <img src={ProfilPic} alt="profil pic" /> }
             <div className="message-item-info">
-                <p className="message-text"> Ceci est un message </p>
+                <p className="message-text"> { message } </p>
                 {
-                    !userIsSender && <Link to="/profile" className="message-sender"> Johan </Link>
+                    sender.name !== "Kyllian" && <Link to="/profile" className="message-sender"> { sender.name } </Link>
                 }
             </div>
-            
         </li>
     );
 }
