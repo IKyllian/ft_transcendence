@@ -1,14 +1,14 @@
 import commonjs from 'rollup-plugin-commonjs';
 import resolve from 'rollup-plugin-node-resolve';
 import replace from '@rollup/plugin-replace';
-import { uglify } from 'rollup-plugin-uglify';
+//import { uglify } from 'rollup-plugin-uglify';
 import typescript from 'rollup-plugin-typescript2';
 
 export default {
 
     //  Our games entry point (edit as required)
     input: [
-        './src/game.ts'
+        './src/mygame.ts'
     ],
 
     //  Where the build file is to be generated.
@@ -16,7 +16,7 @@ export default {
     //  You can also use 'umd' if you need to ingest your game into another system.
     //  The 'intro' property can be removed if using Phaser 3.21 or above. Keep it for earlier versions.
     output: {
-        file: './dist/game.js',
+        file: './dist/mygame.js',
         name: 'MyGame',
         format: 'iife',
         sourcemap: false,
@@ -57,9 +57,9 @@ export default {
         typescript(),
 
         //  See https://www.npmjs.com/package/rollup-plugin-uglify for config options
-        uglify({
-            mangle: false
-        })
+        // uglify({
+        //     mangle: false
+        // })
 
     ]
 };
