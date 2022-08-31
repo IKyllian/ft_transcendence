@@ -82,7 +82,20 @@
                 box-sizing: border-box;
                 padding-right: 20px;
 
-                p {
+                &-user-info {
+                    display: flex;
+                    flex-direction: row;
+                    align-items: center;
+                    .profile-avatar {
+                        @include avatar-player(10em);
+                    }
+        
+                    .player-status {
+                        @include player-status;
+                    }
+                }
+
+                .chan-name {
                     margin-left: 20px;
                 }
 

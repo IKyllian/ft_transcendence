@@ -1,22 +1,23 @@
 import { useState } from "react";
 
-import {IconChevronDown, IconPlus, IconChevronRight} from "@tabler/icons";
+import { IconChevronDown, IconPlus, IconChevronRight } from "@tabler/icons";
 import { ChannelInterface, PrivateMessageInterface } from "../../Interfaces/Datas-Examples"
 
 import { Link } from "react-router-dom"
 
 interface SidebarItemProps {
+    index: number,
     title: string,
     datasArray: ChannelInterface[] | PrivateMessageInterface[],
-    setShowChannelModal: Function,
-    showModal: boolean,
+    setShowModal: Function,
+    showModal: number,
     setChatItem: Function,
 }
 
 function SidebarItem(props: SidebarItemProps) {
     const [sidebarOpen, setSidebarOpen] = useState<boolean>(true);
 
-    const {title, datasArray, setShowChannelModal, showModal, setChatItem} = props;
+    const {index, title, datasArray, setShowModal, showModal, setChatItem} = props;
 
     const handleClick = () => {
         if (sidebarOpen)
@@ -26,10 +27,10 @@ function SidebarItem(props: SidebarItemProps) {
     }
 
     const modalStatus = () => {
-        if (showModal)
-            setShowChannelModal(false);
+        if (showModal > 0)
+            setShowModal(0);
         else
-            setShowChannelModal(true);
+            setShowModal(index === 0 ? 1 : 2);
     }
 
     return (

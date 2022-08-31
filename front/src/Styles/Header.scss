@@ -11,6 +11,7 @@
     padding: 0 $HeaderMarge;
     box-sizing: border-box;
     color: $WhitePalette;
+    font-family: Montserrat;
 
     .header-logo {
         color: $WhitePalette;
@@ -58,4 +59,62 @@
             }
         }
     }
+
+    .header-right-responsive {
+        display: none;
+         .header-picture {
+             @include avatar-player(40px);
+         }
+
+         .responsive-menu-drawer {
+             background-color: $DarkPalette;
+             z-index: 99;
+             position: absolute;
+             top: 45px;
+             border: 0.5px solid $WhitePalette;
+             ul {
+                 list-style-type: none;
+                 margin: 0;
+                 padding: 10px 20px;
+
+                 li {
+                    cursor: pointer;
+                     &:not(&:first-child) {
+                         margin-top: 7px;
+                     }
+                     a {
+                         text-decoration: none;
+                         color: $WhitePalette;
+                     }
+                 }
+             }
+         }
+     }
 }
+
+@media screen and (max-width: 700px) {
+    .header {
+        .header-right {
+            display: none;
+        }
+        .header-right-responsive {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            position: relative;
+            gap: 3px;
+        }
+    }
+}
+
+@media screen and (max-width: 500px) {
+    .header {
+        padding: 0 $HeaderResponsiveMarge;
+        .header-right-responsive { 
+            .responsive-menu-drawer {
+                right: 0;
+            }
+        }
+    }
+}
+

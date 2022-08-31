@@ -2,25 +2,23 @@ import { useState } from "react";
 
 import Header from "../Header/Header";
 import Sidebar from "./Sidebar";
-import AddChannelModal from "./Add-Channel-Modal";
+import ChatModal from "./Chat-Modal";
 import ChatElement from "./Chat-Element";
 import { ChannelInterface, PrivateMessageInterface } from "../../Interfaces/Datas-Examples";
 
-
 function Chat() {
-    const [showChannelModal, setShowChannelModal] = useState<boolean>(false);
+    const [showModal, setShowModal] = useState<number>(0);
     const [chatItem, setChatItem] = useState<ChannelInterface | PrivateMessageInterface | undefined>(undefined);
     return (
         <>
-            <AddChannelModal setShowModal={setShowChannelModal} show={showChannelModal} />
+            <ChatModal setShowModal={setShowModal} showModal={showModal} />
             <Header />
             <div className="chat-page-container">
-                <Sidebar setShowChannelModal={setShowChannelModal} showModal={showChannelModal} setChatItem={setChatItem} />
+                <Sidebar setShowModal={setShowModal} showModal={showModal} setChatItem={setChatItem} />
                 <ChatElement chatItem={chatItem} />
             </div>
         </>
     );
 }
-
 
 export default Chat;

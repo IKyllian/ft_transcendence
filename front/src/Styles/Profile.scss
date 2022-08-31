@@ -1,5 +1,8 @@
 @use "./Variables.scss" as *;
 
+$FontSizeText: 20px;
+$FontSizeTextResponsive: 15px;
+
 .profile-container {
     min-height: 90vh;
     background-color: $LightBluePalette;
@@ -14,7 +17,6 @@
 
         .stats-infos {
             height: 90%;
-            // @include flex-row(center, center, wrap);
             display: flex;
             flex-direction: row;
             flex-wrap: wrap;
@@ -38,7 +40,6 @@
         
                     &:last-child {
                         font-size: 25px;
-
                     }
                 }
             }
@@ -51,11 +52,11 @@
             display: flex;
             flex-direction: row;
             align-items: center;
-            margin-left: 150px;
+            margin-left: $HeaderMarge;
             color: $WhitePalette;
 
             .profile-avatar {
-                @include avatar-player(10em);
+                @include avatar-player(160px);
             }
 
             .player-status {
@@ -63,7 +64,7 @@
             }
 
             p {
-                font-size: 20px;
+                font-size: $FontSizeText;
             }
 
             svg {
@@ -125,9 +126,9 @@
     }
 
     .profile-main {
-        width: 100%;
         z-index: 1;
         position: relative;
+        margin-left: $HeaderMarge + 160px;
 
         &-menu {
             display: flex;
@@ -135,9 +136,10 @@
             gap: 5em;
             justify-content: center;
             color: $WhitePalette;
+            width: 100%;
 
             p {
-                font-size: 20px;
+                font-size: $FontSizeText;
                 font-weight: bold;
                 text-transform: uppercase;
                 cursor: pointer;
@@ -154,7 +156,7 @@
             display: flex;
             flex-direction: column;
             gap: 10px;
-            margin: $ProfileBlockMarge;
+            margin: 30px 10px;
             color: $WhitePalette;
         
             .history-item {
@@ -209,8 +211,8 @@
             }
         }
 
-        .achievement-list{
-            margin: $ProfileBlockMarge;
+        .achievement-list {
+            margin-top: 30px;
             display: flex;
             flex-direction: row;
             flex-wrap: wrap;
@@ -244,7 +246,7 @@
                     p:first-child {
                         margin-top: 1em;
                         font-weight: bold;
-                        font-size: 20px;
+                        font-size: $FontSizeText;
                         color: $OrangeProfile;
                     }
 
@@ -257,7 +259,7 @@
         }
 
         .friends-list {
-            margin: $ProfileBlockMarge;
+            margin-top: 30px;
             display: flex;
             flex-direction: row;
             flex-wrap: wrap;
@@ -328,6 +330,94 @@
                     }
                 }   
             }
+        }
+    }
+}
+
+
+@media screen and (max-width: 855px) {
+    .profile-container {
+        .profile-header {
+            .stats-infos {
+                .stat-elem {
+                    p {
+                        &:first-child {
+                            font-size: 25px;
+                        }
+                        &:last-child {
+                            font-size: 20px;
+                        }
+                    }
+                }
+            }
+            
+            .card-info {
+                margin-left: $HeaderResponsiveMarge;
+                bottom: -30px;
+                .profile-avatar {
+                    @include avatar-player(100px);
+                }
+
+                p {
+                    font-size: $FontSizeTextResponsive;
+                }
+            }
+        }
+
+        .profile-main {
+            margin-left: 0;
+
+            &-menu {
+                gap: 3em;
+                p {
+                    font-size: $FontSizeTextResponsive;
+                }
+            }
+
+            .achievement-list {
+                margin-left: $HeaderResponsiveMarge;
+                justify-content: center;
+                .achievement-item {
+                    width: 200px;
+                    height: 80px;
+                    svg {
+                        min-width: 30%;
+                        max-width: 30%;
+                        height: 100%;
+                        color: rgb(211, 210, 210);
+                    }
+
+                    &-content {
+                        margin-right: 0;
+                        margin-left: 3px;
+                    }
+
+                    p:first-child {
+                        font-size: $FontSizeTextResponsive;
+                    }
+
+                    p:last-child {
+                        font-size: 11px;
+                    }
+                }
+            }
+
+            .friends-list {
+                justify-content: center;
+
+                .friend-item {
+                    width: 200px;
+                    height: 70px;
+                }
+            }
+        }
+    }
+}
+
+@media screen and (max-width: 575px) {
+    .profile-container {
+        .profile-main {
+            margin-top: 20px;
         }
     }
 }

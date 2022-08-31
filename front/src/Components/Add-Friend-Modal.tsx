@@ -3,7 +3,7 @@ import { IconX } from "@tabler/icons";
 import { RootState } from '../Redux/Store'
 import { useAppDispatch, useAppSelector } from '../Redux/Hooks'
 import { ModalState } from "../Interfaces/Interface-Modal";
-import SearchPlayerInput from "./SearchPlayerInput";
+import SearchBarPlayers from "./SearchBarPlayers";
 
 function AddFriendModal() {
     const modalStatus: ModalState =  useAppSelector((state: RootState) => state.modal);
@@ -21,7 +21,7 @@ function AddFriendModal() {
                 <div className="modal-wrapper-container">
                     <div className="add-friend-modal-wrapper">
                         <IconX className="modal-exit" onClick={() => exitModal()} />
-                        <SearchPlayerInput />
+                        <SearchBarPlayers functionality="addFriend" />
                     </div>
                 </div>
             </>

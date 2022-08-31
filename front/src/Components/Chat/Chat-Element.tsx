@@ -18,8 +18,11 @@ function ChatElement(props: {chatItem: ChannelInterface | PrivateMessageInterfac
                     <div className="message-header">
                         {
                             "channelName" in chatItem
-                            ? <p> # {chatItem.channelName} </p>
-                            : <p> {chatItem.user.name} </p>
+                            ? <p className="chan-name"> # {chatItem.channelName} </p>
+                            : 
+                            <div className="message-header-user-info">
+                                <div className="player-status player-status-online"> </div>  <p> {chatItem.user.name} </p>
+                            </div>
                         }
                         <IconSettings />
                     </div>

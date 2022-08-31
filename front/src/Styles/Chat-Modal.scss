@@ -1,9 +1,16 @@
 @use './Variables.scss' as *;
 
-.add-channel-modal {
+.chat-modal {
     @include modal-container(550px, 550px, $DarkPalette); // Params => Height, Width, Background-color
     padding: 10px;
     box-sizing: border-box;
+
+    .search-player-container {
+        .modal-player-list {
+            height: 85%;
+        }
+    }
+
     form {
         color: $WhitePalette;
         display: flex;
@@ -29,7 +36,7 @@
             }
         }
 
-        .add-channel-modal-buttons {
+        .chat-modal-buttons {
             position: absolute;
             width: 100%;
             display: flex;

@@ -2,23 +2,25 @@ import { ChannelsDatas, PrivateMessageDatas } from "../../Interfaces/Datas-Examp
 
 import SidebarItem from "./Sidebar-Item";
 
-function Sidebar(props: {setShowChannelModal: Function, showModal: boolean, setChatItem: Function}) {
-    const {setShowChannelModal, showModal, setChatItem} = props;
+function Sidebar(props: {setShowModal: Function, showModal: number, setChatItem: Function}) {
+    const {setShowModal, showModal, setChatItem} = props;
  
     return (
         <div className="chat-sidebar">
             <ul className="ul-wrapper">
                 <SidebarItem
+                    index={0}
                     title="Channels"
                     datasArray={ChannelsDatas}
-                    setShowChannelModal={setShowChannelModal}
+                    setShowModal={setShowModal}
                     showModal={showModal}
                     setChatItem={setChatItem}
                 />
                 <SidebarItem
+                    index={1}
                     title="Messages Privées"
                     datasArray={PrivateMessageDatas}
-                    setShowChannelModal={setShowChannelModal}
+                    setShowModal={setShowModal}
                     showModal={showModal}
                     setChatItem={setChatItem}
                 />

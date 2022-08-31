@@ -3,10 +3,13 @@ import {IconSearch} from "@tabler/icons";
 
 import { usersArray } from "../Interfaces/Datas-Examples"
 import { ExampleUser } from "../Interfaces/Interface-User";
+import SearchBarButtons from "./SearchBarButtons";
 
-function SearchPlayerInput() {
+function SearchBarPlayers(props: {functionality: string}) {
     const [inputText, setInputText] = useState<string>("");
     const [arrayResult, setArrayResult] = useState<ExampleUser[]>([]);
+
+    const {functionality} = props;
 
     const handleChange = (e: any) => {
         setInputText(e.target.value);
@@ -37,7 +40,7 @@ function SearchPlayerInput() {
                                 <img className='modal-picture' src={elem.profilPic} alt="profil pic" />
                                 <p> {elem.name} </p>
                             </div>
-                            <a> Add friend </a>
+                            <SearchBarButtons functionality={functionality} />
                         </div>
                     )
                 }
@@ -46,4 +49,4 @@ function SearchPlayerInput() {
     );
 }
 
-export default SearchPlayerInput;
+export default SearchBarPlayers;
