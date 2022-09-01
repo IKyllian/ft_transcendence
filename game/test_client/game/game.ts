@@ -1,10 +1,7 @@
-//import 'socket.io-client';
-//const { io } = require("socket.io-client");
-//import { io } from "socket.io-client";
-//socket = io('http://localhost:6161');
 
+import { io } from "socket.io-client";
+import 'phaser';
 
-// import 'phaser';
 
 console.log("game.js loaded-")
 
@@ -30,7 +27,7 @@ export default class Pong extends Phaser.Scene
         this.add.image(400, 300, 'black_dot');
         this.add.image(100, 300, 'red_bar');
         this.add.image(700, 300, 'blue_bar');
-       // this.socket = io.connect(6161);
+        this.socket = io.connect('http://localhost:6161');
     }
     
     atchoum()
@@ -48,8 +45,5 @@ const config = {
     scene: Pong
 };
 
-// export class Client
-// {
-//     socket = io.connect();
-// }
+
 const game = new Phaser.Game(config);
