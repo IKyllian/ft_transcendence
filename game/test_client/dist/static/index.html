@@ -6,8 +6,50 @@
   </head>
 
   <body>
+
+
     <div id="game_anchor"></div>
-    <script src="game.js"></script>
+
+
+    <!-- <script src="game.js"></script> -->
+
+    <script src="libpong.js"></script>
+
+    <script>
+
+
+    function whenAvailable(name, callback) {
+        var interval = 10; // ms
+        window.setTimeout(function() {
+            if (window[name]) {
+                console.log(name, 'has finished loading');
+                callback(window[name]);
+            } else {
+                whenAvailable(name, callback);
+            }
+        }, interval);
+    }
+
+    whenAvailable("libpong", function(t) {
+    
+      window.libpong.launch_pong_duel(
+        {
+          name: 'bob',
+          playertype: 0,
+          win: 15,
+          loss: 8
+        });
+        
+    });
+
+
+    </script>
+
+
+
+
+
+
   </body>
 
 </html>

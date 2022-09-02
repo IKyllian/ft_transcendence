@@ -19,10 +19,13 @@ export default class Pong extends Phaser.Scene
 
     create ()
     {
+       // console.log(this.data.get('atchoum'));
+        console.log(this.game.registry.get('atchoum'));
+        console.log(this.game.registry.get('allo'));
         this.add.image(400, 300, 'black_dot');
         this.add.image(100, 300, 'red_bar');
         this.add.image(700, 300, 'blue_bar');
-        this.socket = io.connect('http://localhost:6161');
+      //  this.socket = io.connect('http://localhost:6161');
     }
 
 }

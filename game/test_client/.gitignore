@@ -1,6 +1,12 @@
 # compiled output
 /node_modules
 
+# ignore dist but allow dist/static
+/dist
+!/dist/static/assets/*
+!/dist/static/index.html
+
+
 # Logs
 logs
 *.log
