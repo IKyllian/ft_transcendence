@@ -7,7 +7,11 @@ $WhitePalette: #E0E1DD;
 $OrangeProfile: orange;
 
 $HeaderMarge: 80px;
+$HeaderResponsiveMarge: 10px;
+
 $ProfileBlockMarge: 30px $HeaderMarge;
+
+
 
 
 @mixin player-status {
@@ -31,17 +35,35 @@ $ProfileBlockMarge: 30px $HeaderMarge;
     border-radius: 50%;
 }
 
-// @mixin flex-row($align-items, $justify-content, $wrap) {
-//     display: flex;
-//     flex-direction: row;
-//     justify-content: $justify-content;
+@mixin modal-container($height, $width, $bgColor) {
+    z-index: 100;
+    height: $height;
+    width: $width;
+    position: absolute;
+    left:0;
+    right:0;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+    border-radius: 10px;
+    background-color: $bgColor;
 
-//     @if $align-items != "none" {
-//         align-items: $align-items;
-//     }
+    .modal-exit {
+        position: absolute;
+        right: 0;
+        top: -55px;
+        width: 40px;
+        height: 40px;
+        color: $WhitePalette;
+        cursor: pointer;
+    }
+}
 
-//     flex-wrap: $wrap;
-// }
+@mixin flex-row-alignCenter {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
 
 @font-face {
     font-family: Montserrat;

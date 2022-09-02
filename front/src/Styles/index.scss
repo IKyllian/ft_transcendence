@@ -4,6 +4,10 @@
 @use "./Profile.scss";
 @use "./Leaderboard.scss";
 @use "./Add-Friend-Modal.scss";
+@use "./Chat/Chat.scss";
+@use "./Chat/Chat-Modal.scss";
+@use "./Search-Player.scss";
+@use "./Chat/Channel-Settings.scss";
 
 body {
   margin: 0;

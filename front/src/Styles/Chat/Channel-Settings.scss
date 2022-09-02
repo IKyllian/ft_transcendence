@@ -1,0 +1,88 @@
+@use '../Variables.scss' as *;
+
+.channel-setting-container {
+    display: flex;
+    flex-direction: row;
+    color: $WhitePalette;
+    height: 100vh;
+
+    .sidebar-setting {
+        background-color: $DarkPalette;
+        width: 500px;
+        padding-top: 30px;
+
+        .sidebar-wrapper {
+            width: 50%;
+            float: right;
+            margin-right: 10px;
+
+            p {
+                margin: 0 0 5px 10px;
+                color: rgb(190, 181, 181);
+            }
+
+            ul {
+                list-style-type: none;
+                margin: 0;
+                padding: 0;
+    
+                li {
+                    &:not(&:first-child) {
+                        margin-top: 2px;
+                    }
+                    padding: 10px;
+                    border-radius: 5px;
+                    cursor: pointer;
+
+                    &:hover {
+                        background-color: $LightDarkPalette;
+                    }
+                }
+            }
+    
+            .separate-line {
+                height: 2px;
+                background-color: $LightDarkPalette;
+                margin: 5px 0;
+            }
+    
+            button {
+                all: unset;
+                padding: 10px;
+                box-sizing: border-box;
+                border-radius: 5px;
+                width: 100%;
+                cursor: pointer;
+                color: red;
+
+                &:hover {
+                    background-color: $LightDarkPalette;
+                }
+            }
+        } 
+    }
+
+    .content-setting-container {
+        background-color: $LightDarkPalette;
+        width: 100%;
+        padding-top: 30px;
+
+        .content-wrapper {
+            margin-left: 50px;
+        }
+    }
+
+    .leave-icon {
+        width: 40px;
+        height: 40px;
+        padding: 5px;
+        box-sizing: border-box;
+        color: $WhitePalette;
+        position: absolute;
+        right: 40px;
+        top: 30px;
+        cursor: pointer;
+        border: 2px solid $WhitePalette;
+        border-radius: 50%;
+    }
+}

@@ -1,4 +1,7 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import { RootState } from '../../Redux/Store'
+import { useAppSelector } from '../../Redux/Hooks'
+import { ModalState } from "../../Interfaces/Interface-Modal";
 
 import Header from "../Header/Header";
 import StatsInfoItem from "./Items/Stats-Info-Item";
@@ -10,13 +13,14 @@ interface profileMenuButtons {
     isActive: string;
 }
 
-function Profile(props: any) {
-    const {modalIsOpen, blurClass} = props
+function Profile() {
     const [attributes, setAttributes] = useState<profileMenuButtons[]>([
         { title: "Achievements", isActive: "true" },
         { title: "Matches", isActive: "false" },
         { title: "Friends", isActive: "false" }
     ]);
+
+    const modalStatus: ModalState =  useAppSelector((state: RootState) => state.modal);
     
     const handleClick = (index: number) => {
        let newArray = [...attributes];
@@ -28,8 +32,8 @@ function Profile(props: any) {
 
     return (
         <>
-            <Header modalIsOpen={modalIsOpen} blurClass={blurClass} />
-            <div className={`profile-container ${blurClass}`}>
+            <Header />
+            <div className={`profile-container ${modalStatus.isOpen ? modalStatus.blurClass : ""}`}>
                 <div className="profile-header">
                     <div className='stats-infos'>
                         <StatsInfoItem label="Games Played" value="100" />

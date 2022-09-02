@@ -1,6 +1,6 @@
-import React, {useEffect, useRef} from "react";
+import { useEffect, useRef } from "react";
 
-function FriendListModal(props: any) {
+function FriendListModal(props: {show: boolean, onClickOutside: Function}) {
     const { show, onClickOutside } = props;
 
     const ref = useRef<HTMLHeadingElement>(null);

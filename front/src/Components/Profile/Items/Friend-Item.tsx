@@ -1,10 +1,10 @@
-import React, {useState} from "react";
+import { useState } from "react";
 
 import { IconDotsVertical } from '@tabler/icons';
 
 import FriendListModal from "../Friend-List-Modal";
 
-function FriendItem(props: any) {
+function FriendItem(props: {name: string, profilPic: string}) {
     const {name, profilPic} = props;
 
     const [showModal, setShowModal] = useState<boolean>(false);
