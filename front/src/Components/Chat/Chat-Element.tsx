@@ -1,11 +1,22 @@
-import { IconSend, IconSettings } from "@tabler/icons";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { IconSend } from "@tabler/icons";
+
+import { ChannelInterface, PrivateMessageInterface, ChannelsDatas} from "../../Interfaces/Datas-Examples";
 import MessageItem from "./Message-Item";
-import { ChannelInterface, PrivateMessageInterface } from "../../Interfaces/Datas-Examples";
+import ChatHeader from "./Chat-Header";
 
-function ChatElement(props: {chatItem: ChannelInterface | PrivateMessageInterface | undefined}) {
-    const { chatItem } = props;
+function ChatElement() {
+    const [chatDatas, setChatDatas] = useState<ChannelInterface | PrivateMessageInterface | undefined>(undefined);
+    let params = useParams();
 
-    if (chatItem === undefined) {
+    useEffect(() => {
+        if (params) {
+            setChatDatas(ChannelsDatas.find((elem) => elem.id === parseInt(params.chatId!, 10)));
+        }
+    }, [params])
+
+    if (chatDatas === undefined) {
         return (
             <div className="no-target-message">
                 <p> Sélectionnez un message ou un channel </p>
@@ -15,21 +26,11 @@ function ChatElement(props: {chatItem: ChannelInterface | PrivateMessageInterfac
         return (
             <div className="message-container">
                 <div className="message-wrapper">
-                    <div className="message-header">
-                        {
-                            "channelName" in chatItem
-                            ? <p className="chan-name"> # {chatItem.channelName} </p>
-                            : 
-                            <div className="message-header-user-info">
-                                <div className="player-status player-status-online"> </div>  <p> {chatItem.user.name} </p>
-                            </div>
-                        }
-                        <IconSettings />
-                    </div>
+                   <ChatHeader chatItem={chatDatas} />
                     <div className="ul-container">
                         <ul>
                             {
-                                chatItem.messages.map((elem, index) =>
+                                chatDatas!.messages.map((elem, index) =>
                                     <MessageItem key={index} sender={elem.sender} message={elem.message} />
                                 )
                             }

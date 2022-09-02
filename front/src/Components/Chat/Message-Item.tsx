@@ -6,12 +6,12 @@ import {ExampleUser} from "../../Interfaces/Interface-User";
 function MessageItem(props: {sender: ExampleUser, message: string}) {
     const {sender, message} = props;
     return (
-        <li className={`message-item message-item-${sender.name === "Kyllian" ? "right" : "left"}`}> 
-            { sender.name !== "Kyllian" && <img src={ProfilPic} alt="profil pic" /> }
+        <li className={`message-item message-item-${sender.id === 1 ? "right" : "left"}`}> 
+            { sender.id !== 1 && <img src={ProfilPic} alt="profil pic" /> }
             <div className="message-item-info">
                 <p className="message-text"> { message } </p>
                 {
-                    sender.name !== "Kyllian" && <Link to="/profile" className="message-sender"> { sender.name } </Link>
+                    sender.id !== 1 && <Link to="/profile" className="message-sender"> { sender.name } </Link>
                 }
             </div>
         </li>

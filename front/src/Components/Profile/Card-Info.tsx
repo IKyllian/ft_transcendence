@@ -20,10 +20,10 @@ function CardInfo() {
                     <Link className="fight-button" to="/profile">
                         Défier
                     </Link>
-                     {/* <Link className="fight-button" to="/profile">
+                     <Link className="fight-button" to="/profile">
                         Watch Game
-                        <IconEye />
-                    </Link> */}
+                        {/* <IconEye /> */}
+                    </Link>
                 </>
             }
         </div>

@@ -54,6 +54,7 @@ interface MessageInterface {
 }
 
 export interface ChannelInterface {
+    id: number,
     channelName: string,
     messages: MessageInterface[],
     users: ExampleUser[],
@@ -62,6 +63,7 @@ export interface ChannelInterface {
 }
 
 export interface PrivateMessageInterface {
+    id: number,
     user: ExampleUser,
     messages: MessageInterface[],
 }
@@ -123,11 +125,12 @@ export const friendsDatas: ExampleUser[] = [
     usersArray[10],
 ];
 
-export const ChannelsDatas: ChannelInterface[] = [
+export const ChannelsDatas: (ChannelInterface | PrivateMessageInterface)[] = [
     {
+        id: 1,
         channelName: "Géneral",
         messages: [
-            messageExample1, messageExample2, messageExample3
+            messageExample1, messageExample2, messageExample3, messageExample3, messageExample3, messageExample3, messageExample3, messageExample3, messageExample3, messageExample3, messageExample3, messageExample3
         ],
         users: [
             usersArray[0], usersArray[1], usersArray[2]
@@ -135,6 +138,7 @@ export const ChannelsDatas: ChannelInterface[] = [
         admin: usersArray[0],
         password: null,
     }, {
+        id: 2,
         channelName: "Random",
         messages: [
             messageExample1, messageExample2
@@ -145,6 +149,7 @@ export const ChannelsDatas: ChannelInterface[] = [
         admin: usersArray[0],
         password: null,
     }, {
+        id: 3,
         channelName: "ChanTest",
         messages: [
             messageExample1, messageExample2, messageExample3, messageExample4
@@ -154,21 +159,20 @@ export const ChannelsDatas: ChannelInterface[] = [
         ],
         admin: usersArray[0],
         password: null,
-    }, 
-];
-
-export const PrivateMessageDatas: PrivateMessageInterface[] = [
-    {
+    }, {
+        id: 4,
         user: usersArray[1],
         messages: [
             messageExample1, messageExample2
         ]
     }, {
+        id: 5,
         user: usersArray[3],
         messages: [
             messageExample1, messageExample4
         ]
     }, {
+        id: 6,
         user: usersArray[2],
         messages: [
             messageExample1, messageExample3

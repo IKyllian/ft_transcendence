@@ -1,4 +1,4 @@
-@use './Variables.scss' as *;
+@use '../Variables.scss' as *;
 
 .no-target-message {
     font-size: 30px;
@@ -68,8 +68,10 @@
         position: relative;
         list-style-type: none;
         box-sizing: border-box;
+        max-height: 90vh;
 
         .message-wrapper {
+            height: 90%;
             .message-header {
                 color: $WhitePalette;
                 width: 100%;
@@ -82,36 +84,39 @@
                 box-sizing: border-box;
                 padding-right: 20px;
 
-                &-user-info {
-                    display: flex;
-                    flex-direction: row;
-                    align-items: center;
-                    .profile-avatar {
-                        @include avatar-player(10em);
-                    }
-        
-                    .player-status {
-                        @include player-status;
-                    }
-                }
-
                 .chan-name {
                     margin-left: 20px;
                 }
 
-                svg {
+                a {
                     margin-right: 10px;
+                    color: $WhitePalette;
+                }
+            }
+
+            .header-user-info {
+                color: $WhitePalette;
+                width: 100%;
+                background-color: $LightDarkPalette;
+                height: 50px;
+                border-bottom: 1px solid $WhitePalette;
+                @include flex-row-alignCenter;
+                .profile-avatar {
+                    @include avatar-player(10em);
+                }
+    
+                .player-status {
+                    @include player-status;
                 }
             }
 
             .ul-container {
                 overflow: scroll;
                 padding-right: 20px;
+                height: 90%;
                 ul {
                     .message-item {
-                        display: flex;
-                        flex-direction: row;
-                        align-items: center;
+                        @include flex-row-alignCenter;
                         gap: 15px;
                         color: $WhitePalette;
 
@@ -168,9 +173,7 @@
 
         .message-input-container {
             border-top: 1px solid $WhitePalette;
-            display: flex;
-            flex-direction: row;
-            align-items: center;
+            @include flex-row-alignCenter;
             justify-content: space-between;
             width: 90%;
             margin: 0 auto;

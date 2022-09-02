@@ -1,4 +1,4 @@
-@use './Variables.scss' as *;
+@use '../Variables.scss' as *;
 
 .chat-modal {
     @include modal-container(550px, 550px, $DarkPalette); // Params => Height, Width, Background-color

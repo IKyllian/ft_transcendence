@@ -8,16 +8,15 @@ import { Link } from "react-router-dom"
 interface SidebarItemProps {
     index: number,
     title: string,
-    datasArray: ChannelInterface[] | PrivateMessageInterface[],
+    datasArray: (ChannelInterface | PrivateMessageInterface)[],
     setShowModal: Function,
     showModal: number,
-    setChatItem: Function,
 }
 
 function SidebarItem(props: SidebarItemProps) {
     const [sidebarOpen, setSidebarOpen] = useState<boolean>(true);
 
-    const {index, title, datasArray, setShowModal, showModal, setChatItem} = props;
+    const {index, title, datasArray, setShowModal, showModal} = props;
 
     const handleClick = () => {
         if (sidebarOpen)
@@ -51,16 +50,16 @@ function SidebarItem(props: SidebarItemProps) {
                         datasArray.map((elem, index) => {
                             if ("channelName" in elem) {
                                 return (
-                                    <li key={index} onClick={() => setChatItem(elem)}>
-                                        <Link to={`/chat/${index}`}>
+                                    <li key={index}>
+                                        <Link to={`/chat/${elem.id}`}>
                                             # {elem.channelName}
                                         </Link>
                                     </li>
                                 );
                             } else {
                                 return (
-                                    <li key={index} onClick={() => setChatItem(elem)}>
-                                        <Link to={`/chat/${index}`}>
+                                    <li key={index}>
+                                        <Link to={`/chat/${elem.id}`}>
                                             {elem.user.name}
                                         </Link>
                                     </li>
