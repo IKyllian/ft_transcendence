@@ -2,9 +2,16 @@
 /node_modules
 
 # ignore dist but allow dist/static
-/dist
-!/dist/static/assets/*
-!/dist/static/index.html
+!dist/
+
+dist/*
+!dist/static/
+
+dist/static/*
+!dist/static/assets/
+!dist/static/avatars/
+!dist/static/index.html
+dist/static/libpong.js
 
 
 # Logs

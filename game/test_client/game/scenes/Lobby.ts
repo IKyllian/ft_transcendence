@@ -1,55 +1,86 @@
 import 'phaser';
+import { PlayerType } from '../types';
+import { io, Socket } from "socket.io-client";
 
 export default class Lobby extends Phaser.Scene
 {
-    constructor ()
-    {
-        super('lobby');
-    }
-    preload ()
-    {
+	constructor ()
+	{
+		super({ key: 'Lobby' });
+	}
 
-    }
-
-  //  text_a:any;
+	player: PlayerType;
+	A_isready: boolean;
+	B_isready: boolean;
+	socket: Socket;
+	
+	preload ()
+	{
+	  this.load.image(
+		'player_a_avatar',
+		this.game.registry.get('players_data').player_A.avatar
+	  );
+	  this.load.image(
+		'player_b_avatar',
+		this.game.registry.get('players_data').player_B.avatar
+	  );
+	}
 
 	create ()
-    {
-        // const styles: TextStyle = {
-        //     color: '#000000',
-        //     align: 'center',
-        //     fontSize: 52
-        //   }
-      
-          console.log(this.game.registry.get('allo'));
-          this.game.registry.set('atchoum', 'Reddadasdada Gem Stone');
+	{
+		this.add.image(30, 30, 'player_a_avatar').setOrigin(0).setDisplaySize(200, 200);
+		this.add.image(430, 30, 'player_b_avatar').setOrigin(0).setDisplaySize(200, 200);
+
+		this.player = this.game.registry.get('players_data').playertype;
+
+		if (this.player == PlayerType.Player_A)
+			console.log("you are player A");
+		else if (this.player == PlayerType.Player_B)
+			console.log("you are player B");
+		else
+			console.log("you are spectator");
 
 
-          console.log('in Lobby create');
-          console.log('player.name',this.game.registry.get('player').name);
-          console.log('player.win', this.game.registry.get('player').win);
-          console.log('player.loss', this.game.registry.get('player').loss);
-          console.log('player.playertype', this.game.registry.get('player').playertype);       
+		//this.ready_to_go();
 
+	}
 
-          //this.text_a.push(this.add.text(0, 0, 'Test', styles).setOrigin(0.5, 0))
-          
-          console.log
+	prepare_matchup = () => {
+		this.socket = io('http://localhost:6161');
+		this.game.registry.set('socket', this.socket);
+		
+		if (this.player == PlayerType.Player_A)
+		{
+			
+		}
+		else if (this.player == PlayerType.Player_B)
+		{
+			
+		}
+		else
+		{
+			
+		}
+	}
 
+	ready_to_go = () => {
 
-            this.add
-              .text(300, 300, 'queue', {
-                color: '#000000',
-                align: 'center',
-                fontSize: '52'
-              })
-              .setOrigin(0.5, 0)
-              .setInteractive()
-              .on('pointerdown', () => {
-                console.log('cliclic');
-                this.scene.start('pong');
-              })
-   
-      
-    }
+		console.log('ready to start');
+		if (this instanceof Phaser.Scene)
+		{
+			this.time.addEvent({
+				delay: 2000,
+				callback: this.fading_out,
+				loop: false
+			});
+
+		}
+
+	}
+
+	fading_out = () => {
+		console.log('imagine the screen fading to black');
+
+		this.scene.start('Pong');
+	}
 }

@@ -10,6 +10,7 @@ import {
   export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@WebSocketServer() server;
 	users: number = 0;
+	
   
 	async handleConnection() {
 	  // A client has connected
@@ -32,4 +33,13 @@ console.log("someone disconnected");
 		console.log("someone called pouet");
 		this.server.emit('ok_pouet', this.users);
 	}
+
+
+
+
+
   }
+
+
+//   @SubscribeMessage('join')
+//  async onJoin(@ConnectedSocket() client: Socket, @MessageBody() data: ChatMessage) {}
