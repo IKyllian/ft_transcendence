@@ -1,26 +1,18 @@
-import { useEffect, useState } from "react";
 import { IconX } from "@tabler/icons";
-import { RootState } from '../Redux/Store'
-import { useAppDispatch, useAppSelector } from '../Redux/Hooks'
-import { ModalState } from "../Interfaces/Interface-Modal";
 import SearchBarPlayers from "./SearchBarPlayers";
+import { useContext } from "react";
+
+import { ModalContext } from "./ModalProvider";
 
 function AddFriendModal() {
-    const modalStatus: ModalState =  useAppSelector((state: RootState) => state.modal);
-    const dispatch = useAppDispatch();
+    const modalStatus = useContext(ModalContext);
 
-    const exitModal = () => {
-        dispatch({
-            type: "modal/changeStatus",
-        })
-    }
-
-    if (modalStatus.isOpen) {
+    if (modalStatus.modal.isOpen) {
         return (
             <>
                 <div className="modal-wrapper-container">
                     <div className="add-friend-modal-wrapper">
-                        <IconX className="modal-exit" onClick={() => exitModal()} />
+                        <IconX className="modal-exit" onClick={() => modalStatus.setStatus()} />
                         <SearchBarPlayers functionality="addFriend" />
                     </div>
                 </div>

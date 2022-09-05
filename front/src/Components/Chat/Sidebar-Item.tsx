@@ -1,22 +1,22 @@
 import { useState } from "react";
+import { Link } from "react-router-dom"
 
 import { IconChevronDown, IconPlus, IconChevronRight } from "@tabler/icons";
-import { ChannelInterface, PrivateMessageInterface } from "../../Interfaces/Datas-Examples"
-
-import { Link } from "react-router-dom"
+import { ChannelsInterfaceFront } from "../../Interfaces/Interface-Chat";
 
 interface SidebarItemProps {
     index: number,
     title: string,
-    datasArray: (ChannelInterface | PrivateMessageInterface)[],
+    datasArray: ChannelsInterfaceFront[] | undefined,
     setShowModal: Function,
     showModal: number,
+    chanClick: Function,
 }
 
 function SidebarItem(props: SidebarItemProps) {
     const [sidebarOpen, setSidebarOpen] = useState<boolean>(true);
 
-    const {index, title, datasArray, setShowModal, showModal} = props;
+    const {index, title, datasArray, setShowModal, showModal, chanClick} = props;
 
     const handleClick = () => {
         if (sidebarOpen)
@@ -44,25 +44,25 @@ function SidebarItem(props: SidebarItemProps) {
                 <IconPlus className="plus-icon" onClick={modalStatus} />
             </div>
             {
-               sidebarOpen && 
+               datasArray !== undefined && sidebarOpen && 
                <ul className="ul-collapse">
                     {
-                        datasArray.map((elem, index) => {
-                            if ("channelName" in elem) {
+                        datasArray.map((elem) => {
+                            if ("channelName" in elem.channel) {
                                 return (
-                                    <li key={index}>
-                                        <Link to={`/chat/${elem.id}`}>
-                                            # {elem.channelName}
-                                        </Link>
-                                    </li>
+                                    <Link key={elem.channel.id} to={`/chat/${elem.channel.id}`}>
+                                        <li onClick={() => chanClick(elem.channel.id)} is-target={elem.isActive}>
+                                            # {elem.channel.channelName}
+                                        </li>
+                                    </Link>
                                 );
                             } else {
                                 return (
-                                    <li key={index}>
-                                        <Link to={`/chat/${elem.id}`}>
-                                            {elem.user.name}
-                                        </Link>
-                                    </li>
+                                    <Link key={elem.channel.id} to={`/chat/${elem.channel.id}`}>
+                                        <li onClick={() => chanClick(elem.channel.id)} is-target={elem.isActive}>
+                                            {elem.channel.user.name }
+                                        </li>
+                                    </Link>
                                 );
                             }
                         })

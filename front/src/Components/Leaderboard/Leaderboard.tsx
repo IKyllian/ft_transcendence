@@ -1,17 +1,17 @@
-import { RootState } from '../../Redux/Store'
-import { useAppSelector } from '../../Redux/Hooks'
-import { ModalState } from "../../Interfaces/Interface-Modal";
-import {leaderboardDatas} from "../../Interfaces/Datas-Examples"
+import { useContext } from "react";
+import { leaderboardDatas } from "../../Interfaces/Datas-Examples"
+
+import { ModalContext } from "../ModalProvider";
 
 import Header from "../Header/Header";
 import LeaderboardItem from "./Leaderboard-Item";
 
 function Leaderboard() {
-    const modalStatus: ModalState =  useAppSelector((state: RootState) => state.modal);
+    const modalStatus = useContext(ModalContext);
     return(
         <>
             <Header />
-            <div className={`leaderboard-page-container ${modalStatus.isOpen ? modalStatus.blurClass : ""}`}>
+            <div className={`leaderboard-page-container ${modalStatus.modal.isOpen ? modalStatus.modal.blurClass : ""}`}>
                 <h2> Leaderboard </h2>
                 <table> 
                     <thead>

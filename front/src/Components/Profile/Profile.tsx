@@ -1,7 +1,5 @@
-import { useState } from "react";
-import { RootState } from '../../Redux/Store'
-import { useAppSelector } from '../../Redux/Hooks'
-import { ModalState } from "../../Interfaces/Interface-Modal";
+import { useState, useContext } from "react";
+import { ModalContext } from "../ModalProvider";
 
 import Header from "../Header/Header";
 import StatsInfoItem from "./Items/Stats-Info-Item";
@@ -20,7 +18,7 @@ function Profile() {
         { title: "Friends", isActive: "false" }
     ]);
 
-    const modalStatus: ModalState =  useAppSelector((state: RootState) => state.modal);
+    const modalStatus = useContext(ModalContext);
     
     const handleClick = (index: number) => {
        let newArray = [...attributes];
@@ -33,7 +31,7 @@ function Profile() {
     return (
         <>
             <Header />
-            <div className={`profile-container ${modalStatus.isOpen ? modalStatus.blurClass : ""}`}>
+            <div className={`profile-container ${modalStatus.modal.isOpen ? modalStatus.modal.blurClass : ""}`}>
                 <div className="profile-header">
                     <div className='stats-infos'>
                         <StatsInfoItem label="Games Played" value="100" />

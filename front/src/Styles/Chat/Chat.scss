@@ -25,6 +25,7 @@
                 .collapse-button {
                     @include flex-row-alignCenter;
                     justify-content: space-between;
+                    height: 35px;
 
                     svg {
                         cursor: pointer;
@@ -41,18 +42,25 @@
 
                 .ul-collapse {
                     list-style-type: none;
+                    padding-left: 15px;
                     li:not(li:first-child) {
-                        margin-top: 10px;
+                        margin-top: 2px;
                     }
 
-                    li {
-                        a {
-                            cursor: pointer;
-                            color: $WhitePalette;
-                            text-decoration: none;
+                    a {
+                        cursor: pointer;
+                        color: $WhitePalette;
+                        text-decoration: none;
+                        li {
+                            padding: 8px;
+                            border-radius: 5px;
                             &:hover {
-                                color: #ffffff;
+                                background-color: $DarkPalette;
                             }
+                        }
+    
+                        li[is-target="true"] {
+                            background-color: $DarkPalette;
                         }
                     }
                 }

@@ -9,7 +9,7 @@ function Chat() {
     const [showModal, setShowModal] = useState<number>(0);
     return (
         <>
-            <ChatModal setShowModal={setShowModal} showModal={showModal} />
+            <ChatModal showModal={showModal} setShowModal={setShowModal}  />
             <Header />
             <div className="chat-page-container">
                 <Sidebar setShowModal={setShowModal} showModal={showModal} />
