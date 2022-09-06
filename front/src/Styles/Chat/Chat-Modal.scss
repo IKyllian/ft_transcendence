@@ -72,3 +72,9 @@
         }
     }
 }
+
+@media screen and (max-width: $BreakPoint_800) {
+    .chat-modal {
+        @include modal-container(550px, 90%, $DarkPalette);
+    }
+}

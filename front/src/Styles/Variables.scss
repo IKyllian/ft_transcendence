@@ -7,9 +7,13 @@ $WhitePalette: #E0E1DD;
 $OrangeProfile: orange;
 
 $HeaderMarge: 80px;
-$HeaderResponsiveMarge: 10px;
+$HeaderResponsive800Marge: 40px;
+$HeaderResponsive500Marge: 10px;
 
 $ProfileBlockMarge: 30px $HeaderMarge;
+
+$BreakPoint_800: 840px;
+$BreakPoint_500: 500px;
 
 
 

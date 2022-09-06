@@ -7,22 +7,18 @@ import { ModalContext } from "./ModalProvider";
 function AddFriendModal() {
     const modalStatus = useContext(ModalContext);
 
-    if (modalStatus.modal.isOpen) {
-        return (
-            <>
-                <div className="modal-wrapper-container">
-                    <div className="add-friend-modal-wrapper">
-                        <IconX className="modal-exit" onClick={() => modalStatus.setStatus()} />
-                        <SearchBarPlayers functionality="addFriend" />
-                    </div>
+    return modalStatus.modal.isOpen ? (
+        <>
+            <div className="modal-wrapper-container">
+                <div className="add-friend-modal-wrapper">
+                    <IconX className="modal-exit" onClick={() => modalStatus.setStatus()} />
+                    <SearchBarPlayers functionality="addFriend" />
                 </div>
-            </>
-        );
-    } else {
-        return(
-            <> </>
-        );
-    }    
+            </div>
+        </>
+    ) : (
+        <> </>
+    );
 }
 
 export default AddFriendModal;

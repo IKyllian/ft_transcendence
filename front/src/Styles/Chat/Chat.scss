@@ -4,6 +4,7 @@
     font-size: 30px;
     color: $WhitePalette;
     margin: auto;
+    text-align: center;
 }
 
 .chat-page-container {
@@ -92,6 +93,11 @@
                 box-sizing: border-box;
                 padding-right: 20px;
 
+                .burger-icon-responsive {
+                    display: none;
+                    cursor: pointer;
+                }
+
                 .chan-name {
                     margin-left: 20px;
                 }
@@ -109,12 +115,20 @@
                 height: 50px;
                 border-bottom: 1px solid $WhitePalette;
                 @include flex-row-alignCenter;
-                .profile-avatar {
-                    @include avatar-player(10em);
+                box-sizing: border-box;
+
+                .burger-icon-responsive {
+                    display: none;
                 }
-    
-                .player-status {
-                    @include player-status;
+                .player-container {
+                    @include flex-row-alignCenter;
+                    .profile-avatar {
+                        @include avatar-player(10em);
+                    }
+        
+                    .player-status {
+                        @include player-status;
+                    }
                 }
             }
 
@@ -191,13 +205,93 @@
                 background-color: $OrangeProfile;
                 border-radius: 50%;
                 padding: 5px;
-                background: linear-gradient(112deg, rgba(255,94,0,1) 0%, rgba(255,145,0,1) 50%, rgba(255,154,0,1) 100%);             }
+                background: linear-gradient(112deg, rgba(255,94,0,1) 0%, rgba(255,145,0,1) 50%, rgba(255,154,0,1) 100%);
+            }
             input {
                 all: unset;
                 width: 95%;
                 color: $WhitePalette;
                 box-sizing: border-box;
                 padding: 18px 20px;
+            }
+        }
+    }
+}
+
+@media screen and (max-width: $BreakPoint_800) {
+    .no-target-message {
+        display: none;
+    }
+    .chat-page-container {
+        .chat-sidebar {
+            display: none;
+            position: absolute;
+            z-index: 99;
+            height: 90%;
+        }
+        .chat-sidebar-responsive {
+            display: block;
+        }
+
+        .message-container {
+            width: 100%;
+            .message-wrapper {
+                .message-header {
+                    padding: 0 $HeaderResponsive800Marge;
+                    .burger-icon-responsive {
+                        display: block;
+                    }
+                }
+
+                .header-user-info {
+                    padding: 0 $HeaderResponsive800Marge;
+                    .burger-icon-responsive {
+                        display: block;
+                        position: absolute;
+                    }
+                    .player-container {
+                        margin: 0 auto
+                    }
+                }
+
+
+                .ul-container {
+                    ul {
+                        .message-item {
+                            img {
+                                @include avatar-player(35px);
+                            }
+                            &-info {
+                                .message-text {
+                                    font-size: 14px;
+                                    padding: 8px 13px;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@media screen and (max-width: $BreakPoint_500) {
+    .chat-page-container {
+        .message-container {
+            .message-wrapper {
+                .message-header {
+                    padding: 0 $HeaderResponsive500Marge;
+                }
+
+                .header-user-info {
+                    padding: 0 $HeaderResponsive500Marge;
+                }            
+            }
+
+            .ul-container {
+                ul {
+                   padding-left: $HeaderResponsive500Marge;
+                }
             }
         }
     }

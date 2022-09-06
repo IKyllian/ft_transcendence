@@ -18,17 +18,15 @@ function FriendListModal(props: {show: boolean, onClickOutside: Function}) {
         };
     }, [onClickOutside]);
     
-    if (!show) {
-        return (null);
-    } else {
-        return (
-            <div ref={ref} className="friend-list-modal">
-                <p> Delete friend </p>
-                <p> Défier </p>
-                <p> Send message </p>
-            </div>
-        );
-    }
+    return (!show) ? (
+        null
+    ) : (
+        <div ref={ref} className="friend-list-modal">
+            <p> Delete friend </p>
+            <p> Défier </p>
+            <p> Send message </p>
+        </div>
+    );
 }
 
 export default FriendListModal;

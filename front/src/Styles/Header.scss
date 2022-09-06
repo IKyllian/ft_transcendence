@@ -92,8 +92,9 @@
      }
 }
 
-@media screen and (max-width: 700px) {
+@media screen and (max-width: $BreakPoint_800) {
     .header {
+        padding: 0 $HeaderResponsive800Marge;
         .header-right {
             display: none;
         }
@@ -109,7 +110,7 @@
 
 @media screen and (max-width: 500px) {
     .header {
-        padding: 0 $HeaderResponsiveMarge;
+        padding: 0 $HeaderResponsive500Marge;
         .header-right-responsive { 
             .responsive-menu-drawer {
                 right: 0;

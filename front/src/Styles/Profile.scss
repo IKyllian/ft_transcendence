@@ -352,7 +352,7 @@ $FontSizeTextResponsive: 15px;
             }
             
             .card-info {
-                margin-left: $HeaderResponsiveMarge;
+                margin-left: $HeaderResponsive800Marge;
                 bottom: -30px;
                 .profile-avatar {
                     @include avatar-player(100px);
@@ -375,7 +375,7 @@ $FontSizeTextResponsive: 15px;
             }
 
             .achievement-list {
-                margin-left: $HeaderResponsiveMarge;
+                margin-left: $HeaderResponsive800Marge;
                 justify-content: center;
                 .achievement-item {
                     width: 200px;

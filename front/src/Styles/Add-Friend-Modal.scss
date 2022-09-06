@@ -15,5 +15,12 @@
     }
 }
 
+@media screen and (max-width: $BreakPoint_800) {
+    .modal-wrapper-container {
+        .add-friend-modal-wrapper {
+            @include modal-container(400px, 90%, $LightDarkPalette);
+        }
+    }
+}
 
 

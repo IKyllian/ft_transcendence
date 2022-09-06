@@ -1,14 +1,30 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { ChannelsDatas } from "../../Interfaces/Datas-Examples";
 import { ChannelsInterfaceFront } from "../../Interfaces/Interface-Chat";
 import SidebarItem from "./Sidebar-Item";
+import { SidebarContext } from "./Chat";
 
 function Sidebar(props: {showModal: number, setShowModal: Function}) {
     const {showModal, setShowModal} = props;
     const [chanDatas, setChanDatas] = useState<ChannelsInterfaceFront[] | undefined>(undefined);
 
+    const sidebarStatus = useContext(SidebarContext);
+    const ref = useRef<HTMLHeadingElement>(null);
     let params = useParams();
+
+    useEffect(() => {
+        const handleClickOutside = (event: any) => {
+            if (ref.current && !ref.current.contains(event.target)) {
+                sidebarStatus.sidebar && sidebarStatus.setSidebarStatus && sidebarStatus.setSidebarStatus();
+            }
+        };
+        document.addEventListener('click', handleClickOutside, true);
+
+        return () => {
+            document.removeEventListener('click', handleClickOutside, true);
+        };
+    }, [sidebarStatus, sidebarStatus.setSidebarStatus]);
 
     useEffect(() => {
         if (ChannelsDatas.length > 0) {
@@ -47,7 +63,8 @@ function Sidebar(props: {showModal: number, setShowModal: Function}) {
     }
  
     return (
-        <div className="chat-sidebar">
+        <div ref={ref} className={`chat-sidebar ${sidebarStatus.sidebar ? "chat-sidebar-responsive" : ""}`}>
+            {/* <IconX className="sidebar-icon-responsive" /> */}
             <ul className="ul-wrapper">
                 <SidebarItem
                     index={0}
