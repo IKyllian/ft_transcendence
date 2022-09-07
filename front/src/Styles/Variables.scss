@@ -15,8 +15,12 @@ $ProfileBlockMarge: 30px $HeaderMarge;
 $BreakPoint_800: 840px;
 $BreakPoint_500: 500px;
 
+$headerHeight: 70px;
 
-
+@mixin page-wrapper {
+    min-height: 100%;
+    overflow: auto;
+}
 
 @mixin player-status {
     height: 13px;

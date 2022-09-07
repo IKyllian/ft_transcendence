@@ -2,20 +2,15 @@
 
 .search-player-container {
     width: 100%;
-    font-family: Montserrat;
-
     .modal-search {
         width: 90%;
-        display: flex;
-        flex-direction: row;
+        @include flex-row-alignCenter();
         border-bottom: 1px solid $WhitePalette;
-        align-items: center;
         height: 50px;
         margin: 0 auto;
         svg {
             width: 25px;
             height: 25px;
-            color: $WhitePalette;
             margin: 0 0 0 10px;
             cursor: pointer;
         }
@@ -23,11 +18,9 @@
         input {
             all: unset;
             width: 100%;
-            box-sizing: border-box;
             padding: 8px 20px;
             margin: 0px auto;
             cursor: pointer;
-            color: $WhitePalette;
         }
     }
 
@@ -39,11 +32,8 @@
         overflow-y: scroll;
         &-item {
             width: 90%;
-            display: flex;
-            flex-direction: row;
-            align-items: center;
+            @include flex-row-alignCenter();
             justify-content: space-between;
-            color: $WhitePalette;
             margin: 0 auto;
             .item-player-info {
                 display: inline-flex;
@@ -60,7 +50,6 @@
                 font-size: 15px;
                 border-radius: 4px;
                 background-color: $LightDarkPalette;
-                color: $WhitePalette;
             }
 
             input {
@@ -95,5 +84,4 @@
             }
         }
     }
-
 }

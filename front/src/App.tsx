@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
+import Header from "./Components/Header/Header";
 import Home from './Components/Home/Home';
 import Sign from './Components/Sign';
 import Profile from './Components/Profile/Profile';
@@ -13,24 +14,27 @@ import { ModalProvider } from "./Components/ModalProvider";
 
 function App() {
   return (
-    <>
+    <div className="app-container">
       <BrowserRouter>
         <ModalProvider>
           <AddFriendModal/>
-          <Routes>
-            <Route path='/' element={ <Sign /> }/>
-            <Route path='/home' element={ <Home /> }/>
-            <Route path='/profile' element={ <Profile /> }/>
-            <Route path='/leaderboard' element={ <Leaderboard /> }/>
-            <Route path='/chat' element={<Chat />}>
-              <Route path=":chatId" element={<ChatElement />}/>
-            </Route>
-            <Route path='/chat/:channelId/settings' element={ <ChannelSettings /> }/>
-            <Route path='*' element={ <Error404 /> } />
-          </Routes>
+          <Header />
+          <main className="page-container">
+            <Routes>
+              <Route path='/' element={ <Sign /> }/>
+              <Route path='/home' element={ <Home /> }/>
+              <Route path='/profile' element={ <Profile /> }/>
+              <Route path='/leaderboard' element={ <Leaderboard /> }/>
+              <Route path='/chat' element={<Chat />}>
+                <Route path=":chatId" element={<ChatElement />}/>
+              </Route>
+              <Route path='/chat/:channelId/settings' element={ <ChannelSettings /> }/>
+              <Route path='*' element={ <Error404 /> } />
+            </Routes>
+          </main>
         </ModalProvider>
       </BrowserRouter>
-    </>
+    </div>
   );
 }
 

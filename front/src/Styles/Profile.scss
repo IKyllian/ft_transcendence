@@ -4,9 +4,8 @@ $FontSizeText: 20px;
 $FontSizeTextResponsive: 15px;
 
 .profile-container {
-    min-height: 90vh;
+    @include page-wrapper();
     background-color: $LightBluePalette;
-    font-family: Montserrat;
 
     .profile-header {
         background: url('../Images-Icons//Backgrounds/background-42.jpg') no-repeat center fixed;
@@ -17,12 +16,9 @@ $FontSizeTextResponsive: 15px;
 
         .stats-infos {
             height: 90%;
-            display: flex;
-            flex-direction: row;
+            @include flex-row-alignCenter();
             flex-wrap: wrap;
             justify-content: center;
-            align-items: center;
-            color: $WhitePalette;
             gap: 4em;
         
             .stat-elem {
@@ -49,11 +45,8 @@ $FontSizeTextResponsive: 15px;
             z-index: 0;
             position: absolute;
             bottom: -60px;
-            display: flex;
-            flex-direction: row;
-            align-items: center;
+            @include flex-row-alignCenter();
             margin-left: $HeaderMarge;
-            color: $WhitePalette;
 
             .profile-avatar {
                 @include avatar-player(160px);
@@ -100,11 +93,8 @@ $FontSizeTextResponsive: 15px;
             }
 
             .fight-button {
-                text-decoration: none;
-                display: flex;
-                align-items: center;
+                @include flex-row-alignCenter();
                 justify-content: center;
-                flex-direction: row;
                 gap: 5px;
                 color: $OrangeProfile;
                 margin-left: 20px;
@@ -113,7 +103,6 @@ $FontSizeTextResponsive: 15px;
                 border-radius: 10px;
                 background-color: $LightDarkPalette;
                 padding: 1em;
-                box-sizing: border-box;
 
                 &:hover {
                     background-color: $LightDarkPalette;
@@ -135,7 +124,6 @@ $FontSizeTextResponsive: 15px;
             flex-direction: row;
             gap: 5em;
             justify-content: center;
-            color: $WhitePalette;
             width: 100%;
 
             p {
@@ -157,23 +145,18 @@ $FontSizeTextResponsive: 15px;
             flex-direction: column;
             gap: 10px;
             margin: 30px 10px;
-            color: $WhitePalette;
         
             .history-item {
-                display: flex;
+                @include flex-row-alignCenter();
                 position: relative;
-                flex-direction: row;
                 justify-content: center;
-                align-items: center;
                 gap: 10px;
                 height: 50px;
                 background-color: $LightDarkPalette;
                 border-radius: 10px;
 
                 .player-container {
-                    display: flex;
-                    flex-direction: row;
-                    align-items: center;
+                    @include flex-row-alignCenter();
                     gap: 10px;
                     width: 100px;
                 }
@@ -220,12 +203,10 @@ $FontSizeTextResponsive: 15px;
 
             .achievement-item {
                 background-color: $LightDarkPalette;
-                display: flex;
-                flex-direction: row;
-                align-items: center;
+                @include flex-row-alignCenter();
                 width: 300px;
                 height: 100px;
-                color: $WhitePalette;
+
                 border-radius: 8px;
 
                 svg {
@@ -267,19 +248,14 @@ $FontSizeTextResponsive: 15px;
 
             .friend-item {
                 background-color: $LightDarkPalette;
-                display: flex;
-                flex-direction: row;
-                align-items: center;
+                @include flex-row-alignCenter();
                 justify-content: space-between;
                 width: 240px;
                 height: 70px;
-                color: $WhitePalette;
                 border-radius: 8px;
 
                 .friend-content {
-                    display: flex;
-                    flex-direction: row;
-                    align-items: center;
+                    @include flex-row-alignCenter();
                     gap: 5px;
                     margin-left: 10px;
 
@@ -307,7 +283,6 @@ $FontSizeTextResponsive: 15px;
                         width: 100px;
                         border-radius: 5px;
                         padding: 5px 0 0 5px;
-                        box-sizing: border-box;
                         background-color: $DarkPalette;
 
                         p {

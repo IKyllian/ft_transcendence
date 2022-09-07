@@ -4,11 +4,9 @@
     min-height: 90vh;
     background-color: $LightBluePalette;
     padding-top: 5px;
-    box-sizing: border-box;
     h2 {
         margin: 0;
         font-size: 45px;
-        color: $WhitePalette;
         text-align: center;
         font-family: Silkscreen;
     }
@@ -23,7 +21,6 @@
         thead {
             th {
                 padding: 25px;
-                color: $WhitePalette;
                 font-size: 14px;
                 font-weight: bold;
             }
@@ -52,7 +49,6 @@
                         }
                     }
                 }
-                color: $WhitePalette;
 
                 &:hover td {
                     background-color: #202d45;
@@ -62,20 +58,11 @@
                     @include player-status;
                 }
 
-                .leaderboard-spec a{
-                    color: $WhitePalette;
-                }
-
                 td {
                     padding: 15px 25px;
                     background: $LightDarkPalette;
                     font-size: 16px;
                     border-bottom: 5px solid $DarkPalette;
-                    
-                    &:nth-child(2) a {
-                        text-decoration: none;
-                        color: $WhitePalette;
-                    }
                 }
             }
         }
@@ -91,7 +78,6 @@
         margin: 10px 0;
         min-width: 100px;
         .pagination-item {
-            color: $WhitePalette;
             background-color: $LightDarkPalette;
             height: 35px;
             width: 35px;
@@ -105,7 +91,6 @@
             }
         }
     }
-    
 }
 
 @media screen and (max-width: $BreakPoint_800) {

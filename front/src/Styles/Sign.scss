@@ -2,16 +2,14 @@
 
 .sign-container {
     min-width: 100%;
-    min-height: 100%;
+    @include page-wrapper();
     background-color: black;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 2em;
     padding-top: 10em;
-    box-sizing: border-box;
     text-align: center;
-    color: $WhitePalette;
     background: url('../Images-Icons//Backgrounds/background-42.jpg') no-repeat center fixed;
     background-size: cover;
 

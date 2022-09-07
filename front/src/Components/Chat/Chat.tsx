@@ -1,6 +1,5 @@
 import { useState, useContext, createContext, useEffect } from "react";
 
-import Header from "../Header/Header";
 import Sidebar from "./Sidebar/Sidebar";
 import ChatModal from "./Chat-Modal";
 import { Outlet, useParams } from "react-router-dom";
@@ -29,7 +28,6 @@ function Chat() {
     return (
         <SidebarContext.Provider value={{sidebar: responsiveSidebar, setSidebarStatus: handleClick}}>
             <ChatModal showModal={showModal} setShowModal={setShowModal}  />
-            <Header />
             <div className={`chat-page-container ${modalStatus.modal.isOpen ? modalStatus.modal.blurClass : ""}`}>
                 <Sidebar setShowModal={setShowModal} showModal={showModal} />
                 {
