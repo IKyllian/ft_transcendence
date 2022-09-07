@@ -16,7 +16,7 @@
     table {
         border-collapse: collapse;
         text-align: left;
-        margin: 30px $HeaderMarge;
+        margin: 30px auto 0 auto;
         width: 90%;
         background-color: $DarkPalette;
 
@@ -31,6 +31,27 @@
 
         tbody {
             tr {
+                &:first-child {
+                    td {
+                        &:first-child {
+                            color: gold;
+                        }
+                    }
+                }
+                &:nth-child(2) {
+                    td {
+                        &:first-child {
+                            color: silver;
+                        }
+                    }
+                }
+                &:nth-child(3) {
+                    td {
+                        &:first-child {
+                            color: #CD7F32;
+                        }
+                    }
+                }
                 color: $WhitePalette;
 
                 &:hover td {
@@ -54,6 +75,79 @@
                     &:nth-child(2) a {
                         text-decoration: none;
                         color: $WhitePalette;
+                    }
+                }
+            }
+        }
+    }
+}
+
+.pagination {
+    &-wrapper {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        gap: 10px;
+        margin: 10px 0;
+        min-width: 100px;
+        .pagination-item {
+            color: $WhitePalette;
+            background-color: $LightDarkPalette;
+            height: 35px;
+            width: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 5px;
+            p {
+                font-weight: bold;
+                margin: 0;
+            }
+        }
+    }
+    
+}
+
+@media screen and (max-width: $BreakPoint_800) {
+    .leaderboard-page-container {
+        table {
+            thead {
+                .responsive-column {
+                    display: none;
+                }
+                th {
+                    padding: 15px 15px;
+                    font-size: 10px;
+                }
+            }
+            tbody {
+                tr {
+                    .responsive-column {
+                        display: none;
+                    }
+
+                    td {
+                        font-size: 13px;
+                        padding: 15px 15px;
+                    }
+                }
+            }
+        }
+    }
+}
+
+@media screen and (max-width: $BreakPoint_500) {
+    .leaderboard-page-container {
+        table {
+            thead {
+                .responsive-column {
+                    display: none;
+                }
+            }
+            tbody {
+                tr {
+                    .responsive-column {
+                        display: none;
                     }
                 }
             }

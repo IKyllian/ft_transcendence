@@ -2,8 +2,8 @@ import { useState, useContext } from "react";
 import { Link } from "react-router-dom"
 
 import { IconChevronDown, IconPlus, IconChevronRight } from "@tabler/icons";
-import { ChannelsInterfaceFront } from "../../Interfaces/Interface-Chat";
-import { SidebarContext } from './Chat';
+import { ChannelsInterfaceFront } from "../../../Interfaces/Interface-Chat";
+import { SidebarContext } from '../Chat';
 
 interface SidebarItemProps {
     index: number,

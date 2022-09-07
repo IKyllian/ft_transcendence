@@ -1,9 +1,9 @@
 import { useEffect, useState, useContext, useRef } from "react";
 import { useParams } from "react-router-dom";
-import { ChannelsDatas } from "../../Interfaces/Datas-Examples";
-import { ChannelsInterfaceFront } from "../../Interfaces/Interface-Chat";
+import { ChannelsDatas } from "../../../Interfaces/Datas-Examples";
+import { ChannelsInterfaceFront } from "../../../Interfaces/Interface-Chat";
 import SidebarItem from "./Sidebar-Item";
-import { SidebarContext } from "./Chat";
+import { SidebarContext } from "../Chat";
 
 function Sidebar(props: {showModal: number, setShowModal: Function}) {
     const {showModal, setShowModal} = props;

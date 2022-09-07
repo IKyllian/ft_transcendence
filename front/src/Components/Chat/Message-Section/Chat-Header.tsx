@@ -2,8 +2,8 @@ import { useContext } from "react";
 import { Link } from "react-router-dom";
 import { IconSettings, IconMenu2 } from "@tabler/icons";
 
-import { SidebarContext } from "./Chat";
-import { ChannelInterface, PrivateMessageInterface } from "../../Interfaces/Datas-Examples";
+import { SidebarContext } from "../Chat";
+import { ChannelInterface, PrivateMessageInterface } from "../../../Interfaces/Datas-Examples";
 
 function ChatHeader(props: {chatItem: ChannelInterface | PrivateMessageInterface | undefined}) {
     const { chatItem } = props;

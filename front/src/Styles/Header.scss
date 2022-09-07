@@ -62,34 +62,34 @@
 
     .header-right-responsive {
         display: none;
-         .header-picture {
-             @include avatar-player(40px);
-         }
+        .header-picture {
+            @include avatar-player(40px);
+        }
 
-         .responsive-menu-drawer {
-             background-color: $DarkPalette;
-             z-index: 99;
-             position: absolute;
-             top: 45px;
-             border: 0.5px solid $WhitePalette;
-             ul {
-                 list-style-type: none;
-                 margin: 0;
-                 padding: 10px 20px;
+        .responsive-menu-drawer {
+            background-color: $DarkPalette;
+            z-index: 99;
+            position: absolute;
+            top: 45px;
+            border: 0.5px solid $WhitePalette;
+            ul {
+                list-style-type: none;
+                margin: 0;
+                padding: 10px 20px;
 
-                 li {
+                li {
                     cursor: pointer;
-                     &:not(&:first-child) {
-                         margin-top: 7px;
-                     }
-                     a {
-                         text-decoration: none;
-                         color: $WhitePalette;
-                     }
-                 }
-             }
-         }
-     }
+                    &:not(&:first-child) {
+                        margin-top: 7px;
+                    }
+                    a {
+                        text-decoration: none;
+                        color: $WhitePalette;
+                    }
+                }
+            }
+        }
+    }
 }
 
 @media screen and (max-width: $BreakPoint_800) {
@@ -108,7 +108,7 @@
     }
 }
 
-@media screen and (max-width: 500px) {
+@media screen and (max-width: $BreakPoint_500) {
     .header {
         padding: 0 $HeaderResponsive500Marge;
         .header-right-responsive { 

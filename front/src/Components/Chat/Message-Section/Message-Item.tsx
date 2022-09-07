@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
-import ProfilPic from "../../Images-Icons/pp.jpg"; 
+import ProfilPic from "../../../Images-Icons/pp.jpg"; 
 
-import {ExampleUser} from "../../Interfaces/Interface-User";
+import {ExampleUser} from "../../../Interfaces/Interface-User";
 
 function MessageItem(props: {sender: ExampleUser, message: string}) {
     const {sender, message} = props;

@@ -7,7 +7,7 @@ import Leaderboard from './Components/Leaderboard/Leaderboard';
 import AddFriendModal from './Components/Add-Friend-Modal';
 import Chat from './Components/Chat/Chat';
 import ChannelSettings from './Components/Chat/Channel-Settings/Settings-Container';
-import ChatElement from "./Components/Chat/Chat-Element";
+import ChatElement from "./Components/Chat/Message-Section/Chat-Element";
 import Error404 from "./Components/404-Error";
 import { ModalProvider } from "./Components/ModalProvider";
 

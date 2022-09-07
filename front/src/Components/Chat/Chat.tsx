@@ -1,7 +1,7 @@
 import { useState, useContext, createContext, useEffect } from "react";
 
 import Header from "../Header/Header";
-import Sidebar from "./Sidebar";
+import Sidebar from "./Sidebar/Sidebar";
 import ChatModal from "./Chat-Modal";
 import { Outlet, useParams } from "react-router-dom";
 import { ModalContext } from "../ModalProvider";

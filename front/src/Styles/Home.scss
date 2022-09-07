@@ -1,8 +1,7 @@
 @use "./Variables.scss" as *;
 
 .home-container {
-    // min-width: 100%;
-    min-height: 90%;
+    min-height: 90vh;
     background-color: $LightDarkPalette;
     font-family: Silkscreen;
 

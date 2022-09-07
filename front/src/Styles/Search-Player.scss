@@ -5,13 +5,13 @@
     font-family: Montserrat;
 
     .modal-search {
-        width: 100%;
+        width: 90%;
         display: flex;
         flex-direction: row;
         border-bottom: 1px solid $WhitePalette;
         align-items: center;
         height: 50px;
-
+        margin: 0 auto;
         svg {
             width: 25px;
             height: 25px;
@@ -48,10 +48,8 @@
             .item-player-info {
                 display: inline-flex;
                 .modal-picture {
+                    @include avatar-player(50px);
                     margin-right: 10px;
-                    height: 50px;
-                    width: 50px;
-                    border-radius: 50%;
                 }
             }
             button {
@@ -71,4 +69,31 @@
             }
         }
     }  
+}
+
+@media screen and (max-width: $BreakPoint_800) {
+    .search-player-container {
+        .modal-search {
+            svg {
+                width: 20px;
+                height: 20px;
+            }
+
+            input {
+                font-size: 15px;
+            }
+        }
+
+        .modal-player-list {
+            &-item {
+                font-size: 14px;
+                .item-player-info {
+                    .modal-picture {
+                        @include avatar-player(40px);
+                    }
+                }
+            }
+        }
+    }
+
 }
