@@ -5,9 +5,15 @@ import { IconSend } from "@tabler/icons";
 import { ChannelInterface, PrivateMessageInterface, ChannelsDatas} from "../../../Interfaces/Datas-Examples";
 import MessageItem from "./Message-Item";
 import ChatHeader from "./Chat-Header";
+import UsersSidebar from "./Users-Sidebar";
 
 function ChatElement() {
     const [chatDatas, setChatDatas] = useState<ChannelInterface | PrivateMessageInterface | undefined>(undefined);
+    const [showUsersSidebar, setShowUsersSidebar] = useState<boolean>(false);
+
+    const changeSidebarStatus = () => {
+        setShowUsersSidebar(!showUsersSidebar);
+    }
     // const messagesEndRef = useRef<null | HTMLDivElement>(null);
     let params = useParams();
 
@@ -31,23 +37,26 @@ function ChatElement() {
         </div>
     ) : (
         <div className="message-container">
-            <div className="message-wrapper">
-                <ChatHeader chatItem={chatDatas} />
-                <div className="ul-container">
-                    <ul>
-                        {
-                            chatDatas!.messages.map((elem, index) =>
-                                <MessageItem key={index} sender={elem.sender} message={elem.message} />
-                            )
-                        }
-                    </ul>
-                    {/* <div ref={messagesEndRef} /> */}
+            <div className="message-container-main">
+                <div className="message-wrapper">
+                    <ChatHeader chatItem={chatDatas} showUsersSidebar={showUsersSidebar} changeSidebarStatus={changeSidebarStatus} />
+                    <div className="ul-container">
+                        <ul>
+                            {
+                                chatDatas!.messages.map((elem, index) =>
+                                    <MessageItem key={index} sender={elem.sender} message={elem.message} />
+                                )
+                            }
+                        </ul>
+                        {/* <div ref={messagesEndRef} /> */}
+                    </div>
+                </div>
+                <div className="message-input-container">
+                    <input type="text" placeholder="Type Your Message..." />
+                    <IconSend />
                 </div>
             </div>
-            <div className="message-input-container">
-                <input type="text" placeholder="Type Your Message..." />
-                <IconSend />
-            </div>
+            { showUsersSidebar && "channelName" in chatDatas && <UsersSidebar usersList={chatDatas.users} /> }
         </div>
     );
 }

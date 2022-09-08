@@ -17,6 +17,9 @@ $BreakPoint_500: 500px;
 
 $headerHeight: 70px;
 
+$OnlineColor: rgb(15, 187, 15);
+$OfflineColor: rgb(194, 29, 29);
+
 @mixin page-wrapper {
     min-height: 100%;
     overflow: auto;
@@ -29,11 +32,11 @@ $headerHeight: 70px;
     margin: 0 10px 0 20px;
     
     &-online {
-        background-color: rgb(15, 187, 15);
+        background-color: $OnlineColor;
     }
 
     &-offline {
-        background-color: rgb(194, 29, 29);
+        background-color: $OfflineColor;
     }
 }
 

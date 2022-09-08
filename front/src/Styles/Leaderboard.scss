@@ -69,29 +69,29 @@
     }
 }
 
-.pagination {
-    &-wrapper {
-        display: flex;
-        flex-direction: row;
-        justify-content: center;
-        gap: 10px;
-        margin: 10px 0;
-        min-width: 100px;
-        .pagination-item {
-            background-color: $LightDarkPalette;
-            height: 35px;
-            width: 35px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 5px;
-            p {
-                font-weight: bold;
-                margin: 0;
-            }
-        }
-    }
-}
+// .pagination {
+//     &-wrapper {
+//         display: flex;
+//         flex-direction: row;
+//         justify-content: center;
+//         gap: 10px;
+//         margin: 10px 0;
+//         min-width: 100px;
+//         .pagination-item {
+//             background-color: $LightDarkPalette;
+//             height: 35px;
+//             width: 35px;
+//             display: flex;
+//             align-items: center;
+//             justify-content: center;
+//             border-radius: 5px;
+//             p {
+//                 font-weight: bold;
+//                 margin: 0;
+//             }
+//         }
+//     }
+// }
 
 @media screen and (max-width: $BreakPoint_800) {
     .leaderboard-page-container {
