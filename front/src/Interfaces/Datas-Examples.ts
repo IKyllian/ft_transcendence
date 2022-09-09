@@ -53,19 +53,14 @@ interface MessageInterface {
     sender: ExampleUser,
 }
 
-export interface ChannelInterface {
+export interface ChatInterface {
     id: number,
-    channelName: string,
+    isChannel: boolean,
+    channelName?: string,
     messages: MessageInterface[],
     users: ExampleUser[],
-    admin: ExampleUser,
-    password: string | null,
-}
-
-export interface PrivateMessageInterface {
-    id: number,
-    user: ExampleUser,
-    messages: MessageInterface[],
+    admin?: ExampleUser,
+    password?: string | null,
 }
 
 const messageExample1: MessageInterface = {
@@ -125,9 +120,10 @@ export const friendsDatas: ExampleUser[] = [
     usersArray[10],
 ];
 
-export const ChannelsDatas: (ChannelInterface | PrivateMessageInterface)[] = [
+export const ChannelsDatas: ChatInterface[] = [
     {
         id: 1,
+        isChannel: true,
         channelName: "Géneral",
         messages: [
             messageExample1, messageExample2, messageExample3, messageExample3, messageExample3, messageExample3, messageExample3, messageExample3, messageExample3, messageExample3, messageExample3, messageExample3
@@ -139,6 +135,7 @@ export const ChannelsDatas: (ChannelInterface | PrivateMessageInterface)[] = [
         password: null,
     }, {
         id: 2,
+        isChannel: true,
         channelName: "Random",
         messages: [
             messageExample1, messageExample2
@@ -150,6 +147,7 @@ export const ChannelsDatas: (ChannelInterface | PrivateMessageInterface)[] = [
         password: null,
     }, {
         id: 3,
+        isChannel: true,
         channelName: "ChanTest",
         messages: [
             messageExample1, messageExample2, messageExample3, messageExample4
@@ -161,19 +159,22 @@ export const ChannelsDatas: (ChannelInterface | PrivateMessageInterface)[] = [
         password: null,
     }, {
         id: 4,
-        user: usersArray[1],
+        isChannel: false,
+        users: [usersArray[1]],
         messages: [
             messageExample1, messageExample2
         ]
     }, {
         id: 5,
-        user: usersArray[3],
+        isChannel: false,
+        users: [usersArray[3]],
         messages: [
             messageExample1, messageExample4
         ]
     }, {
         id: 6,
-        user: usersArray[2],
+        isChannel: false,
+        users: [usersArray[2]],
         messages: [
             messageExample1, messageExample3
         ]

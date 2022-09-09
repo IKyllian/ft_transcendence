@@ -1,13 +1,13 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ChannelInterface, PrivateMessageInterface } from "../../../Interfaces/Datas-Examples";
+import { ChatInterface } from "../../../Interfaces/Datas-Examples";
 
-function SidebarSettings(props: {setSidebarItem: Function, channelDatas: ChannelInterface | PrivateMessageInterface | undefined}) {
+function SidebarSettings(props: {setSidebarItem: Function, channelDatas: ChatInterface | undefined}) {
     const {setSidebarItem, channelDatas} = props;
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (channelDatas === undefined || !("channelName" in channelDatas))
+        if (channelDatas === undefined || !channelDatas.isChannel)
             navigate(-1);
     }, [channelDatas, navigate]);
 
@@ -16,7 +16,7 @@ function SidebarSettings(props: {setSidebarItem: Function, channelDatas: Channel
     ) : (
         <div className="sidebar-setting">
             <div className="sidebar-wrapper">
-                <p> # { "channelName" in channelDatas! && 
+                <p> # {channelDatas!.isChannel && 
                     channelDatas!.channelName!} </p>
                 <ul>
                     <li onClick={() => setSidebarItem("Settings")}> Settings </li>

@@ -3,10 +3,10 @@ import { Link } from "react-router-dom";
 import { IconSettings, IconMenu2, IconChevronLeft, IconChevronRight } from "@tabler/icons";
 
 import { SidebarContext } from "../Chat";
-import { ChannelInterface, PrivateMessageInterface } from "../../../Interfaces/Datas-Examples";
+import { ChatInterface } from "../../../Interfaces/Datas-Examples";
 
 interface Props {
-    chatItem: ChannelInterface | PrivateMessageInterface | undefined,
+    chatItem: ChatInterface | undefined,
     showUsersSidebar: boolean,
     changeSidebarStatus: Function,
 }
@@ -16,7 +16,7 @@ function ChatHeader(props: Props) {
 
     const sidebarStatus = useContext(SidebarContext);
 
-    return ("channelName" in chatItem!) ? (
+    return (chatItem && chatItem.isChannel) ? (
         <div className="message-header">
             <IconMenu2
                 className="burger-icon-responsive"
@@ -39,10 +39,9 @@ function ChatHeader(props: Props) {
                 onClick={() => sidebarStatus.setSidebarStatus()}
             />
             <div className="player-container">
-                <div className={`player-status player-status-${chatItem!.user.isOnline ? "online" : "offline"}`}> </div>
-                <p> {chatItem!.user.name} </p>
+                <div className={`player-status player-status-${chatItem!.users[0].isOnline ? "online" : "offline"}`}> </div>
+                <p> {chatItem!.users[0].name} </p>
             </div>
-            
         </div>
     );
 }

@@ -2,13 +2,13 @@ import { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { IconSend } from "@tabler/icons";
 
-import { ChannelInterface, PrivateMessageInterface, ChannelsDatas} from "../../../Interfaces/Datas-Examples";
+import { ChatInterface, ChannelsDatas} from "../../../Interfaces/Datas-Examples";
 import MessageItem from "./Message-Item";
 import ChatHeader from "./Chat-Header";
 import UsersSidebar from "./Users-Sidebar";
 
 function ChatElement() {
-    const [chatDatas, setChatDatas] = useState<ChannelInterface | PrivateMessageInterface | undefined>(undefined);
+    const [chatDatas, setChatDatas] = useState<ChatInterface | undefined>(undefined);
     const [showUsersSidebar, setShowUsersSidebar] = useState<boolean>(false);
 
     const changeSidebarStatus = () => {
@@ -56,7 +56,7 @@ function ChatElement() {
                     <IconSend />
                 </div>
             </div>
-            { showUsersSidebar && "channelName" in chatDatas && <UsersSidebar usersList={chatDatas.users} /> }
+            { showUsersSidebar && chatDatas.isChannel && <UsersSidebar usersList={chatDatas.users} /> }
         </div>
     );
 }

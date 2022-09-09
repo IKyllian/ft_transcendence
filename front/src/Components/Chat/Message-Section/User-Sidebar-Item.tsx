@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import ProfilPic from "../../../Images-Icons/pp.jpg";
 import { ExampleUser } from "../../../Interfaces/Interface-User";
 
@@ -11,7 +12,9 @@ function UserSidebarItem(props: {user: ExampleUser}) {
                     <div className={`${user.isOnline ? "online" :"offline"}`}> </div>
                 </div>
             </div>
-            { user.name }
+            <Link to="/profile">
+                { user.name }
+            </Link>
         </li>
     );
 }

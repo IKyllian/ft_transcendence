@@ -69,7 +69,7 @@ function Sidebar(props: {showModal: number, setShowModal: Function}) {
                 <SidebarItem
                     index={0}
                     title="Channels"
-                    datasArray={chanDatas === undefined ? undefined : chanDatas.filter((elem) => "channelName" in elem.channel)} // (Temporaire en attendant le Back) Sert pour l'instant à différencié le type ChannelInterface et PrivateMessageInterface puisque tout est stocker dans le meme tableau
+                    datasArray={chanDatas === undefined ? undefined : chanDatas.filter((elem) => elem.channel.isChannel)} // (Temporaire en attendant le Back) Sert pour l'instant à différencié le type ChannelInterface et PrivateMessageInterface puisque tout est stocker dans le meme tableau
                     setShowModal={setShowModal}
                     showModal={showModal}
                     chanClick={chanClick}
@@ -77,7 +77,7 @@ function Sidebar(props: {showModal: number, setShowModal: Function}) {
                 <SidebarItem
                     index={1}
                     title="Messages Privées"
-                    datasArray={chanDatas === undefined ? undefined : chanDatas.filter((elem) => "user" in elem.channel)} // (Temporaire en attendant le Back) Sert pour l'instant à différencié le type ChannelInterface et PrivateMessageInterface puisque tout est stocker dans le meme tableau
+                    datasArray={chanDatas === undefined ? undefined : chanDatas.filter((elem) => !elem.channel.isChannel)} // (Temporaire en attendant le Back) Sert pour l'instant à différencié le type ChannelInterface et PrivateMessageInterface puisque tout est stocker dans le meme tableau
                     setShowModal={setShowModal}
                     showModal={showModal}
                     chanClick={chanClick}

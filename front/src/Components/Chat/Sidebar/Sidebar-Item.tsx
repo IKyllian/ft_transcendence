@@ -38,9 +38,7 @@ function SidebarItem(props: SidebarItemProps) {
         <li className="ul-wrapper-elem">
             <div className="collapse-button">
                 <div className="collapse-button-name">
-                    {
-                        sidebarOpen ? <IconChevronDown onClick={handleClick} /> : <IconChevronRight onClick={handleClick} />
-                    }
+                    { sidebarOpen ? <IconChevronDown onClick={handleClick} /> : <IconChevronRight onClick={handleClick} /> }
                     <p> {title} </p>
                 </div>
                 <IconPlus className="plus-icon" onClick={modalStatus} />
@@ -49,21 +47,13 @@ function SidebarItem(props: SidebarItemProps) {
                datasArray !== undefined && sidebarOpen && 
                <ul className="ul-collapse">
                     {
-                        datasArray.map((elem) => {
-                            return ("channelName" in elem.channel) ? (
-                                <Link key={elem.channel.id} to={`/chat/${elem.channel.id}`} onClick={() => sidebarStatus.setSidebarStatus()}>
-                                    <li onClick={() => chanClick(elem.channel.id)} is-target={elem.isActive}>
-                                        # {elem.channel.channelName}
-                                    </li>
-                                </Link>
-                            ) : (
-                                <Link key={elem.channel.id} to={`/chat/${elem.channel.id}`} onClick={() => sidebarStatus.setSidebarStatus()}>
-                                    <li onClick={() => chanClick(elem.channel.id)} is-target={elem.isActive}>
-                                        {elem.channel.user.name }
-                                    </li>
-                                </Link>
-                            );
-                        })
+                        datasArray.map((elem) => 
+                            <Link key={elem.channel.id} to={`/chat/${elem.channel.id}`} onClick={() => sidebarStatus.setSidebarStatus()}>
+                                <li onClick={() => chanClick(elem.channel.id)} is-target={elem.isActive}>
+                                    # {elem.channel.isChannel ? elem.channel.channelName : elem.channel.users[0].name}
+                                </li>
+                            </Link>
+                        )
                     }
                 </ul>
             } 
