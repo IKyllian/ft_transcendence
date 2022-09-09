@@ -60,7 +60,7 @@ export interface ChatInterface {
     messages: MessageInterface[],
     users: ExampleUser[],
     admin?: ExampleUser,
-    password?: string | null,
+    password?: string,
 }
 
 const messageExample1: MessageInterface = {
@@ -132,7 +132,6 @@ export const ChannelsDatas: ChatInterface[] = [
             usersArray[0], usersArray[1], usersArray[2]
         ],
         admin: usersArray[0],
-        password: null,
     }, {
         id: 2,
         isChannel: true,
@@ -144,7 +143,6 @@ export const ChannelsDatas: ChatInterface[] = [
             usersArray[0], usersArray[1]
         ],
         admin: usersArray[0],
-        password: null,
     }, {
         id: 3,
         isChannel: true,
@@ -156,7 +154,6 @@ export const ChannelsDatas: ChatInterface[] = [
             usersArray[0], usersArray[1], usersArray[2], usersArray[3]
         ],
         admin: usersArray[0],
-        password: null,
     }, {
         id: 4,
         isChannel: false,
@@ -180,3 +177,42 @@ export const ChannelsDatas: ChatInterface[] = [
         ]
     }
 ];
+
+
+export const ChannelsPublicDatas: ChatInterface[] = [
+    {
+        id: 1,
+        isChannel: true,
+        channelName: "Public 1",
+        messages: [
+            messageExample1, messageExample2, messageExample3, messageExample3, messageExample3, messageExample3, messageExample3, messageExample3, messageExample3, messageExample3, messageExample3, messageExample3
+        ],
+        users: [
+            usersArray[0], usersArray[1], usersArray[2]
+        ],
+        admin: usersArray[0],
+    }, {
+        id: 2,
+        isChannel: true,
+        channelName: "Public 2",
+        messages: [
+            messageExample1, messageExample2, messageExample3, messageExample3, messageExample3, messageExample3, messageExample3, messageExample3, messageExample3, messageExample3, messageExample3, messageExample3
+        ],
+        users: [
+            usersArray[0], usersArray[1], usersArray[2]
+        ],
+        admin: usersArray[0],
+    }, {
+        id: 3,
+        isChannel: true,
+        channelName: "Public 3",
+        messages: [
+            messageExample1, messageExample2, messageExample3, messageExample3, messageExample3, messageExample3, messageExample3, messageExample3, messageExample3, messageExample3, messageExample3, messageExample3
+        ],
+        users: [
+            usersArray[0], usersArray[1], usersArray[2]
+        ],
+        admin: usersArray[0],
+        password: "password",
+    }, 
+]

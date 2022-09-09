@@ -3,7 +3,7 @@ import ProfilPic from "../../../Images-Icons/pp.jpg";
 import { ExampleUser } from "../../../Interfaces/Interface-User";
 
 function UserSidebarItem(props: {user: ExampleUser}) {
-    const {user} = props;
+    const { user } = props;
     return (
         <li>
             <div className="avatar-container">

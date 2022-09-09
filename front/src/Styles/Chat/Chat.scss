@@ -45,8 +45,7 @@
                         margin-top: 2px;
                     }
 
-                    a {
-                        cursor: pointer;
+                    .list-item-container {
                         text-decoration: none;
                         li {
                             padding: 8px;
@@ -58,6 +57,32 @@
     
                         li[is-target="true"] {
                             background-color: $DarkPalette;
+                        }
+
+                        .public-chan-item {
+                            display: flex;
+                            align-items: center;
+                            justify-content: space-between;
+
+                            .icon-container {
+                                display: flex;
+                                align-items: center;
+                                span {
+                                    font-size: 15px;
+                                }
+                                svg {
+                                    &:first-child {
+                                        width: 17px;
+                                        height: 17px;
+                                    }
+                                    &:last-child {
+                                        cursor: pointer;
+                                        width: 20px;
+                                        height: 20px;
+                                        margin-left: 5px;
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -205,6 +230,8 @@
                 cursor: pointer;
                 background-color: $OrangeProfile;
                 border-radius: 50%;
+                width: 30px;
+                height: 30px;
                 padding: 5px;
                 background: linear-gradient(112deg, rgba(255,94,0,1) 0%, rgba(255,145,0,1) 50%, rgba(255,154,0,1) 100%);
             }
@@ -293,6 +320,9 @@
                 .message-wrapper {
                     .message-header {
                         padding: 0 $HeaderResponsive800Marge;
+                        &-right-side {
+                            margin-right: 0px;
+                        }
                         .burger-icon-responsive {
                             display: block;
                         }
@@ -333,19 +363,21 @@
 @media screen and (max-width: $BreakPoint_500) {
     .chat-page-container {
         .message-container {
-            .message-wrapper {
-                .message-header {
-                    padding: 0 $HeaderResponsive500Marge;
+            .message-container-main { 
+                .message-wrapper {
+                    .message-header {
+                        padding: 0 $HeaderResponsive500Marge;
+                    }
+
+                    .header-user-info {
+                        padding: 0 $HeaderResponsive500Marge;
+                    }            
                 }
 
-                .header-user-info {
-                    padding: 0 $HeaderResponsive500Marge;
-                }            
-            }
-
-            .ul-container {
-                ul {
-                   padding-left: $HeaderResponsive500Marge;
+                .ul-container {
+                    ul {
+                    padding-left: $HeaderResponsive500Marge;
+                    }
                 }
             }
         }

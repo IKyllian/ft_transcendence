@@ -1,6 +1,6 @@
 import { useEffect, useState, useContext, useRef } from "react";
 import { useParams } from "react-router-dom";
-import { ChannelsDatas } from "../../../Interfaces/Datas-Examples";
+import { ChannelsDatas, ChannelsPublicDatas } from "../../../Interfaces/Datas-Examples";
 import { ChannelsInterfaceFront } from "../../../Interfaces/Interface-Chat";
 import SidebarItem from "./Sidebar-Item";
 import { SidebarContext } from "../Chat";
@@ -64,12 +64,11 @@ function Sidebar(props: {showModal: number, setShowModal: Function}) {
  
     return (
         <div ref={ref} className={`chat-sidebar ${sidebarStatus.sidebar ? "chat-sidebar-responsive" : ""}`}>
-            {/* <IconX className="sidebar-icon-responsive" /> */}
             <ul className="ul-wrapper">
                 <SidebarItem
                     index={0}
                     title="Channels"
-                    datasArray={chanDatas === undefined ? undefined : chanDatas.filter((elem) => elem.channel.isChannel)} // (Temporaire en attendant le Back) Sert pour l'instant à différencié le type ChannelInterface et PrivateMessageInterface puisque tout est stocker dans le meme tableau
+                    datasArray={chanDatas === undefined ? undefined : chanDatas.filter((elem) => elem.channel.isChannel)}
                     setShowModal={setShowModal}
                     showModal={showModal}
                     chanClick={chanClick}
@@ -77,7 +76,15 @@ function Sidebar(props: {showModal: number, setShowModal: Function}) {
                 <SidebarItem
                     index={1}
                     title="Messages Privées"
-                    datasArray={chanDatas === undefined ? undefined : chanDatas.filter((elem) => !elem.channel.isChannel)} // (Temporaire en attendant le Back) Sert pour l'instant à différencié le type ChannelInterface et PrivateMessageInterface puisque tout est stocker dans le meme tableau
+                    datasArray={chanDatas === undefined ? undefined : chanDatas.filter((elem) => !elem.channel.isChannel)}
+                    setShowModal={setShowModal}
+                    showModal={showModal}
+                    chanClick={chanClick}
+                />
+                <SidebarItem
+                    index={2}
+                    title="Public Channels"
+                    publicChanArray={ChannelsPublicDatas}
                     setShowModal={setShowModal}
                     showModal={showModal}
                     chanClick={chanClick}

@@ -2,7 +2,7 @@ import UserSidebarItem from "./User-Sidebar-Item";
 import { ExampleUser } from "../../../Interfaces/Interface-User";
 
 function UsersSidebar(props: {usersList: ExampleUser[]}) {
-    const {usersList} = props;
+    const { usersList } = props;
     return (
         <div className="users-sidebar">
             <div className="users-sidebar-wrapper">
@@ -17,7 +17,7 @@ function UsersSidebar(props: {usersList: ExampleUser[]}) {
                             if (index > 0)
                                 return <UserSidebarItem key={elem.id} user={elem} />
                             else 
-                                return <> </> //Temporaire
+                                return <> </> //Temporaire en attendant les roles
                         })
                     }
                 </ul>
