@@ -65,6 +65,36 @@ a, button{
   color: $WhitePalette;
   text-decoration: none;
 }
+
 .blur-background {
   filter: blur(5px);
+}
+
+.dropdown-container {
+  background-color: white;
+  position: absolute;
+  right: 20px;
+  top: 20px;
+  width: 100px;
+  border-radius: 5px;
+  background-color: $DarkPalette;
+  z-index: 100;
+
+  .dropdown-wrapper {
+    margin: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+
+    .red-item {
+      color: red;
+    }
+  
+    p {
+        margin: 0;
+        font-size: 13px;
+        letter-spacing: 1.5px;
+        cursor: pointer;
+    }
+  }
 }

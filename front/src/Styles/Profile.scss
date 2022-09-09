@@ -275,34 +275,6 @@ $FontSizeTextResponsive: 15px;
 
                 &-menu {
                     position: relative;
-                    .friend-list-modal {
-                        background-color: white;
-                        position: absolute;
-                        right: 20px;
-                        top: 20px;
-                        width: 100px;
-                        border-radius: 5px;
-                        padding: 5px 0 0 5px;
-                        background-color: $DarkPalette;
-
-                        p {
-                            margin: 0;
-                            font-size: 12px;
-                            cursor: pointer;
-
-                            &:not(:first-child) {
-                                margin-top: 2px;
-                            }
-
-                            &:first-child {
-                                color: red;
-                            }
-
-                            &:last-child {
-                                margin-bottom: 2px;
-                            }
-                        }
-                    }
                 }   
             }
         }

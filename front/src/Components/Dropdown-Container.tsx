@@ -1,7 +1,7 @@
-import { useEffect, useRef } from "react";
+import { ReactNode, useEffect, useRef } from "react";
 
-function FriendListModal(props: {show: boolean, onClickOutside: Function}) {
-    const { show, onClickOutside } = props;
+function DropdownContainer(props: {show: boolean, onClickOutside: Function, children?: ReactNode}) {
+    const { show, onClickOutside, children } = props;
 
     const ref = useRef<HTMLHeadingElement>(null);
 
@@ -17,16 +17,16 @@ function FriendListModal(props: {show: boolean, onClickOutside: Function}) {
             document.removeEventListener('click', handleClickOutside, true);
         };
     }, [onClickOutside]);
-    
-    return (!show) ? (
-        null
-    ) : (
-        <div ref={ref} className="friend-list-modal">
-            <p> Delete friend </p>
-            <p> Défier </p>
-            <p> Send message </p>
+
+    return show ? (
+        <div ref={ref} className="dropdown-container">
+            <div className="dropdown-wrapper">
+                {children}
+            </div>
         </div>
+    ) : (
+        <> </>
     );
 }
 
-export default FriendListModal;
+export default DropdownContainer;

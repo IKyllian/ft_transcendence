@@ -188,10 +188,12 @@
                                 }
         
                                 .message-sender {
+                                    cursor: pointer;
                                     font-size: 10px;
                                     color: #a5abb0;
                                     margin-top: 5px;
                                     text-decoration: none;
+                                    position: relative;
                                 }
                             }
                 
