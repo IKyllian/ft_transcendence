@@ -4,6 +4,7 @@ import { Repository } from "typeorm";
 import { User } from "src/entities/user.entity";
 import { Friendship, friendShipStatus } from "src/entities/friendship.entity";
 import { Statistic } from "src/entities/statistic.entity";
+import { Avatar } from "src/entities/avatar.entity";
 
 @Injectable()
 export class UserService {
@@ -13,7 +14,7 @@ export class UserService {
 		@InjectRepository(Friendship)
 		private friendshipsRepo: Repository<Friendship>,
 		@InjectRepository(Statistic)
-		private statisticsRepo: Repository<Statistic>
+		private statisticsRepo: Repository<Statistic>,
 	) {}
 	
 	findById(id: number): Promise<User | undefined> {
@@ -91,6 +92,11 @@ export class UserService {
 
 	async addLoss(user: User) {
 		user.statistic.matchLost++;
+		await this.usersRepo.save(user);
+	}
+
+	async updateAvatar(user: User, fileName: string) {
+		user.avatar = fileName;
 		await this.usersRepo.save(user);
 	}
 }

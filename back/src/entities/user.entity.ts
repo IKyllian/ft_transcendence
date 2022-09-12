@@ -20,9 +20,11 @@ export class User {
 	@Column({ nullable: true })
 	hash?: string
 	
-	@OneToOne(() => Avatar, { nullable: true })
-	@JoinColumn({ name: 'avatar_id' })
-	avatar?: Avatar;
+	/* @OneToOne(() => Avatar, { nullable: true })
+	@JoinColumn({ name: 'avatar_id' }) */
+	@Column({ nullable: true })
+	avatar?: string;
+	//avatar?: Avatar;
 	
 	@OneToOne(() => Statistic, (statistic) => statistic.user, { cascade: true, eager: true })
 	statistic: Statistic;
