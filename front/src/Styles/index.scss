@@ -66,6 +66,14 @@ a, button{
   text-decoration: none;
 }
 
+button {
+  cursor: pointer;
+}
+
+input, button {
+  all: unset;
+}
+
 .blur-background {
   filter: blur(5px);
 }
@@ -73,9 +81,9 @@ a, button{
 .dropdown-container {
   background-color: white;
   position: absolute;
-  right: 20px;
-  top: 20px;
-  width: 100px;
+  left: -20px;
+  top: 30px;
+  width: 200px;
   border-radius: 5px;
   background-color: $DarkPalette;
   z-index: 100;
@@ -94,7 +102,13 @@ a, button{
         margin: 0;
         font-size: 13px;
         letter-spacing: 1.5px;
+        padding: 5px;
+        border-radius: 5px;
         cursor: pointer;
+
+        &:hover {
+          background-color: $LightDarkPalette;
+        }
     }
   }
 }

@@ -33,8 +33,7 @@
             gap: 10px;
 
             svg {
-                width: 25px;
-                height: 25px;
+                @include width-height(25px, 25px);
             }
         }
 
@@ -57,20 +56,26 @@
         }
 
         .responsive-menu-drawer {
+            width: 140px;
             background-color: $DarkPalette;
             z-index: 99;
             position: absolute;
             top: 45px;
+            right: 0;
             border: 0.5px solid $WhitePalette;
             ul {
                 list-style-type: none;
                 margin: 0;
-                padding: 10px 20px;
-
+                padding: 0;
                 li {
+                    text-align: center;
                     cursor: pointer;
+                    padding: 10px;
                     &:not(&:first-child) {
                         margin-top: 7px;
+                    }
+                    &:hover {
+                        background-color: $LightDarkPalette;
                     }
                 }
             }
@@ -97,11 +102,6 @@
 @media screen and (max-width: $BreakPoint_500) {
     .header {
         padding: 0 $HeaderResponsive500Marge;
-        .header-right-responsive { 
-            .responsive-menu-drawer {
-                right: 0;
-            }
-        }
     }
 }
 

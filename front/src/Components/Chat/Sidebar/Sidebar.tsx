@@ -16,7 +16,8 @@ function Sidebar(props: {showModal: number, setShowModal: Function}) {
     useEffect(() => {
         const handleClickOutside = (event: any) => {
             if (ref.current && !ref.current.contains(event.target)) {
-                sidebarStatus.sidebar && sidebarStatus.setSidebarStatus && sidebarStatus.setSidebarStatus();
+                sidebarStatus.sidebar && sidebarStatus.setSidebarStatus 
+                && params.chatId !== undefined && sidebarStatus.setSidebarStatus();
             }
         };
         document.addEventListener('click', handleClickOutside, true);

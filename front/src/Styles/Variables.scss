@@ -12,8 +12,9 @@ $HeaderResponsive500Marge: 10px;
 
 $ProfileBlockMarge: 30px $HeaderMarge;
 
-$BreakPoint_800: 840px;
-$BreakPoint_500: 500px;
+$BreakPoint_800: 855px;
+$BreakPoint_500: 575px;
+$BreakPoint_400: 400px;
 
 $headerHeight: 70px;
 
@@ -74,6 +75,11 @@ $OfflineColor: rgb(194, 29, 29);
     display: flex;
     flex-direction: row;
     align-items: center;
+}
+
+@mixin width-height($width, $height) {
+    width: $width;
+    height: $height;
 }
 
 @font-face {

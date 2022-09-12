@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import ProfilPic from "../../../Images-Icons/pp.jpg"
 import { ExampleUser } from "../../../Interfaces/Interface-User";
 
@@ -24,7 +25,9 @@ function MatchHistoryItem(props: historyItemProps) {
             </p>
             <div className="player-container">
                 <img className='avatar-player' src={ProfilPic} alt="profil pic" />
-                <p> {enemyPlayer.name} </p>
+                <Link to="/profile">
+                    {enemyPlayer.name}
+                </Link>
             </div>
             
         </div>

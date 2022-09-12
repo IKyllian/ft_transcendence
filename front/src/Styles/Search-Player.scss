@@ -3,14 +3,12 @@
 .search-player-container {
     width: 100%;
     .modal-search {
-        width: 90%;
+        @include width-height(90%, 50px);
         @include flex-row-alignCenter();
         border-bottom: 1px solid $WhitePalette;
-        height: 50px;
         margin: 0 auto;
         svg {
-            width: 25px;
-            height: 25px;
+            @include width-height(25px, 25px);
             margin: 0 0 0 10px;
             cursor: pointer;
         }
@@ -53,8 +51,7 @@
             }
 
             input {
-                width: 17px;
-                height: 17px;
+                @include width-height(17px, 17px);
             }
         }
     }  
@@ -64,8 +61,7 @@
     .search-player-container {
         .modal-search {
             svg {
-                width: 20px;
-                height: 20px;
+                @include width-height(20px, 20px);
             }
 
             input {

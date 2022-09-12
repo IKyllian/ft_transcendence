@@ -72,8 +72,7 @@
     }
 
     .leave-icon {
-        width: 40px;
-        height: 40px;
+        @include width-height(40px, 40px);
         padding: 5px;
         color: $WhitePalette;
         position: absolute;

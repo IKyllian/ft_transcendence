@@ -6,6 +6,8 @@ import HomeButton from "./Home-Button";
 function Home() {
     const modalStatus = useContext(ModalContext);
 
+    console.log(window.location.href);
+
     return (
         <div className={`home-container ${modalStatus.modal.isOpen ? modalStatus.modal.blurClass : ""}`}>
             <div className="home-menu">

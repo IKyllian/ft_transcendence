@@ -20,8 +20,7 @@
         .home-button {
             all: unset;
             cursor: pointer;
-            width: 25em;
-            height: 3.5em;
+            @include width-height(25px, 3.5em);
             background-color: $BlueDarkPalette;
             border-radius: 30px;
             display: flex;

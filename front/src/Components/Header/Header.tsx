@@ -3,16 +3,23 @@ import { IconLogout, IconMessages, IconUserPlus, IconChevronDown } from '@tabler
 
 import { ModalContext } from '../ModalProvider';
 import ProfilPic from "../../Images-Icons/pp.jpg"
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 import ResponsiveMenu from './Responsive-Menu';
 
 function Header() {
     const [showMenu, setShowMenu] = useState<boolean>(false);
+    let location = useLocation();
 
     const modalStatus = useContext(ModalContext);
 
-    return (
+    const handleClick = () => {
+        setShowMenu(!showMenu);
+    }
+
+    return location.pathname === "/" ? (
+        <> </>
+    ) : (
         <header className={`header ${modalStatus.modal.isOpen ? modalStatus.modal.blurClass : ""}`} >
             <Link className='header-logo' to="/home">
                 pong
@@ -33,7 +40,7 @@ function Header() {
             <div className='header-right-responsive'>
                     <img className='header-picture' src={ProfilPic} alt="profil pic" />
                     <IconChevronDown onClick={() => setShowMenu(!showMenu)} />
-                    <ResponsiveMenu show={showMenu} headerModal={modalStatus.setStatus} />
+                    <ResponsiveMenu show={showMenu} handleClick={handleClick} headerModal={modalStatus.setStatus} />
                 </div>
         </header>
     );

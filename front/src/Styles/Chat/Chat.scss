@@ -33,8 +33,7 @@
                         gap: 5px;
                     }
                     .plus-icon {
-                        width: 20px;
-                        height: 20px;
+                        @include width-height(20px, 20px);
                     }
                 }
 
@@ -72,13 +71,11 @@
                                 }
                                 svg {
                                     &:first-child {
-                                        width: 17px;
-                                        height: 17px;
+                                        @include width-height(17px, 17px);
                                     }
                                     &:last-child {
                                         cursor: pointer;
-                                        width: 20px;
-                                        height: 20px;
+                                        @include width-height(20px, 20px);
                                         margin-left: 5px;
                                     }
                                 }
@@ -92,12 +89,10 @@
 
     .message-container {
         width: 80%;
-        max-height: 90vh;
         display: flex;
         flex-direction: row;
         .message-container-main {
-            height: 100%;
-            width: 100%;
+            @include width-height(100%, 100%);
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -106,9 +101,8 @@
             .message-wrapper {
                 height: 90%;
                 .message-header {
-                    width: 100%;
+                    @include width-height(100%, 50px);
                     background-color: $LightDarkPalette;
-                    height: 50px;
                     display: flex;
                     align-items: center;
                     justify-content: space-between;
@@ -139,9 +133,8 @@
                 }
     
                 .header-user-info {
-                    width: 100%;
+                    @include width-height(100%, 50px);
                     background-color: $LightDarkPalette;
-                    height: 50px;
                     border-bottom: 1px solid $WhitePalette;
                     @include flex-row-alignCenter;
     
@@ -232,8 +225,7 @@
                 cursor: pointer;
                 background-color: $OrangeProfile;
                 border-radius: 50%;
-                width: 30px;
-                height: 30px;
+                @include width-height(30px, 30px);
                 padding: 5px;
                 background: linear-gradient(112deg, rgba(255,94,0,1) 0%, rgba(255,145,0,1) 50%, rgba(255,154,0,1) 100%);
             }
@@ -245,8 +237,7 @@
         }
 
         .users-sidebar {
-            width: 300px;
-            height: 100%;
+            @include width-height(300px, 100%);
             background-color: $DarkPalette;
             overflow-y: auto;
             &-wrapper {
@@ -272,8 +263,7 @@
                                 @include avatar-player(40px);
                             }
                             .user-status {
-                                width: 20px;
-                                height: 20px;
+                                @include width-height(20px, 20px);
                                 border-radius: 50%;
                                 background-color: $DarkPalette;
                                 position: absolute;
@@ -281,8 +271,7 @@
                                 top: 25px;
                                 padding: 2px 0 0 2px;
                                 div {
-                                    width: 15px;
-                                    height: 15px;
+                                    @include width-height(15px, 15px);
                                     border-radius: 50%;
                                 }
                                 .online {
@@ -324,6 +313,12 @@
                         padding: 0 $HeaderResponsive800Marge;
                         &-right-side {
                             margin-right: 0px;
+                            svg {
+                                cursor: pointer;
+                                &:first-child {
+                                    margin-right: 0px;
+                                }
+                            }
                         }
                         .burger-icon-responsive {
                             display: block;

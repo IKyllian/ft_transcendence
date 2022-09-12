@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Header from "./Components/Header/Header";
 import Home from './Components/Home/Home';
-import Sign from './Components/Sign';
+import Sign from './Components/Sign/Sign';
 import Profile from './Components/Profile/Profile';
 import Leaderboard from './Components/Leaderboard/Leaderboard';
 import AddFriendModal from './Components/Add-Friend-Modal';

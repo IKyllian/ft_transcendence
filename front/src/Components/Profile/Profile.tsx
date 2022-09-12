@@ -33,7 +33,7 @@ function Profile() {
                 <div className='stats-infos'>
                     <StatsInfoItem label="Games Played" value="100" />
                     <StatsInfoItem label="Win Rate" value="50%" />
-                    <StatsInfoItem label="Rank" value="3" />
+                    <StatsInfoItem label="Rank" value="#3" />
                 </div>
                 <CardInfo />
             </div>

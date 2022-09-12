@@ -2,7 +2,7 @@ import AchievementItem from "../Items/Achievement-Item";
 
 function BlockAchievement() {
     return (
-        <div className="achievement-list">
+        <div className="profile-block-wrapper achievement-list">
             <AchievementItem />
             <AchievementItem />
             <AchievementItem />
