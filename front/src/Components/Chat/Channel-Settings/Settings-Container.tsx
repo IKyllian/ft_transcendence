@@ -4,12 +4,12 @@ import { IconX } from "@tabler/icons";
 import SidebarSettings from "./Sidebar-Settings";
 import RenderSettingPage from "./Render-Setting-Page";
 import { useNavigate, useParams } from "react-router-dom";
-import { ChannelsDatas, ChannelInterface, PrivateMessageInterface } from "../../../Interfaces/Datas-Examples";
+import { ChannelsDatas, ChatInterface } from "../../../Interfaces/Datas-Examples";
 
 
 function ChannelSettings() {
     const [sidebarItem, setSidebarItem] = useState<string>("Settings");
-    const [channelDatas, setChannelDatas] = useState<ChannelInterface | PrivateMessageInterface | undefined>(undefined);
+    const [channelDatas, setChannelDatas] = useState<ChatInterface | undefined>(undefined);
     const [loading, setLoading] = useState<boolean>(true);
      
     let params = useParams();

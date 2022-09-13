@@ -4,28 +4,24 @@ $FontSizeText: 20px;
 $FontSizeTextResponsive: 15px;
 
 .profile-container {
-    min-height: 90vh;
+    @include page-wrapper();
     background-color: $LightBluePalette;
-    font-family: Montserrat;
 
     .profile-header {
         background: url('../Images-Icons//Backgrounds/background-42.jpg') no-repeat center fixed;
         background-size: cover;
-        height: 250px;
-        width: 100%;
+        @include width-height(100%, 250px);
         position: relative;
 
         .stats-infos {
             height: 90%;
-            display: flex;
-            flex-direction: row;
+            @include flex-row-alignCenter();
             flex-wrap: wrap;
             justify-content: center;
-            align-items: center;
-            color: $WhitePalette;
             gap: 4em;
         
             .stat-elem {
+                margin: auto;
                 p {
                     margin: 0;
                     text-align: center;
@@ -48,15 +44,12 @@ $FontSizeTextResponsive: 15px;
         .card-info {
             z-index: 0;
             position: absolute;
-            bottom: -60px;
-            display: flex;
-            flex-direction: row;
-            align-items: center;
+            bottom: -58px;
+            @include flex-row-alignCenter();
             margin-left: $HeaderMarge;
-            color: $WhitePalette;
 
             .profile-avatar {
-                @include avatar-player(160px);
+                @include avatar-player(150px);
             }
 
             .player-status {
@@ -68,16 +61,14 @@ $FontSizeTextResponsive: 15px;
             }
 
             svg {
-                width: 13px;
-                height: 13px;
+                @include width-height(13px, 13px);
                 margin-left: 5px;
                 cursor: pointer;
             }
 
             .friend-icone {
                 margin-left: 20px;
-                width: 22px;
-                height: 22px;
+                @include width-height(22px, 22px);
 
                 &-add {
                     color: white;
@@ -89,8 +80,7 @@ $FontSizeTextResponsive: 15px;
             }
 
             .send-message-icon {
-                height: 22px;
-                width: 22px;
+                @include width-height(22px, 22px);
                 margin-left: 10px;
                 svg {
                     color: white;
@@ -100,11 +90,8 @@ $FontSizeTextResponsive: 15px;
             }
 
             .fight-button {
-                text-decoration: none;
-                display: flex;
-                align-items: center;
+                @include flex-row-alignCenter();
                 justify-content: center;
-                flex-direction: row;
                 gap: 5px;
                 color: $OrangeProfile;
                 margin-left: 20px;
@@ -113,7 +100,6 @@ $FontSizeTextResponsive: 15px;
                 border-radius: 10px;
                 background-color: $LightDarkPalette;
                 padding: 1em;
-                box-sizing: border-box;
 
                 &:hover {
                     background-color: $LightDarkPalette;
@@ -135,7 +121,6 @@ $FontSizeTextResponsive: 15px;
             flex-direction: row;
             gap: 5em;
             justify-content: center;
-            color: $WhitePalette;
             width: 100%;
 
             p {
@@ -152,30 +137,31 @@ $FontSizeTextResponsive: 15px;
             }
         }
 
+        .profile-block-wrapper {
+            margin-right: $HeaderMarge;
+        }
+
         .history-list {
             display: flex;
             flex-direction: column;
             gap: 10px;
-            margin: 30px 10px;
-            color: $WhitePalette;
         
             .history-item {
-                display: flex;
+                @include flex-row-alignCenter();
                 position: relative;
-                flex-direction: row;
                 justify-content: center;
-                align-items: center;
                 gap: 10px;
                 height: 50px;
                 background-color: $LightDarkPalette;
                 border-radius: 10px;
 
                 .player-container {
-                    display: flex;
-                    flex-direction: row;
-                    align-items: center;
+                    @include flex-row-alignCenter();
                     gap: 10px;
                     width: 100px;
+                    .avatar-player {  
+                        @include avatar-player(40px);
+                    }
                 }
         
                 .history-score {
@@ -200,19 +186,10 @@ $FontSizeTextResponsive: 15px;
                         font-weight: 500;
                     }
                 }
-
-                p:last-child {
-                    cursor: pointer;
-                }
-        
-                .avatar-player {  
-                    @include avatar-player(40px);
-                }
             }
         }
 
         .achievement-list {
-            margin-top: 30px;
             display: flex;
             flex-direction: row;
             flex-wrap: wrap;
@@ -220,23 +197,18 @@ $FontSizeTextResponsive: 15px;
 
             .achievement-item {
                 background-color: $LightDarkPalette;
-                display: flex;
-                flex-direction: row;
-                align-items: center;
-                width: 300px;
-                height: 100px;
-                color: $WhitePalette;
+                @include flex-row-alignCenter();
+                @include width-height(300px, 100px);
+
                 border-radius: 8px;
 
                 svg {
-                    width: 40%;
-                    height: 100%;
+                    @include width-height(40%, 100%);
                     color: rgb(211, 210, 210);
                 }
 
                 &-content {
-                    width: 60%;
-                    height: 100%;
+                    @include width-height(60%, 100%);
                     margin-right: 5px;
 
                     p {
@@ -259,7 +231,6 @@ $FontSizeTextResponsive: 15px;
         }
 
         .friends-list {
-            margin-top: 30px;
             display: flex;
             flex-direction: row;
             flex-wrap: wrap;
@@ -267,19 +238,13 @@ $FontSizeTextResponsive: 15px;
 
             .friend-item {
                 background-color: $LightDarkPalette;
-                display: flex;
-                flex-direction: row;
-                align-items: center;
+                @include flex-row-alignCenter();
                 justify-content: space-between;
-                width: 240px;
-                height: 70px;
-                color: $WhitePalette;
+                @include width-height(240px, 70px);
                 border-radius: 8px;
 
                 .friend-content {
-                    display: flex;
-                    flex-direction: row;
-                    align-items: center;
+                    @include flex-row-alignCenter();
                     gap: 5px;
                     margin-left: 10px;
 
@@ -299,35 +264,6 @@ $FontSizeTextResponsive: 15px;
 
                 &-menu {
                     position: relative;
-                    .friend-list-modal {
-                        background-color: white;
-                        position: absolute;
-                        right: 20px;
-                        top: 20px;
-                        width: 100px;
-                        border-radius: 5px;
-                        padding: 5px 0 0 5px;
-                        box-sizing: border-box;
-                        background-color: $DarkPalette;
-
-                        p {
-                            margin: 0;
-                            font-size: 12px;
-                            cursor: pointer;
-
-                            &:not(:first-child) {
-                                margin-top: 2px;
-                            }
-
-                            &:first-child {
-                                color: red;
-                            }
-
-                            &:last-child {
-                                margin-bottom: 2px;
-                            }
-                        }
-                    }
                 }   
             }
         }
@@ -335,9 +271,23 @@ $FontSizeTextResponsive: 15px;
 }
 
 
-@media screen and (max-width: 855px) {
+@media screen and (max-width: $BreakPoint_800) {
     .profile-container {
         .profile-header {
+            .stats-infos {
+                height: 70%;
+                .stat-elem {
+                    p {        
+                        &:first-child {
+                            font-size: 20px;
+                        }
+            
+                        &:last-child {
+                            font-size: 15px;
+                        }
+                    }
+                }
+            }
             .stats-infos {
                 .stat-elem {
                     p {
@@ -352,8 +302,8 @@ $FontSizeTextResponsive: 15px;
             }
             
             .card-info {
-                margin-left: $HeaderResponsiveMarge;
-                bottom: -30px;
+                margin-left: $HeaderResponsive800Marge;
+                bottom: -35px;
                 .profile-avatar {
                     @include avatar-player(100px);
                 }
@@ -368,18 +318,45 @@ $FontSizeTextResponsive: 15px;
             margin-left: 0;
 
             &-menu {
-                gap: 3em;
+                gap: 2em;
                 p {
                     font-size: $FontSizeTextResponsive;
                 }
             }
 
+            .profile-block-wrapper {
+                margin: 0 $HeaderResponsive800Marge;
+            }
+
+            .history-list {
+                .history-item {
+                    gap: 0;
+                    .player-container {
+                        font-size: 13px;
+                        overflow-x: scroll;
+                        .avatar-player {  
+                            @include avatar-player(30px);
+                        }
+                    }
+                    .history-score {
+                        font-size: 25px;
+                        margin: 0 0px;
+
+                        span:nth-child(2) {
+                            font-size: 12px;
+                            margin: 5px 0 0 0;
+                        }
+                   }
+                }
+            }
+
             .achievement-list {
-                margin-left: $HeaderResponsiveMarge;
+                margin-left: $HeaderResponsive800Marge;
                 justify-content: center;
                 .achievement-item {
                     width: 200px;
                     height: 80px;
+                    @include width-height(200px, 80px);
                     svg {
                         min-width: 30%;
                         max-width: 30%;
@@ -406,18 +383,49 @@ $FontSizeTextResponsive: 15px;
                 justify-content: center;
 
                 .friend-item {
-                    width: 200px;
-                    height: 70px;
+                    @include width-height(200px, 70px);
                 }
             }
         }
     }
 }
 
-@media screen and (max-width: 575px) {
+@media screen and (max-width: $BreakPoint_500) {
     .profile-container {
+        .profile-header {
+            .card-info {
+                margin-left: $HeaderResponsive500Marge;
+            }
+        }
         .profile-main {
             margin-top: 20px;
+            &-menu {
+                gap: 1em;
+            }
+            .profile-block-wrapper {
+                margin: 0 $HeaderResponsive500Marge;
+            }
+        }
+    }
+}
+
+@media screen and (max-width: $BreakPoint_400) {
+    .profile-container {
+        .profile-header {
+            .stats-infos {
+                @include width-height(90%, 60%);
+                .stat-elem {
+                    p {        
+                        &:first-child {
+                            font-size: 20px;
+                        }
+            
+                        &:last-child {
+                            font-size: 15px;
+                        }
+                    }
+                }
+            }
         }
     }
 }

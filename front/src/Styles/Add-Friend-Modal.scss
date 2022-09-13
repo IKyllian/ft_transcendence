@@ -2,8 +2,7 @@
 
 .modal-wrapper-container {
     position: absolute;
-    width: 100vw;
-    height: 100vh;
+    @include width-height(100vw, 100vh);
     background-color: $DarkPalette;
     .add-friend-modal-wrapper {
         @include modal-container(400px, 500px, $LightDarkPalette); // Params => Height, Width, Background-color
@@ -15,5 +14,12 @@
     }
 }
 
+@media screen and (max-width: $BreakPoint_800) {
+    .modal-wrapper-container {
+        .add-friend-modal-wrapper {
+            @include modal-container(400px, 90%, $LightDarkPalette);
+        }
+    }
+}
 
 

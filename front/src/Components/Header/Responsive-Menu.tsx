@@ -1,32 +1,28 @@
 import { Link } from "react-router-dom";
 
-function ResponsiveMenu(props: {show: boolean, headerModal: Function}) {
-    const { show, headerModal } = props;
+function ResponsiveMenu(props: {show: boolean, handleClick:Function, headerModal: Function}) {
+    const { show, handleClick, headerModal } = props;
 
-    if (show) {
-        return (
-            <div className="responsive-menu-drawer">
-                <ul>
-                    <li>
-                        <Link to="/profile">
-                            Profile
-                        </Link>
-                    </li>
-                    <li> 
-                        <Link to="/chat">
-                            Message
-                        </Link>
-                    </li>
-                    <li onClick={() => headerModal()}> Add friend </li>
-                    <li> Logout </li>
-                </ul>
-            </div>
-        );
-    } else {
-        return (
-            <> </>
-        );
-    }
+    return show ? (
+        <div className="responsive-menu-drawer">
+            <ul>
+                <li>
+                    <Link to="/profile" onClick={() => handleClick()}>
+                        Profile
+                    </Link>
+                </li>
+                <li> 
+                    <Link to="/chat" onClick={() => handleClick()}>
+                        Message
+                    </Link>
+                </li>
+                <li onClick={() => {headerModal(); handleClick()}}> Add friend </li>
+                <li onClick={() => handleClick()}> Logout </li>
+            </ul>
+        </div>
+    ) : (
+        <> </>
+    );
 }
 
 export default ResponsiveMenu;

@@ -7,12 +7,24 @@ $WhitePalette: #E0E1DD;
 $OrangeProfile: orange;
 
 $HeaderMarge: 80px;
-$HeaderResponsiveMarge: 10px;
+$HeaderResponsive800Marge: 40px;
+$HeaderResponsive500Marge: 10px;
 
 $ProfileBlockMarge: 30px $HeaderMarge;
 
+$BreakPoint_800: 855px;
+$BreakPoint_500: 575px;
+$BreakPoint_400: 400px;
 
+$headerHeight: 70px;
 
+$OnlineColor: rgb(15, 187, 15);
+$OfflineColor: rgb(194, 29, 29);
+
+@mixin page-wrapper {
+    min-height: 100%;
+    overflow: auto;
+}
 
 @mixin player-status {
     height: 13px;
@@ -21,11 +33,11 @@ $ProfileBlockMarge: 30px $HeaderMarge;
     margin: 0 10px 0 20px;
     
     &-online {
-        background-color: rgb(15, 187, 15);
+        background-color: $OnlineColor;
     }
 
     &-offline {
-        background-color: rgb(194, 29, 29);
+        background-color: $OfflineColor;
     }
 }
 
@@ -63,6 +75,11 @@ $ProfileBlockMarge: 30px $HeaderMarge;
     display: flex;
     flex-direction: row;
     align-items: center;
+}
+
+@mixin width-height($width, $height) {
+    width: $width;
+    height: $height;
 }
 
 @font-face {

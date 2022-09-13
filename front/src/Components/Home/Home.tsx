@@ -1,25 +1,22 @@
-import { RootState } from '../../Redux/Store'
-import { useAppSelector } from '../../Redux/Hooks'
-import { ModalState } from "../../Interfaces/Interface-Modal";
+import { useContext } from "react";
 
+import { ModalContext } from "../ModalProvider";
 import HomeButton from "./Home-Button";
-import Header from "../Header/Header";
 
 function Home() {
-    const modalStatus: ModalState =  useAppSelector((state: RootState) => state.modal);
+    const modalStatus = useContext(ModalContext);
+
+    console.log(window.location.href);
 
     return (
-        <>
-            <Header/>
-            <div className={`home-container ${modalStatus.isOpen ? modalStatus.blurClass : ""}`}>
-                <div className="home-menu">
-                    <h1> Pong Game </h1>
-                    <HomeButton text={"Play"} link={"/game"} />
-                    <HomeButton text={"Profile"} link={"/profile"} />
-                    <HomeButton text={"Leaderboard"} link={"/leaderboard"} />
-                </div>
+        <div className={`home-container ${modalStatus.modal.isOpen ? modalStatus.modal.blurClass : ""}`}>
+            <div className="home-menu">
+                <h1> Pong Game </h1>
+                <HomeButton text={"Play"} link={"/game"} />
+                <HomeButton text={"Profile"} link={"/profile"} />
+                <HomeButton text={"Leaderboard"} link={"/leaderboard"} />
             </div>
-        </>
+        </div>
     );
 }
 

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import {IconSearch} from "@tabler/icons";
+import { IconSearch } from "@tabler/icons";
 
 import { usersArray } from "../Interfaces/Datas-Examples"
 import { ExampleUser } from "../Interfaces/Interface-User";
