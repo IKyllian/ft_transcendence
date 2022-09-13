@@ -1,7 +1,7 @@
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useForm } from "react-hook-form";
 
-import {uid, secret_42} from "../../env";
+import { uid } from "../../env";
 
 type FormValues = {
     username: string,

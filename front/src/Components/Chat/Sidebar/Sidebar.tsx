@@ -25,7 +25,7 @@ function Sidebar(props: {showModal: number, setShowModal: Function}) {
         return () => {
             document.removeEventListener('click', handleClickOutside, true);
         };
-    }, [sidebarStatus, sidebarStatus.setSidebarStatus]);
+    }, [sidebarStatus, sidebarStatus.setSidebarStatus, params.chatId]);
 
     useEffect(() => {
         if (ChannelsDatas.length > 0) {
