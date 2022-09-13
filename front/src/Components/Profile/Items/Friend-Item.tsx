@@ -1,8 +1,7 @@
 import { useState } from "react";
-
 import { IconDotsVertical } from '@tabler/icons';
 
-import FriendListModal from "../Friend-List-Modal";
+import FriendListModal from "../Friend-Dropdown";
 
 function FriendItem(props: {name: string, profilPic: string}) {
     const {name, profilPic} = props;
@@ -10,11 +9,7 @@ function FriendItem(props: {name: string, profilPic: string}) {
     const [showModal, setShowModal] = useState<boolean>(false);
 
     const handleClick = () => {
-        if (showModal)
-            setShowModal(false);
-        else
-            setShowModal(true);
-        
+        setShowModal(!showModal);
     }
 
     return (
