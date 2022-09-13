@@ -1,10 +1,11 @@
-import { Injectable } from "@nestjs/common";
+import { ForbiddenException, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { User } from "src/entities/user.entity";
 import { Friendship, friendShipStatus } from "src/entities/friendship.entity";
 import { Statistic } from "src/entities/statistic.entity";
 import { Avatar } from "src/entities/avatar.entity";
+import { UserDto } from "./dto/user.dto";
 
 @Injectable()
 export class UserService {
@@ -16,12 +17,28 @@ export class UserService {
 		@InjectRepository(Statistic)
 		private statisticsRepo: Repository<Statistic>,
 	) {}
+
+	async create(userdto: UserDto) {
+		try {
+			console.log(userdto);
+			const user = this.usersRepo.create(userdto);
+			user.statistic = await this.statisticsRepo.save(new Statistic());
+			await this.usersRepo.save(user);
+			return user;
+
+		} catch (error) {
+			if (error.code === '23505') {
+				throw new ForbiddenException('Username taken');
+			}
+			throw error;
+		}
+	}
 	
 	findById(id: number): Promise<User | undefined> {
 		return this.usersRepo.findOne({ where: { id } });
 	}
 
-	findBy42Id(id42: string): Promise<User | undefined> {
+	findBy42Id(id42: number): Promise<User | undefined> {
 		return this.usersRepo.findOne({ where: { id42 } });
 	}
 
@@ -29,7 +46,7 @@ export class UserService {
 		return this.usersRepo.findOne({ where: { username } });
 	}
 
-	async setUsername(id42: string, name: string) : Promise<User | undefined> {
+	async setUsername(id42: number, name: string) : Promise<User | undefined> {
 		const UserExist = await this.findByUsername(name);
 		if (UserExist) {
 			throw new Error('Username already taken');
