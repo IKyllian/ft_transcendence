@@ -1,7 +1,9 @@
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useForm } from "react-hook-form";
+import { useEffect } from 'react';
+import axios from 'axios';
 
-import { uid } from "../../env";
+// import { uid } from "../../env";
 
 type FormValues = {
     username: string,
@@ -11,17 +13,34 @@ type FormValues = {
 function Sign() {
     const { register, control, handleSubmit } = useForm<FormValues>();
     let navigate = useNavigate();
+    const [searchParams, setSearchParams] = useSearchParams();
     const onSubmit = handleSubmit(async (data, e) => {
         e?.preventDefault();
         navigate("/home");
         console.log(data);
     });
 
+    useEffect(() => {
+        const authorizationCode = searchParams.get('code');
+
+        if (authorizationCode) {
+            axios.post('http://localhost:5000/api/auth/login42', { authorizationCode })
+            .then((response) => {
+                console.log('JWT =>', response.data);
+                // TODO stocker le jwt dans le store redux
+                navigate('/home');
+            })
+            .catch(err => {
+                // TODO Handle error: Display error message on login page
+            });
+        }
+    }, []);
+
     const sign42 = async (e: any) => {
         e.preventDefault();
         const url: string = "https://api.intra.42.fr/oauth/authorize";
-        const params: string = `?client_id=${uid}&redirect_uri=http://localhost:3000/home&response_type=code`;
-        window.location.replace(url+params);
+        const params: string = `?client_id=adbab679751cec3f90c7612f3cbe2a70eb1549967e1abea7873835e05bce7939&redirect_uri=http://localhost:3000&response_type=code`;
+        const ret = window.location.replace(url+params);
         // await fetch(url+params, {    
         //     method: 'GET',
         //     mode: 'no-cors',

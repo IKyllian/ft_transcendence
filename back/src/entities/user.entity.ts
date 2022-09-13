@@ -11,10 +11,10 @@ export class User {
 	@PrimaryGeneratedColumn()
 	id: number;
 	
-	@Column({ nullable: false })
+	@Column({ nullable: true })
 	id42?: number;
 
-	@Column({ nullable: false, unique: true })
+	@Column({ unique: true })
 	username: string;
 
 	@Column({ nullable: true })
