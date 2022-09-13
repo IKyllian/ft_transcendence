@@ -1,7 +1,13 @@
 import { useNavigate } from 'react-router-dom'
 import { useForm } from "react-hook-form";
-
+import { useAppDispatch, useAppSelector } from '../../Redux/Hooks'
 import { uid } from "../../env";
+import { usersArray } from '../../Interfaces/Datas-Examples';
+
+import LoadingSpin from '../Loading-Spin';
+
+import { loginPending, loginSuccess, loginError, logoutPending, logoutSuccess } from "../../Redux/AuthSlice";
+import { useEffect } from 'react';
 
 type FormValues = {
     username: string,
@@ -11,10 +17,21 @@ type FormValues = {
 function Sign() {
     const { register, control, handleSubmit } = useForm<FormValues>();
     let navigate = useNavigate();
+    const dispatch = useAppDispatch();
+    let authDatas = useAppSelector((state) => state.auth);
+
+
     const onSubmit = handleSubmit(async (data, e) => {
         e?.preventDefault();
-        navigate("/home");
         console.log(data);
+        // if (data.password === "" || data.username === "")
+        //     return ;
+        dispatch(loginPending());
+        setTimeout(() => {
+            dispatch(loginSuccess(usersArray[0]));
+        }, 2000);
+        
+        // navigate("/home");
     });
 
     const sign42 = async (e: any) => {
@@ -22,25 +39,13 @@ function Sign() {
         const url: string = "https://api.intra.42.fr/oauth/authorize";
         const params: string = `?client_id=${uid}&redirect_uri=http://localhost:3000/home&response_type=code`;
         window.location.replace(url+params);
-        // await fetch(url+params, {    
-        //     method: 'GET',
-        //     mode: 'no-cors',
-        //     // headers: {
-        //     //     'Access-Control-Allow-Origin':'*',
-        //     //     "Content-Type": "application/json",
-        //     // }
-        // })
-        // .then((response) => {
-        //     console.log(response);
-        //     console.log(response.url);
-        //     // response.json()
-        // }).catch(err => {
-        //     console.log(err);
-        // })
-        // .then((datas) => {
-        //     console.log(datas);
-        // })
     }
+
+    useEffect(() => {
+        if (authDatas.currentUser !== undefined) {
+            navigate("/home");
+        }
+    }, [authDatas])
     
     return (
         <div className="sign-container">
@@ -56,7 +61,10 @@ function Sign() {
 
                     <label htmlFor="password"> Password </label>
                     <input id="password" type="password" {...register("password")} />
-                    <input type='submit' value="Login" />
+                    <button type='submit'>
+                        {!authDatas.loading && "Login" }
+                        {authDatas.loading && <LoadingSpin />}
+                    </button>
                 </form>
             </div>
         </div>

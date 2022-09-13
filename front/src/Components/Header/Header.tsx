@@ -4,12 +4,14 @@ import { IconLogout, IconMessages, IconUserPlus, IconChevronDown } from '@tabler
 import { ModalContext } from '../ModalProvider';
 import ProfilPic from "../../Images-Icons/pp.jpg"
 import { Link, useLocation } from 'react-router-dom';
+import { useAppSelector } from '../../Redux/Hooks';
 
 import ResponsiveMenu from './Responsive-Menu';
 
 function Header() {
     const [showMenu, setShowMenu] = useState<boolean>(false);
     let location = useLocation();
+    let {currentUser} = useAppSelector(state => state.auth);
 
     const modalStatus = useContext(ModalContext);
 
@@ -17,11 +19,11 @@ function Header() {
         setShowMenu(!showMenu);
     }
 
-    return location.pathname === "/" ? (
+    return location.pathname === "/login" ? (
         <> </>
     ) : (
         <header className={`header ${modalStatus.modal.isOpen ? modalStatus.modal.blurClass : ""}`} >
-            <Link className='header-logo' to="/home">
+            <Link className='header-logo' to="/">
                 pong
             </Link>
             <div className='header-right'>
@@ -33,7 +35,7 @@ function Header() {
                 </div>
                 <Link className='header-profile' to="/profile">
                     <img className='header-picture' src={ProfilPic} alt="profil pic" />
-                    Kyllian 
+                    {currentUser?.name} 
                 </Link>
                 <IconLogout />
             </div>

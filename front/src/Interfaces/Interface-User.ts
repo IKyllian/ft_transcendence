@@ -8,3 +8,10 @@ export interface ExampleUser {
     isOnline: boolean;
     isInGame: boolean;
 }
+
+export interface AuthState {
+    currentUser: ExampleUser | undefined,
+    isAuthenticated: boolean,
+    error?: string,
+    loading: boolean,
+}
