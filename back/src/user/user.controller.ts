@@ -43,7 +43,7 @@ export class UserController {
 	}
 
 	@UseGuards(JwtGuard)
-	@Post('edit-username')
+	@Patch('edit-username')
 	editUser(@GetUser() user: User, @Body() body) {
 		console.log(body);
 		return this.userService.editUsername(user, body.username);
