@@ -1,8 +1,7 @@
 @use "./Variables.scss" as *;
 
 .home-container {
-    // min-width: 100%;
-    min-height: 90%;
+    @include page-wrapper();
     background-color: $LightDarkPalette;
     font-family: Silkscreen;
 
@@ -12,28 +11,25 @@
         align-items: center;
         justify-content: center;
         gap: 1.5em;
-        color: $WhitePalette;
 
         h1 {
             font-size: 90px;
+            text-align: center;
         }
 
         .home-button {
             all: unset;
             cursor: pointer;
-            width: 25em;
-            height: 3.5em;
+            @include width-height(25em, 3.5em);
             background-color: $BlueDarkPalette;
             border-radius: 30px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: $WhitePalette;
             transition-duration: 0.5s;
         }
     
         .home-button:hover {
-            // background-color: #4d6b8e;
             transform: scale(1.2);
             transition-timing-function: cubic-bezier(0.47, 2.02, 0.31, -0.36);
         }

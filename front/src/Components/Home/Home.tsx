@@ -1,22 +1,22 @@
-import React from "react";
+import { useContext } from "react";
 
+import { ModalContext } from "../ModalProvider";
 import HomeButton from "./Home-Button";
-import Header from "../Header/Header";
 
-function Home(props: any) {
-    const {modalIsOpen, blurClass} = props
+function Home() {
+    const modalStatus = useContext(ModalContext);
+
+    console.log(window.location.href);
+
     return (
-        <>
-            <Header modalIsOpen={modalIsOpen} blurClass={blurClass} />
-            <div className={`home-container ${blurClass}`}>
-                <div className="home-menu">
-                    <h1> Pong Game </h1>
-                    <HomeButton text={"Play"} link={"/game"} />
-                    <HomeButton text={"Profile"} link={"/profile"} />
-                    <HomeButton text={"Leaderboard"} link={"/leaderboard"} />
-                </div>
+        <div className={`home-container ${modalStatus.modal.isOpen ? modalStatus.modal.blurClass : ""}`}>
+            <div className="home-menu">
+                <h1> Pong Game </h1>
+                <HomeButton text={"Play"} link={"/game"} />
+                <HomeButton text={"Profile"} link={"/profile"} />
+                <HomeButton text={"Leaderboard"} link={"/leaderboard"} />
             </div>
-        </>
+        </div>
     );
 }
 

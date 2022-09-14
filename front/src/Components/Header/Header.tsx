@@ -1,34 +1,48 @@
-import React from 'react'
+import { useState, useContext } from 'react';
+import { IconLogout, IconMessages, IconUserPlus, IconChevronDown } from '@tabler/icons';
 
-import { IconLogout, IconMessages, IconUserPlus } from '@tabler/icons';
-
+import { ModalContext } from '../ModalProvider';
 import ProfilPic from "../../Images-Icons/pp.jpg"
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
-import AddFriendModal from '../Add-Friend-Modal';
+import ResponsiveMenu from './Responsive-Menu';
 
-function Header(props: any) {
-    const {modalIsOpen, blurClass} = props;
-    return (
-        <>
-            <header className={`header ${blurClass}`} >
-            {/* <header className="header" > */}
-                <Link className='header-logo' to="/home">
-                    pong
-                </Link>
-                <div className='header-right'>
-                    <div className='icons-header'>
-                        <IconUserPlus onClick={() => modalIsOpen(true)} />
+function Header() {
+    const [showMenu, setShowMenu] = useState<boolean>(false);
+    let location = useLocation();
+
+    const modalStatus = useContext(ModalContext);
+
+    const handleClick = () => {
+        setShowMenu(!showMenu);
+    }
+
+    return location.pathname === "/" ? (
+        <> </>
+    ) : (
+        <header className={`header ${modalStatus.modal.isOpen ? modalStatus.modal.blurClass : ""}`} >
+            <Link className='header-logo' to="/home">
+                pong
+            </Link>
+            <div className='header-right'>
+                <div className='icons-header'>
+                    <IconUserPlus onClick={() => modalStatus.setStatus()} />
+                    <Link to="/chat">
                         <IconMessages />
-                    </div>
-                    <Link className='header-profile' to="/profile">
-                        <img className='header-picture' src={ProfilPic} alt="profil pic" />
-                        Kyllian 
                     </Link>
-                    <IconLogout />
                 </div>
-            </header>
-        </>
+                <Link className='header-profile' to="/profile">
+                    <img className='header-picture' src={ProfilPic} alt="profil pic" />
+                    Kyllian 
+                </Link>
+                <IconLogout />
+            </div>
+            <div className='header-right-responsive'>
+                    <img className='header-picture' src={ProfilPic} alt="profil pic" />
+                    <IconChevronDown onClick={() => setShowMenu(!showMenu)} />
+                    <ResponsiveMenu show={showMenu} handleClick={handleClick} headerModal={modalStatus.setStatus} />
+                </div>
+        </header>
     );
 }
 

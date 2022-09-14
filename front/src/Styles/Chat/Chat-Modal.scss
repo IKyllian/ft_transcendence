@@ -1,0 +1,74 @@
+@use '../Variables.scss' as *;
+
+.chat-modal {
+    @include modal-container(550px, 550px, $DarkPalette); // Params => Height, Width, Background-color
+    padding: 10px;
+
+    .search-player-container {
+        .modal-player-list {
+            height: 85%;
+        }
+    }
+
+    form {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        margin-bottom: 10px;
+        label {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            font-size: 15px;
+            input {
+                all: unset;
+                cursor: pointer;
+                padding: 8px;
+                border: 1px solid $WhitePalette;
+                margin-top: 2px;
+                &::placeholder {
+                    font-size: 12px;
+                }
+            }
+        }
+
+        .chat-modal-buttons {
+            position: absolute;
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            gap: 10px;
+            bottom: 10px;
+            button, input {
+                @include width-height(80px, 40px);
+                border: none;
+                font-size: 17px;
+                font-weight: bold;
+                cursor: pointer;
+                border-radius: 10px;
+    
+                &:first-child {
+                    background-color: $DarkPalette;
+                    color: red;
+                }
+    
+                &:last-child {
+                    background-color: rgb(255, 123, 0);
+                }
+            }
+        }
+    
+        .search-player-container {
+            .modal-player-list {
+                height: 250px;
+            }
+        }
+    }
+}
+
+@media screen and (max-width: $BreakPoint_800) {
+    .chat-modal {
+        @include modal-container(550px, 90%, $DarkPalette);
+    }
+}

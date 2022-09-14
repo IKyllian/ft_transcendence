@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import { useState, useContext } from "react";
+import { ModalContext } from "../ModalProvider";
 
-import Header from "../Header/Header";
 import StatsInfoItem from "./Items/Stats-Info-Item";
 import RenderProfileBlock from "./Render-Profile-Block";
 import CardInfo from "./Card-Info";
@@ -10,13 +10,14 @@ interface profileMenuButtons {
     isActive: string;
 }
 
-function Profile(props: any) {
-    const {modalIsOpen, blurClass} = props
+function Profile() {
     const [attributes, setAttributes] = useState<profileMenuButtons[]>([
         { title: "Achievements", isActive: "true" },
         { title: "Matches", isActive: "false" },
         { title: "Friends", isActive: "false" }
     ]);
+
+    const modalStatus = useContext(ModalContext);
     
     const handleClick = (index: number) => {
        let newArray = [...attributes];
@@ -27,29 +28,26 @@ function Profile(props: any) {
     }
 
     return (
-        <>
-            <Header modalIsOpen={modalIsOpen} blurClass={blurClass} />
-            <div className={`profile-container ${blurClass}`}>
-                <div className="profile-header">
-                    <div className='stats-infos'>
-                        <StatsInfoItem label="Games Played" value="100" />
-                        <StatsInfoItem label="Win Rate" value="50%" />
-                        <StatsInfoItem label="Rank" value="3" />
-                    </div>
-                    <CardInfo />
+        <div className={`profile-container ${modalStatus.modal.isOpen ? modalStatus.modal.blurClass : ""}`}>
+            <div className="profile-header">
+                <div className='stats-infos'>
+                    <StatsInfoItem label="Games Played" value="100" />
+                    <StatsInfoItem label="Win Rate" value="50%" />
+                    <StatsInfoItem label="Rank" value="#3" />
                 </div>
-                <div className="profile-main">
-                    <div className="profile-main-menu">
-                        {
-                            attributes.map((elem, index) =>
-                                <p key={index} onClick={() => handleClick(index)} is-target={elem.isActive}> {elem.title} </p>
-                            )
-                        }
-                    </div>
-                    <RenderProfileBlock blockTitle={attributes.find(elem => elem.isActive === "true")!.title} />
-                </div>
+                <CardInfo />
             </div>
-        </>
+            <div className="profile-main">
+                <div className="profile-main-menu">
+                    {
+                        attributes.map((elem, index) =>
+                            <p key={index} onClick={() => handleClick(index)} is-target={elem.isActive}> {elem.title} </p>
+                        )
+                    }
+                </div>
+                <RenderProfileBlock blockTitle={attributes.find(elem => elem.isActive === "true")!.title} />
+            </div>
+        </div>
     );
 }
 

@@ -1,6 +1,4 @@
-import React from "react";
-
-function StatsInfoItem(props: any) {
+function StatsInfoItem(props: {label: string, value: string}) {
     const { label, value } = props;
     return (
         <div className='stat-elem'>

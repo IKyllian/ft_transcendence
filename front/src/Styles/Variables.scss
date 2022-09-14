@@ -7,8 +7,24 @@ $WhitePalette: #E0E1DD;
 $OrangeProfile: orange;
 
 $HeaderMarge: 80px;
+$HeaderResponsive800Marge: 40px;
+$HeaderResponsive500Marge: 10px;
+
 $ProfileBlockMarge: 30px $HeaderMarge;
 
+$BreakPoint_800: 855px;
+$BreakPoint_500: 575px;
+$BreakPoint_400: 400px;
+
+$headerHeight: 70px;
+
+$OnlineColor: rgb(15, 187, 15);
+$OfflineColor: rgb(194, 29, 29);
+
+@mixin page-wrapper {
+    min-height: 100%;
+    overflow: auto;
+}
 
 @mixin player-status {
     height: 13px;
@@ -17,11 +33,11 @@ $ProfileBlockMarge: 30px $HeaderMarge;
     margin: 0 10px 0 20px;
     
     &-online {
-        background-color: rgb(15, 187, 15);
+        background-color: $OnlineColor;
     }
 
     &-offline {
-        background-color: rgb(194, 29, 29);
+        background-color: $OfflineColor;
     }
 }
 
@@ -31,17 +47,40 @@ $ProfileBlockMarge: 30px $HeaderMarge;
     border-radius: 50%;
 }
 
-// @mixin flex-row($align-items, $justify-content, $wrap) {
-//     display: flex;
-//     flex-direction: row;
-//     justify-content: $justify-content;
+@mixin modal-container($height, $width, $bgColor) {
+    z-index: 100;
+    height: $height;
+    width: $width;
+    position: absolute;
+    left:0;
+    right:0;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+    border-radius: 10px;
+    background-color: $bgColor;
 
-//     @if $align-items != "none" {
-//         align-items: $align-items;
-//     }
+    .modal-exit {
+        position: absolute;
+        right: 0;
+        top: -55px;
+        width: 40px;
+        height: 40px;
+        color: $WhitePalette;
+        cursor: pointer;
+    }
+}
 
-//     flex-wrap: $wrap;
-// }
+@mixin flex-row-alignCenter {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+@mixin width-height($width, $height) {
+    width: $width;
+    height: $height;
+}
 
 @font-face {
     font-family: Montserrat;

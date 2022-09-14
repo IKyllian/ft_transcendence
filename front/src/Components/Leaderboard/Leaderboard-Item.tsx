@@ -1,8 +1,17 @@
-import React from "react";
 import { Link } from "react-router-dom";
 import { IconEye } from "@tabler/icons";
 
-function LeaderboardItem(props: any) {
+interface LeaderboardItemProps {
+    pos: number,
+    name: string,
+    gamesPlayed: number,
+    winRate: number,
+    points: number,
+    isOnline: boolean,
+    isInGame: boolean
+}
+
+function LeaderboardItem(props: LeaderboardItemProps) {
     const { pos, name, gamesPlayed, winRate, points, isOnline, isInGame } = props;
 
     return (
@@ -14,12 +23,12 @@ function LeaderboardItem(props: any) {
                 </Link>
             </td>
             <td> { gamesPlayed } </td>
-            <td> { winRate }% </td>
+            <td className="responsive-column"> { winRate }% </td>
             <td> { points } </td>
-            <td className="leaderboard-status"> 
+            <td className="leaderboard-status responsive-column"> 
                 <div className={`player-status player-status-${isOnline ? "online" : "offline"}`}> </div>
             </td>
-            <td className="leaderboard-spec">
+            <td className="leaderboard-spec responsive-column">
                 { isInGame && <Link to="#"> <IconEye /> </Link> }
             </td>
         </tr>
