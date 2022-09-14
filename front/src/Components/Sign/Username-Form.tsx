@@ -24,7 +24,7 @@ function UsernameForm() {
         e?.preventDefault();
         if (data.username === "")
             return ;
-        axios.post('http://localhost:5000/api/users/edit-username', {username: data.username}, {
+        axios.patch('http://localhost:5000/api/users/edit-username', {username: data.username}, {
             headers: {
                 "Authorization": `Bearer ${locationState.token}`,
             }
