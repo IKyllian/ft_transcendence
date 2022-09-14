@@ -4,41 +4,152 @@ import {
 	SubscribeMessage,
 	OnGatewayConnection,
 	OnGatewayDisconnect,
+	ConnectedSocket,
+	MessageBody
   } from '@nestjs/websockets';
-  
+import { Socket, Server } from 'socket.io';
+import { LobbyFactory } from '../lobby/lobby.factory';
+import { NewGameData, PlayersLobbyData } from '../types/shared.types';
+
+
   @WebSocketGateway({ cors: true })
-  export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
-	@WebSocketServer() server;
-	users: number = 0;
-	
-  
-	async handleConnection() {
-	  // A client has connected
-	  this.users++;
-console.log("someone connected");
-	  // Notify connected clients of current users
-	  this.server.emit('ok_connect', this.users);
-	}
-  
-	async handleDisconnect() {
-	  // A client has disconnected
-	  this.users--;
-console.log("someone disconnected");
-	  // Notify connected clients of current users
-	  this.server.emit('ok_message', this.users);
-	}
-  
-	@SubscribeMessage('pouet')
-	async onPouet() {
-		console.log("someone called pouet");
-		this.server.emit('ok_pouet', this.users);
+  export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect
+  {
+
+	/* ----- Initialisation ----- */
+
+	@WebSocketServer() server: Server;
+	admin?: Socket;
+//get admin secret from envs
+	admin_secret: string = 'praclarushtaonas';
+
+	constructor(
+		private readonly lobbyfactory: LobbyFactory,
+	  )
+	  {
+	  }
+
+	afterInit(server: Server): any
+	{
+	  this.lobbyfactory.server = server;
 	}
 
 
 
 
+
+	/* ----- Connect/Disconnect ----- */
+
+	async handleConnection(client: Socket)
+	{
+		console.log("someone connected", client['id']);
+	}
+  
+	async handleDisconnect(client: Socket)
+	{
+		console.log("someone disconnected ", client['id']);
+		this.lobbyfactory.lobby_quit(client);
+	}
+
+	@SubscribeMessage('ping')
+	async onPing(client: Socket)
+	{
+		client.emit('pong');
+	}
+
+
+
+
+
+	/* ----- Administration ----- */
+
+	@SubscribeMessage('admin_authenticate')
+	async onAdminAuthenticate(@ConnectedSocket() client: Socket,
+	@MessageBody() data: string)
+	{
+//		console.log("admin password received:", data);
+
+		if (data == this.admin_secret)
+		{
+			this.admin = client;
+			console.log("admin has logged in");
+			client.emit('admin_connection', true);
+		}
+		else
+		{
+			client.emit('admin_connection', false);
+			//log the incident somewhere
+		}
+	}
+
+	@SubscribeMessage('admin_newgame')
+	async onAdminNewGame(@ConnectedSocket() client: Socket,
+	@MessageBody() data: {player_A: string, player_B: string})
+	{
+		// console.log('in onAdminNewGame');
+		// console.log(data);
+		if (client['id'] == this.admin['id'])
+		{
+			const gamedata: NewGameData = this.lobbyfactory.lobby_create(data);
+			console.log(gamedata);
+			client.emit('newgame_data', gamedata);
+		}
+		else
+		{
+			//log the event somewhere
+		}	
+	}
+
+	@SubscribeMessage('admin_lobby_quantity')
+	async onAdminLobbyQuantity(@ConnectedSocket() client: Socket)
+	{
+		if (client['id'] == this.admin['id'])
+		{
+			client.emit('lobby_quantity', this.lobbyfactory.get_lobby_quantity());
+		}
+		else
+		{
+			//log the event somewhere
+		}	
+	}
+
+	@SubscribeMessage('admin_lobby_list')
+	async onAdminLobbyList(@ConnectedSocket() client: Socket,
+	@MessageBody() data: {player_A: string, player_B: string})
+	{
+		if (client['id'] == this.admin['id'])
+		{
+			client.emit('lobby_list', this.lobbyfactory.get_lobby_list());
+		}
+		else
+		{
+			//log the event somewhere
+		}	
+	}
+
+
+	/* ----- Users Lobby Management ----- */
+
+
+	@SubscribeMessage('user_join_lobby')
+	async onUserJoinLobby(@ConnectedSocket() client: Socket,
+	@MessageBody() data: PlayersLobbyData)
+	{
+console.log("user join lobby", data);
+		this.lobbyfactory.lobby_join(client, data);
+	}
+
+	@SubscribeMessage('user_is_ready')
+	async onUserisReady(@ConnectedSocket() client: Socket)
+	{
+		this.lobbyfactory.lobby_player_ready(client);
+	}
 
   }
+
+
+//   @SubscribeMessage('set-broadcaster')
+//  async setBroadcaster(@ConnectedSocket() client: Socket, @MessageBody() data: {client_id: string, password: string}) {
 
 
 //   @SubscribeMessage('join')

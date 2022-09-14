@@ -12,9 +12,57 @@
 
     <script src="libpong.js"></script>
 
-    <button onclick="runMario()">Mario</button> 
+
+    <button onclick="buildlobby()">new lobby(check console)</button> 
+
+    <div>Mario</div>
+    <form onsubmit="return playMario(this)">
+      <div>
+        <label>game_id:</label>
+        <input id="game_id" name="game_id" type="text">
+      </div>
+      <div>
+        <label>mario_secret:</label>
+        <input id="player_secret" name="player_secret" type="text">
+      </div>
+      <div>
+        <input id="submit" type="submit">
+      </div>
+    </form>
+
+    <div>Luigi</div>
+    <form onsubmit="return playLuigi(this)">
+      <div>
+        <label>game_id:</label>
+        <input id="game_id" name="game_id" type="text">
+      </div>
+      <div>
+        <label>luigi_secret:</label>
+        <input id="player_secret" name="player_secret" type="text">
+      </div>
+      <div>
+        <input id="submit" type="submit">
+      </div>
+    </form>
+
+    <div>Spect</div>
+    <form onsubmit="return playSpect(this)">
+      <div>
+        <label>game_id:</label>
+        <input id="game_id" name="game_id" type="text">
+      </div>
+      <div>
+        <label>spectator_secret:</label>
+        <input id="player_secret" name="player_secret" type="text">
+      </div>
+      <div>
+        <input id="submit" type="submit">
+      </div>
+    </form>
+
+    <!-- <button onclick="runMario()">Mario</button> 
     <button onclick="runLuigi()">Luigi</button>
-    <button onclick="runSpect()">Spectator</button>
+    <button onclick="runSpect()">Spectator</button> -->
 
 
     <script>
@@ -33,12 +81,85 @@
 
     // whenAvailable("libpong", function(t) {
 
-    //     //ask new game
+    //   window.libpong.admin_new_game('Mario', 'Luigi');
 
     // });
     
+    function playMario(form) {
+      window.libpong.launch_game(
+            {
+              player_A:
+              {
+                  name: 'Mario',
+                  win: 15,
+                  loss: 8,
+                  avatar: 'avatars/mario.png'
+              },
+              player_B:
+              {
+                  name: 'Luigi',
+                  win: 6,
+                  loss: 12,
+                  avatar: 'avatars/luigi.jpeg'
+              },
+              playertype: 0,
+              player_secret: form.player_secret,
+              game_id: form.game_id
+            });
+    }
+
+    function playLuigi(form) {
+      window.libpong.launch_game(
+            {
+              player_A:
+              {
+                  name: 'Mario',
+                  win: 15,
+                  loss: 8,
+                  avatar: 'avatars/mario.png'
+              },
+              player_B:
+              {
+                  name: 'Luigi',
+                  win: 6,
+                  loss: 12,
+                  avatar: 'avatars/luigi.jpeg'
+              },
+              playertype: 1,
+              player_secret: form.player_secret,
+              game_id: form.game_id
+            });
+    }
 
 
+    function playSpect(form) {
+      window.libpong.launch_game(
+            {
+              player_A:
+              {
+                  name: 'Mario',
+                  win: 15,
+                  loss: 8,
+                  avatar: 'avatars/mario.png'
+              },
+              player_B:
+              {
+                  name: 'Luigi',
+                  win: 6,
+                  loss: 12,
+                  avatar: 'avatars/luigi.jpeg'
+              },
+              playertype: 2,
+              player_secret: '',
+              game_id: form.game_id
+            });
+    }
+
+      function buildlobby()
+      {
+        var data = window.libpong.admin_new_game('Mario', 'Luigi');
+        console.log("data from the html", data);
+      }
 
       function runMario()
       {
@@ -115,12 +236,6 @@
 
 
 <script src="libpong.js"></script>
-<script>
-  
- // window.libpong.launch_pong_duel(data);
-
-</script>
-
 
   </body>
 

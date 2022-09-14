@@ -1,13 +1,45 @@
 import 'phaser';
 import Pong from './scenes/Pong';
 import Lobby from './scenes/Lobby';
-// import { Player} from './types';
-import { Player, Game } from './types';
+import { NewGameData, PlayersGameData } from './types/shared.types';
+import { io, Socket } from 'socket.io-client';
 
-export function launch_game(players_data: Game): void
+
+// export function admin_login(): void
+// {
+// 	const sock: Socket = io('http://localhost:6161');
+// 	sock.emit('admin_authenticate', 'paclarushtaonas');
+
+// 	sock.on('admin_connection',function(data){
+// 		console.log('server reponse: admin_conenction:', data);
+// 	});
+// }
+
+export function admin_new_game(player_A: string, player_B: string): NewGameData | void
 {
+	const sock: Socket = io('http://localhost:6161');
+	//let gamedata: NewGameData;
+//get admin secret from env
+	sock.emit('admin_authenticate', 'praclarushtaonas');
 
+	sock.on('admin_connection',function(data: boolean){
+		console.log('server reponse: admin_conenction:', data);
+	});
 
+	console.log('requesting new game for', player_A, player_B);
+	sock.emit('admin_newgame', {player_A: player_A, player_B: player_B});
+
+	sock.on('new_game_data',function(data:NewGameData){
+		console.log('server reponse: new_game_data:', data);
+		//gamedata = data;
+		sock.disconnect();
+		return data;
+	});
+	//sock.disconnect();
+}
+
+export function launch_game(players_data: PlayersGameData): void
+{
 	const config = {
 		type: Phaser.AUTO,
 		parent: 'game_anchor',
@@ -16,46 +48,10 @@ export function launch_game(players_data: Game): void
 		height: 600,
 		callbacks: {
 			preBoot: function (game) {
-				console.log('config callback');
-
 				game.registry.set('players_data', players_data);
 			}
 		  },
 		scene: [ Lobby, Pong ]
 	};
-	
-	
 	const game = new Phaser.Game(config);
-
-}
-
-export function launch_pong_duel(player: Player): void
-{
-	// console.log('config launch_pong_duel');
-	// console.log('player.name', player.name);
-	// console.log('player.win', player.win);
-	// console.log('player.loss', player.loss);
-	// console.log('player.playertype', player.playertype);
-
-	const config = {
-		type: Phaser.AUTO,
-		parent: 'game_anchor',
-		backgroundColor: '#FFFFFF',
-		width: 800,
-		height: 600,
-		callbacks: {
-			preBoot: function (game) {
-				console.log('config callback');
-
-				game.registry.set('player', player);
-	
-			 // game.registry.merge({'allo': 'coucou de preset value'});
-			}
-		  },
-		scene: [ Lobby, Pong ]
-	};
-	
-	
-	const game = new Phaser.Game(config);
-	
 }

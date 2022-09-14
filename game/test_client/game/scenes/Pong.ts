@@ -1,6 +1,6 @@
 import 'phaser';
 import { io } from "socket.io-client";
-import { PlayerType } from '../types';
+import { PlayerType } from '../types/shared.types';
 
 export default class Pong extends Phaser.Scene
 {

@@ -1,5 +1,5 @@
 import 'phaser';
-import { PlayerType } from '../types';
+import { PlayersLobbyData, PlayerStatus, PlayerType } from '../types/shared.types';
 import { io, Socket } from "socket.io-client";
 
 export default class Lobby extends Phaser.Scene
@@ -9,10 +9,10 @@ export default class Lobby extends Phaser.Scene
 		super({ key: 'Lobby' });
 	}
 
-	player: PlayerType;
-	A_isready: boolean;
-	B_isready: boolean;
-	socket: Socket;
+	player?: PlayerType;
+	player_A_is_ready: PlayerStatus = PlayerStatus.Absent;
+	player_B_is_ready: PlayerStatus = PlayerStatus.Absent;
+	socket?: Socket;
 	
 	preload ()
 	{
@@ -24,12 +24,18 @@ export default class Lobby extends Phaser.Scene
 		'player_b_avatar',
 		this.game.registry.get('players_data').player_B.avatar
 	  );
+
+	  this.load.image(
+		'ready_button',
+		'avatars/peach.jpg'
+	  ); 
 	}
 
 	create ()
 	{
 		this.add.image(30, 30, 'player_a_avatar').setOrigin(0).setDisplaySize(200, 200);
 		this.add.image(430, 30, 'player_b_avatar').setOrigin(0).setDisplaySize(200, 200);
+		this.add.image(230, 230, 'ready_button').setOrigin(0).setDisplaySize(200, 200);
 
 		this.player = this.game.registry.get('players_data').playertype;
 
@@ -42,12 +48,20 @@ export default class Lobby extends Phaser.Scene
 
 
 		//this.ready_to_go();
+		this.socket = io('http://localhost:6161');
+		this.game.registry.set('socket', this.socket);
 
+
+		let lobbydata: PlayersLobbyData = 
+		{
+			player_secret: this.game.registry.get('players_data').player_secret,
+			game_id: this.game.registry.get('players_data').game_id
+		};
+		this.socket.emit('user_join_lobby', lobbydata);
+		this.socket.emit('user_is_ready');
 	}
 
 	prepare_matchup = () => {
-		this.socket = io('http://localhost:6161');
-		this.game.registry.set('socket', this.socket);
 		
 		if (this.player == PlayerType.Player_A)
 		{
