@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable, UnauthorizedException } from "@nestjs/common";
+import { ForbiddenException, forwardRef, Inject, Injectable, UnauthorizedException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { User } from "src/entities/user.entity";
 import { Statistic } from "src/entities/statistic.entity";
@@ -15,10 +15,11 @@ import { UserService } from "src/user/user.service";
 @Injectable()
 export class AuthService {
 	constructor(
+		@Inject(forwardRef(() => UserService))
+		private userService: UserService,
 		private jwt: JwtService,
 		private config: ConfigService,
 		private readonly httpService: HttpService,
-		private userService: UserService,
 		@InjectRepository(User)
 		private usersRepo: Repository<User>,
 		@InjectRepository(Statistic)
@@ -36,7 +37,11 @@ export class AuthService {
 			user.statistic = await this.statsRepo.save(new Statistic());
 			await this.usersRepo.save(user);
 			console.log(user);
-			return this.signToken(user.id, user.username);
+			
+			return {
+				token: await this.signToken(user.id, user.username),
+				user: user,
+			}
 
 		} catch (error) {
 			if (error.code === '23505') {
@@ -60,8 +65,10 @@ export class AuthService {
 		if (!pwdMatches)
 			throw new ForbiddenException('Password incorrect');
 
-		console.log(user.statistic.matchWon);
-		return this.signToken(user.id, user.username);
+		return {
+			token: await this.signToken(user.id, user.username),
+			user: user,
+		}
 	}
 
 	async get42token(code: string) {
@@ -93,7 +100,11 @@ export class AuthService {
 				 id42: response.data.id,
 			});
 		}
-		return this.signToken(user.id, user.username);
+		return {
+			token: await this.signToken(user.id, user.username),
+			user: user,
+			usernameSet: user.username ? true : false,
+		}
 	}
 	
 	async signToken(userId: number, username: string): Promise<{ access_token: string }> {
