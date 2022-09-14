@@ -1,4 +1,4 @@
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { IconLogout, IconMessages, IconUserPlus, IconChevronDown } from '@tabler/icons';
 
 import { ModalContext } from '../ModalProvider';
@@ -11,7 +11,7 @@ import ResponsiveMenu from './Responsive-Menu';
 function Header() {
     const [showMenu, setShowMenu] = useState<boolean>(false);
     let location = useLocation();
-    let {currentUser} = useAppSelector(state => state.auth);
+    let { currentUser } = useAppSelector(state => state.auth);
 
     const modalStatus = useContext(ModalContext);
 
@@ -35,7 +35,7 @@ function Header() {
                 </div>
                 <Link className='header-profile' to="/profile">
                     <img className='header-picture' src={ProfilPic} alt="profil pic" />
-                    {currentUser?.name} 
+                    {currentUser?.username}
                 </Link>
                 <IconLogout />
             </div>
@@ -46,6 +46,7 @@ function Header() {
                 </div>
         </header>
     );
+    
 }
 
 export default Header;

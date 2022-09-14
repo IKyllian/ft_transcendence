@@ -3,7 +3,8 @@ import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAppDispatch } from '../../Redux/Hooks'
 import { useEffect } from "react";
-import { logoutSuccess } from "../../Redux/AuthSlice";
+import { logoutSuccess, loginSuccess } from "../../Redux/AuthSlice";
+import { LoginPayload } from "../../Interfaces/Interface-User";
 
 interface CustomState {
     token: string,
@@ -18,22 +19,22 @@ function UsernameForm() {
 
     const locationState = location.state as CustomState;
 
-    console.log(locationState);
-
-
     console.log(location);
     const onSubmit = handleSubmit(async (data, e) => {
         e?.preventDefault();
-        console.log(data);
         if (data.username === "")
             return ;
         axios.post('http://localhost:5000/api/users/edit-username', {username: data.username}, {
             headers: {
-                "authorization": `Bearer ${locationState.token}`,
+                "Authorization": `Bearer ${locationState.token}`,
             }
         })
         .then((response) => {
-            console.log(response);
+            const payload: LoginPayload = {
+                user: response.data.user,
+                token: response.data.token,
+            }
+            dispatch(loginSuccess(payload));
         })
         .catch(err => {
             console.log(err);

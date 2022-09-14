@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Request, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Get, Patch, Post, Request, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { Observable, of } from "rxjs";
 import { GetUser } from "src/auth/decorator/get-user.decorator";
@@ -40,5 +40,12 @@ export class UserController {
 		console.log(file);
 		this.userService.updateAvatar(req.user, file.path);
 		return of({imagePath: file.path})
+	}
+
+	@UseGuards(JwtGuard)
+	@Post('edit-username')
+	editUser(@GetUser() user: User, @Body() body) {
+		console.log(body);
+		return this.userService.editUsername(user, body.username);
 	}
 }

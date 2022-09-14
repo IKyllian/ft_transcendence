@@ -40,7 +40,7 @@ function ChatHeader(props: Props) {
             />
             <div className="player-container">
                 <div className={`player-status player-status-${chatItem!.users[0].isOnline ? "online" : "offline"}`}> </div>
-                <p> {chatItem!.users[0].name} </p>
+                <p> {chatItem!.users[0].username} </p>
             </div>
         </div>
     );

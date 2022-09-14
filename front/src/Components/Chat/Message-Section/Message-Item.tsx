@@ -18,7 +18,7 @@ function MessageItem(props: {sender: ExampleUser, message: string}) {
                 {
                     sender.id !== 1 &&
                     <div className="message-sender">
-                        <p className="message-sender" onClick={() => handleClick()}> {sender.name} </p>     
+                        <p className="message-sender" onClick={() => handleClick()}> {sender.username} </p>     
                         <DropdownContainer show={showDropdown} onClickOutside={handleClick}>
                             <p> profile </p>
                             <p> block </p>

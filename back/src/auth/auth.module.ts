@@ -1,5 +1,5 @@
 import { HttpModule } from "@nestjs/axios";
-import { Module } from "@nestjs/common";
+import { forwardRef, Module } from "@nestjs/common";
 import { JwtModule } from "@nestjs/jwt";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { Statistic } from "src/entities/statistic.entity";
@@ -13,6 +13,7 @@ import { JwtStrategy } from "./strategy/jwt.strategy";
 	imports: [
 		HttpModule,
 		UserModule,
+		// forwardRef(() => UserModule),
 		JwtModule.register({}),
 		TypeOrmModule.forFeature([
 			User,
@@ -21,5 +22,6 @@ import { JwtStrategy } from "./strategy/jwt.strategy";
 	],
 	controllers: [AuthController],
 	providers: [AuthService, JwtStrategy],
+	exports: [AuthService],
 })
 export class AuthModule {}

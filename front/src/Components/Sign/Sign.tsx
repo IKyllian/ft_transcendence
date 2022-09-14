@@ -3,7 +3,6 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useForm } from "react-hook-form";
 import { useAppDispatch, useAppSelector } from '../../Redux/Hooks'
 import { uid } from "../../env";
-import { usersArray } from '../../Interfaces/Datas-Examples';
 import { LoginPayload } from "../../Interfaces/Interface-User";
 
 import LoadingSpin from '../Loading-Spin';
@@ -26,15 +25,17 @@ function Sign() {
 
     const onSubmit = handleSubmit(async (data, e) => {
         e?.preventDefault();
-        console.log(data);
-        // if (data.password === "" || data.username === "")
-        //     return ;
-        // dispatch(loginPending());
-        // setTimeout(() => {
-        //     dispatch(loginSuccess(usersArray[0]));
-        // }, 2000);
-        
-        // navigate("/home");
+        if (data.password === "" || data.username === "")
+            return ;
+        axios.post('http://localhost:5000/api/auth/login', {username: data.username, password: data.password})
+        .then((response) => {
+        console.log('JWT =>', response.data);
+            const payload: LoginPayload = {
+                token: response.data.token,
+                user: response.data.user,
+            }
+            dispatch(loginSuccess(payload));
+        })
     });
 
     useEffect(() => {
@@ -47,15 +48,13 @@ function Sign() {
                 console.log('JWT =>', response.data);
                 if (response.data.usernameSet) {
                     const payload: LoginPayload = {
-                        token: response.data.token.access_token,
+                        token: response.data.token,
                         user: response.data.user,
                     }
                     dispatch(loginSuccess(payload));
                 } else {
                     navigate("/set-username", {state:{token: response.data.token}});
-                    // navigate("/set-username");
                 }
-                // TODO stocker le jwt dans le store redux
             })
             .catch(err => {
                 // TODO Handle error: Display error message on login page
@@ -69,7 +68,6 @@ function Sign() {
         const params: string = `?client_id=${uid}&redirect_uri=http://localhost:3000/sign&response_type=code`;
         const ret = window.location.replace(url+params);
     }
-
 
     return (authDatas.loading) ? (
         <div className="sign-container">
@@ -91,8 +89,6 @@ function Sign() {
                     <input id="password" type="password" {...register("password")} />
                     <button type='submit'>
                         Login
-                        {/* {!authDatas.loading && "Login" } */}
-                        {/* {authDatas.loading && <LoadingSpin />} */}
                     </button>
                 </form>
             </div>

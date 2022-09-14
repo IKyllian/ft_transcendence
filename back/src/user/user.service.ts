@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable } from "@nestjs/common";
+import { ForbiddenException, forwardRef, Inject, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { User } from "src/entities/user.entity";
@@ -6,6 +6,8 @@ import { Friendship, friendShipStatus } from "src/entities/friendship.entity";
 import { Statistic } from "src/entities/statistic.entity";
 import { Avatar } from "src/entities/avatar.entity";
 import { UserDto } from "./dto/user.dto";
+import { AuthService } from "src/auth/auth.service";
+import { use } from "passport";
 
 @Injectable()
 export class UserService {
@@ -16,6 +18,8 @@ export class UserService {
 		private friendshipsRepo: Repository<Friendship>,
 		@InjectRepository(Statistic)
 		private statisticsRepo: Repository<Statistic>,
+		@Inject(forwardRef(() => AuthService))
+		private authService: AuthService,
 	) {}
 
 	async create(userdto: UserDto) {
@@ -46,19 +50,20 @@ export class UserService {
 		return this.usersRepo.findOne({ where: { username } });
 	}
 
-	async setUsername(id42: number, name: string) : Promise<User | undefined> {
-		const UserExist = await this.findByUsername(name);
-		if (UserExist) {
-			throw new Error('Username already taken');
-		}
+	async editUsername(user: User, name: string) {
+		try {
+			user.username = name;
+			this.usersRepo.save(user);
+			delete user.hash;
 
-		const UserToEdit = await this.findBy42Id(id42);
-		if (!UserToEdit) {
-			throw new Error('User not found');
+			return {
+				token: (await this.authService.signToken(user.id, user.username)).access_token,
+				user: user,
+			}
+		} catch(error) {
+			console.log(error.message);
+			throw new ForbiddenException();
 		}
-
-		UserToEdit.username = name;
-		return this.usersRepo.save(UserToEdit);
 	}
 
 	async getUsers() {

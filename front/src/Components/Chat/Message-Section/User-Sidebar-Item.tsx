@@ -13,7 +13,7 @@ function UserSidebarItem(props: {user: ExampleUser}) {
                 </div>
             </div>
             <Link to="/profile">
-                { user.name }
+                { user.username }
             </Link>
         </li>
     );

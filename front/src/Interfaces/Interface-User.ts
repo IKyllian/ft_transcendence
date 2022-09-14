@@ -1,6 +1,6 @@
 export interface ExampleUser {
     id: number,
-    name: string;
+    username: string;
     profilPic: string;
     gamesPlayed: number;
     winRate: number;
