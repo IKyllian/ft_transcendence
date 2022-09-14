@@ -15,7 +15,7 @@ function MatchHistoryItem(props: historyItemProps) {
     return (
         <div className="history-item">
             <div className="player-container">
-                <p> {player.name } </p>
+                <p> {player.username } </p>
                 <img className='avatar-player' src={ProfilPic} alt="profil pic" />
             </div>
             <p className="history-score">
@@ -26,7 +26,7 @@ function MatchHistoryItem(props: historyItemProps) {
             <div className="player-container">
                 <img className='avatar-player' src={ProfilPic} alt="profil pic" />
                 <Link to="/profile">
-                    {enemyPlayer.name}
+                    {enemyPlayer.username}
                 </Link>
             </div>
             

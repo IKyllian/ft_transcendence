@@ -7,7 +7,7 @@ function BlockFriends() {
         <div className="profile-block-wrapper friends-list">
             {
                 friendsDatas.map((elem, index) =>
-                    <FriendItem key={index} name={elem.name} profilPic={elem.profilPic} />
+                    <FriendItem key={index} name={elem.username} profilPic={elem.profilPic} />
                 )
             }
         </div>

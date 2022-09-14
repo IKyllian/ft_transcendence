@@ -8,6 +8,7 @@
 @use "./Chat/Chat-Modal.scss";
 @use "./Search-Player.scss";
 @use "./Chat/Channel-Settings.scss";
+@use "./Loading-Spin.scss";
 @use "./Variables.scss" as *;
 
 body {
@@ -99,16 +100,16 @@ input, button {
     }
   
     p {
-        margin: 0;
-        font-size: 13px;
-        letter-spacing: 1.5px;
-        padding: 5px;
-        border-radius: 5px;
-        cursor: pointer;
+      margin: 0;
+      font-size: 13px;
+      letter-spacing: 1.5px;
+      padding: 5px;
+      border-radius: 5px;
+      cursor: pointer;
 
-        &:hover {
-          background-color: $LightDarkPalette;
-        }
+      &:hover {
+        background-color: $LightDarkPalette;
+      }
     }
   }
 }

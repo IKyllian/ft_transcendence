@@ -36,7 +36,7 @@ function Leaderboard() {
                             <LeaderboardItem
                                 key={index}
                                 pos={index + 1}
-                                name={elem.name}
+                                name={elem.username}
                                 gamesPlayed={elem.gamesPlayed}
                                 winRate={elem.winRate}
                                 points={elem.points}

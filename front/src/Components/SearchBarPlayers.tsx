@@ -19,7 +19,7 @@ function SearchBarPlayers(props: {functionality: string}) {
         if (inputText.length > 0) {
             let newArray: ExampleUser[] = [];
 
-            newArray = usersArray.filter(elem => ((elem.name.toLowerCase().includes(inputText.toLowerCase())) === true));
+            newArray = usersArray.filter(elem => ((elem.username.toLowerCase().includes(inputText.toLowerCase())) === true));
             setArrayResult(newArray);
         } else {
             setArrayResult([]);
@@ -38,7 +38,7 @@ function SearchBarPlayers(props: {functionality: string}) {
                         <div key={index} className="modal-player-list-item">
                             <div className="item-player-info">
                                 <img className='modal-picture' src={elem.profilPic} alt="profil pic" />
-                                <p> {elem.name} </p>
+                                <p> {elem.username} </p>
                             </div>
                             <SearchBarButtons functionality={functionality} />
                         </div>

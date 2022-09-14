@@ -65,32 +65,31 @@
             display: flex;
             flex-direction: column;
             gap: 6px;
-            button {
-                margin-top: 10px;
-                border-radius: 3px;
-                padding: 7px;
-                background-color: $LightBluePalette;
-            }
-            a {
-                margin-top: 10px;
-                border-radius: 3px;
-                padding: 7px;
-                background-color: $LightBluePalette;
-            }   
             input {
                 border: 1px solid white;
                 border-radius: 5px;
                 padding: 4px;
-
-                &:last-child {
-                    border: none;
-                    cursor: pointer;
-                    margin-top: 10px;
-                    border-radius: 3px;
-                    padding: 7px;
-                    background-color: $LightBluePalette;
-                }
             }
+            button {
+                border: none;
+                cursor: pointer;
+                margin-top: 10px;
+                border-radius: 3px;
+                height: 35px;
+                background-color: $LightBluePalette;
+            }
+        }
+    }
+
+    .username-form {
+        display: flex;
+        flex-direction: column;
+        margin: auto;
+        gap: 10px;
+        input {
+            border: 1px solid white;
+            border-radius: 5px;
+            padding: 5px;
         }
     }
 }
