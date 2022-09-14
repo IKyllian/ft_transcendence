@@ -19,7 +19,7 @@ function Header() {
         setShowMenu(!showMenu);
     }
 
-    return location.pathname === "/login" ? (
+    return location.pathname === "/sign" || location.pathname === "/set-username" ? (
         <> </>
     ) : (
         <header className={`header ${modalStatus.modal.isOpen ? modalStatus.modal.blurClass : ""}`} >

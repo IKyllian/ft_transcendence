@@ -1,11 +1,13 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { AuthState, ExampleUser } from '../Interfaces/Interface-User';
+import { AuthState } from '../Interfaces/Interface-User';
+import { LoginPayload } from '../Interfaces/Interface-User';
 
 const defaultState: AuthState = {
     currentUser: undefined,
     isAuthenticated: false,
     error: '',
     loading: false,
+    token:'',
 }
 
 export const authSlice = createSlice({
@@ -15,8 +17,9 @@ export const authSlice = createSlice({
         loginPending: (state) => {
             state.loading = true;
         },
-        loginSuccess: (state, {payload}: PayloadAction<ExampleUser>) => {
-            state.currentUser = payload;
+        loginSuccess: (state, {payload}: PayloadAction<LoginPayload>) => {
+            state.currentUser = payload.user;
+            state.token = payload.token;
             state.isAuthenticated = true;
             state.loading = false;
         },
@@ -33,6 +36,7 @@ export const authSlice = createSlice({
             state.isAuthenticated = false;
             state.error = '';
             state.currentUser = undefined;
+            state.token= '';
         }
     }
 });

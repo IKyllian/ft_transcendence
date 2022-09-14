@@ -13,6 +13,7 @@ import Error404 from "./Components/404-Error";
 import { ModalProvider } from "./Components/ModalProvider";
 import PublicRoute from "./Route/Public-Route";
 import PrivateRoute from "./Route/Private-Route";
+import UsernameForm from "./Components/Sign/Username-Form";
 
 interface RouteProps {
 	path: string,
@@ -31,6 +32,12 @@ const routes: RouteProps[] = [
 		element:
 			<PublicRoute>
 				<Sign />
+			</PublicRoute>,
+	}, {
+		path: '/set-username',
+		element:
+			<PublicRoute>
+				<UsernameForm />
 			</PublicRoute>,
 	}, {
 		path: '/profile',

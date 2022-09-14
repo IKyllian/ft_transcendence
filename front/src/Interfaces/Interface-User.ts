@@ -14,4 +14,10 @@ export interface AuthState {
     isAuthenticated: boolean,
     error?: string,
     loading: boolean,
+    token: string,
+}
+
+export interface LoginPayload {
+    user: ExampleUser,
+    token: string
 }
