@@ -48,4 +48,12 @@ export class UserController {
 		console.log(body);
 		return this.userService.editUsername(user, body.username);
 	}
+
+	@UseGuards(JwtGuard)
+	@Get()
+	getUsers() {
+		return this.userService.getUsers();
+	}
+
+	// user by id
 }
