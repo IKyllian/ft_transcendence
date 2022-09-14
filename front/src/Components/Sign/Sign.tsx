@@ -13,7 +13,7 @@ type FormValues = {
 function Sign() {
     const { register, control, handleSubmit } = useForm<FormValues>();
     let navigate = useNavigate();
-    const [searchParams, setSearchParams] = useSearchParams();
+    const [searchParams] = useSearchParams();
     const onSubmit = handleSubmit(async (data, e) => {
         e?.preventDefault();
         navigate("/home");
