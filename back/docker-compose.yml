@@ -1,0 +1,14 @@
+version: '3.8'
+services:
+  dev-db:
+    image: postgres:latest
+    ports:
+      - '5432:5432'
+    env_file:
+      - .env.db
+    networks:
+      - dev-net
+    restart: always
+
+networks:
+  dev-net:

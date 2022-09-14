@@ -5,6 +5,8 @@ import StatsInfoItem from "./Items/Stats-Info-Item";
 import RenderProfileBlock from "./Render-Profile-Block";
 import CardInfo from "./Card-Info";
 
+import { useAppSelector } from '../../Redux/Hooks';
+
 interface profileMenuButtons {
     title: string;
     isActive: string;
@@ -18,6 +20,7 @@ function Profile() {
     ]);
 
     const modalStatus = useContext(ModalContext);
+    let {currentUser} = useAppSelector(state => state.auth);
     
     const handleClick = (index: number) => {
        let newArray = [...attributes];
@@ -31,8 +34,8 @@ function Profile() {
         <div className={`profile-container ${modalStatus.modal.isOpen ? modalStatus.modal.blurClass : ""}`}>
             <div className="profile-header">
                 <div className='stats-infos'>
-                    <StatsInfoItem label="Games Played" value="100" />
-                    <StatsInfoItem label="Win Rate" value="50%" />
+                    <StatsInfoItem label="Games Played" value={currentUser!.gamesPlayed.toString()} />
+                    <StatsInfoItem label="Win Rate" value={currentUser!.winRate.toString()} />
                     <StatsInfoItem label="Rank" value="#3" />
                 </div>
                 <CardInfo />

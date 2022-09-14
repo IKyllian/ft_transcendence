@@ -27,7 +27,7 @@ function fillArray() {
     for (let i: number = 0; i < playerDatas.length; i++) {
         newArray.push({
             id: i + 1,
-            name: playerDatas[i],
+            username: playerDatas[i],
             profilPic: ProfilPic,
             gamesPlayed: getRandomInt(5, 150),
             winRate: getRandomInt(5, 100),
