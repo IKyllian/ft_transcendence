@@ -37,7 +37,7 @@ export class AuthService {
 			user.statistic = await this.statsRepo.save(new Statistic());
 			await this.usersRepo.save(user);
 			console.log(user);
-			
+			delete user.hash;
 			return {
 				token: await this.signToken(user.id, user.username),
 				user: user,
@@ -65,6 +65,7 @@ export class AuthService {
 		if (!pwdMatches)
 			throw new ForbiddenException('Password incorrect');
 
+		delete user.hash;
 		return {
 			token: await this.signToken(user.id, user.username),
 			user: user,
@@ -100,6 +101,7 @@ export class AuthService {
 				 id42: response.data.id,
 			});
 		}
+		delete user.hash;
 		return {
 			token: await this.signToken(user.id, user.username),
 			user: user,

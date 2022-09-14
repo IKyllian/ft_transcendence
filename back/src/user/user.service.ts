@@ -7,6 +7,7 @@ import { Statistic } from "src/entities/statistic.entity";
 import { Avatar } from "src/entities/avatar.entity";
 import { UserDto } from "./dto/user.dto";
 import { AuthService } from "src/auth/auth.service";
+import { use } from "passport";
 
 @Injectable()
 export class UserService {
@@ -53,6 +54,7 @@ export class UserService {
 		try {
 			user.username = name;
 			this.usersRepo.save(user);
+			delete user.hash;
 
 			return {
 				token: await this.authService.signToken(user.id, user.username),
