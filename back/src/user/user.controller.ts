@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Patch, Post, Request, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
+import { Body, ClassSerializerInterceptor, Controller, Get, Param, Patch, Post, Request, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { Observable, of } from "rxjs";
 import { GetUser } from "src/auth/decorator/get-user.decorator";
@@ -22,6 +22,7 @@ export const avatarStorage = {
 }
 
 @Controller('users')
+@UseInterceptors(ClassSerializerInterceptor)
 export class UserController {
 
 	constructor(private userService: UserService) {}
@@ -45,7 +46,7 @@ export class UserController {
 	@UseGuards(JwtGuard)
 	@Patch('edit-username')
 	editUser(@GetUser() user: User, @Body() body) {
-		console.log(body);
+		console.log('user to edit', user);
 		return this.userService.editUsername(user, body.username);
 	}
 
@@ -55,5 +56,9 @@ export class UserController {
 		return this.userService.getUsers();
 	}
 
-	// user by id
+ 	@UseGuards(JwtGuard)
+	@Get(':id')
+	async getUserById(@Param('id') id: number) {
+		return  this.userService.findById(id);
+	}
 }

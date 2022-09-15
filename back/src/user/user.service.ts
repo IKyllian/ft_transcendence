@@ -1,13 +1,13 @@
-import { ForbiddenException, forwardRef, Inject, Injectable } from "@nestjs/common";
+import { ForbiddenException, forwardRef, Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { User } from "src/entities/user.entity";
 import { Friendship, friendShipStatus } from "src/entities/friendship.entity";
 import { Statistic } from "src/entities/statistic.entity";
 import { Avatar } from "src/entities/avatar.entity";
-import { UserDto } from "./dto/user.dto";
 import { AuthService } from "src/auth/auth.service";
 import { use } from "passport";
+import { CreateUserDto } from "./dto/createUser.dto";
 
 @Injectable()
 export class UserService {
@@ -22,9 +22,8 @@ export class UserService {
 		private authService: AuthService,
 	) {}
 
-	async create(userdto: UserDto) {
+	async create(userdto: CreateUserDto) {
 		try {
-			console.log(userdto);
 			const user = this.usersRepo.create(userdto);
 			user.statistic = await this.statisticsRepo.save(new Statistic());
 			await this.usersRepo.save(user);
@@ -38,24 +37,25 @@ export class UserService {
 		}
 	}
 	
-	findById(id: number): Promise<User | undefined> {
-		return this.usersRepo.findOne({ where: { id } });
+	async findById(id: number): Promise<User | undefined> {
+		const user = await this.usersRepo.findOneBy({ id });
+		if (!user)
+			throw new NotFoundException('Username not found');
+		return user
 	}
 
-	findBy42Id(id42: number): Promise<User | undefined> {
-		return this.usersRepo.findOne({ where: { id42 } });
+	async findBy42Id(id42: number): Promise<User | undefined> {
+		return await this.usersRepo.findOneBy({ id42 });
 	}
 
-	findByUsername(username: string): Promise<User | undefined> {
-		return this.usersRepo.findOne({ where: { username } });
+	async findByUsername(username: string): Promise<User | undefined> {
+		return await this.usersRepo.findOneBy({ username });
 	}
 
 	async editUsername(user: User, name: string) {
 		try {
 			user.username = name;
-			this.usersRepo.save(user);
-			delete user.hash;
-
+			await this.usersRepo.save(user);
 			return {
 				token: (await this.authService.signToken(user.id, user.username)).access_token,
 				user: user,

@@ -4,7 +4,8 @@ import {
 	IsNumber,
 } from 'class-validator'
 
-export class UserDto {
+export class CreateUserDto {
+
 	@IsString()
 	@IsNotEmpty()
 	username: string;

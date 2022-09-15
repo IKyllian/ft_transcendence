@@ -37,7 +37,6 @@ export class AuthService {
 			user.statistic = await this.statsRepo.save(new Statistic());
 			await this.usersRepo.save(user);
 			console.log(user);
-			delete user.hash;
 			return {
 				token: (await this.signToken(user.id, user.username)).access_token,
 				user: user,
@@ -65,7 +64,6 @@ export class AuthService {
 		if (!pwdMatches)
 			throw new ForbiddenException('Password incorrect');
 
-		delete user.hash;
 		return {
 			token: await this.signToken(user.id, user.username),
 			user: user,
@@ -81,7 +79,7 @@ export class AuthService {
 						client_id: this.config.get('API42_CLIENT_ID'),
 						client_secret: this.config.get('API42_CLIENT_SECRET'),
 						code,
-						redirect_uri: this.config.get('REDIRECT_HOME'),
+						redirect_uri: this.config.get('API42_AUTH_REDIRECT'),
 				}
 			));
 			return response.data.access_token;
@@ -94,15 +92,14 @@ export class AuthService {
 		const token = await this.get42token(code);
 
 		const response = await lastValueFrom(this.httpService.get(`https://api.intra.42.fr/v2/me?access_token=${token}`));
-		let user = await this.userService.findBy42Id(response.data.id42);
+		let user = await this.userService.findBy42Id(response.data.id);
 		if (!user) {
-			user = await this.userService.create({ 
-				// username: response.data.login,
-				username: '',
+			console.log('user 42 not found, creating a new one');
+			user = await this.userService.create({
+				username: null,
 				id42: response.data.id,
 			});
 		}
-		delete user.hash;
 		return {
 			token: (await this.signToken(user.id, user.username)).access_token,
 			user: user,
