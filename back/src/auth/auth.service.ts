@@ -1,4 +1,4 @@
-import { ForbiddenException, forwardRef, Inject, Injectable, UnauthorizedException } from "@nestjs/common";
+import { ForbiddenException, forwardRef, Inject, Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { User } from "src/entities/user.entity";
 import { Statistic } from "src/entities/statistic.entity";
@@ -54,7 +54,7 @@ export class AuthService {
 		const user = await this.userService.findByUsername(dto.username)
 
 		if (!user)
-			throw new ForbiddenException('User not found')
+			throw new NotFoundException('User not found')
 		
 		const pwdMatches = await argon.verify(
 			user.hash,
@@ -62,7 +62,7 @@ export class AuthService {
 		);
 
 		if (!pwdMatches)
-			throw new ForbiddenException('Password incorrect');
+			throw new UnauthorizedException('Password incorrect');
 
 		return {
 			token: await this.signToken(user.id, user.username),

@@ -1,4 +1,4 @@
-import { Body, ClassSerializerInterceptor, Controller, Get, Param, Patch, Post, Request, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
+import { Body, ClassSerializerInterceptor, Controller, ForbiddenException, Get, Param, Patch, Post, Request, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { Observable, of } from "rxjs";
 import { GetUser } from "src/auth/decorator/get-user.decorator";
@@ -11,7 +11,7 @@ import { UserService } from "./user.service";
 
 export const avatarStorage = {
 	storage: diskStorage({
-		destination: './uploads/avatars',
+		destination: './uploads/',
 		filename: (_req, file, cb) => {
 			const name: string = uuidv4();
 			const extension: string = path.parse(file.originalname).ext;
@@ -34,12 +34,13 @@ export class UserController {
 	}
 
 	@UseGuards(JwtGuard)
-	@Post('upload')
-	@UseInterceptors(FileInterceptor('file', avatarStorage))
-	uploadFile(@UploadedFile() file, @Request() req) : Observable<Object> {
-		console.log(req.user);
+	@Post('avatar/upload')
+	@UseInterceptors(FileInterceptor('image', avatarStorage))
+	uploadFile(@UploadedFile() file, @GetUser() user: User) : Observable<Object> {
 		console.log(file);
-		this.userService.updateAvatar(req.user, file.path);
+		if (!file)
+			throw new ForbiddenException('Image is missing')
+		this.userService.updateAvatar(user, file.path);
 		return of({imagePath: file.path})
 	}
 
