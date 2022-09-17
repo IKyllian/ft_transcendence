@@ -15,7 +15,7 @@
 
     <button onclick="buildlobby()">new lobby(check console)</button> 
 
-    <div>Mario</div>
+    <!-- <div>Mario</div>
     <form onsubmit="return playMario(this)">
       <div>
         <label>game_id:</label>
@@ -58,11 +58,11 @@
       <div>
         <input id="submit" type="submit">
       </div>
-    </form>
+    </form> -->
 
-    <!-- <button onclick="runMario()">Mario</button> 
-    <button onclick="runLuigi()">Luigi</button>
-    <button onclick="runSpect()">Spectator</button> -->
+    <button onclick="runMario()">runMario</button> 
+    <button onclick="runLuigi()">runLuigi</button>
+    <button onclick="runSpect()">runSpectator</button>
 
 
     <script>
@@ -85,75 +85,77 @@
 
     // });
     
-    function playMario(form) {
-      window.libpong.launch_game(
-            {
-              player_A:
-              {
-                  name: 'Mario',
-                  win: 15,
-                  loss: 8,
-                  avatar: 'avatars/mario.png'
-              },
-              player_B:
-              {
-                  name: 'Luigi',
-                  win: 6,
-                  loss: 12,
-                  avatar: 'avatars/luigi.jpeg'
-              },
-              playertype: 0,
-              player_secret: form.player_secret,
-              game_id: form.game_id
-            });
-    }
+    // function playMario(form) {
+    //   window.libpong.launch_game(
+    //         {
+    //           player_A:
+    //           {
+    //               name: 'Mario',
+    //               win: 15,
+    //               loss: 8,
+    //               avatar: 'avatars/mario.png'
+    //           },
+    //           player_B:
+    //           {
+    //               name: 'Luigi',
+    //               win: 6,
+    //               loss: 12,
+    //               avatar: 'avatars/luigi.jpeg'
+    //           },
+    //           playertype: 0,
+    //           player_secret: form.player_secret,
+    //           game_id: form.game_id
+    //         });
+    // }
 
-    function playLuigi(form) {
-      window.libpong.launch_game(
-            {
-              player_A:
-              {
-                  name: 'Mario',
-                  win: 15,
-                  loss: 8,
-                  avatar: 'avatars/mario.png'
-              },
-              player_B:
-              {
-                  name: 'Luigi',
-                  win: 6,
-                  loss: 12,
-                  avatar: 'avatars/luigi.jpeg'
-              },
-              playertype: 1,
-              player_secret: form.player_secret,
-              game_id: form.game_id
-            });
-    }
+    // function playLuigi(form) {
+    //   window.libpong.launch_game(
+    //         {
+    //           player_A:
+    //           {
+    //               name: 'Mario',
+    //               win: 15,
+    //               loss: 8,
+    //               avatar: 'avatars/mario.png'
+    //           },
+    //           player_B:
+    //           {
+    //               name: 'Luigi',
+    //               win: 6,
+    //               loss: 12,
+    //               avatar: 'avatars/luigi.jpeg'
+    //           },
+    //           playertype: 1,
+    //           // player_secret: form.player_secret,
+    //           // game_id: form.game_id
+    //           player_secret: 'hh',
+    //           game_id:'fff'
+    //         });
+    // }
 
 
-    function playSpect(form) {
-      window.libpong.launch_game(
-            {
-              player_A:
-              {
-                  name: 'Mario',
-                  win: 15,
-                  loss: 8,
-                  avatar: 'avatars/mario.png'
-              },
-              player_B:
-              {
-                  name: 'Luigi',
-                  win: 6,
-                  loss: 12,
-                  avatar: 'avatars/luigi.jpeg'
-              },
-              playertype: 2,
-              player_secret: '',
-              game_id: form.game_id
-            });
-    }
+    // function playSpect(form) {
+    //   window.libpong.launch_game(
+    //         {
+    //           player_A:
+    //           {
+    //               name: 'Mario',
+    //               win: 15,
+    //               loss: 8,
+    //               avatar: 'avatars/mario.png'
+    //           },
+    //           player_B:
+    //           {
+    //               name: 'Luigi',
+    //               win: 6,
+    //               loss: 12,
+    //               avatar: 'avatars/luigi.jpeg'
+    //           },
+    //           playertype: 2,
+    //           player_secret: '',
+    //           game_id: form.game_id
+    //         });
+    // }
 
       function buildlobby()
       {
@@ -180,8 +182,8 @@
                   avatar: 'avatars/luigi.jpeg'
               },
               playertype: 0,
-              player_secret: 'itsame',
-              game_id: 'test_id'
+              player_secret: 'qEpOFNfjlL',
+              game_id: '0zr2DeEme'
             });
       }
 
@@ -204,8 +206,8 @@
                   avatar: 'avatars/luigi.jpeg'
               },
               playertype: 1,
-              player_secret: 'deathstare',
-              game_id: 'test_id'
+              player_secret: 'xk_aKwG5kB',
+              game_id: '0zr2DeEme'
             });
       }
 
@@ -229,13 +231,13 @@
               },
               playertype: 0,
               player_secret: '',
-              game_id: 'test_id'
+              game_id: '0zr2DeEme'
             });
       }
     </script>
 
-
-<script src="libpong.js"></script>
+<!-- 
+<script src="libpong.js"></script> -->
 
   </body>
 

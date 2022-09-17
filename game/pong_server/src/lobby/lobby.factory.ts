@@ -71,6 +71,7 @@ export class LobbyFactory
 		}
 		else
 		{
+			client.emit('join_lobby_fail', 'room not found');
 			console.log("unable to join room, not found: ", data.game_id);
 		}
 		//this.lobby_list.get(data.game_id).lobby_add(client, data.player_secret);

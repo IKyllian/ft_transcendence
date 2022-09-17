@@ -1,5 +1,6 @@
 import 'phaser';
 import { io } from "socket.io-client";
+import ClientSocketManager from '../client.socket.manager';
 import { PlayerType } from '../types/shared.types';
 
 export default class Pong extends Phaser.Scene
@@ -9,6 +10,8 @@ export default class Pong extends Phaser.Scene
         super({ key: 'Pong' });
     }
     test: PlayerType;
+    socketmanager?: ClientSocketManager;
+
     preload ()
     {
         this.load.image('black_dot', 'assets/black_dot.png');
@@ -18,6 +21,7 @@ export default class Pong extends Phaser.Scene
 
     create ()
     {
+        this.socketmanager = this.registry.get('socketmanager');
 
         this.add.image(400, 300, 'black_dot');
         this.add.image(100, 300, 'red_bar');
@@ -31,5 +35,13 @@ export default class Pong extends Phaser.Scene
 			console.log("scene PONG you are player B");
 		else
 			console.log("scene PONG you are spectator");
+
+
+
+        console.log('inside pong scene');
+        if (this.socketmanager instanceof ClientSocketManager)
+        {
+            this.socketmanager.print_test();
+        }
     }
 }
