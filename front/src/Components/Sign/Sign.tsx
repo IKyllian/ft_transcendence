@@ -1,14 +1,15 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useForm } from "react-hook-form";
 import { useAppDispatch, useAppSelector } from '../../Redux/Hooks'
 import { uid } from "../../env";
-import { LoginPayload } from "../../Interfaces/Interface-User";
+import { LoginPayload } from "../../Types/User-Types";
+import LoadDatasContainer from '../Load-Datas-Container';
 
 import LoadingSpin from '../Loading-Spin';
 import axios from 'axios';
 
-import { loginPending, loginSuccess } from "../../Redux/AuthSlice";
+import { loginError, loginPending, loginSuccess, setUsername } from "../../Redux/AuthSlice";
 
 type FormValues = {
     username: string,
@@ -16,6 +17,7 @@ type FormValues = {
 }
 
 function Sign() {
+    const [isSignIn, setIsSignIn] = useState<boolean>(true);
     const { register, control, handleSubmit } = useForm<FormValues>();
     let navigate = useNavigate();
     const dispatch = useAppDispatch();
@@ -23,10 +25,14 @@ function Sign() {
     const [searchParams] = useSearchParams();
 
 
-    const onSubmit = handleSubmit(async (data, e) => {
+    const onSignIn = handleSubmit(async (data, e) => {
         e?.preventDefault();
-        if (data.password === "" || data.username === "")
+        console.log(control);
+        if (data.password === "" || data.username === "") {
+            dispatch(loginError("username and password must not be empty"));
             return ;
+        }
+        dispatch(loginPending());
         axios.post('http://localhost:5000/api/auth/login', {username: data.username, password: data.password})
         .then((response) => {
         console.log('JWT =>', response.data);
@@ -35,13 +41,36 @@ function Sign() {
                 user: response.data.user,
             }
             dispatch(loginSuccess(payload));
+        }).catch(err => {
+            dispatch(loginError("username or password incorect"));
+        })
+    });
+
+    const onSignUp = handleSubmit(async (data, e) => {
+        e?.preventDefault();
+        if (data.password === "" || data.username === "") {
+            dispatch(loginError("username and password must not be empty"));
+            return ;
+        }
+        dispatch(loginPending());
+        axios.post('http://localhost:5000/api/auth/signup', {username: data.username, password: data.password})
+        .then((response) => {
+        console.log('JWT =>', response.data);
+            const payload: LoginPayload = {
+                token: response.data.token,
+                user: response.data.user,
+            }
+            dispatch(loginSuccess(payload));
+        }).catch(err => {
+            dispatch(loginError("username or password incorect"));
         })
     });
 
     useEffect(() => {
         const authorizationCode = searchParams.get('code');
-        
         if (authorizationCode) {
+            if (authDatas.setUsersame)
+                navigate(-1);
             dispatch(loginPending());
             axios.post('http://localhost:5000/api/auth/login42', { authorizationCode })
             .then((response) => {
@@ -53,10 +82,12 @@ function Sign() {
                     }
                     dispatch(loginSuccess(payload));
                 } else {
+                    dispatch(setUsername());
                     navigate("/set-username", {state:{token: response.data.token}});
                 }
             })
             .catch(err => {
+                dispatch(loginError("Error while login with 42"));
                 // TODO Handle error: Display error message on login page
             });
         }
@@ -69,30 +100,38 @@ function Sign() {
         const ret = window.location.replace(url+params);
     }
 
-    return (authDatas.loading) ? (
-        <div className="sign-container">
-            <LoadingSpin />
-        </div>
-    ) : (
-        <div className="sign-container">
-            <div className='auth-wrapper'>
-                <h2> Sign In </h2>
-                <button className='sign-42-button' onClick={(e) => sign42(e)}> Sign with 42 </button>
-                <div className='auth-separator'>
-                    <span>ou</span>
-                </div>
-                <form className='form-wrapper' onSubmit={onSubmit}>
-                    <label htmlFor="username"> Username </label>
-                    <input id="username" type="text" {...register("username")} />
+    // return (authDatas.loading) ? (
+    //     <div className="sign-container">
+    //         <LoadingSpin />
+    //     </div>
+    // ) : 
+    return (
+        <LoadDatasContainer datas={authDatas.loading} containerClass="sign-container">
+            <div className="sign-container">
+                <div className='auth-wrapper'>
+                    <h2> {isSignIn ? "Sign In" : "Sign Up"} </h2>
+                    <button className='sign-42-button' onClick={(e) => sign42(e)}> Sign with 42 </button>
+                    <div className='auth-separator'>
+                        <span>ou</span>
+                    </div>
+                    {
+                        (authDatas.error !== undefined && authDatas.error !== '') &&
+                        <p className='form-error'> {authDatas.error} </p>
+                    }
+                    <form className='form-wrapper' onSubmit={isSignIn ? onSignIn : onSignUp}>
+                        <label htmlFor="username"> Username </label>
+                        <input id="username" type="text" {...register("username")} />
 
-                    <label htmlFor="password"> Password </label>
-                    <input id="password" type="password" {...register("password")} />
-                    <button type='submit'>
-                        Login
-                    </button>
-                </form>
+                        <label htmlFor="password"> Password </label>
+                        <input id="password" type="password" {...register("password")} />
+                        <button type='submit'>
+                            {isSignIn ? "Login" : "Create Account"}
+                        </button>
+                    </form>
+                    <p className='btn-switch-form' onClick={() => setIsSignIn(!isSignIn) }> {isSignIn ? "Pas de compte ? Créez en un" : "Déjà un compte ? Connectez vous"} </p>
+                </div>
             </div>
-        </div>
+        </LoadDatasContainer>
     );
 }
 

@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ChatInterface } from "../../../Interfaces/Datas-Examples";
+import { ChatInterface } from "../../../Types/Datas-Examples";
 
 function SidebarSettings(props: {setSidebarItem: Function, channelDatas: ChatInterface | undefined}) {
     const {setSidebarItem, channelDatas} = props;

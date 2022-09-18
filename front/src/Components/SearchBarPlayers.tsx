@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { IconSearch } from "@tabler/icons";
 
-import { usersArray } from "../Interfaces/Datas-Examples"
-import { ExampleUser } from "../Interfaces/Interface-User";
+import { usersArray } from "../Types/Datas-Examples"
+import { ExampleUser } from "../Types/User-Types";
 import SearchBarButtons from "./SearchBarButtons";
 
 function SearchBarPlayers(props: {functionality: string}) {

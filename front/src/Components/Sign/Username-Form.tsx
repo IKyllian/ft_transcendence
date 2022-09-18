@@ -1,10 +1,10 @@
 import { useForm } from "react-hook-form";
 import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useAppDispatch } from '../../Redux/Hooks'
+import { useAppDispatch, useAppSelector } from '../../Redux/Hooks'
 import { useEffect } from "react";
 import { logoutSuccess, loginSuccess } from "../../Redux/AuthSlice";
-import { LoginPayload } from "../../Interfaces/Interface-User";
+import { LoginPayload } from "../../Types/User-Types";
 
 interface CustomState {
     token: string,
@@ -16,10 +16,10 @@ function UsernameForm() {
     const location = useLocation();
     let navigate = useNavigate();
     const dispatch = useAppDispatch();
+    let authDatas = useAppSelector((state) => state.auth);
 
     const locationState = location.state as CustomState;
 
-    console.log(location);
     const onSubmit = handleSubmit(async (data, e) => {
         e?.preventDefault();
         if (data.username === "")
@@ -43,7 +43,7 @@ function UsernameForm() {
     });
     
     useEffect(() => {
-        if (!location.state) {
+        if (!authDatas.setUsersame) {
             dispatch(logoutSuccess());
             navigate("/sign");
         }
@@ -52,8 +52,8 @@ function UsernameForm() {
     return (
         <div className="sign-container">
             <form className="username-form" onSubmit={onSubmit}>
-                <label htmlFor="username"> Username </label>
-                <input id="username" type="text" placeholder="Choose Username..." {...register("username")} />
+                <label htmlFor="username"> Choose a username </label>
+                <input id="username" type="text" placeholder="Username..." {...register("username")} />
             </form>
         </div>
     );

@@ -1,15 +1,17 @@
 import { IconEdit, IconUserPlus, IconMessage } from '@tabler/icons';
+import { UserInterface } from '../../Types/User-Types';
 
 import ProfilePic from "../../Images-Icons/pp.jpg"
 import { Link } from "react-router-dom";
 
-function CardInfo() {
+function CardInfo(props: {userDatas: UserInterface}) {
+    const {userDatas} = props;
     const isConnectedUser: boolean = true;
     return (
         <div className="card-info">
             <img className='profile-avatar' src={ProfilePic} alt="profil pic" />
             <div className="player-status player-status-online"> </div>
-            <p> Kyllian </p>
+            <p> {userDatas.username} </p>
             {
                 isConnectedUser ? <IconEdit /> : 
                 <>

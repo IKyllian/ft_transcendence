@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { IconSettings, IconMenu2, IconChevronLeft, IconChevronRight } from "@tabler/icons";
 
 import { SidebarContext } from "../Chat";
-import { ChatInterface } from "../../../Interfaces/Datas-Examples";
+import { ChatInterface } from "../../../Types/Datas-Examples";
 
 interface Props {
     chatItem: ChatInterface | undefined,

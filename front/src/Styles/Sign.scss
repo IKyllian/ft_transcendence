@@ -23,7 +23,7 @@
         background-color: $LightDarkPalette;
         padding: 15px;
         width: 300px;
-        height: 380px;
+        min-height: 380px;
         border-radius: 5px;
 
         .auth-separator {
@@ -54,6 +54,13 @@
             }
         }
 
+        .form-error {
+            color: red;
+            margin: 0 0 1em 0;
+            font-size: 15px;
+            letter-spacing: 1px;
+        }
+
         .sign-42-button {
             border: 1px solid white;
             border-radius: 3px;
@@ -78,6 +85,10 @@
                 height: 35px;
                 background-color: $LightBluePalette;
             }
+        }
+        .btn-switch-form {
+            font-size: 12px;
+            cursor: pointer;
         }
     }
 

@@ -2,8 +2,8 @@ import { useContext } from "react";
 import { Link } from "react-router-dom";
 
 import { IconUser, IconPlus } from "@tabler/icons";
-import { ChannelsInterfaceFront } from "../../../Interfaces/Interface-Chat";
-import { ChatInterface } from "../../../Interfaces/Datas-Examples";
+import { ChannelsInterfaceFront } from "../../../Types/Chat-Types";
+import { ChatInterface } from "../../../Types/Datas-Examples";
 import { SidebarContext } from '../Chat';
 
 interface Props {

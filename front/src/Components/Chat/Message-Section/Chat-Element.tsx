@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { IconSend } from "@tabler/icons";
 
-import { ChatInterface, ChannelsDatas} from "../../../Interfaces/Datas-Examples";
+import { ChatInterface, ChannelsDatas} from "../../../Types/Datas-Examples";
 import MessageItem from "./Message-Item";
 import ChatHeader from "./Chat-Header";
 import UsersSidebar from "./Users-Sidebar";

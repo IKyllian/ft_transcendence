@@ -40,7 +40,7 @@ const routes: RouteProps[] = [
 				<UsernameForm />
 			</PublicRoute>,
 	}, {
-		path: '/profile',
+		path: '/profile/:username',
 		element:
 			<PrivateRoute>
 				<Profile />

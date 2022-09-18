@@ -10,14 +10,27 @@ export interface ExampleUser {
 }
 
 export interface AuthState {
-    currentUser: ExampleUser | undefined,
+    currentUser: UserInterface | undefined,
     isAuthenticated: boolean,
     error?: string,
     loading: boolean,
     token: string,
+    setUsersame: boolean,
 }
 
 export interface LoginPayload {
-    user: ExampleUser,
+    user: UserInterface,
     token: string
+}
+
+export interface UserInterface {
+    id: number,
+    username: string,
+    avatar: string,
+    statistic: Statistic,
+}
+
+interface Statistic {
+    matchWon: number,
+    matchLost: number,
 }

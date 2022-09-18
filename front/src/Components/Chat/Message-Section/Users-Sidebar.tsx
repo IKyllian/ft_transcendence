@@ -1,5 +1,5 @@
 import UserSidebarItem from "./User-Sidebar-Item";
-import { ExampleUser } from "../../../Interfaces/Interface-User";
+import { ExampleUser } from "../../../Types/User-Types";
 
 function UsersSidebar(props: {usersList: ExampleUser[]}) {
     const { usersList } = props;

@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { AuthState } from '../Interfaces/Interface-User';
-import { LoginPayload } from '../Interfaces/Interface-User';
+import { AuthState } from '../Types/User-Types';
+import { LoginPayload } from '../Types/User-Types';
 
 const defaultState: AuthState = {
     currentUser: undefined,
@@ -8,6 +8,7 @@ const defaultState: AuthState = {
     error: '',
     loading: false,
     token:'',
+    setUsersame: false,
 }
 
 export const authSlice = createSlice({
@@ -28,17 +29,17 @@ export const authSlice = createSlice({
             state.isAuthenticated = false;
             state.loading = false;
         },
+        setUsername: (state) => {    
+            state.setUsersame = true,
+            state.loading = false;
+        },
         logoutPending: (state) => {
             state.loading = true;
         },
         logoutSuccess: (state) => {
-            state.loading = false
-            state.isAuthenticated = false;
-            state.error = '';
-            state.currentUser = undefined;
-            state.token= '';
+            state = defaultState;
         }
     }
 });
 
-export const { loginPending, loginSuccess, loginError, logoutPending, logoutSuccess } = authSlice.actions;
+export const { loginPending, loginSuccess, loginError, setUsername, logoutPending, logoutSuccess } = authSlice.actions;

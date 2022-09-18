@@ -1,7 +1,7 @@
 import { useEffect, useState, useContext, useRef } from "react";
 import { useParams } from "react-router-dom";
-import { ChannelsDatas, ChannelsPublicDatas } from "../../../Interfaces/Datas-Examples";
-import { ChannelsInterfaceFront } from "../../../Interfaces/Interface-Chat";
+import { ChannelsDatas, ChannelsPublicDatas } from "../../../Types/Datas-Examples";
+import { ChannelsInterfaceFront } from "../../../Types/Chat-Types";
 import SidebarItem from "./Sidebar-Item";
 import { SidebarContext } from "../Chat";
 

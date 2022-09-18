@@ -1,7 +1,7 @@
 import { useState } from "react";
 import ProfilPic from "../../../Images-Icons/pp.jpg"; 
 
-import { ExampleUser } from "../../../Interfaces/Interface-User";
+import { ExampleUser } from "../../../Types/User-Types";
 import DropdownContainer from "../../Dropdown-Container";
 
 function MessageItem(props: {sender: ExampleUser, message: string}) {

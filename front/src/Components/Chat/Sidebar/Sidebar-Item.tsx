@@ -1,7 +1,7 @@
 import { useState } from "react";
 
-import { ChannelsInterfaceFront } from "../../../Interfaces/Interface-Chat";
-import { ChatInterface } from "../../../Interfaces/Datas-Examples";
+import { ChannelsInterfaceFront } from "../../../Types/Chat-Types";
+import { ChatInterface } from "../../../Types/Datas-Examples";
 import ItemHeader from "./Item-Header";
 import ItemContent from "./Item-Content";
 

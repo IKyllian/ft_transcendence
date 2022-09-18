@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
-import { leaderboardDatas } from "../../Interfaces/Datas-Examples"
-import { ExampleUser } from "../../Interfaces/Interface-User";
+import { leaderboardDatas } from "../../Types/Datas-Examples"
+import { ExampleUser } from "../../Types/User-Types";
 import { ModalContext } from "../ModalProvider";
 
 import LeaderboardItem from "./Leaderboard-Item";

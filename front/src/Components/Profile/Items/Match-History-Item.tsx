@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import ProfilPic from "../../../Images-Icons/pp.jpg"
-import { ExampleUser } from "../../../Interfaces/Interface-User";
+import { ExampleUser } from "../../../Types/User-Types";
 
 interface historyItemProps {
     player: ExampleUser,

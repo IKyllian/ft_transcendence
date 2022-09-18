@@ -92,9 +92,11 @@ export class AuthService {
 
 	async login42(code: string) {
 		const token = await this.get42token(code);
-
+		console.log(token);
 		const response = await lastValueFrom(this.httpService.get(`https://api.intra.42.fr/v2/me?access_token=${token}`));
+		console.log(response);
 		let user = await this.userService.findBy42Id(response.data.id42);
+		console.log(user);
 		if (!user) {
 			user = await this.userService.create({ 
 				// username: response.data.login,
@@ -115,7 +117,6 @@ export class AuthService {
 			sub: userId,
 			username
 		};
-
 		const token = await this.jwt.signAsync(
 			payload,
 			{

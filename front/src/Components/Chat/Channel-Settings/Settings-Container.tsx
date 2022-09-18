@@ -4,7 +4,7 @@ import { IconX } from "@tabler/icons";
 import SidebarSettings from "./Sidebar-Settings";
 import RenderSettingPage from "./Render-Setting-Page";
 import { useNavigate, useParams } from "react-router-dom";
-import { ChannelsDatas, ChatInterface } from "../../../Interfaces/Datas-Examples";
+import { ChannelsDatas, ChatInterface } from "../../../Types/Datas-Examples";
 
 
 function ChannelSettings() {

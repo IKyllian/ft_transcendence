@@ -1,4 +1,4 @@
-import { ExampleUser } from "./Interface-User"
+import { ExampleUser } from "./User-Types"
 import ProfilPic from "../Images-Icons/pp.jpg"
 
 export const playerDatas: string[] = [

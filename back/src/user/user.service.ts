@@ -39,15 +39,15 @@ export class UserService {
 	}
 	
 	findById(id: number): Promise<User | undefined> {
-		return this.usersRepo.findOne({ where: { id } });
+		return this.usersRepo.findOne({ where: { id: id } });
 	}
 
 	findBy42Id(id42: number): Promise<User | undefined> {
-		return this.usersRepo.findOne({ where: { id42 } });
+		return this.usersRepo.findOne({ where: { id42: id42 } });
 	}
 
 	findByUsername(username: string): Promise<User | undefined> {
-		return this.usersRepo.findOne({ where: { username } });
+		return this.usersRepo.findOne({ where: { username: username } });
 	}
 
 	async editUsername(user: User, name: string) {
