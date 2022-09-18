@@ -125,4 +125,16 @@ export class AuthService {
 			access_token: token
 		};
 	}
+
+	async verify(token: string) {
+		try {
+			const decoded = this.jwt.verify(token, {
+				secret: this.config.get('JWT_SECRET')
+			});
+			return await this.userService.findById(decoded.id);
+		}
+		catch(e) {
+			return null;
+		}
+	}
 }

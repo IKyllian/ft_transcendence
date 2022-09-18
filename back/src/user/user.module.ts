@@ -11,7 +11,6 @@ import { UserService } from "./user.service";
 @Module({
 	imports: [
 		forwardRef(() => AuthModule),
-		// AuthModule,
 		TypeOrmModule.forFeature([User, Friendship, Statistic, Avatar]),
 	],
 	providers: [UserService],

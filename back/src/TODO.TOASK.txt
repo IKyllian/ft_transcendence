@@ -1,0 +1,3 @@
+// Channels:
+	- Unique name?
+	- Make creator/owner of the channel != moderator (ex: can't be kick/mute)

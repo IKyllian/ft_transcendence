@@ -3,19 +3,22 @@ import { Channel } from "./channel.entity";
 import { User } from "./user.entity";
 
 @Entity()
-export class ChannelMessage {
+export class Message {
 	@PrimaryGeneratedColumn()
 	id: number;
 
-	@ManyToOne(() => User, (sender) => sender.id)
-	@JoinColumn()
-	sender: User;
+	// @JoinColumn()
+	// @ManyToOne(() => User)
+	// sender: User;
 
-	@CreateDateColumn()
-	send_at: Date;
+	@Column()
+	sender: string;
 
 	@Column()
 	content: string;
+
+	@CreateDateColumn()
+	send_at: Date;
 
 	@ManyToOne(() => Channel, (channel) => channel.messages)
 	@JoinColumn()

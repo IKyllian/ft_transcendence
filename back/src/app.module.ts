@@ -5,12 +5,13 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { UserModule } from './user/user.module';
-import { ChatGateway } from './gateways/chat.gateway';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
   imports: [
     AuthModule,
     UserModule,
+    ChatModule,
     ConfigModule.forRoot({ envFilePath: '.env', isGlobal: true }),
     TypeOrmModule.forRoot({
       type: 'postgres',
@@ -25,6 +26,6 @@ import { ChatGateway } from './gateways/chat.gateway';
     }),
   ],
   controllers: [AppController],
-  providers: [AppService, ChatGateway],
+  providers: [AppService],
 })
 export class AppModule {}

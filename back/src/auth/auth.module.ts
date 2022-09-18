@@ -14,7 +14,10 @@ import { JwtStrategy } from "./strategy/jwt.strategy";
 		HttpModule,
 		UserModule,
 		// forwardRef(() => UserModule),
-		JwtModule.register({}),
+		JwtModule.register({
+			secret: process.env.JWT_SECRET,
+			signOptions: { expiresIn: '20m' }
+		}),
 		TypeOrmModule.forFeature([
 			User,
 			Statistic,

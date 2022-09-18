@@ -1,8 +1,11 @@
-import { Column, Entity, JoinTable, ManyToMany, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-import { ChannelMessage } from "./channelMsg.entity";
+import { InjectRepository } from "@nestjs/typeorm";
+import { ChannelService } from "src/chat/channel.service";
+import { Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, Repository, Unique } from "typeorm";
+import { Message } from "./message.entity";
 import { User } from "./user.entity";
+import { chanRole, UserInChannel } from "./userInChannel.entity";
 
-type channelStatus = 'public' | 'private';
+export type channelOption = 'public' | 'private' | 'protected';
 
 @Entity()
 export class Channel {
@@ -13,20 +16,20 @@ export class Channel {
 	name: string;
 
 	@Column()
-	status: channelStatus;
+	option: channelOption;
 
-	@Column({ default: false })
-	protected: boolean;
+	@Column({ default: 0 })
+	nb: number;
 
-	@ManyToMany(() => User, {
-		nullable: true
+	// @ManyToMany(() => User, { nullable: true })
+	// @JoinTable({ name: 'user_in_channel' })
+	// users: User[];
+
+	@OneToMany(() => UserInChannel, (users) => users.channel)
+	users?: UserInChannel[];
+
+	@OneToMany(() => Message, (message) => message.id, {
+		nullable: true,
 	})
-	@JoinTable({ name: 'user_in_channel'})
-	users: User[]
-
-	@OneToMany(() => ChannelMessage, (message) => message.channel, {
-		nullable: true
-	})
-	messages: ChannelMessage[];
-
+	messages: Message[];
 }
