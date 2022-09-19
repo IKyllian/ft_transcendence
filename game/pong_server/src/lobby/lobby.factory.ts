@@ -93,6 +93,10 @@ export class LobbyFactory
 		return this.client_list.get(client['id']);
 	}
 
+	lobby_request_status(client: Socket, game_id: string)
+	{
+		this.lobby_list.get(game_id)?.lobby_send_lobby_status(client);
+	}
 
 	lobby_player_ready(client: Socket)
 	{

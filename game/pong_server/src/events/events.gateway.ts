@@ -145,6 +145,15 @@ console.log("user join lobby", data);
 		this.lobbyfactory.lobby_player_ready(client);
 	}
 
+
+	@SubscribeMessage('user_lobby_request_status')
+	async onUserLobbyRequestStatus(@ConnectedSocket() client: Socket,
+	@MessageBody() game_id: string)
+	{
+		this.lobbyfactory.lobby_request_status(client, game_id);
+	}
+
+
   }
 
 

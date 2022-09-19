@@ -1,6 +1,6 @@
 import { Socket } from "socket.io";
 import { PongGame } from "../game/pong.game";
-import { NewGameData, PlayerStatus } from "../types/shared.types";
+import { LobbyStatus, NewGameData, PlayerStatus } from "../types/shared.types";
 
 export class Lobby
 {
@@ -24,13 +24,6 @@ export class Lobby
 	{
 		this.game_id = gamedata.game_id;
 	}
-
-
-	// on_disconnect(client: Socket)
-	// {
-	// 	//if player -> abort
-	// 	//if spectator remove
-	// }
 
 	lobby_add(client: Socket, player_secret: string)
 	{
@@ -73,7 +66,7 @@ export class Lobby
 		{
 			//playerB left
 			console.log("player B left from game ", this.game_id);
-			this.player_A_status = PlayerStatus.Absent;
+			this.player_B_status = PlayerStatus.Absent;
 			this.player_B = undefined;
 			this.player_B_id = '';
 			//if game_has_started
@@ -104,6 +97,66 @@ export class Lobby
 		});
 	}
 
+	lobby_send_lobby_status(client: Socket)
+	{
+		if (this.player_A_status === PlayerStatus.Ready
+			&& this.player_B_status === PlayerStatus.Ready)
+		{
+			client.emit('lobby_all_ready');
+		}
+		else
+		{
+			let ret: LobbyStatus =
+			{
+				player_A: this.player_A_status,
+				player_B: this.player_B_status
+			}
+			client.emit('lobby_status', ret);
+		}
+	}
+
+	lobby_broadcast_lobby_status()
+	{
+		if (this.player_A_status === PlayerStatus.Ready
+			&& this.player_B_status === PlayerStatus.Ready)
+		{
+			this.lobby_broadcast_message('lobby_all_ready');
+		}
+		else
+		{
+			let ret: LobbyStatus =
+			{
+				player_A: this.player_A_status,
+				player_B: this.player_B_status
+			}
+			this.lobby_broadcast_data('lobby_status', ret);
+		}
+	}
+
+	lobby_broadcast_data(message: string, data: any)
+	{
+		console.log("in lobby broadcast data");
+		if (this.player_A_status !== PlayerStatus.Absent)
+		{
+			this.player_A.emit(message, data);
+			console.log('sending to player A', message);
+		}
+		if (this.player_B_status !== PlayerStatus.Absent)
+		{
+			this.player_B.emit(message, data);
+			console.log('sending to player B', message);
+		}
+		this.spectators.forEach(function(spectator)
+		{
+			// if (spectator instanceof Socket)
+			// {
+				spectator.emit(message, data);
+				console.log('sending to spectator', message);
+			//}
+		});
+	}
+
+
 	lobby_broadcast_message(message: string)
 	{
 		console.log("in lobby broadcast message");
@@ -129,14 +182,12 @@ export class Lobby
 
 	player_ready(client: Socket)
 	{
-		if (this.player_A_status !== PlayerStatus.Absent
-			&& client['id'] === this.player_A['id'])
+		if (client.id === this.player_A_id)
 		{
 			this.player_A_status = PlayerStatus.Ready;
 			console.log("player A is ready ", this.game_id);
 		}
-		else if (this.player_B_status !== PlayerStatus.Absent
-			&& client['id'] === this.player_B['id'])
+		else if (client.id === this.player_B_id)
 		{
 			this.player_B_status = PlayerStatus.Ready;
 			console.log("player B is ready ", this.game_id);

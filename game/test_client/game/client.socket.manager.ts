@@ -1,5 +1,5 @@
 import { io, Socket } from "socket.io-client";
-import { PlayersLobbyData } from './types/shared.types';
+import { LobbyStatus, PlayersLobbyData } from './types/shared.types';
 
 export default class ClientSocketManager
 {
@@ -36,16 +36,18 @@ export default class ClientSocketManager
 	
 	join_lobby = (lobbydata: PlayersLobbyData) =>
 	{
-		// let lobbydata: PlayersLobbyData = 
-		// {
-		// 	player_secret: player_secret,
-		// 	game_id: game_id
-		// };
 		if (this.socket instanceof Socket)
 		{
 			this.socket.emit('user_join_lobby', lobbydata);
 		}
+	}
 
+	request_lobby_status = (game_id: string) =>
+	{
+		if (this.socket instanceof Socket)
+		{
+			this.socket.emit('user_lobby_request_status', game_id);
+		}
 	}
 
 
@@ -65,6 +67,7 @@ export default class ClientSocketManager
 		{
 			this.socket.on('join_lobby_ok', this.onLobbyJoinOk.bind(this));
 			this.socket.on('lobby_all_ready', this.onLobbyAllReady.bind(this));
+			this.socket.on('lobby_status', this.onLobbyStatus.bind(this));
 		}
 	}
 
@@ -79,6 +82,11 @@ export default class ClientSocketManager
 		this.lobby_triggers.ready_to_go();
 	}
 
+	onLobbyStatus = (new_status: LobbyStatus) =>
+	{
+		console.log('received lobby_status');
+		this.lobby_triggers.update_lobby_status(new_status);	
+	}
 
 
 	print_test = () =>

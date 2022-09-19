@@ -59,3 +59,9 @@ export type BallData =
 	velocity: number,
 	direction: number
 }
+
+export type LobbyStatus =
+{
+	player_A: PlayerStatus,
+	player_B: PlayerStatus
+}
