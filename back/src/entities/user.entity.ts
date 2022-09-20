@@ -22,9 +22,9 @@ export class User {
 	@Column({ unique: true, nullable: true })
 	username: string;
 
-	@Column({ nullable: true })
-	@Exclude()
-	hash?: string
+	// @Column({ nullable: true })
+	// @Exclude()
+	// hash?: string
 	
 	/* @OneToOne(() => Avatar, { nullable: true })
 	@JoinColumn({ name: 'avatar_id' }) */

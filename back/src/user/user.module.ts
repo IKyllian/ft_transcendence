@@ -1,6 +1,7 @@
 import { forwardRef, Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { AuthModule } from "src/auth/auth.module";
+import { ChatModule } from "src/chat/chat.module";
 import { Avatar } from "src/entities/avatar.entity";
 import { Friendship } from "src/entities/friendship.entity";
 import { Statistic } from "src/entities/statistic.entity";

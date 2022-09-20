@@ -9,7 +9,7 @@ export class ChannelDto {
 	@IsNotEmpty()
 	name: string;
 
-	option: channelOption;
+	option?: channelOption;
 
 	@IsString()
 	@IsNotEmpty()

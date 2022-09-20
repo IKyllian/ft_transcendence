@@ -22,13 +22,15 @@ export class ChannelService {
 	}
 
 	async joinChannel(channelDto: ChannelDto, user: User) {
-		let channel = await this.channelsRepo.findOneBy({ name: ChannelDto.name });
-		if (!channel) {
+		let channel = await this.findbyName(channelDto.name);
+		if (channel === null) {
+			console.log('creating channel: ', channelDto.name, channel);
 			channel = await this.createChannel(channelDto);
-			this.addUser(user, channel, 'owner');
+			await this.addUser(user, channel, 'owner');
 		} else {
-			this.addUser(user, channel, 'pleb');
+			await this.addUser(user, channel, 'pleb');
 		}
+		return await this.channelsRepo.save(channel);
 	}
 
 	async findUserInChannel(channel: Channel, user: User) {
@@ -46,12 +48,16 @@ export class ChannelService {
 		});
 	}
 
+	async findbyName(name: string) {
+		return await this.channelsRepo.findOneBy({ name });
+	}
+
 	async addUser(user: User, channel: Channel, role?: chanRole) {
 		let userfound = await this.findUserInChannel(channel, user);
 		if (userfound.length) {
 			
 			// TODO: ws execption ??, FAIRE CA PROPRE
-			// console.log('userFound:', userfound);
+			console.log('user already in channel');
 			return ;
 			throw new ForbiddenException('user already in channel');
 		}

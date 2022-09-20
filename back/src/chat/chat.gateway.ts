@@ -26,11 +26,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private channelService: ChannelService,
     ) {}
 
-  // afterInit(serv: Server) {
-  //   this.server = serv;
-  //   console.log('gateway running');
-  // }
-
   async handleConnection(client: Socket) {
     console.log(client.id, 'connected')
     const token = client.handshake.headers.authorization.split(' ')[1];

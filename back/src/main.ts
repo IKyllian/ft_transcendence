@@ -16,13 +16,14 @@ async function bootstrap() {
 
   let user = await userService.create({ username: 'chak' });
   let user2 = await userService.create({ username: 'kiki' });
-  let channel = await channelService.createChannel({
-    name: 'Géneral',
+  let channel = await channelService.joinChannel({
+    name: 'general',
     option: 'public',
   },
+  user
   );
-  await channelService.addUser(user, channel)
-  await channelService.addUser(user, channel)
+  // await channelService.addUser(user, channel)
+  // await channelService.addUser(user, channel)
   console.log(channel);
   // let userchan = await channelService.addUser(user2, channel);
   // console.log(channel);

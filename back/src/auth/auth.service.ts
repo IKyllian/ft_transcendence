@@ -11,31 +11,43 @@ import { Avatar } from "src/entities/avatar.entity";
 import { HttpService } from "@nestjs/axios";
 import { lastValueFrom } from "rxjs";
 import { UserService } from "src/user/user.service";
+import { ChannelService } from "src/chat/channel.service";
+import { UserHash } from "src/entities/user-hash.entity";
 
 @Injectable()
 export class AuthService {
 	constructor(
-		@Inject(forwardRef(() => UserService))
+		// @Inject(forwardRef(() => UserService))
 		private userService: UserService,
 		private jwt: JwtService,
 		private config: ConfigService,
+		// @Inject(forwardRef(() => ChannelService))
+		private channelService: ChannelService,
 		private readonly httpService: HttpService,
 		@InjectRepository(User)
 		private usersRepo: Repository<User>,
 		@InjectRepository(Statistic)
 		private statsRepo: Repository<Statistic>,
+		@InjectRepository(UserHash)
+		private userHashRepo: Repository<UserHash>
 	) {}
 
 	async signup(dto: AuthDto) {
 		const hash = await argon.hash(dto.password);
 
 		try {
-			const user = this.usersRepo.create({
-				username: dto.username,
-				hash,
-			});
+			const user = this.usersRepo.create({ username: dto.username });
 			user.statistic = await this.statsRepo.save(new Statistic());
+
 			await this.usersRepo.save(user);
+			this.userHashRepo.save({ user_id: user.id, hash });
+			// const chanGen = await this.channelService.findbyName('general');
+			this.channelService.joinChannel({
+				name: 'general',
+				option: 'public',
+			},
+			user
+			);
 			console.log(user);
 			return {
 				token: (await this.signToken(user.id, user.username)).access_token,
@@ -56,8 +68,9 @@ export class AuthService {
 		if (!user)
 			throw new NotFoundException('User not found')
 		
+		const userHash = await this.userHashRepo.findOneBy({user_id: user.id})
 		const pwdMatches = await argon.verify(
-			user.hash,
+			userHash.hash,
 			dto.password,
 		);
 

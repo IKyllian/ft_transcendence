@@ -23,13 +23,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
 		sub: number;
 		username: string;
 	}) {
-		const user = await this.usersRepo.findOne({
-			where: {
-				id: payload.sub,
-			}
-		})
-		if (user)
-			delete user.hash;
+		const user = await this.usersRepo.findOneBy({ id: payload.sub })
 		return user;
 	}
 }

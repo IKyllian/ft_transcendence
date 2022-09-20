@@ -1,3 +1,9 @@
 // Channels:
 	- Unique name?
 	- Make creator/owner of the channel != moderator (ex: can't be kick/mute)
+
+// Auth:
+	- Store access_token and refresh_token in local storage,
+	on access_token expiration send request to server with refresh_token.
+	If fail redirect to login page.
+	- On logout, remove token from local storage?

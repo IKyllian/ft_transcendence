@@ -2,7 +2,9 @@ import { HttpModule } from "@nestjs/axios";
 import { forwardRef, Module } from "@nestjs/common";
 import { JwtModule } from "@nestjs/jwt";
 import { TypeOrmModule } from "@nestjs/typeorm";
+import { ChatModule } from "src/chat/chat.module";
 import { Statistic } from "src/entities/statistic.entity";
+import { UserHash } from "src/entities/user-hash.entity";
 import { User } from "src/entities/user.entity";
 import { UserModule } from "src/user/user.module";
 import { AuthController } from "./auth.controller";
@@ -11,6 +13,7 @@ import { JwtStrategy } from "./strategy/jwt.strategy";
 
 @Module({
 	imports: [
+		forwardRef(() => ChatModule),
 		HttpModule,
 		UserModule,
 		// forwardRef(() => UserModule),
@@ -20,6 +23,7 @@ import { JwtStrategy } from "./strategy/jwt.strategy";
 		}),
 		TypeOrmModule.forFeature([
 			User,
+			UserHash,
 			Statistic,
 		])
 	],
