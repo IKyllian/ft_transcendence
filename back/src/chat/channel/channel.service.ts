@@ -1,10 +1,10 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Channel } from 'src/entities/channel.entity';
-import { User } from 'src/entities/user.entity';
-import { chanRole, UserInChannel } from 'src/entities/userInChannel.entity';
+import { Channel, User, UserInChannel } from 'src/typeorm';
+import { chanRole } from 'src/typeorm/entities/userInChannel';
+import { UserService } from 'src/user/user.service';
 import { Repository } from 'typeorm';
-import { ChannelDto } from './dto/channel.dto';
+import { ChannelDto } from '../dto/channel.dto';
 
 @Injectable()
 export class ChannelService {
@@ -16,6 +16,34 @@ export class ChannelService {
 		@InjectRepository(User)
 		private userRepo: Repository<User>,
 	){}
+
+	/**
+	 * @param user_id 
+	 * @returns All the channel that the user joined or that is visible
+	 */
+	async getChannels(user_id: number) {
+		return await this.channelsRepo.find({
+			select: {
+				users: true,
+				option: true
+			},
+			relations: {
+				users: {
+					user: true,
+				},
+			},
+			where: [{
+				users: {
+					user: {
+						id: user_id,
+					}
+				}
+			},
+			{
+				option: 'public',
+			}]
+		});
+	}
 
 	async createChannel(channelDto: ChannelDto) {
 		return await this.channelsRepo.save(channelDto);

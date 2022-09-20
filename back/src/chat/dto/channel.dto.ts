@@ -1,7 +1,6 @@
 import { IsNotEmpty, IsString } from "class-validator";
-import { channelOption } from "src/entities/channel.entity";
-import { Message } from "src/entities/message.entity";
-import { User } from "src/entities/user.entity";
+import { User, Message } from "src/typeorm";
+import { channelOption } from "src/typeorm/entities/channel";
 
 export class ChannelDto {
 

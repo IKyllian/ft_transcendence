@@ -1,7 +1,7 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ChannelService } from './chat/channel.service';
+import { ChannelService } from './chat/channel/channel.service';
 import { UserService } from './user/user.service';
 
 async function bootstrap() {
@@ -30,5 +30,7 @@ async function bootstrap() {
   // channel = await channelService.addUser(user, channel);
   // let user2 = await userService.create({ username: 'chaki' });
   // channel = await channelService.addUser(channel, user)
+  const channels = await channelService.getChannels(user2.id);
+  console.log(channels);
 }
 bootstrap();

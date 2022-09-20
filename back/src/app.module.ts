@@ -6,6 +6,7 @@ import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { UserModule } from './user/user.module';
 import { ChatModule } from './chat/chat.module';
+import entities from './typeorm';
 
 @Module({
   imports: [
@@ -20,7 +21,7 @@ import { ChatModule } from './chat/chat.module';
       username: process.env.POSTGRES_USER,
       password: process.env.POSTGRES_PASSWORD,
       database: process.env.POSTGRES_NAME,
-      entities: [__dirname + '/entities/*'],
+      entities,
       synchronize: true, // Setting synchronize: true shouldn't be used in production - otherwise you can lose production data.
       dropSchema: true,
     }),

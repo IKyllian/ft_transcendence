@@ -1,15 +1,13 @@
 
 import { Exclude } from "class-transformer";
-import { Socket } from "socket.io";
 import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn, Unique, ManyToMany, JoinTable, ManyToOne } from "typeorm";
-import { Avatar } from "./avatar.entity";
-import { Channel } from "./channel.entity";
-import { Friendship } from "./friendship.entity";
-import { Statistic } from "./statistic.entity";
-import { UserInChannel } from "./userInChannel.entity";
+import { Avatar } from "./avatar";
+import { Channel } from "./channel";
+import { Friendship } from "./friendship";
+import { Statistic } from "./statistic";
 
 
-@Entity({ name: "users" })
+@Entity()
 export class User {
 
 	@PrimaryGeneratedColumn()
@@ -21,10 +19,6 @@ export class User {
 
 	@Column({ unique: true, nullable: true })
 	username: string;
-
-	// @Column({ nullable: true })
-	// @Exclude()
-	// hash?: string
 	
 	/* @OneToOne(() => Avatar, { nullable: true })
 	@JoinColumn({ name: 'avatar_id' }) */

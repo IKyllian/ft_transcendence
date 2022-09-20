@@ -1,9 +1,6 @@
-import { InjectRepository } from "@nestjs/typeorm";
-import { ChannelService } from "src/chat/channel.service";
 import { Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, Repository, Unique } from "typeorm";
-import { Message } from "./message.entity";
-import { User } from "./user.entity";
-import { chanRole, UserInChannel } from "./userInChannel.entity";
+import { Message } from "./message";
+import { UserInChannel } from "./userInChannel";
 
 export type channelOption = 'public' | 'private' | 'protected';
 

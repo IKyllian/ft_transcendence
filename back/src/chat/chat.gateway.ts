@@ -4,15 +4,18 @@ import { Server, Socket } from 'socket.io';
 import { AuthService } from 'src/auth/auth.service';
 import { GetUser } from 'src/auth/decorator/get-user.decorator';
 import { WsJwtGuard } from 'src/auth/guard/ws-jwt.guard';
-import { User } from 'src/entities/user.entity';
-import { ChannelService } from './channel.service';
-// import { ChatService } from './chat.service';
+import { User } from 'src/typeorm';
+import { ChannelService } from './channel/channel.service';
 import { MessageDto } from './dto/message.dto';
 import { MessageService } from './message.service';
 
 
 @WebSocketGateway({
-  cors: true
+  // cors: true
+  cors: {
+    origin: ['http://localhost:3000'],
+    credential: true
+  }
 })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 

@@ -1,6 +1,6 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryColumn, PrimaryGeneratedColumn, RelationId } from "typeorm";
-import { Channel } from "./channel.entity";
-import { User } from "./user.entity";
+import { Channel } from "./channel";
+import { User } from "./user";
 
 export type chanRole = 'owner' | 'moderator' | 'pleb';
 

@@ -1,7 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { channel, Channel } from 'diagnostics_channel';
-import { Message } from 'src/entities/message.entity';
 import { MessageDto } from './dto/message.dto';
 
 // @Injectable()

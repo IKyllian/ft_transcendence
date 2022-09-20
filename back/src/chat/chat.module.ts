@@ -2,14 +2,10 @@ import { forwardRef, Module } from '@nestjs/common';
 // import { ChatService } from './chat.service';
 import { ChatGateway } from './chat.gateway';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Channel } from 'src/entities/channel.entity';
-import { Message } from 'src/entities/message.entity';
-import { ChannelService } from './channel.service';
+import { ChannelService } from './channel/channel.service';
 import { MessageService } from './message.service';
 import { AuthModule } from 'src/auth/auth.module';
-import { UserInChannel } from 'src/entities/userInChannel.entity';
-import { User } from 'src/entities/user.entity';
-import { UserHash } from 'src/entities/user-hash.entity';
+import { Channel, Message, User, UserInChannel } from 'src/typeorm';
 
 @Module({
   imports: [

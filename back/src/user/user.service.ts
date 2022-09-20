@@ -1,13 +1,10 @@
 import { ForbiddenException, forwardRef, Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { User } from "src/entities/user.entity";
-import { Friendship, friendShipStatus } from "src/entities/friendship.entity";
-import { Statistic } from "src/entities/statistic.entity";
-import { Avatar } from "src/entities/avatar.entity";
 import { AuthService } from "src/auth/auth.service";
-import { use } from "passport";
 import { CreateUserDto } from "./dto/createUser.dto";
+import { Friendship, Statistic, User } from "src/typeorm";
+import { friendShipStatus } from "src/typeorm/entities/friendship";
 
 @Injectable()
 export class UserService {

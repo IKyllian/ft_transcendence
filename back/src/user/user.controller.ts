@@ -3,7 +3,7 @@ import { FileInterceptor } from "@nestjs/platform-express";
 import { Observable, of } from "rxjs";
 import { GetUser } from "src/auth/decorator/get-user.decorator";
 import { JwtGuard } from "src/auth/guard/jwt.guard";
-import { User } from "src/entities/user.entity";
+import { User } from "src/typeorm";
 import { diskStorage } from "multer";
 import { v4 as uuidv4 } from "uuid";
 import * as path from 'path';
