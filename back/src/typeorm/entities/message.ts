@@ -1,18 +1,17 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { BaseEntity, Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Channel } from "./channel";
 import { User } from "./user";
 
 @Entity()
-export class Message {
+export class Message extends BaseEntity {
 	@PrimaryGeneratedColumn()
 	id: number;
 
-	// @JoinColumn()
-	// @ManyToOne(() => User)
-	// sender: User;
+	@ManyToOne(() => User)
+	sender: User;
 
-	@Column()
-	sender: string;
+	// @Column()
+	// sender: string;
 
 	@Column()
 	content: string;

@@ -1,14 +1,15 @@
 
 import { Exclude } from "class-transformer";
-import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn, Unique, ManyToMany, JoinTable, ManyToOne } from "typeorm";
+import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn, Unique, ManyToMany, JoinTable, ManyToOne, BaseEntity } from "typeorm";
 import { Avatar } from "./avatar";
 import { Channel } from "./channel";
 import { Friendship } from "./friendship";
 import { Statistic } from "./statistic";
+import { UserInChannel } from "./userInChannel";
 
 
 @Entity()
-export class User {
+export class User extends BaseEntity {
 
 	@PrimaryGeneratedColumn()
 	id: number;
@@ -29,8 +30,8 @@ export class User {
 	@OneToOne(() => Statistic, (statistic) => statistic.user, { cascade: true, eager: true })
 	statistic: Statistic;
 
-	// @OneToOne(() => UserInChannel, (userInChan) => userInChan.user)
-	// userInChan
+	// @OneToMany(() => UserInChannel, (userInChan) => userInChan.user)
+	// userInChan: UserInChannel[]
 
 	// @ManyToOne(() => Channel, (channel) => channel.id, { nullable: true })
 	// channels: Channel[];

@@ -9,23 +9,15 @@ import { friendShipStatus } from "src/typeorm/entities/friendship";
 @Injectable()
 export class UserService {
 	constructor(
-		@InjectRepository(User)
-		private usersRepo: Repository<User>,
-		@InjectRepository(Friendship)
-		private friendshipsRepo: Repository<Friendship>,
-		@InjectRepository(Statistic)
-		private statisticsRepo: Repository<Statistic>,
 		@Inject(forwardRef(() => AuthService))
 		private authService: AuthService,
 	) {}
 
 	async create(userdto: CreateUserDto) {
 		try {
-			const user = this.usersRepo.create(userdto);
-			user.statistic = await this.statisticsRepo.save(new Statistic());
-			await this.usersRepo.save(user);
-			return user;
-
+			const user = User.create(userdto);
+			user.statistic = await Statistic.save(new Statistic());
+			return await user.save();
 		} catch (error) {
 			if (error.code === '23505') {
 				throw new ForbiddenException('Username taken');
@@ -35,24 +27,24 @@ export class UserService {
 	}
 	
 	async findById(id: number): Promise<User | undefined> {
-		const user = await this.usersRepo.findOneBy({ id });
+		const user = User.findOneBy({ id });
 		if (!user)
 			throw new NotFoundException('Username not found');
 		return user
 	}
 
-	async findBy42Id(id42: number): Promise<User | undefined> {
-		return await this.usersRepo.findOneBy({ id42 });
-	}
+	// async findBy42Id(id42: number): Promise<User | undefined> {
+	// 	return await User.findOneBy({ id42 });
+	// }
 
-	async findByUsername(username: string): Promise<User | undefined> {
-		return await this.usersRepo.findOneBy({ username });
-	}
+	// async findByUsername(username: string): Promise<User | undefined> {
+	// 	return await User.findOneBy({ username });
+	// }
 
 	async editUsername(user: User, name: string) {
 		try {
 			user.username = name;
-			await this.usersRepo.save(user);
+			await user.save();
 			return {
 				token: (await this.authService.signToken(user.id, user.username)).access_token,
 				user: user,
@@ -64,18 +56,34 @@ export class UserService {
 	}
 
 	async getUsers() {
-		return await this.usersRepo.find();
+		return await User.find();
 	}
 
 	async getFriendlist(user: User) {
-		const rawFriendList = await this.friendshipsRepo.find({
+		// const rawFriendList = await this.friendshipsRepo.find({
+		// 	relations: {
+		// 		requester: true,
+		// 		addressee: true
+		// 	},
+		// 	where: [
+		// 		{ requester: user, status: 'accepted' },
+		// 		{ addressee: user, status: 'accepted' }
+		// 	]
+		// });
+
+		const rawFriendList = await Friendship.find({
 			relations: {
 				requester: true,
 				addressee: true
 			},
 			where: [
-				{ requester: user, status: 'accepted' },
-				{ addressee: user, status: 'accepted' }
+				{ requester: {
+					id: user.id,
+				}, status: 'accepted' },
+
+				{ addressee: {
+					id: user.id,
+				}, status: 'accepted' },
 			]
 		});
 		let friendList: User[] = [];
@@ -90,32 +98,37 @@ export class UserService {
 	}
 
 	async sendFriendRequest(requester: User, addressee: User) {
-		return this.friendshipsRepo.save({ requester, addressee, status: 'requested' });
+		return Friendship.save({ requester, addressee, status: 'requested' });
 	}
 
 	async respondFriendRequest(addressee: User, requester: User, status: friendShipStatus) {
-		const friendship = await this.friendshipsRepo.findOne({
-			where: { addressee, requester, status: 'requested' },
+		const friendship = await Friendship.findOne({
+			where: { addressee: {
+				id: addressee.id,
+			},
+			requester: {
+				id: requester.id,
+			}, status: 'requested' },
 		});
 		if (!friendship) {
 			throw new Error('Request not found');
 		}
 		friendship.status = status;
-		return this.friendshipsRepo.save(friendship);
+		return await friendship.save();
 	}
 
 	async addWin(user: User) {
 		user.statistic.matchWon++;
-		await this.usersRepo.save(user);
+		await user.save();
 	}
 
 	async addLoss(user: User) {
 		user.statistic.matchLost++;
-		await this.usersRepo.save(user);
+		await user.save();
 	}
 
 	async updateAvatar(user: User, fileName: string) {
 		user.avatar = fileName;
-		await this.usersRepo.save(user);
+		await user.save();
 	}
 }

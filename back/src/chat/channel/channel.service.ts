@@ -1,32 +1,22 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { ClassSerializerInterceptor, ForbiddenException, Injectable, UseInterceptors } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { ClassTransformer } from 'class-transformer';
 import { Channel, User, UserInChannel } from 'src/typeorm';
 import { chanRole } from 'src/typeorm/entities/userInChannel';
 import { UserService } from 'src/user/user.service';
 import { Repository } from 'typeorm';
 import { ChannelDto } from '../dto/channel.dto';
+import { ChannelExistException } from '../exceptions/ChannelExist';
+import { ChannelNotFoundException } from '../exceptions/ChannelNotFound';
 
 @Injectable()
 export class ChannelService {
-	constructor(
-		@InjectRepository(Channel)
-		private channelsRepo: Repository<Channel>,
-		@InjectRepository(UserInChannel)
-		private userInChanRepo: Repository<UserInChannel>,
-		@InjectRepository(User)
-		private userRepo: Repository<User>,
-	){}
-
 	/**
 	 * @param user_id 
-	 * @returns All the channel that the user joined or that is visible
+	 * @returns All the channel that the user joined or that is public
 	 */
 	async getChannels(user_id: number) {
-		return await this.channelsRepo.find({
-			select: {
-				users: true,
-				option: true
-			},
+		const chan = await Channel.find({
 			relations: {
 				users: {
 					user: true,
@@ -43,26 +33,33 @@ export class ChannelService {
 				option: 'public',
 			}]
 		});
+		console.log('channel joined', chan);
+		return chan;
 	}
 
-	async createChannel(channelDto: ChannelDto) {
-		return await this.channelsRepo.save(channelDto);
-	}
-
-	async joinChannel(channelDto: ChannelDto, user: User) {
-		let channel = await this.findbyName(channelDto.name);
-		if (channel === null) {
-			console.log('creating channel: ', channelDto.name, channel);
-			channel = await this.createChannel(channelDto);
-			await this.addUser(user, channel, 'owner');
-		} else {
-			await this.addUser(user, channel, 'pleb');
+	async create(user: User, dto: ChannelDto) {
+		try {
+			// TODO hash password if there is one
+			const channel = await Channel.save(dto);
+			return await this.addUser(user, channel, 'owner');
+		} catch(e) {
+			if (e.code === '23505')
+				throw new ChannelExistException;
+			throw e;
 		}
-		return await this.channelsRepo.save(channel);
+	}
+
+	async join(user: User, channelDto: ChannelDto) {
+		const channel = await Channel.findOneBy({ name: channelDto.name });
+		if (!channel)
+			throw new ChannelNotFoundException();
+		// TODO compare password
+		return await this.addUser(user, channel, 'pleb');
+
 	}
 
 	async findUserInChannel(channel: Channel, user: User) {
-		return await this.userInChanRepo.find({
+		return await UserInChannel.findOne({
 			relations: {
 				channel: true,
 				user: true,
@@ -71,36 +68,40 @@ export class ChannelService {
 				channel: {
 					id: channel.id,
 				},
-				user: user,
+				user: {
+					id: user.id,
+				}
 			}
 		});
 	}
 
-	async findbyName(name: string) {
-		return await this.channelsRepo.findOneBy({ name });
-	}
-
 	async addUser(user: User, channel: Channel, role?: chanRole) {
 		let userfound = await this.findUserInChannel(channel, user);
-		if (userfound.length) {
-			
-			// TODO: ws execption ??, FAIRE CA PROPRE
+		
+		if (userfound) {
 			console.log('user already in channel');
-			return ;
 			throw new ForbiddenException('user already in channel');
 		}
-		let userIn = this.userInChanRepo.create({
+		let userIn = UserInChannel.create({
 			user,
 			channel,
 		});
 		if (role)
 			userIn.role = role;
-		if (!channel.users)
-			channel.users = [userIn];
-		else
-			channel.users.push(userIn);
 
+		let users = await channel.users;
+		if (!users) {
+			console.log('no user, pushing', channel.users)
+			channel.users = Promise.resolve([userIn]);
+			console.log('in push', channel.users)
+		}
+		else {
+			users.push(userIn);
+			channel.users = Promise.resolve(users);
+		}
+		
 		channel.nb++;
-		return await this.userInChanRepo.save(userIn);
+		// console.log(channel)
+		return await Channel.save(channel);
 	}
 }

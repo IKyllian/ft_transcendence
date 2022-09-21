@@ -10,39 +10,28 @@ import { lastValueFrom } from "rxjs";
 import { UserService } from "src/user/user.service";
 import { ChannelService } from "src/chat/channel/channel.service";
 import { Statistic, User, UserPassHash } from "src/typeorm";
+import { ChannelDto } from "src/chat/dto/channel.dto";
 
 @Injectable()
 export class AuthService {
 	constructor(
-		private userService: UserService,
 		private jwt: JwtService,
 		private config: ConfigService,
 		private channelService: ChannelService,
 		private readonly httpService: HttpService,
-		@InjectRepository(User)
-		private usersRepo: Repository<User>,
-		@InjectRepository(Statistic)
-		private statsRepo: Repository<Statistic>,
-		@InjectRepository(UserPassHash)
-		private userHashRepo: Repository<UserPassHash>
 	) {}
 
 	async signup(dto: AuthDto) {
 		const hash = await argon.hash(dto.password);
 
 		try {
-			const user = this.usersRepo.create({ username: dto.username });
-			user.statistic = await this.statsRepo.save(new Statistic());
+			const user = User.create({ username: dto.username });
+			user.statistic = await Statistic.save(new Statistic());
 
-			await this.usersRepo.save(user);
-			this.userHashRepo.save({ user_id: user.id, hash });
-			// const chanGen = await this.channelService.findbyName('general');
-			this.channelService.joinChannel({
-				name: 'general',
-				option: 'public',
-			},
-			user
-			);
+			await user.save();
+			UserPassHash.save({ user_id: user.id, hash });
+			// await this.channelService.joinChannel(new ChannelDto('general', 'public'), user);
+
 			console.log(user);
 			return {
 				token: (await this.signToken(user.id, user.username)).access_token,
@@ -58,12 +47,12 @@ export class AuthService {
 	}
 
 	async login(dto: AuthDto) {
-		const user = await this.userService.findByUsername(dto.username)
+		const user = await User.findOneBy({ username: dto.username });
 
 		if (!user)
 			throw new NotFoundException('User not found')
 		
-		const userHash = await this.userHashRepo.findOneBy({user_id: user.id})
+		const userHash = await UserPassHash.findOneBy({user_id: user.id})
 		const pwdMatches = await argon.verify(
 			userHash.hash,
 			dto.password,
@@ -100,10 +89,10 @@ export class AuthService {
 		const token = await this.get42token(code);
 
 		const response = await lastValueFrom(this.httpService.get(`https://api.intra.42.fr/v2/me?access_token=${token}`));
-		let user = await this.userService.findBy42Id(response.data.id);
+		let user = await User.findOneBy({ id42: response.data.id });
 		if (!user) {
 			console.log('user 42 not found, creating a new one');
-			user = await this.userService.create({
+			user = User.create({
 				username: null,
 				id42: response.data.id,
 			});
@@ -139,10 +128,15 @@ export class AuthService {
 			const decoded = this.jwt.verify(token, {
 				secret: this.config.get('JWT_SECRET')
 			});
-			return await this.userService.findById(decoded.id);
+			console.log('decoded', decoded)
+			return await User.findOneBy({ id: decoded.sub });
 		}
 		catch(e) {
 			return null;
 		}
+	}
+
+	decodeJwt(token: string) {
+		return this.jwt.decode(token);
 	}
 }

@@ -4,10 +4,12 @@ import { Server, Socket } from 'socket.io';
 import { AuthService } from 'src/auth/auth.service';
 import { GetUser } from 'src/auth/decorator/get-user.decorator';
 import { WsJwtGuard } from 'src/auth/guard/ws-jwt.guard';
-import { User } from 'src/typeorm';
+import { Message, User } from 'src/typeorm';
 import { ChannelService } from './channel/channel.service';
+import { ChatSessionManager } from './chat.session';
 import { MessageDto } from './dto/message.dto';
-import { MessageService } from './message.service';
+import { MessageService } from './message/message.service';
+import { JwtPayload } from 'src/utils/types/jwtPayload';
 
 
 @WebSocketGateway({
@@ -27,66 +29,30 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private messageService: MessageService,
     private authService: AuthService,
     private channelService: ChannelService,
+    private readonly session: ChatSessionManager,
     ) {}
 
-  async handleConnection(client: Socket) {
-    console.log(client.id, 'connected')
-    const token = client.handshake.headers.authorization.split(' ')[1];
+  async handleConnection(socket: Socket) {
+    const token = socket.handshake.headers.authorization.split(' ')[1];
     const user = await this.authService.verify(token);
     if (!user) {
       console.log('invalid credential')
-      client.emit('connection', 'failed');
-      client.disconnect();
+      socket.emit('connection', 'failed');
+      return socket.disconnect();
     }
-    client.emit('connection', "success");
-    client.join('general');
+    console.log(user.username, 'connected')
+    socket.emit('connection', "success");
+    this.session.setUserSocket(user.id, socket);
   }
 
-  handleDisconnect(client: Socket) {
-    console.log(client.id, 'disconnected')
+  handleDisconnect(socket: Socket) {
+    const user = this.authService.decodeJwt(socket.handshake.headers.authorization.split(' ')[1]) as JwtPayload;
+    console.log(user.username, 'disconnected')
+    this.session.removeUserSocket(user.sub)
   }
 
-  @UseGuards(WsJwtGuard)
-  @SubscribeMessage('createMessage')
-  async create(
-    @MessageBody() messageDto: MessageDto,
-    @ConnectedSocket() client: Socket,
-    @GetUser() user: User,
-    ) {
-    const message = await this.messageService.create(messageDto);
-    // this.server.emit('message', message);
-    this.server.in('lolroom').emit('message', message);
-    // client.to(client.id).emit('message', message);
-    // client.in('lolroom').emit('message', message);
-    console.log('message: ', message);
-    
-    return message;
+  handleMessageToSend(message: Message) {
+    const socket = this.session.getUserSocket(message.sender.id);
+    socket.to(`channel-${message.channel.id}`).emit('message', message);
   }
-
-  @UseGuards(WsJwtGuard)
-  @SubscribeMessage('test')
-  test(@GetUser() user: User, @ConnectedSocket() client: Socket) {
-    client.send("cc");
-
-  }
-
-  @SubscribeMessage('findAllMessages')
-  findAll() {
-    // return this.chatService.findAll();
-  }
-
-  @SubscribeMessage('joinChannel')
-  joinChannel(
-    @MessageBody('sender') name: string,
-    @ConnectedSocket() client: Socket,
-  ) {
-    // return this.channelService.joinChannel(name, client.id);
-    return { }
-  }
-
-  @SubscribeMessage('leaveChannel')
-  leaveChannel() {
-
-  }
-
 }

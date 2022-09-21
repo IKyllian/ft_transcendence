@@ -1,6 +1,6 @@
-import { IsNotEmpty, IsString } from "class-validator";
+import { IsNotEmpty, IsOptional, IsString } from "class-validator";
 import { User, Message } from "src/typeorm";
-import { channelOption } from "src/typeorm/entities/channel";
+import { Channel, channelOption } from "src/typeorm/entities/channel";
 
 export class ChannelDto {
 
@@ -11,10 +11,21 @@ export class ChannelDto {
 	option?: channelOption;
 
 	@IsString()
+	@IsOptional()
 	@IsNotEmpty()
 	password?: string;
-	
-	users?: User[]
-	messages?: Message[];
 
+	// constructor(name: string, option: channelOption) {
+	// 	this.name = name;
+	// 	this.option = option;
+	// }
+
+	// public toChannel?(): Channel {
+	// 	const channel = new Channel();
+
+	// 	channel.name = this.name;
+	// 	channel.option = this.option;
+
+	// 	return channel;
+	// }
 }
