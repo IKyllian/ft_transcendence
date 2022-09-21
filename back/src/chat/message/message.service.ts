@@ -15,7 +15,7 @@ export class MessageService {
 	) {}
 
 	async create(chanId: number, user: User, messageDto: MessageDto) {
-		const channel = await Channel.findOneBy({id: chanId});
+		const channel = await Channel.findOneBy({ id: chanId });
 		if (!channel)
 			throw new ChannelNotFoundException();
 		const userInChannel = await this.channelService.findUserInChannel(channel, user);
@@ -28,5 +28,23 @@ export class MessageService {
 			sender: user,
 		});
 		return await message.save();
+	}
+
+	async getMessages(chanId: number, user: User) {
+		const channel = await Channel.findOneBy({ id: chanId });
+		if (!channel)
+			throw new ChannelNotFoundException();
+		const userInChannel = await this.channelService.findUserInChannel(channel, user);
+		if (!userInChannel) { throw new NotInChannelException() }
+
+		return await Message.find({
+			relations: ['sender'],
+			where: {
+				channel: {
+					id: chanId,
+				}
+			},
+			order: { send_at: 'DESC' },
+		});
 	}
 }

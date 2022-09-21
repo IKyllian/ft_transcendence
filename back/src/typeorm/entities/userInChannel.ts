@@ -11,16 +11,16 @@ export class UserInChannel extends BaseEntity {
 	id: number;
 
 	@ManyToOne(() => User)
-	user: User;
+	user!: User;
 	
 	@ManyToOne(() => Channel, (channel) => channel.users)
-	channel: Channel;
+	channel!: Channel;
 	
 	@Column({ default: 'pleb' })
 	role: chanRole;
 	
 	@Column({ default: false })
-	is_muted: boolean;
+	is_muted!: boolean;
 	
 	@Column({ nullable: true })
 	mutedTime?: Date;

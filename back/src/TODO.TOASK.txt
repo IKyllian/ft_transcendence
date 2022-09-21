@@ -2,6 +2,7 @@
 	- Unique name?
 	- Make creator/owner of the channel != moderator (ex: can't be kick/mute)
 	- At creation: Add option in front to choose channel options
+	- on chat page: send all channel or only public/joined one
 
 // Auth:
 	- Store access_token and refresh_token in local storage,

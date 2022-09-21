@@ -53,6 +53,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   handleMessageToSend(message: Message) {
     const socket = this.session.getUserSocket(message.sender.id);
-    socket.to(`channel-${message.channel.id}`).emit('message', message);
+    // socket.to(`channel-${message.channel.id}`).emit('message', message);
   }
 }
