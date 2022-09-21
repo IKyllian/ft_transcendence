@@ -4,7 +4,6 @@ import { useForm } from "react-hook-form";
 import { useAppDispatch, useAppSelector } from '../../Redux/Hooks'
 import { uid } from "../../env";
 import { LoginPayload } from "../../Types/User-Types";
-import LoadDatasContainer from '../Load-Datas-Container';
 
 import LoadingSpin from '../Loading-Spin';
 import axios from 'axios';
@@ -100,38 +99,35 @@ function Sign() {
         const ret = window.location.replace(url+params);
     }
 
-    // return (authDatas.loading) ? (
-    //     <div className="sign-container">
-    //         <LoadingSpin />
-    //     </div>
-    // ) : 
-    return (
-        <LoadDatasContainer datas={authDatas.loading} containerClass="sign-container">
-            <div className="sign-container">
-                <div className='auth-wrapper'>
-                    <h2> {isSignIn ? "Sign In" : "Sign Up"} </h2>
-                    <button className='sign-42-button' onClick={(e) => sign42(e)}> Sign with 42 </button>
-                    <div className='auth-separator'>
-                        <span>ou</span>
-                    </div>
-                    {
-                        (authDatas.error !== undefined && authDatas.error !== '') &&
-                        <p className='form-error'> {authDatas.error} </p>
-                    }
-                    <form className='form-wrapper' onSubmit={isSignIn ? onSignIn : onSignUp}>
-                        <label htmlFor="username"> Username </label>
-                        <input id="username" type="text" {...register("username")} />
-
-                        <label htmlFor="password"> Password </label>
-                        <input id="password" type="password" {...register("password")} />
-                        <button type='submit'>
-                            {isSignIn ? "Login" : "Create Account"}
-                        </button>
-                    </form>
-                    <p className='btn-switch-form' onClick={() => setIsSignIn(!isSignIn) }> {isSignIn ? "Pas de compte ? Créez en un" : "Déjà un compte ? Connectez vous"} </p>
+    return (authDatas.loading) ? (
+        <div className="sign-container">
+            <LoadingSpin />
+        </div>
+    ) : (
+        <div className="sign-container">
+            <div className='auth-wrapper'>
+                <h2> {isSignIn ? "Sign In" : "Sign Up"} </h2>
+                <button className='sign-42-button' onClick={(e) => sign42(e)}> Sign with 42 </button>
+                <div className='auth-separator'>
+                    <span>ou</span>
                 </div>
+                {
+                    (authDatas.error !== undefined && authDatas.error !== '') &&
+                    <p className='form-error'> {authDatas.error} </p>
+                }
+                <form className='form-wrapper' onSubmit={isSignIn ? onSignIn : onSignUp}>
+                    <label htmlFor="username"> Username </label>
+                    <input id="username" type="text" {...register("username")} />
+
+                    <label htmlFor="password"> Password </label>
+                    <input id="password" type="password" {...register("password")} />
+                    <button type='submit'>
+                        {isSignIn ? "Login" : "Create Account"}
+                    </button>
+                </form>
+                <p className='btn-switch-form' onClick={() => setIsSignIn(!isSignIn) }> {isSignIn ? "Pas de compte ? Créez en un" : "Déjà un compte ? Connectez vous"} </p>
             </div>
-        </LoadDatasContainer>
+        </div>
     );
 }
 

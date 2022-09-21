@@ -3,7 +3,24 @@ import { IconSearch } from "@tabler/icons";
 
 import { usersArray } from "../Types/Datas-Examples"
 import { ExampleUser } from "../Types/User-Types";
-import SearchBarButtons from "./SearchBarButtons";
+import UserFindItem from "./User-Find-Item";
+
+function SearchBarButtons(props: {functionality: string}) {
+    const { functionality } = props;
+    if (functionality === "addFriend") {
+        return (
+            <button> Add friend </button>
+        );
+    } else if (functionality === "chanInvite") {
+        return (
+            <input type="checkbox" />
+        );
+    } else {
+        return (
+            <button> Send message </button>
+        );
+    }
+}
 
 function SearchBarPlayers(props: {functionality: string}) {
     const [inputText, setInputText] = useState<string>("");
@@ -35,13 +52,9 @@ function SearchBarPlayers(props: {functionality: string}) {
             <div className="modal-player-list">
                 {
                     arrayResult.map((elem, index) =>
-                        <div key={index} className="modal-player-list-item">
-                            <div className="item-player-info">
-                                <img className='modal-picture' src={elem.profilPic} alt="profil pic" />
-                                <p> {elem.username} </p>
-                            </div>
+                        <UserFindItem key={index} avatar={elem.profilPic} name={elem.username} >
                             <SearchBarButtons functionality={functionality} />
-                        </div>
+                        </UserFindItem>
                     )
                 }
             </div>

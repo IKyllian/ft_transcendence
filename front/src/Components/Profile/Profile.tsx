@@ -1,7 +1,7 @@
 import { useState, useContext, useEffect } from "react";
 import { ModalContext } from "../ModalProvider";
 
-import StatsInfoItem from "./Items/Stats-Info-Item";
+import StatsInfoItem from "./Stats-Info-Item";
 import RenderProfileBlock from "./Render-Profile-Block";
 import CardInfo from "./Card-Info";
 import LoadingSpin from "../Loading-Spin";

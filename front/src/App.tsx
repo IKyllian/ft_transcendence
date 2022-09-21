@@ -5,7 +5,7 @@ import Home from './Components/Home/Home';
 import Sign from './Components/Sign/Sign';
 import Profile from './Components/Profile/Profile';
 import Leaderboard from './Components/Leaderboard/Leaderboard';
-import AddFriendModal from './Components/Add-Friend-Modal';
+import AddFriendModal from './Components/Friends-Modal';
 import Chat from './Components/Chat/Chat';
 import ChannelSettings from './Components/Chat/Channel-Settings/Settings-Container';
 import ChatElement from "./Components/Chat/Message-Section/Chat-Element";
