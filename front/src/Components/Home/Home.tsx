@@ -1,6 +1,6 @@
 import { useContext } from "react";
 
-import { ModalContext } from "../ModalProvider";
+import { ModalContext } from "../Utils/ModalProvider";
 import { useAppSelector } from '../../Redux/Hooks';
 import HomeButton from "./Home-Button";
 

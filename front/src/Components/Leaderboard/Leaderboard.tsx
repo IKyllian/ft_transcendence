@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { leaderboardDatas } from "../../Types/Datas-Examples"
 import { ExampleUser } from "../../Types/User-Types";
-import { ModalContext } from "../ModalProvider";
+import { ModalContext } from "../Utils/ModalProvider";
 
 import LeaderboardItem from "./Leaderboard-Item";
 

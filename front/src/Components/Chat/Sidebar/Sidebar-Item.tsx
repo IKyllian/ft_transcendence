@@ -33,8 +33,8 @@ function SidebarItem(props: SidebarItemProps) {
 
     return (
         <li className="ul-wrapper-elem">
-            {datasArray && <ItemHeader title={title} publicItem={true} sidebarOpen={sidebarOpen} handleClick={handleClick} modalStatus={modalStatus} />}
-            {publicChanArray && <ItemHeader title={title} publicItem={false} sidebarOpen={sidebarOpen} handleClick={handleClick} />}
+            {datasArray && <ItemHeader title={title} publicItem={false} sidebarOpen={sidebarOpen} handleClick={handleClick} modalStatus={modalStatus} />}
+            {publicChanArray && <ItemHeader title={title} publicItem={true} sidebarOpen={sidebarOpen} handleClick={handleClick} />}
             
             {
                datasArray !== undefined && sidebarOpen && 

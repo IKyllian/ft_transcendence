@@ -1,7 +1,7 @@
-import { useState, useContext, useEffect } from 'react';
+import { useState, useContext } from 'react';
 import { IconLogout, IconMessages, IconUserPlus, IconChevronDown } from '@tabler/icons';
 
-import { ModalContext } from '../ModalProvider';
+import { ModalContext } from '../Utils/ModalProvider';
 import ProfilPic from "../../Images-Icons/pp.jpg"
 import { Link, useLocation } from 'react-router-dom';
 import { useAppSelector } from '../../Redux/Hooks';

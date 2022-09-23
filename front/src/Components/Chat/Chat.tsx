@@ -3,21 +3,21 @@ import { useState, useContext, createContext, useEffect } from "react";
 import Sidebar from "./Sidebar/Sidebar";
 import ChatModal from "./Chat-Modal";
 import { Outlet, useParams } from "react-router-dom";
-import { ModalContext } from "../ModalProvider";
+import { ModalContext } from "../Utils/ModalProvider";
 
 export const SidebarContext = createContext({sidebar: false, setSidebarStatus: () => {}});
 
 function Chat() {
     const [showModal, setShowModal] = useState<number>(0);
     const [responsiveSidebar, setReponsiveSidebar] = useState<boolean>(false);
+    // const [channelsDatas, setChannelsDatas] = useState<ChannelInterface | undefined>(undefined);
 
     const params = useParams();
+    const modalStatus = useContext(ModalContext);
 
     const handleClick = () => {
         setReponsiveSidebar(!responsiveSidebar);
     }
-
-    const modalStatus = useContext(ModalContext);
 
     useEffect(() => {
         if (params.chatId === undefined) {
@@ -25,6 +25,15 @@ function Chat() {
         }
     }, [params])
 
+    // useEffect(() => {
+        // Fetch to get channels
+    // }, [])
+
+    // return !channelsDatas ? (
+
+    // ) : (
+
+    // )
     return (
         <SidebarContext.Provider value={{sidebar: responsiveSidebar, setSidebarStatus: handleClick}}>
             <ChatModal showModal={showModal} setShowModal={setShowModal}  />

@@ -16,7 +16,7 @@ function ItemHeader(props: Props) {
                 { sidebarOpen ? <IconChevronDown onClick={() => handleClick()} /> : <IconChevronRight onClick={() => handleClick()} /> }
                 <p> {title} </p>
             </div>
-            {publicItem && <IconPlus className="plus-icon" onClick={() => modalStatus!()} />}
+            {!publicItem && <IconPlus className="plus-icon" onClick={() => modalStatus!()} />}
         </div>
     );
 }

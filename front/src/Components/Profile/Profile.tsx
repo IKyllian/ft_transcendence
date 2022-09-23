@@ -1,10 +1,10 @@
 import { useState, useContext, useEffect } from "react";
-import { ModalContext } from "../ModalProvider";
+import { ModalContext } from "../Utils/ModalProvider";
 
 import StatsInfoItem from "./Stats-Info-Item";
 import RenderProfileBlock from "./Render-Profile-Block";
 import CardInfo from "./Card-Info";
-import LoadingSpin from "../Loading-Spin";
+import LoadingSpin from "../Utils/Loading-Spin";
 
 import { UserInterface } from "../../Types/User-Types";
 import { useAppSelector } from '../../Redux/Hooks';

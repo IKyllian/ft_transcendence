@@ -5,7 +5,7 @@ import { useAppDispatch, useAppSelector } from '../../Redux/Hooks'
 import { uid } from "../../env";
 import { LoginPayload } from "../../Types/User-Types";
 
-import LoadingSpin from '../Loading-Spin';
+import LoadingSpin from '../Utils/Loading-Spin';
 import axios from 'axios';
 
 import { loginError, loginPending, loginSuccess, setUsername } from "../../Redux/AuthSlice";
@@ -17,20 +17,14 @@ type FormValues = {
 
 function Sign() {
     const [isSignIn, setIsSignIn] = useState<boolean>(true);
-    const { register, control, handleSubmit } = useForm<FormValues>();
+    const { register, handleSubmit, reset, formState: {errors}} = useForm<FormValues>();
     let navigate = useNavigate();
     const dispatch = useAppDispatch();
     let authDatas = useAppSelector((state) => state.auth);
     const [searchParams] = useSearchParams();
 
-
     const onSignIn = handleSubmit(async (data, e) => {
         e?.preventDefault();
-        console.log(control);
-        if (data.password === "" || data.username === "") {
-            dispatch(loginError("username and password must not be empty"));
-            return ;
-        }
         dispatch(loginPending());
         axios.post('http://localhost:5000/api/auth/login', {username: data.username, password: data.password})
         .then((response) => {
@@ -47,10 +41,6 @@ function Sign() {
 
     const onSignUp = handleSubmit(async (data, e) => {
         e?.preventDefault();
-        if (data.password === "" || data.username === "") {
-            dispatch(loginError("username and password must not be empty"));
-            return ;
-        }
         dispatch(loginPending());
         axios.post('http://localhost:5000/api/auth/signup', {username: data.username, password: data.password})
         .then((response) => {
@@ -87,7 +77,6 @@ function Sign() {
             })
             .catch(err => {
                 dispatch(loginError("Error while login with 42"));
-                // TODO Handle error: Display error message on login page
             });
         }
     }, []);
@@ -111,21 +100,40 @@ function Sign() {
                 <div className='auth-separator'>
                     <span>ou</span>
                 </div>
-                {
-                    (authDatas.error !== undefined && authDatas.error !== '') &&
-                    <p className='form-error'> {authDatas.error} </p>
-                }
+                {authDatas.error && <p className='txt-form-error'> {authDatas.error} </p> }
                 <form className='form-wrapper' onSubmit={isSignIn ? onSignIn : onSignUp}>
-                    <label htmlFor="username"> Username </label>
-                    <input id="username" type="text" {...register("username")} />
+                    <label> Username </label>
+                    {errors.username && <p className='txt-form-error'> {errors.username.message} </p>}
+                    <input
+                        id="username"
+                        type="text"
+                        {...register("username", {
+                            required: "Username is required",
+                            minLength: {
+                                value: 2,
+                                message: "Min length is 2"
+                            }
+                        })}
+                    />
 
-                    <label htmlFor="password"> Password </label>
-                    <input id="password" type="password" {...register("password")} />
+                    <label> Password </label>
+                    {errors.password && <p className='txt-form-error'> {errors.password.message} </p>}
+                    <input
+                        id="password"
+                        type="password"
+                        {...register("password", {
+                            required: "Password is required",
+                            minLength: !isSignIn ? { 
+                                value: 5,
+                                message: "Min length is 5"
+                            } : 5
+                        })}
+                    />
                     <button type='submit'>
                         {isSignIn ? "Login" : "Create Account"}
                     </button>
                 </form>
-                <p className='btn-switch-form' onClick={() => setIsSignIn(!isSignIn) }> {isSignIn ? "Pas de compte ? Créez en un" : "Déjà un compte ? Connectez vous"} </p>
+                <p className='btn-switch-form' onClick={() => {setIsSignIn(!isSignIn); reset() }}> {isSignIn ? "Pas de compte ? Créez en un" : "Déjà un compte ? Connectez vous"} </p>
             </div>
         </div>
     );

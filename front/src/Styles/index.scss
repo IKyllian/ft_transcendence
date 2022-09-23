@@ -71,10 +71,6 @@ button {
   cursor: pointer;
 }
 
-input, button {
-  all: unset;
-}
-
 .blur-background {
   filter: blur(5px);
 }
@@ -118,4 +114,12 @@ input, button {
   color: $WhitePalette;
   text-align: center;
   font-size: 25px;
+}
+
+.txt-form-error {
+  color: red;
+  // margin: 0 0 1em 0;
+  margin: 0;
+  font-size: 14px;
+  letter-spacing: 1px;
 }

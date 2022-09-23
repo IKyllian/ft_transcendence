@@ -1,7 +1,7 @@
 import { IconX, IconUser, IconMessage, IconBrandAppleArcade } from "@tabler/icons";
 import { useContext, useState } from "react";
 
-import { ModalContext } from "./ModalProvider";
+import { ModalContext } from "./Utils/ModalProvider";
 import UserFindItem from "./User-Find-Item";
 import SearchBarPlayers from "./SearchBarPlayers";
 

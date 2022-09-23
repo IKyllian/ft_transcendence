@@ -27,6 +27,7 @@ function ChatElement() {
 
     useEffect(() => {
         if (params) {
+            // Fetch to get Chat datas
             setChatDatas(ChannelsDatas.find((elem) => elem.id === parseInt(params.chatId!, 10)));
         }
     }, [params])

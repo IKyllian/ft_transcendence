@@ -5,7 +5,7 @@ import { LoginPayload } from '../Types/User-Types';
 const defaultState: AuthState = {
     currentUser: undefined,
     isAuthenticated: false,
-    error: '',
+    error: undefined,
     loading: false,
     token:'',
     setUsersame: false,
@@ -29,7 +29,7 @@ export const authSlice = createSlice({
             state.isAuthenticated = false;
             state.loading = false;
         },
-        setUsername: (state) => {    
+        setUsername: (state) => {
             state.setUsersame = true,
             state.loading = false;
         },

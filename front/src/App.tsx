@@ -10,10 +10,12 @@ import Chat from './Components/Chat/Chat';
 import ChannelSettings from './Components/Chat/Channel-Settings/Settings-Container';
 import ChatElement from "./Components/Chat/Message-Section/Chat-Element";
 import Error404 from "./Components/404-Error";
-import { ModalProvider } from "./Components/ModalProvider";
+import { ModalProvider } from "./Components/Utils/ModalProvider";
 import PublicRoute from "./Route/Public-Route";
 import PrivateRoute from "./Route/Private-Route";
 import UsernameForm from "./Components/Sign/Username-Form";
+
+import { io } from "socket.io-client";
 
 interface RouteProps {
 	path: string,

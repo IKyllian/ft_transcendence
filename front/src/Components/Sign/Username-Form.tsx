@@ -53,7 +53,7 @@ function UsernameForm() {
         <div className="sign-container">
             <form className="username-form" onSubmit={onSubmit}>
                 <label htmlFor="username"> Choose a username </label>
-                <input id="username" type="text" placeholder="Username..." {...register("username")} />
+                <input id="username" type="text" placeholder="Username..." {...register("username", {required: true})} />
             </form>
         </div>
     );

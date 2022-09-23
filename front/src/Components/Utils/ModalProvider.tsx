@@ -1,6 +1,6 @@
 import { createContext, useState, ReactNode } from "react";
 
-import { ModalState } from "../Types/Modal-Types";
+import { ModalState } from "../../Types/Modal-Types";
 
 const initialState: ModalState = {
     isOpen: false,
