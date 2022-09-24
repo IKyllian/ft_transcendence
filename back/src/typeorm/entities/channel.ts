@@ -1,7 +1,8 @@
 import { ChannelDto } from "src/chat/dto/channel.dto";
-import { BaseEntity, Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, Repository, Unique } from "typeorm";
+import { BaseEntity, Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, Repository, Unique } from "typeorm";
+import { ChannelUser } from "./channelUser";
 import { Message } from "./message";
-import { UserInChannel } from "./userInChannel";
+import { User } from "./user";
 
 export type channelOption = 'public' | 'private' | 'protected';
 
@@ -19,12 +20,18 @@ export class Channel extends BaseEntity {
 	@Column({ default: 0 })
 	nb: number;
 
-	@OneToMany(() => UserInChannel, (users) => users.channel, {cascade: true})
-	users?: Promise<UserInChannel[]>;
+	@OneToMany(() => ChannelUser, (users) => users.channel, { cascade: true })
+	users?: ChannelUser[];
 
 	@OneToMany(() => Message, (message) => message.id, {
-		nullable: true,
-		cascade: ['insert', 'remove']
+		// nullable: true,
+		// FAUT LIRE LA DOC SUR CASCADE, LAZY, recherche d'un objet dans un tableau LA, HOW GUARDS WORKS etc
+		cascade: ['insert', 'remove'],
+		// onDelete: "CASCADE",
 	})
 	messages: Message[];
+
+	@ManyToMany(() => User, { cascade: true })
+	@JoinTable({ name: 'user_banned' })
+	bannedUsers?: User[];
 }

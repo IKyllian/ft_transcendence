@@ -2,22 +2,26 @@ import { BaseEntity, Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOn
 import { Channel } from "./channel";
 import { User } from "./user";
 
-export type chanRole = 'owner' | 'moderator' | 'pleb';
+export enum channelRole {
+	OWNER = 'owner',
+	MODERATOR = 'moderator',
+	MEMBER = 'clampin'
+};
 
 @Entity()
-export class UserInChannel extends BaseEntity {
+export class ChannelUser extends BaseEntity {
 
 	@PrimaryGeneratedColumn()
 	id: number;
 
-	@ManyToOne(() => User)
+	@ManyToOne(() => User, { nullable: false })
 	user!: User;
-	
-	@ManyToOne(() => Channel, (channel) => channel.users)
+
+	@ManyToOne(() => Channel, { nullable: false })
 	channel!: Channel;
 	
-	@Column({ default: 'pleb' })
-	role: chanRole;
+	@Column({ default: channelRole.MEMBER })
+	role: channelRole;
 	
 	@Column({ default: false })
 	is_muted!: boolean;

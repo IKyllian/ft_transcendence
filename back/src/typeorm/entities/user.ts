@@ -5,8 +5,8 @@ import { Avatar } from "./avatar";
 import { Channel } from "./channel";
 import { Friendship } from "./friendship";
 import { Statistic } from "./statistic";
-import { UserInChannel } from "./userInChannel";
 
+export type userStatus = 'online' | 'offline' | 'in_game';
 
 @Entity()
 export class User extends BaseEntity {
@@ -20,14 +20,14 @@ export class User extends BaseEntity {
 
 	@Column({ unique: true, nullable: true })
 	username: string;
+
+	@Column({ default: 'offline' })
+	status: userStatus;
 	
-	/* @OneToOne(() => Avatar, { nullable: true })
-	@JoinColumn({ name: 'avatar_id' }) */
 	@Column({ nullable: true })
 	avatar?: string;
-	//avatar?: Avatar;
 	
-	@OneToOne(() => Statistic, (statistic) => statistic.user, { cascade: true, eager: true })
+	@OneToOne(() => Statistic, (statistic) => statistic.user, { cascade: true, eager: true, onDelete: 'CASCADE' })
 	statistic: Statistic;
 
 	// @OneToMany(() => UserInChannel, (userInChan) => userInChan.user)

@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Param, ParseIntPipe, Post, UseGuards } from "@nestjs/common";
-import { GetUser } from "src/auth/decorator/get-user.decorator";
 import { JwtGuard } from "src/auth/guard/jwt.guard";
 import { User } from "src/typeorm";
+import { GetUser } from "src/utils/decorators";
 import { ChatGateway } from "../chat.gateway";
 import { MessageDto } from "../dto/message.dto";
 import { MessageService } from "./message.service";

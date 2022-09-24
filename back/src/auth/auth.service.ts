@@ -29,10 +29,7 @@ export class AuthService {
 			user.statistic = await Statistic.save(new Statistic());
 
 			await user.save();
-			UserPassHash.save({ user_id: user.id, hash });
-			// await this.channelService.joinChannel(new ChannelDto('general', 'public'), user);
-
-			console.log(user);
+			UserPassHash.save({ user, hash });
 			return {
 				token: (await this.signToken(user.id, user.username)).access_token,
 				user: user,
@@ -52,7 +49,10 @@ export class AuthService {
 		if (!user)
 			throw new NotFoundException('User not found')
 		
-		const userHash = await UserPassHash.findOneBy({user_id: user.id})
+		const userHash = await UserPassHash.findOne({
+			relations: { user: true },
+			where: { user: { id: user.id } }
+		});
 		const pwdMatches = await argon.verify(
 			userHash.hash,
 			dto.password,

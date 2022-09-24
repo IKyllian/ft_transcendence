@@ -23,7 +23,7 @@ import entities from './typeorm';
       database: process.env.POSTGRES_NAME,
       entities,
       synchronize: true, // Setting synchronize: true shouldn't be used in production - otherwise you can lose production data.
-      // dropSchema: true,
+      dropSchema: true,
       // logging: true,
     }),
   ],

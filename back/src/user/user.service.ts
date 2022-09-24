@@ -5,6 +5,7 @@ import { AuthService } from "src/auth/auth.service";
 import { CreateUserDto } from "./dto/createUser.dto";
 import { Friendship, Statistic, User } from "src/typeorm";
 import { friendShipStatus } from "src/typeorm/entities/friendship";
+import { userStatus } from "src/typeorm/entities/user";
 
 @Injectable()
 export class UserService {
@@ -13,9 +14,9 @@ export class UserService {
 		private authService: AuthService,
 	) {}
 
-	async create(userdto: CreateUserDto) {
+	async create(dto: CreateUserDto) {
 		try {
-			const user = User.create(userdto);
+			const user = User.create({ username: dto.username, id42: dto.id42 });
 			user.statistic = await Statistic.save(new Statistic());
 			return await user.save();
 		} catch (error) {
@@ -27,19 +28,18 @@ export class UserService {
 	}
 	
 	async findById(id: number): Promise<User | undefined> {
-		const user = User.findOneBy({ id });
+		const user = await User.findOneBy({ id });
 		if (!user)
 			throw new NotFoundException('Username not found');
-		return user
+		return user;
 	}
 
-	// async findBy42Id(id42: number): Promise<User | undefined> {
-	// 	return await User.findOneBy({ id42 });
-	// }
-
-	// async findByUsername(username: string): Promise<User | undefined> {
-	// 	return await User.findOneBy({ username });
-	// }
+	async findByName(username: string): Promise<User | undefined> {
+		const user = await User.findOneBy({ username });
+		if (!user)
+			throw new NotFoundException('Username not found');
+		return user;
+	}
 
 	async editUsername(user: User, name: string) {
 		try {
@@ -55,22 +55,16 @@ export class UserService {
 		}
 	}
 
+	setStatus(user: User, status: userStatus) {
+		user.status = status;
+		user.save()
+	}
+
 	async getUsers() {
 		return await User.find();
 	}
 
 	async getFriendlist(user: User) {
-		// const rawFriendList = await this.friendshipsRepo.find({
-		// 	relations: {
-		// 		requester: true,
-		// 		addressee: true
-		// 	},
-		// 	where: [
-		// 		{ requester: user, status: 'accepted' },
-		// 		{ addressee: user, status: 'accepted' }
-		// 	]
-		// });
-
 		const rawFriendList = await Friendship.find({
 			relations: {
 				requester: true,

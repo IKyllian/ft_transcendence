@@ -1,11 +1,10 @@
-// Channels:
-	- Unique name?
-	- Make creator/owner of the channel != moderator (ex: can't be kick/mute)
-	- At creation: Add option in front to choose channel options
-	- on chat page: send all channel or only public/joined one
-
 // Auth:
 	- Store access_token and refresh_token in local storage,
 	on access_token expiration send request to server with refresh_token.
 	If fail redirect to login page.
 	- On logout, remove token from local storage?
+
+// TODO TOMMOROW
+	- Fix delete user problems
+	- Add password to Channels
+	- etc etc

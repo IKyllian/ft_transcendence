@@ -4,9 +4,9 @@ import { Channel, Message, User } from "src/typeorm";
 import { Repository } from "typeorm";
 import { ChannelService } from "../channel/channel.service";
 import { MessageDto } from "../dto/message.dto";
-import { ChannelNotFoundException } from "../exceptions/ChannelNotFound";
-import { IsMutedException } from "../exceptions/IsMuted";
-import { NotInChannelException } from "../exceptions/NotInChannel";
+import { ChannelNotFoundException } from "../../utils/exceptions/ChannelNotFound";
+import { IsMutedException } from "../../utils/exceptions/IsMuted";
+import { NotInChannelException } from "../../utils/exceptions/NotInChannel";
 
 @Injectable()
 export class MessageService {
@@ -18,9 +18,9 @@ export class MessageService {
 		const channel = await Channel.findOneBy({ id: chanId });
 		if (!channel)
 			throw new ChannelNotFoundException();
-		const userInChannel = await this.channelService.findUserInChannel(channel, user);
-		if (!userInChannel) { throw new NotInChannelException() } 
-		if (userInChannel.is_muted) { throw new IsMutedException() }
+		const channelUser = await this.channelService.getChannelUser(channel, user);
+		if (!channelUser) { throw new NotInChannelException() } 
+		if (channelUser.is_muted) { throw new IsMutedException() }
 
 		const message = Message.create({
 			content: messageDto.content,
@@ -34,8 +34,8 @@ export class MessageService {
 		const channel = await Channel.findOneBy({ id: chanId });
 		if (!channel)
 			throw new ChannelNotFoundException();
-		const userInChannel = await this.channelService.findUserInChannel(channel, user);
-		if (!userInChannel) { throw new NotInChannelException() }
+		const channelUser = await this.channelService.getChannelUser(channel, user);
+		if (!channelUser) { throw new NotInChannelException() }
 
 		return await Message.find({
 			relations: ['sender'],

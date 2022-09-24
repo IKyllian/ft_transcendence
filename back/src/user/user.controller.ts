@@ -1,13 +1,13 @@
-import { Body, ClassSerializerInterceptor, Controller, ForbiddenException, Get, Param, Patch, Post, Request, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
+import { Body, ClassSerializerInterceptor, Controller, Delete, ForbiddenException, Get, Param, ParseIntPipe, Patch, Post, Request, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { Observable, of } from "rxjs";
-import { GetUser } from "src/auth/decorator/get-user.decorator";
 import { JwtGuard } from "src/auth/guard/jwt.guard";
 import { User } from "src/typeorm";
 import { diskStorage } from "multer";
 import { v4 as uuidv4 } from "uuid";
 import * as path from 'path';
 import { UserService } from "./user.service";
+import { GetUser } from "src/utils/decorators";
 
 export const avatarStorage = {
 	storage: diskStorage({
@@ -59,7 +59,20 @@ export class UserController {
 
  	@UseGuards(JwtGuard)
 	@Get(':id')
-	async getUserById(@Param('id') id: number) {
-		return  this.userService.findById(id);
+	getUserById(@Param('id') id: number) {
+		return this.userService.findById(id);
+	}
+
+	@UseGuards(JwtGuard)
+	@Get(':username')
+	getUserbyName(@Param('username') username: string) {
+		return this.userService.findByName(username);
+	}
+
+	//test
+	@Delete(':id')
+	async deleteUser(@Param('id', ParseIntPipe) id: number) {
+		console.log('deleting user')
+		return await User.delete(id);
 	}
 }
