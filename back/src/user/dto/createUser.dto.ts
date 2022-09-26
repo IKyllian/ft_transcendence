@@ -4,7 +4,6 @@ import {
 	IsNumber,
 	IsOptional,
 } from 'class-validator'
-import { UserHash } from 'src/typeorm';
 
 export class CreateUserDto {
 

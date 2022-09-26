@@ -9,7 +9,7 @@ import { HttpService } from "@nestjs/axios";
 import { lastValueFrom } from "rxjs";
 import { UserService } from "src/user/user.service";
 import { ChannelService } from "src/chat/channel/channel.service";
-import { Statistic, User, UserHash } from "src/typeorm";
+import { Statistic, User } from "src/typeorm";
 import { ChannelDto } from "src/chat/dto/channel.dto";
 
 @Injectable()

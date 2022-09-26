@@ -11,14 +11,16 @@ import { ChatSessionManager } from './chat.session';
 import { MessageController } from './message/message.controller';
 import { UserService } from 'src/user/user.service';
 import { ChannelModule } from './channel/channel.module';
+import { UserModule } from 'src/user/user.module';
 
 @Module({
   imports: [
     ChannelModule,
+    UserModule,
     forwardRef(() => AuthModule),
     TypeOrmModule.forFeature([Channel, Message, ChannelUser, User, Statistic]),
   ],
-  providers: [ChatGateway, MessageService, ChatSessionManager, UserService],
+  providers: [ChatGateway, MessageService, ChatSessionManager],
   controllers: [ChannelController, MessageController],
 })
 export class ChatModule {}

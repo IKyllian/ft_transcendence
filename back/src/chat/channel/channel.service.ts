@@ -1,7 +1,7 @@
 import { BadRequestException, ClassSerializerInterceptor, ConflictException, ForbiddenException, Injectable, NotFoundException, UnauthorizedException, UseInterceptors } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ClassTransformer } from 'class-transformer';
-import { Channel, User, ChannelUser, ChannelHash } from 'src/typeorm';
+import { Channel, User, ChannelUser } from 'src/typeorm';
 import { UserService } from 'src/user/user.service';
 import { Repository } from 'typeorm';
 import { ChannelDto } from '../dto/channel.dto';
@@ -87,12 +87,16 @@ export class ChannelService {
 		return chan
 	}
 
+	isInChannel(channel: Channel, id: number) {
+		return channel.channelUsers.find((chanUser) => chanUser.user.id === id);
+	}
+
 	async join(user: User, id: number, pwdDto?: ChannelPasswordDto) {
 		const channel = await this.findOne({ id }, true)
 		if (!channel)
 			throw new ChannelNotFoundException();
 
-		const inChannel = channel.channelUsers.find((chanUser) => chanUser.user.id === user.id);
+		const inChannel = this.isInChannel(channel, id);
 		// TODO: add check if banned when ban system is done
 		if (inChannel)
 			throw new BadRequestException('User already in channel');
@@ -115,7 +119,7 @@ export class ChannelService {
 		if (!channel)
 			throw new ChannelNotFoundException();
 		
-		const inChannel = channel.channelUsers.find((chanUser) => chanUser.user.id === user.id);
+		const inChannel = this.isInChannel(channel, id);
 		if (!inChannel)
 			throw new BadRequestException('User not in channel');
 

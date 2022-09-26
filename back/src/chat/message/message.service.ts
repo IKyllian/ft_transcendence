@@ -12,34 +12,34 @@ import { NotInChannelException } from "../../utils/exceptions/NotInChannel";
 export class MessageService {
 	constructor(
 		private channelService: ChannelService,
-		@InjectRepository(Channel)
-		private channelRepo: Repository<Channel>,
+		@InjectRepository(Message)
+		private messagesRepo: Repository<Message>,
 	) {}
 
 	async create(chanId: number, user: User, messageDto: MessageDto) {
-		const channel = await this.channelRepo.findOneBy({ id: chanId });
+		const channel = await this.channelService.findOne({ id: chanId });
 		if (!channel)
 			throw new ChannelNotFoundException();
 		const channelUser = await this.channelService.getChannelUser(channel, user);
 		if (!channelUser) { throw new NotInChannelException() } 
 		if (channelUser.is_muted) { throw new IsMutedException() }
 
-		const message = Message.create({
+		const message = this.messagesRepo.create({
 			content: messageDto.content,
 			channel,
 			sender: user,
 		});
-		return await message.save();
+		return await this.messagesRepo.save(message);
 	}
 
 	async getMessages(chanId: number, user: User) {
-		const channel = await this.channelRepo.findOneBy({ id: chanId });
+		const channel = await this.channelService.findOne({ id: chanId });
 		if (!channel)
 			throw new ChannelNotFoundException();
 		const channelUser = await this.channelService.getChannelUser(channel, user);
 		if (!channelUser) { throw new NotInChannelException() }
 
-		return await Message.find({
+		return await this.messagesRepo.find({
 			relations: ['sender'],
 			where: {
 				channel: {

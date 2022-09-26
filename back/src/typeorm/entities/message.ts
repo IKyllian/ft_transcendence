@@ -3,15 +3,12 @@ import { Channel } from "./channel";
 import { User } from "./user";
 
 @Entity()
-export class Message extends BaseEntity {
+export class Message {
 	@PrimaryGeneratedColumn()
 	id: number;
 
 	@ManyToOne(() => User)
 	sender: User;
-
-	// @Column()
-	// sender: string;
 
 	@Column()
 	content: string;

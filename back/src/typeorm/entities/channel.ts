@@ -3,7 +3,6 @@ import { ColdObservable } from "rxjs/internal/testing/ColdObservable";
 import { ChannelDto } from "src/chat/dto/channel.dto";
 import { channelOption } from "src/utils/types/types";
 import { BaseEntity, Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, Repository, Unique } from "typeorm";
-import { ChannelHash } from "./channel-hash";
 import { ChannelUser } from "./channelUser";
 import { Message } from "./message";
 import { User } from "./user";

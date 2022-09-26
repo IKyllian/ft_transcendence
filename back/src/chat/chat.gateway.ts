@@ -66,6 +66,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   handleMessageToSend(message: Message) {
     const socket = this.session.getUserSocket(message.sender.id);
+    //check if socket joined the room
     socket.to(`channel-${message.channel.id}`).emit('message', message);
   }
 
