@@ -20,7 +20,8 @@ export class UserService {
 	) {}
 
 	async create(dto: CreateUserDto) {
-		const userExist = await this.userRepo.findOneBy({ username: dto.username });
+		console.log(dto)
+		const userExist = await this.findOne({ username: dto.username });
 		if (userExist)
 			throw new ForbiddenException('Username taken');
 
@@ -43,7 +44,7 @@ export class UserService {
 		const param = {
 			where: whereParams,
 			select: selectAll ? selectionsWithHash : selections,
-			relations: ['statistic'],
+			relations: ['statistic', 'channelUser'],
 		};
 		return await this.userRepo.findOne(param);
 	}

@@ -22,5 +22,6 @@ import { UserModule } from 'src/user/user.module';
   ],
   providers: [ChatGateway, MessageService, ChatSessionManager],
   controllers: [ChannelController, MessageController],
+  exports: [ChatGateway]
 })
 export class ChatModule {}

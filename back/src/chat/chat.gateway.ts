@@ -10,6 +10,7 @@ import { MessageDto } from './dto/message.dto';
 import { MessageService } from './message/message.service';
 import { UserService } from 'src/user/user.service';
 import { JwtPayload } from 'src/utils/types/types';
+import { GetUser } from 'src/utils/decorators';
 
 
 @WebSocketGateway({
@@ -37,7 +38,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     let user: User = null;
     if (socket.handshake.headers.authorization) {
       const token = socket.handshake.headers.authorization.split(' ')[1];
-      const user = await this.authService.verify(token);
+      user = await this.authService.verify(token);
     }
 
     if (!user) {
@@ -64,9 +65,37 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         console.log(socket.id, 'disconnected');
   }
 
+  async handleJoinConversation(user: User, channel_id: number) {
+    const socket = this.session.getUserSocket(user.id);
+    // console.log(socket)
+    if (!socket)
+      return;
+    socket.join(`channel-${channel_id}`);
+    console.log(`${user.username} joining channel ${channel_id}`);
+    const clients = await (await this.server.in(`channel-${channel_id}`).fetchSockets()).map(client => client.id)
+    console.log('clients in room: ', clients)
+  }
+
+  @UseGuards(WsJwtGuard)
+  @SubscribeMessage('onLeaveRoom')
+  leaveRoom(@GetUser() user: User, roomId: number) {
+    const socket = this.session.getUserSocket(user.id);
+    // console.log(socket)
+    if (!socket)
+      return;
+    socket.leave(`channel-${roomId}`);
+  }
+
   handleMessageToSend(message: Message) {
     const socket = this.session.getUserSocket(message.sender.id);
+    if (!socket) {
+      console.log('pas de socket')
+      return;
+
+    }
     //check if socket joined the room
+    // this.server.to(`channel-${message.channel.id}`).emit('message', message);
+    console.log(`${message.sender.username} sending message`)
     socket.to(`channel-${message.channel.id}`).emit('message', message);
   }
 

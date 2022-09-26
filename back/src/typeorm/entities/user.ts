@@ -43,6 +43,6 @@ export class User {
 	// hash: UserHash;
 
 	@Exclude()
-	@Column({ select: false })
-	hash: string
+	@Column({nullable: true, select: false })
+	hash?: string
 } 

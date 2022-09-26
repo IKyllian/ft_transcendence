@@ -2,6 +2,7 @@ import { Body, ClassSerializerInterceptor, Controller, Get, Param, ParseIntPipe,
 import { JwtGuard } from "src/auth/guard/jwt.guard";
 import { Channel, ChannelUser, User } from "src/typeorm";
 import { GetChannelUser, GetUser } from "src/utils/decorators";
+import { ChatGateway } from "../chat.gateway";
 import { ChannelPasswordDto } from "../dto/channel-pwd.dto";
 import { ChannelDto } from "../dto/channel.dto";
 import { ChannelPermissionGuard } from "../guards/channel-permission.guard";
@@ -13,12 +14,19 @@ import { ChannelService } from "./channel.service";
 export class ChannelController {
 	constructor(
 		private channelService: ChannelService,
+		private chatGateway: ChatGateway,
 		) {}
 
 	@Get()
 	@UseGuards(JwtGuard)
 	getVisibleChannels(@GetUser('id') user_id: number) {
 		return this.channelService.getVisibleChannels(user_id);
+	}
+
+	@Get('my_channels')
+	@UseGuards(JwtGuard)
+	getChannelsByUser(@GetUser('id') id: number) {
+		return this.channelService.getChannelsByUser(id);
 	}
 
 	@Post()
@@ -47,8 +55,15 @@ export class ChannelController {
 
 	//test
 	@Get(':id')
-	async getChannel(@Param('id', ParseIntPipe) id: number) {
-		return await this.channelService.findOne({ id });
+	@UseGuards(JwtGuard)
+	async getChannel(
+		@Param('id', ParseIntPipe) id: number,
+		@GetUser() user: User,
+		) {
+		const channel = await this.channelService.getChannelById(user, id);
+		this.chatGateway.handleJoinConversation(user, channel.id);
+		return channel;
+
 	}
 
 	// @UseGuards(JwtGuard, InChannelGuard, ChannelPermissionGuard)
@@ -69,3 +84,4 @@ export class ChannelController {
 	// 	return this.channelService.unbanUser(user, channelId, userId);
 	// }
 }
+

@@ -1,6 +1,5 @@
 import { ForbiddenException, forwardRef, Inject, Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
 import { AuthDto } from "./dto/auth.dto";
 import * as argon from 'argon2';
 import { JwtService } from "@nestjs/jwt";
@@ -11,6 +10,7 @@ import { UserService } from "src/user/user.service";
 import { ChannelService } from "src/chat/channel/channel.service";
 import { Statistic, User } from "src/typeorm";
 import { ChannelDto } from "src/chat/dto/channel.dto";
+import e from "express";
 
 @Injectable()
 export class AuthService {
@@ -19,8 +19,6 @@ export class AuthService {
 		private config: ConfigService,
 		private userService: UserService,
 		private readonly httpService: HttpService,
-		@InjectRepository(User)
-		private userRepo: Repository<User>,
 	) {}
 
 	async signup(dto: AuthDto) {
@@ -69,15 +67,15 @@ export class AuthService {
 			));
 			return response.data.access_token;
 		} catch(error) {
+			console.log(error.message)
 			throw new UnauthorizedException();
 		}
 	}
 
 	async login42(code: string) {
 		const token = await this.get42token(code);
-
 		const response = await lastValueFrom(this.httpService.get(`https://api.intra.42.fr/v2/me?access_token=${token}`));
-		let user = await this.userRepo.findOneBy({ id42: response.data.id });
+		let user = await this.userService.findOne({ id42: response.data.id });
 		if (!user) {
 			console.log('user 42 not found, creating a new one');
 			user = await this.userService.create({ id42 : response.data.id });
@@ -114,7 +112,7 @@ export class AuthService {
 				secret: this.config.get('JWT_SECRET')
 			});
 			console.log('decoded', decoded)
-			return await this.userRepo.findOneBy({ id: decoded.sub });
+			return await this.userService.findOne({ id: decoded.sub });
 		}
 		catch(e) {
 			return null;

@@ -21,6 +21,7 @@ export class MessageController {
 	@Body() msgDto: MessageDto) {
 		const message = await this.messageService.create(chanId, user, msgDto);
 		this.chatGateway.handleMessageToSend(message);
+		return message;
 	}
 
 	@Get()

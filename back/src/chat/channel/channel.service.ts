@@ -40,6 +40,18 @@ export class ChannelService {
 		return chan;
 	}
 
+	async getChannelsByUser(id: number) {
+		return await this.channelRepo.find({
+			where: {
+				channelUsers: {
+					user: {
+						id,
+					}
+				}
+			}
+		});
+	}
+
 	async findOne(
 		whereParams: FindChannelParams,
 		selectAll?: boolean,
@@ -96,7 +108,7 @@ export class ChannelService {
 		if (!channel)
 			throw new ChannelNotFoundException();
 
-		const inChannel = this.isInChannel(channel, id);
+		const inChannel = this.isInChannel(channel, user.id);
 		// TODO: add check if banned when ban system is done
 		if (inChannel)
 			throw new BadRequestException('User already in channel');
@@ -119,7 +131,7 @@ export class ChannelService {
 		if (!channel)
 			throw new ChannelNotFoundException();
 		
-		const inChannel = this.isInChannel(channel, id);
+		const inChannel = this.isInChannel(channel, user.id);
 		if (!inChannel)
 			throw new BadRequestException('User not in channel');
 
@@ -129,6 +141,25 @@ export class ChannelService {
 		await this.channelUserRepo.delete({id: inChannel.id});
 		channel.nb--;
 		return await this.channelRepo.save(channel);
+	}
+
+	async getChannelById(user: User, id: number) {
+		const channel = await this.channelRepo.findOne({
+			relations: {
+				channelUsers: { user: true },
+				messages: { sender: true },
+			},
+			where: {
+				id: id,
+			}
+		});
+		if (!channel)
+			throw new ChannelNotFoundException();
+		
+		const inChannel = this.isInChannel(channel, user.id);
+		if (!inChannel)
+			throw new BadRequestException('User not in channel');
+		return channel;
 	}
 
 	async getChannelUser(channel: { id: number }, user: { id: number }) {
