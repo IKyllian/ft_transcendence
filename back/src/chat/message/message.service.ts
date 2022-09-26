@@ -12,10 +12,12 @@ import { NotInChannelException } from "../../utils/exceptions/NotInChannel";
 export class MessageService {
 	constructor(
 		private channelService: ChannelService,
+		@InjectRepository(Channel)
+		private channelRepo: Repository<Channel>,
 	) {}
 
 	async create(chanId: number, user: User, messageDto: MessageDto) {
-		const channel = await Channel.findOneBy({ id: chanId });
+		const channel = await this.channelRepo.findOneBy({ id: chanId });
 		if (!channel)
 			throw new ChannelNotFoundException();
 		const channelUser = await this.channelService.getChannelUser(channel, user);
@@ -31,7 +33,7 @@ export class MessageService {
 	}
 
 	async getMessages(chanId: number, user: User) {
-		const channel = await Channel.findOneBy({ id: chanId });
+		const channel = await this.channelRepo.findOneBy({ id: chanId });
 		if (!channel)
 			throw new ChannelNotFoundException();
 		const channelUser = await this.channelService.getChannelUser(channel, user);

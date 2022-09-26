@@ -17,7 +17,7 @@ export class AuthController {
 		return this.authService.login(dto);
 	}
 
-	@Post('login42')
+	@Post('login42') //create auth42dto
 	login42(@Body() body) {
 		return this.authService.login42(body.authorizationCode);
 	}

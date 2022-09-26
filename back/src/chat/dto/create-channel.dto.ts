@@ -1,7 +1,7 @@
-import { IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { IsString, IsNotEmpty, IsOptional } from "class-validator";
 import { channelOption } from "src/utils/types/types";
 
-export class ChannelDto {
+export class CreateChannelDto {
 
 	@IsString()
 	@IsNotEmpty()

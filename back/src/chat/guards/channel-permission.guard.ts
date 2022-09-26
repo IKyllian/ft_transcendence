@@ -1,7 +1,7 @@
 import { CanActivate, ExecutionContext, Injectable } from "@nestjs/common";
 import { Observable } from "rxjs";
-import { channelRole } from "src/typeorm/entities/channelUser";
 import { ChannelPermissionException } from "src/utils/exceptions";
+import { channelRole } from "src/utils/types/types";
 
 // TODO: do it better than that
 @Injectable()

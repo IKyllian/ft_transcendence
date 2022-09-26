@@ -1,29 +1,38 @@
-import { ClassSerializerInterceptor, ConflictException, ForbiddenException, Injectable, NotFoundException, UnauthorizedException, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, ClassSerializerInterceptor, ConflictException, ForbiddenException, Injectable, NotFoundException, UnauthorizedException, UseInterceptors } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ClassTransformer } from 'class-transformer';
-import { Channel, User, ChannelUser } from 'src/typeorm';
+import { Channel, User, ChannelUser, ChannelHash } from 'src/typeorm';
 import { UserService } from 'src/user/user.service';
 import { Repository } from 'typeorm';
 import { ChannelDto } from '../dto/channel.dto';
-import { channelRole } from 'src/typeorm/entities/channelUser';
 import { ChannelExistException, ChannelNotFoundException, NotInChannelException, UnauthorizedActionException } from 'src/utils/exceptions';
+import * as argon from 'argon2';
+import { CreateChannelDto } from '../dto/create-channel.dto';
+import { ChannelPasswordDto } from '../dto/channel-pwd.dto';
+import { channelOption, channelRole, FindChannelParams } from 'src/utils/types/types';
 
 @Injectable()
 export class ChannelService {
+	constructor(
+		@InjectRepository(Channel)
+		private channelRepo: Repository<Channel>,
+		@InjectRepository(ChannelUser)
+		private channelUserRepo: Repository<ChannelUser>,
+	) {}
 	/**
 	 * @param user_id 
 	 * @returns All the channel that the user joined or that is visible
 	 */
 	async getVisibleChannels(user_id: number) {
-		const chan = await Channel.find({
+		const chan = await this.channelRepo.find({
 			relations: {
-				users: {
+				channelUsers: {
 					user: true,
 				},
 			},
 			where: [
-			{ users: { user: { id: user_id } } },
-			{ option: 'public' },
+			{ channelUsers: { user: { id: user_id } } },
+			{ option: channelOption.PUBLIC },
 			],
 		});
 		// TODO FIX
@@ -31,40 +40,98 @@ export class ChannelService {
 		return chan;
 	}
 
-	async create(user: User, dto: ChannelDto) {
-		try {
-			// TODO hash password if there is one
-			if (dto.password) {
-				
-				delete dto.password;
-			}
-			const channel = await Channel.save(dto);
-			return await this.addUser(user, channel, channelRole.OWNER);
-		} catch(e) {
-			if (e.code === '23505')
-				throw new ChannelExistException;
-			throw e;
-		}
+	async findOne(
+		whereParams: FindChannelParams,
+		selectAll?: boolean,
+	) {
+		const selections: (keyof Channel)[] = [
+			'name',
+			'id',
+			'option',
+			'nb',
+		];
+		const selectionsWithHash: (keyof Channel)[] = [...selections, 'hash'];
+		const param = {
+			where: whereParams,
+			select: selectAll ? selectionsWithHash : selections,
+			relations: {
+				channelUsers: {
+					user: true,
+				}
+			},
+		};
+		const channel = await this.channelRepo.findOne(param);
+		return channel;
 	}
 
-	async join(user: User, id: number, pwd?: string) {
-		const channel = await Channel.findOne({
-			relations: {
-				users: true,
-			},
-			where: { id }
-		});
+	async create(user: User, dto: CreateChannelDto) {
+		const channelExist = await this.findOne({ name: dto.name });
+		if (channelExist)
+			throw new ChannelExistException();
+
+		let hash: string = null;
+		if (dto.option === channelOption.PROTECTED) {
+			hash = await argon.hash(dto.password);
+		}
+		const channelUser = this.channelUserRepo.create({ user, role: channelRole.OWNER });
+		const params = {
+			name: dto.name,
+			channelUsers: [channelUser],
+			option: dto.option,
+			hash,
+			nb: 1,
+		};
+		const channel = this.channelRepo.create(params);
+		const chan = await this.channelRepo.save(channel);
+		console.log(chan)
+		return chan
+	}
+
+	async join(user: User, id: number, pwdDto?: ChannelPasswordDto) {
+		const channel = await this.findOne({ id }, true)
 		if (!channel)
 			throw new ChannelNotFoundException();
-		// TODO compare password
-		return await this.addUser(user, channel, channelRole.MEMBER);
 
+		const inChannel = channel.channelUsers.find((chanUser) => chanUser.user.id === user.id);
+		// TODO: add check if banned when ban system is done
+		if (inChannel)
+			throw new BadRequestException('User already in channel');
+
+		if (channel.option === channelOption.PROTECTED) {
+			if (!pwdDto.password)
+				throw new UnauthorizedException('Password is not provided');
+			const pwdMatches = await argon.verify(channel.hash, pwdDto.password);
+			if (!pwdMatches)
+				throw new UnauthorizedException('Password incorrect');
+		}
+		const channelUser = this.channelUserRepo.create({ user });
+		channel.channelUsers = [...channel.channelUsers, channelUser];
+		channel.nb++;
+		return await this.channelRepo.save(channel);
+	}
+
+	async leave(user: User, id: number) {
+		const channel = await this.findOne({ id })
+		if (!channel)
+			throw new ChannelNotFoundException();
+		
+		const inChannel = channel.channelUsers.find((chanUser) => chanUser.user.id === user.id);
+		if (!inChannel)
+			throw new BadRequestException('User not in channel');
+
+			console.log('before leave', channel.channelUsers);
+		channel.channelUsers = channel.channelUsers.filter((chanUser) => chanUser.user.id !== user.id);
+			console.log('after leave', channel.channelUsers);
+		await this.channelUserRepo.delete({id: inChannel.id});
+		channel.nb--;
+		return await this.channelRepo.save(channel);
 	}
 
 	async getChannelUser(channel: { id: number }, user: { id: number }) {
-		const userInChannel = await ChannelUser.findOne({
+		const userInChannel = await this.channelUserRepo.findOne({
 			relations: {
 				user: true,
+				channel: true,
 			},
 			where: {
 				channel: {
@@ -80,64 +147,53 @@ export class ChannelService {
 		return userInChannel;
 	}
 
-	async addUser(user: User, channel: Channel, role?: channelRole) {
-		let userfound = await this.getChannelUser(channel, user);
-		if (userfound) {
-			console.log('user already in channel');
-			throw new ForbiddenException('user already in channel');
-		}
-		let userIn = ChannelUser.create({
-			user,
-			channel,
-		});
-		if (role)
-			userIn.role = role;
+	// async banUser(user: ChannelUser, chanId: number, userId: number) {
+	// 	let channel = await this.channelRepo.findOne({
+	// 		relations: {
+	// 			bannedUsers: true,
+	// 			users: true,
+	// 		},
+	// 		where: { id: chanId }
+	// 	});
+	// 	if (!channel)
+	// 		throw new ChannelNotFoundException();
+	// 	const userToBan = await this.getChannelUser(channel, { id: userId });
+	// 	if (!userToBan)
+	// 		throw new NotInChannelException();
+	// 	else if (userToBan.role === 'owner' || user.id === userId)
+	// 		throw new UnauthorizedActionException();
 
-		if (!channel.users)
-			channel.users = [userIn];
-		else
-			channel.users.push(userIn);
-		channel.nb++;
-		return await Channel.save(channel);
-	}
+	// 	channel.bannedUsers.push(userToBan.user);
+	// 	await ChannelUser.delete(userToBan.id);
+	// 	return await this.channelRepo.save(channel)
+	// }
 
-	async banUser(user: ChannelUser, chanId: number, userId: number) {
-		let channel = await Channel.findOne({
-			relations: {
-				bannedUsers: true,
-				users: true,
-			},
-			where: { id: chanId }
-		});
-		if (!channel)
-			throw new ChannelNotFoundException();
-		const userToBan = await this.getChannelUser(channel, {id: userId});
-		if (!userToBan)
-			throw new NotInChannelException();
-		else if (userToBan.role === 'owner' || user.id === userId)
-			throw new UnauthorizedActionException();
+	// async unbanUser(user: ChannelUser, chanId: number, userId: number) {
+	// 	let channel = await this.channelRepo.findOne({
+	// 		relations: {
+	// 			bannedUsers: true,
+	// 		},
+	// 		where: { id: chanId }
+	// 	});
+	// 	if (!channel)
+	// 		throw new ChannelNotFoundException();
 
-		channel.bannedUsers.push(userToBan.user);
-		await ChannelUser.delete(userToBan.id);
-		return await channel.save()
-	}
+	// 	if (!channel.bannedUsers.find(e => e.id === userId))
+	// 		throw new ConflictException('User is not banned from this channel');
 
-	async unbanUser(user: ChannelUser, chanId: number, userId: number) {
-		let channel = await Channel.findOne({
-			relations: {
-				bannedUsers: true,
-			},
-			where: { id: chanId }
-		});
-		if (!channel)
-			throw new ChannelNotFoundException();
+	// 	console.log('before unban: ', channel.bannedUsers)
+	// 	channel.bannedUsers = channel.bannedUsers.filter((users) => users.id !== userId)
+	// 	console.log('after unban: ', channel.bannedUsers)
+	// 	return await this.channelRepo.save(channel)
+	// }
 
-		if (!channel.bannedUsers.find(e => e.id === userId))
-			throw new ConflictException('User is not banned from this channel');
-
-		console.log('before unban: ', channel.bannedUsers)
-		channel.bannedUsers = channel.bannedUsers.filter((users) => users.id !== userId)
-		console.log('after unban: ', channel.bannedUsers)
-		return await channel.save()
-	}
+	// async isBanned(user: User, channel: Channel) {
+	// 	let isBanned = await this.channelRepo.findOne({
+	// 		relations: {
+	// 			bannedUsers: true,
+	// 		},
+	// 		where: { id: channel.id, bannedUsers: {id: user.id} }
+	// 	});
+	// 	return isBanned ? true : false;
+	// }
 }

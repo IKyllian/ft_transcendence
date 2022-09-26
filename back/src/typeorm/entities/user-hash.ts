@@ -2,14 +2,11 @@ import { BaseEntity, Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColum
 import { User } from "./user";
 
 @Entity()
-export class UserPassHash extends BaseEntity {
+export class UserHash extends BaseEntity {
 	@PrimaryGeneratedColumn()
 	id: number;
 
-	// @Column({ unique: true })
-	// user_id: number;
-
-	@OneToOne(() => User)
+	@OneToOne(() => User, { onDelete: 'CASCADE' })
 	@JoinColumn()
 	user: User;
 

@@ -1,15 +1,18 @@
 
 import { Exclude } from "class-transformer";
+import { userInfo } from "os";
 import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn, Unique, ManyToMany, JoinTable, ManyToOne, BaseEntity } from "typeorm";
 import { Avatar } from "./avatar";
 import { Channel } from "./channel";
+import { ChannelUser } from "./channelUser";
 import { Friendship } from "./friendship";
 import { Statistic } from "./statistic";
+import { UserHash } from "./user-hash";
 
 export type userStatus = 'online' | 'offline' | 'in_game';
 
 @Entity()
-export class User extends BaseEntity {
+export class User {
 
 	@PrimaryGeneratedColumn()
 	id: number;
@@ -27,13 +30,23 @@ export class User extends BaseEntity {
 	@Column({ nullable: true })
 	avatar?: string;
 	
-	@OneToOne(() => Statistic, (statistic) => statistic.user, { cascade: true, eager: true, onDelete: 'CASCADE' })
+	@OneToOne(() => Statistic, (statistic) => statistic.user, {
+		cascade: true,
+		// eager: true,
+		// onDelete: 'CASCADE'
+	})
 	statistic: Statistic;
 
-	// @OneToMany(() => UserInChannel, (userInChan) => userInChan.user)
-	// userInChan: UserInChannel[]
+	@OneToMany(() => ChannelUser, (channelUser) => channelUser.user)
+	channelUser: ChannelUser[];
 
-	// @ManyToOne(() => Channel, (channel) => channel.id, { nullable: true })
-	// channels: Channel[];
-	
+	// @Exclude()
+	// @OneToOne(() => UserHash, (userHash) => userHash.hash, {
+	// 	cascade: true,
+	// })
+	// hash: UserHash;
+
+	@Exclude()
+	@Column({ select: false })
+	hash: string
 } 

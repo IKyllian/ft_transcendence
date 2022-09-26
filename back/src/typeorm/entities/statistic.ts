@@ -6,7 +6,7 @@ export class Statistic extends BaseEntity {
 	@PrimaryGeneratedColumn()
 	id: number;
 
-	@OneToOne(() => User, (user) => user.statistic)
+	@OneToOne(() => User, (user) => user.statistic, { onDelete: 'CASCADE'})
 	@JoinColumn({ name: 'user_id' })
 	user: User;
 

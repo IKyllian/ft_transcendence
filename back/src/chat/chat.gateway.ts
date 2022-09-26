@@ -8,8 +8,8 @@ import { ChannelService } from './channel/channel.service';
 import { ChatSessionManager } from './chat.session';
 import { MessageDto } from './dto/message.dto';
 import { MessageService } from './message/message.service';
-import { JwtPayload } from 'src/utils/types/jwtPayload';
 import { UserService } from 'src/user/user.service';
+import { JwtPayload } from 'src/utils/types/types';
 
 
 @WebSocketGateway({
@@ -56,7 +56,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (socket.handshake.headers.authorization) {
       const payload = this.authService.decodeJwt(socket.handshake.headers.authorization.split(' ')[1]) as JwtPayload;
       this.session.removeUserSocket(payload.sub);
-      const user = await User.findOneBy({ id: payload.sub });
+      const user = await this.userService.findOne({id: payload.sub });
       this.userService.setStatus(user, 'offline');
       socket.emit('userDisconnected', user);
       console.log(user.username, 'disconnected');

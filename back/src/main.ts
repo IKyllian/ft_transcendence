@@ -14,9 +14,10 @@ async function bootstrap() {
   const userService = await app.resolve(UserService);
   const channelService = await app.resolve(ChannelService);
 
-  // let user = await userService.create({ username: 'chak' });
+  // let user = await userService.create({ username: 'chak12313' });
   // let channel = await channelService.create(user, {
-  //   name: 'testo',
+  //   name: 'testou',
+  //   option: channelOption.PUBLIC
   //   // option: 'private'
   // })
   // let user2 = await userService.create({ username: 'kiki' });

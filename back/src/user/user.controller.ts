@@ -2,7 +2,7 @@ import { Body, ClassSerializerInterceptor, Controller, Delete, ForbiddenExceptio
 import { FileInterceptor } from "@nestjs/platform-express";
 import { Observable, of } from "rxjs";
 import { JwtGuard } from "src/auth/guard/jwt.guard";
-import { User } from "src/typeorm";
+import { Statistic, User } from "src/typeorm";
 import { diskStorage } from "multer";
 import { v4 as uuidv4 } from "uuid";
 import * as path from 'path';
@@ -57,22 +57,29 @@ export class UserController {
 		return this.userService.getUsers();
 	}
 
- 	@UseGuards(JwtGuard)
+	// test
+ 	// @UseGuards(JwtGuard)
 	@Get(':id')
 	getUserById(@Param('id') id: number) {
-		return this.userService.findById(id);
+		return this.userService.findOne({id}, true);
 	}
 
 	@UseGuards(JwtGuard)
 	@Get(':username')
 	getUserbyName(@Param('username') username: string) {
-		return this.userService.findByName(username);
+		return this.userService.findOne({ username });
 	}
 
 	//test
 	@Delete(':id')
 	async deleteUser(@Param('id', ParseIntPipe) id: number) {
 		console.log('deleting user')
-		return await User.delete(id);
+		// return await this.userRepo.delete(id);
+		// return await User
+		// .createQueryBuilder()
+		// .delete()
+		// .from(User)
+		// .where("id = :id", { id: id })
+		// .execute()
 	}
 }

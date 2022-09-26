@@ -9,7 +9,7 @@ import { HttpService } from "@nestjs/axios";
 import { lastValueFrom } from "rxjs";
 import { UserService } from "src/user/user.service";
 import { ChannelService } from "src/chat/channel/channel.service";
-import { Statistic, User, UserPassHash } from "src/typeorm";
+import { Statistic, User, UserHash } from "src/typeorm";
 import { ChannelDto } from "src/chat/dto/channel.dto";
 
 @Injectable()
@@ -17,50 +17,38 @@ export class AuthService {
 	constructor(
 		private jwt: JwtService,
 		private config: ConfigService,
-		private channelService: ChannelService,
+		private userService: UserService,
 		private readonly httpService: HttpService,
+		@InjectRepository(User)
+		private userRepo: Repository<User>,
 	) {}
 
 	async signup(dto: AuthDto) {
+		
 		const hash = await argon.hash(dto.password);
-
-		try {
-			const user = User.create({ username: dto.username });
-			user.statistic = await Statistic.save(new Statistic());
-
-			await user.save();
-			UserPassHash.save({ user, hash });
-			return {
-				token: (await this.signToken(user.id, user.username)).access_token,
-				user: user,
-			}
-
-		} catch (error) {
-			if (error.code === '23505') {
-				throw new ForbiddenException('Username taken');
-			}
-			throw error;
+		const params = {
+			username: dto.username,
+			hash,
+		}
+		const user = await this.userService.create(params);
+		return {
+			token: await this.signToken(user.id, user.username),
+			user: user,
 		}
 	}
 
 	async login(dto: AuthDto) {
-		const user = await User.findOneBy({ username: dto.username });
-
+		const user = await this.userService.findOne({username: dto.username}, true)
 		if (!user)
 			throw new NotFoundException('User not found')
-		
-		const userHash = await UserPassHash.findOne({
-			relations: { user: true },
-			where: { user: { id: user.id } }
-		});
+
 		const pwdMatches = await argon.verify(
-			userHash.hash,
+			user.hash,
 			dto.password,
 		);
-
 		if (!pwdMatches)
 			throw new UnauthorizedException('Password incorrect');
-
+		
 		return {
 			token: await this.signToken(user.id, user.username),
 			user: user,
@@ -89,13 +77,10 @@ export class AuthService {
 		const token = await this.get42token(code);
 
 		const response = await lastValueFrom(this.httpService.get(`https://api.intra.42.fr/v2/me?access_token=${token}`));
-		let user = await User.findOneBy({ id42: response.data.id });
+		let user = await this.userRepo.findOneBy({ id42: response.data.id });
 		if (!user) {
 			console.log('user 42 not found, creating a new one');
-			user = User.create({
-				username: null,
-				id42: response.data.id,
-			});
+			user = await this.userService.create({ id42 : response.data.id });
 		}
 		return {
 			token: (await this.signToken(user.id, user.username)).access_token,
@@ -113,7 +98,7 @@ export class AuthService {
 		const token = await this.jwt.signAsync(
 			payload,
 			{
-				expiresIn: '20m',
+				expiresIn: '200m',
 				secret: this.config.get('JWT_SECRET')
 			},
 		);
@@ -129,7 +114,7 @@ export class AuthService {
 				secret: this.config.get('JWT_SECRET')
 			});
 			console.log('decoded', decoded)
-			return await User.findOneBy({ id: decoded.sub });
+			return await this.userRepo.findOneBy({ id: decoded.sub });
 		}
 		catch(e) {
 			return null;
