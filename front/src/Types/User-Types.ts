@@ -1,3 +1,6 @@
+import { Channel } from "./Chat-Types";
+import { Socket } from "socket.io-client";
+
 export interface ExampleUser {
     id: number,
     username: string;
@@ -16,6 +19,7 @@ export interface AuthState {
     loading: boolean,
     token: string,
     setUsersame: boolean,
+    socket?: any
 }
 
 export interface LoginPayload {
@@ -28,9 +32,20 @@ export interface UserInterface {
     username: string,
     avatar: string,
     statistic: Statistic,
+    channels?: Channel[],
 }
 
 interface Statistic {
     matchWon: number,
     matchLost: number,
 }
+
+// export interface ServerToClientEvents {
+//     noArg: () => void;
+//     basicEmit: (a: number, b: string, c: Buffer) => void;
+//     withAck: (d: string, callback: (e: number) => void) => void;
+// }
+
+// export interface ClientToServerEvents {
+//     hello: () => void;
+// }

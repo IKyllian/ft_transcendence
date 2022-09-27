@@ -1,6 +1,9 @@
 import SearchBarPlayers from "../SearchBarPlayers";
 import { useForm } from 'react-hook-form';
+import axios from "axios";
 
+import { useAppSelector } from '../../Redux/Hooks'
+import { baseUrl } from "../../env";
 import { IconX } from '@tabler/icons';
 import { useEffect, useState } from "react";
 
@@ -15,9 +18,23 @@ function ChatModal(props: {setShowModal: Function, showModal: number}) {
     const { register, handleSubmit, formState: {errors} } = useForm<FormValues>();
     const { setShowModal, showModal } = props;
 
+
+    let authDatas = useAppSelector((state) => state.auth);
+
     const formSubmit = handleSubmit((data, e) => {
         e?.preventDefault();
         console.log(data);
+        axios.post(`${baseUrl}/channel`, {name: data.chanName, option: data.chanMode}, {
+            headers: {
+                "Authorization": `Bearer ${authDatas.token}`,
+            }
+        })
+        .then((response) => {
+           console.log(response);
+            // dispatch(loginSuccess(payload));
+        }).catch(err => {
+            // dispatch(loginError("username or password incorect"));
+        })
     })
 
     if (showModal === 1) {
@@ -29,9 +46,10 @@ function ChatModal(props: {setShowModal: Function, showModal: number}) {
                     <div className="checkbox-container">
                         
                         {
-                            ["public", "privée"].map((elem, index) => 
+                            ["public", "protected" ,"privée"].map((elem, index) => 
                                 <label key={index}>
-                                    {index === 0 ? "Public" : "Privée"}
+                                    {elem}
+                                    {/* {index === 0 ? "Public" : "Privée"} */}
                                     <input
                                         type="radio"
                                         value={elem}

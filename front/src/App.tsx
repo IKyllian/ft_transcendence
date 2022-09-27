@@ -17,6 +17,8 @@ import UsernameForm from "./Components/Sign/Username-Form";
 
 import { io } from "socket.io-client";
 
+const socket = io;
+
 interface RouteProps {
 	path: string,
 	element: JSX.Element,

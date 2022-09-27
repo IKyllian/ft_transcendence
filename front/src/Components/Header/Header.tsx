@@ -33,7 +33,7 @@ function Header() {
                         <IconMessages />
                     </Link>
                 </div>
-                <Link className='header-profile' to="/profile">
+                <Link className='header-profile' to={`/profile/${currentUser?.username}`}>
                     <img className='header-picture' src={ProfilPic} alt="profil pic" />
                     {currentUser?.username}
                 </Link>

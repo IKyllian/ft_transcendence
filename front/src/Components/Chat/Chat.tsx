@@ -4,14 +4,20 @@ import Sidebar from "./Sidebar/Sidebar";
 import ChatModal from "./Chat-Modal";
 import { Outlet, useParams } from "react-router-dom";
 import { ModalContext } from "../Utils/ModalProvider";
+import { Channel, ChannelsInterfaceFront } from "../../Types/Chat-Types";
+import LoadingSpin from "../Utils/Loading-Spin";
+import axios from "axios";
+import { baseUrl } from "../../env";
+import { useAppSelector } from '../../Redux/Hooks'
 
 export const SidebarContext = createContext({sidebar: false, setSidebarStatus: () => {}});
 
 function Chat() {
     const [showModal, setShowModal] = useState<number>(0);
     const [responsiveSidebar, setReponsiveSidebar] = useState<boolean>(false);
-    // const [channelsDatas, setChannelsDatas] = useState<ChannelInterface | undefined>(undefined);
+    const [channelsDatas, setChannelsDatas] = useState<ChannelsInterfaceFront[] | undefined>(undefined);
 
+    let authDatas = useAppSelector((state) => state.auth);
     const params = useParams();
     const modalStatus = useContext(ModalContext);
 
@@ -25,20 +31,42 @@ function Chat() {
         }
     }, [params])
 
-    // useEffect(() => {
-        // Fetch to get channels
-    // }, [])
+    useEffect(() => {
+        axios.get(`${baseUrl}/channel/my_channels`, {
+            headers: {
+                "Authorization": `Bearer ${authDatas.token}`,
+            }
+        })
+        .then((response) => {
+            const channelArray: Channel[] = response.data;
 
-    // return !channelsDatas ? (
+            let datasArray: ChannelsInterfaceFront[] = [];
+            for (let i: number = 0; i < channelArray.length; i++) {
+                datasArray.push({
+                    channel: channelArray[i],
+                    isActive: "false",
+                });
+            }
+            if (params) {
+                let findOpenChat: ChannelsInterfaceFront | undefined = datasArray.find(elem => elem.channel.id === parseInt(params.chatId!, 10));
+                if (findOpenChat) {
+                    findOpenChat.isActive = "true";
+                }
+            }
+            setChannelsDatas(datasArray);
+        }).catch(err => {
+            console.log(err);
+        })
+       // Fetch to get channels
+    }, [])
 
-    // ) : (
-
-    // )
-    return (
+    return !channelsDatas ? (
+        <LoadingSpin classContainer="chat-page-container" />
+    ) : (
         <SidebarContext.Provider value={{sidebar: responsiveSidebar, setSidebarStatus: handleClick}}>
             <ChatModal showModal={showModal} setShowModal={setShowModal}  />
             <div className={`chat-page-container ${modalStatus.modal.isOpen ? modalStatus.modal.blurClass : ""}`}>
-                <Sidebar setShowModal={setShowModal} showModal={showModal} />
+                <Sidebar setShowModal={setShowModal} showModal={showModal} chanDatas={channelsDatas} />
                 {
                     params.chatId === undefined
                     ? 
@@ -50,7 +78,24 @@ function Chat() {
                 }
             </div>
         </SidebarContext.Provider>
-    );
+    )
+    // return (
+    //     <SidebarContext.Provider value={{sidebar: responsiveSidebar, setSidebarStatus: handleClick}}>
+    //         <ChatModal showModal={showModal} setShowModal={setShowModal}  />
+    //         <div className={`chat-page-container ${modalStatus.modal.isOpen ? modalStatus.modal.blurClass : ""}`}>
+    //             <Sidebar setShowModal={setShowModal} showModal={showModal} />
+    //             {
+    //                 params.chatId === undefined
+    //                 ? 
+    //                 <div className="no-target-message">
+    //                     <p> Sélectionnez un message ou un channel </p>
+    //                 </div> 
+    //                 :
+    //                 <Outlet />
+    //             }
+    //         </div>
+    //     </SidebarContext.Provider>
+    // );
 }
 
 export default Chat;

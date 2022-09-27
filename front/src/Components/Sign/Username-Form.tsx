@@ -6,6 +6,8 @@ import { useEffect } from "react";
 import { logoutSuccess, loginSuccess } from "../../Redux/AuthSlice";
 import { LoginPayload } from "../../Types/User-Types";
 
+import { baseUrl } from "../../env";
+
 interface CustomState {
     token: string,
 }
@@ -24,7 +26,7 @@ function UsernameForm() {
         e?.preventDefault();
         if (data.username === "")
             return ;
-        axios.patch('http://localhost:5000/api/users/edit-username', {username: data.username}, {
+        axios.patch(`${baseUrl}/users/edit-username`, {username: data.username}, {
             headers: {
                 "Authorization": `Bearer ${locationState.token}`,
             }

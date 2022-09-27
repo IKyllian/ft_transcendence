@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { ChannelsInterfaceFront } from "../../../Types/Chat-Types";
+import { ChannelsInterfaceFront, Channel } from "../../../Types/Chat-Types";
 import { ChatInterface } from "../../../Types/Datas-Examples";
 import ItemHeader from "./Item-Header";
 import ItemContent from "./Item-Content";
@@ -9,6 +9,7 @@ interface SidebarItemProps {
     index: number,
     title: string,
     datasArray?: ChannelsInterfaceFront[],
+    // datasArray?: Channel[],
     publicChanArray?: ChatInterface[],
     setShowModal?: Function,
     showModal?: number,

@@ -4,9 +4,10 @@ import { IconSettings, IconMenu2, IconChevronLeft, IconChevronRight } from "@tab
 
 import { SidebarContext } from "../Chat";
 import { ChatInterface } from "../../../Types/Datas-Examples";
+import { Channel } from "../../../Types/Chat-Types"
 
 interface Props {
-    chatItem: ChatInterface | undefined,
+    chatItem: Channel | undefined,
     showUsersSidebar: boolean,
     changeSidebarStatus: Function,
 }
@@ -16,15 +17,16 @@ function ChatHeader(props: Props) {
 
     const sidebarStatus = useContext(SidebarContext);
 
-    return (chatItem && chatItem.isChannel) ? (
+    // return (chatItem && chatItem.isChannel) ? (
+    return (
         <div className="message-header">
             <IconMenu2
                 className="burger-icon-responsive"
                 onClick={() => sidebarStatus.setSidebarStatus()}
             />
-            <p className="chan-name"> # {chatItem.channelName} </p>
+            <p className="chan-name"> # {chatItem?.name} </p>
             <div className="message-header-right-side">
-                <Link to={`/chat/${chatItem.id}/settings`}>
+                <Link to={`/chat/${chatItem?.id}/settings`}>
                     <IconSettings />
                 </Link>
                 {!showUsersSidebar && <IconChevronLeft onClick={() => changeSidebarStatus()} />}
@@ -32,18 +34,19 @@ function ChatHeader(props: Props) {
                 
             </div>
         </div>
-    ) : (
-        <div className="header-user-info">
-            <IconMenu2
-                className="burger-icon-responsive"
-                onClick={() => sidebarStatus.setSidebarStatus()}
-            />
-            <div className="player-container">
-                <div className={`player-status player-status-${chatItem!.users[0].isOnline ? "online" : "offline"}`}> </div>
-                <p> {chatItem!.users[0].username} </p>
-            </div>
-        </div>
-    );
+    )
+    // : (
+    //     <div className="header-user-info">
+    //         <IconMenu2
+    //             className="burger-icon-responsive"
+    //             onClick={() => sidebarStatus.setSidebarStatus()}
+    //         />
+    //         <div className="player-container">
+    //             <div className={`player-status player-status-${chatItem!.users[0].isOnline ? "online" : "offline"}`}> </div>
+    //             <p> {chatItem!.users[0].username} </p>
+    //         </div>
+    //     </div>
+    // );
 }
 
 export default ChatHeader;

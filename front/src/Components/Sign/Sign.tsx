@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useForm } from "react-hook-form";
 import { useAppDispatch, useAppSelector } from '../../Redux/Hooks'
-import { uid } from "../../env";
+import { uid, baseUrl } from "../../env";
 import { LoginPayload } from "../../Types/User-Types";
 
 import LoadingSpin from '../Utils/Loading-Spin';
@@ -26,7 +26,7 @@ function Sign() {
     const onSignIn = handleSubmit(async (data, e) => {
         e?.preventDefault();
         dispatch(loginPending());
-        axios.post('http://localhost:5000/api/auth/login', {username: data.username, password: data.password})
+        axios.post(`${baseUrl}/auth/login`, {username: data.username, password: data.password})
         .then((response) => {
         console.log('JWT =>', response.data);
             const payload: LoginPayload = {
@@ -42,7 +42,7 @@ function Sign() {
     const onSignUp = handleSubmit(async (data, e) => {
         e?.preventDefault();
         dispatch(loginPending());
-        axios.post('http://localhost:5000/api/auth/signup', {username: data.username, password: data.password})
+        axios.post(`${baseUrl}/auth/signup`, {username: data.username, password: data.password})
         .then((response) => {
         console.log('JWT =>', response.data);
             const payload: LoginPayload = {
@@ -57,11 +57,12 @@ function Sign() {
 
     useEffect(() => {
         const authorizationCode = searchParams.get('code');
+        console.log(`${baseUrl}/auth/login42`);
         if (authorizationCode) {
             if (authDatas.setUsersame)
                 navigate(-1);
             dispatch(loginPending());
-            axios.post('http://localhost:5000/api/auth/login42', { authorizationCode })
+            axios.post(`${baseUrl}/auth/login42`, { authorizationCode })
             .then((response) => {
                 console.log('JWT =>', response.data);
                 if (response.data.usernameSet) {

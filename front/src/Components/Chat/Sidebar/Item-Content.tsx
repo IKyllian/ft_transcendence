@@ -2,7 +2,7 @@ import { useContext } from "react";
 import { Link } from "react-router-dom";
 
 import { IconUser, IconPlus } from "@tabler/icons";
-import { ChannelsInterfaceFront } from "../../../Types/Chat-Types";
+import { ChannelsInterfaceFront, Channel } from "../../../Types/Chat-Types";
 import { ChatInterface } from "../../../Types/Datas-Examples";
 import { SidebarContext } from '../Chat';
 
@@ -21,8 +21,9 @@ function ItemContent(props: Props) {
                 datasArray && datasArray.map((elem) => 
                     <Link className="list-item-container" key={elem.channel.id} to={`/chat/${elem.channel.id}`} onClick={() => sidebarStatus.setSidebarStatus()}>
                         <li onClick={() => chanClick!(elem.channel.id)} is-target={elem.isActive}>
-                            {elem.channel.isChannel && "# "}
-                            {elem.channel.isChannel ? elem.channel.channelName : elem.channel.users[0].username}
+                            # {elem.channel.name}
+                            {/* {elem.channel.isChannel && "# "}
+                            {elem.channel.isChannel ? elem.channel.channelName : elem.channel.users[0].username} */}
                         </li>
                     </Link>
                 )
