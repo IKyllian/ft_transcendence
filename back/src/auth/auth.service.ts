@@ -111,7 +111,6 @@ export class AuthService {
 			const decoded = this.jwt.verify(token, {
 				secret: this.config.get('JWT_SECRET')
 			});
-			console.log('decoded', decoded)
 			return await this.userService.findOne({ id: decoded.sub });
 		}
 		catch(e) {

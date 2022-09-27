@@ -22,7 +22,6 @@ export const avatarStorage = {
 }
 
 @Controller('users')
-@UseInterceptors(ClassSerializerInterceptor)
 export class UserController {
 
 	constructor(private userService: UserService) {}

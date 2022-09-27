@@ -1,4 +1,5 @@
-import { forwardRef, Module } from "@nestjs/common";
+import { ClassSerializerInterceptor, forwardRef, Module } from "@nestjs/common";
+import { APP_INTERCEPTOR } from "@nestjs/core";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { AuthModule } from "src/auth/auth.module";
 import { Avatar, Friendship, Statistic, User } from "src/typeorm";
@@ -10,7 +11,11 @@ import { UserService } from "./user.service";
 		forwardRef(() => AuthModule),
 		TypeOrmModule.forFeature([User, Friendship, Statistic, Avatar]),
 	],
-	providers: [UserService],
+	providers: [UserService,
+	{
+		provide: APP_INTERCEPTOR,
+		useClass: ClassSerializerInterceptor,
+	}],
 	controllers: [UserController],
 	exports: [UserService]
 })

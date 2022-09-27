@@ -10,11 +10,11 @@ export class ChatSessionManager {
 	}
 
 	setUserSocket(userId: number, socket: Socket) {
-	this.sessions.set(userId, socket);
+		this.sessions.set(userId, socket);
 	}
 	
 	removeUserSocket(userId: number) {
-	this.sessions.delete(userId);
+		this.sessions.delete(userId);
 	}
 
 	getSockets(): Map<number, Socket> {

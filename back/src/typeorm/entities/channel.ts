@@ -1,10 +1,8 @@
 import { Exclude } from "class-transformer";
-import { ColdObservable } from "rxjs/internal/testing/ColdObservable";
-import { ChannelDto } from "src/chat/dto/channel.dto";
 import { channelOption } from "src/utils/types/types";
-import { BaseEntity, Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, Repository, Unique } from "typeorm";
+import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { ChannelMessage } from "./channelMessage";
 import { ChannelUser } from "./channelUser";
-import { Message } from "./message";
 import { User } from "./user";
 
 @Entity()
@@ -27,11 +25,11 @@ export class Channel {
 	})
 	channelUsers: ChannelUser[];
 
-	@OneToMany(() => Message, (message) => message.channel, {
+	@OneToMany(() => ChannelMessage, (message) => message.channel, {
 		cascade: ['insert', 'remove'],
 		// onDelete: "CASCADE",
 	})
-	messages: Message[];
+	messages: ChannelMessage[];
 
 	@Column({ nullable: true, select: false })
 	@Exclude()

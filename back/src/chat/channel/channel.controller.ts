@@ -10,7 +10,6 @@ import { InChannelGuard } from "../guards/inChannel.guard";
 import { ChannelService } from "./channel.service";
 
 @Controller('channel')
-@UseInterceptors(ClassSerializerInterceptor)
 export class ChannelController {
 	constructor(
 		private channelService: ChannelService,
@@ -32,6 +31,7 @@ export class ChannelController {
 	@Post()
 	@UseGuards(JwtGuard)
 	createChannel(@GetUser() user: User, @Body() channelDto: ChannelDto) {
+		console.log('test')
 		return this.channelService.create(user, channelDto);
 	}
 
@@ -61,7 +61,7 @@ export class ChannelController {
 		@GetUser() user: User,
 		) {
 		const channel = await this.channelService.getChannelById(user, id);
-		this.chatGateway.handleJoinConversation(user, channel.id);
+		// this.chatGateway.handleJoinConversation(user, channel.id);
 		return channel;
 
 	}
