@@ -1,9 +1,9 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Channel } from "./channel";
 import { User } from "./user";
 
 @Entity()
-export class Message {
+export class ChannelMessage {
 	@PrimaryGeneratedColumn()
 	id: number;
 
@@ -16,7 +16,6 @@ export class Message {
 	@CreateDateColumn()
 	send_at: Date;
 
-	@ManyToOne(() => Channel, (channel) => channel.messages)
-	// @JoinColumn()
+	@ManyToOne(() => Channel, (channel) => channel.messages, { onDelete: 'CASCADE' })
 	channel: Channel;
 }

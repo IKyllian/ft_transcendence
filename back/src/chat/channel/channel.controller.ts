@@ -1,4 +1,4 @@
-import { Body, ClassSerializerInterceptor, Controller, Get, Param, ParseIntPipe, Post, UseGuards, UseInterceptors } from "@nestjs/common";
+import { Body, ClassSerializerInterceptor, Controller, Delete, Get, Param, ParseIntPipe, Post, UseGuards, UseInterceptors } from "@nestjs/common";
 import { JwtGuard } from "src/auth/guard/jwt.guard";
 import { Channel, ChannelUser, User } from "src/typeorm";
 import { GetChannelUser, GetUser } from "src/utils/decorators";
@@ -10,14 +10,13 @@ import { InChannelGuard } from "../guards/inChannel.guard";
 import { ChannelService } from "./channel.service";
 
 @Controller('channel')
-@UseInterceptors(ClassSerializerInterceptor)
 export class ChannelController {
 	constructor(
 		private channelService: ChannelService,
 		private chatGateway: ChatGateway,
 		) {}
 
-	@Get()
+	@Get('visible')
 	@UseGuards(JwtGuard)
 	getVisibleChannels(@GetUser('id') user_id: number) {
 		return this.channelService.getVisibleChannels(user_id);
@@ -32,6 +31,7 @@ export class ChannelController {
 	@Post()
 	@UseGuards(JwtGuard)
 	createChannel(@GetUser() user: User, @Body() channelDto: ChannelDto) {
+		console.log('test')
 		return this.channelService.create(user, channelDto);
 	}
 
@@ -50,6 +50,7 @@ export class ChannelController {
 		@GetUser() user: User,
 		@Param('id', ParseIntPipe) id: number) {
 		// add reason ?
+		console.log('in route leave channel')
 		return this.channelService.leave(user, id);
 	}
 
@@ -60,12 +61,15 @@ export class ChannelController {
 		@Param('id', ParseIntPipe) id: number,
 		@GetUser() user: User,
 		) {
-		const channel = await this.channelService.getChannelById(user, id);
-		this.chatGateway.handleJoinConversation(user, channel.id);
-		return channel;
-
+			return await this.channelService.getChannelById(user, id);
 	}
 
+	@Delete(':id')
+	async deleteChannel(
+		@Param('id') id: number,
+	) {
+		return await this.channelService.delete(id);
+	}
 	// @UseGuards(JwtGuard, InChannelGuard, ChannelPermissionGuard)
 	// @Post(':id/ban/:userId')
 	// banUser(

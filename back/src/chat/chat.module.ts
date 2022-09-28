@@ -1,27 +1,29 @@
-import { forwardRef, Module } from '@nestjs/common';
+import { ClassSerializerInterceptor, forwardRef, Module } from '@nestjs/common';
 // import { ChatService } from './chat.service';
 import { ChatGateway } from './chat.gateway';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ChannelService } from './channel/channel.service';
-import { MessageService } from './message/message.service';
 import { AuthModule } from 'src/auth/auth.module';
-import { Channel, Message, User, ChannelUser, Statistic } from 'src/typeorm';
+import { Channel, User, ChannelUser, Statistic, ChannelMessage } from 'src/typeorm';
 import { ChannelController } from './channel/channel.controller';
 import { ChatSessionManager } from './chat.session';
-import { MessageController } from './message/message.controller';
 import { UserService } from 'src/user/user.service';
 import { ChannelModule } from './channel/channel.module';
 import { UserModule } from 'src/user/user.module';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 
 @Module({
   imports: [
     ChannelModule,
     UserModule,
     forwardRef(() => AuthModule),
-    TypeOrmModule.forFeature([Channel, Message, ChannelUser, User, Statistic]),
+    TypeOrmModule.forFeature([Channel, ChannelUser, ChannelMessage, User, Statistic]), // needed?
   ],
-  providers: [ChatGateway, MessageService, ChatSessionManager],
-  controllers: [ChannelController, MessageController],
+  providers: [ChatGateway, ChatSessionManager,
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ClassSerializerInterceptor,
+    }],
   exports: [ChatGateway]
 })
 export class ChatModule {}

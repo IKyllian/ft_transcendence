@@ -30,7 +30,8 @@ export class AuthService {
 		}
 		const user = await this.userService.create(params);
 		return {
-			token: await this.signToken(user.id, user.username),
+			token: (await this.signToken(user.id, user.username)).access_token,
+
 			user: user,
 		}
 	}
@@ -48,7 +49,7 @@ export class AuthService {
 			throw new UnauthorizedException('Password incorrect');
 		
 		return {
-			token: await this.signToken(user.id, user.username),
+			token: (await this.signToken(user.id, user.username)).access_token,
 			user: user,
 		}
 	}
@@ -110,7 +111,6 @@ export class AuthService {
 			const decoded = this.jwt.verify(token, {
 				secret: this.config.get('JWT_SECRET')
 			});
-			console.log('decoded', decoded)
 			return await this.userService.findOne({ id: decoded.sub });
 		}
 		catch(e) {
