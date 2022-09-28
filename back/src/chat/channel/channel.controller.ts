@@ -2,11 +2,11 @@ import { Body, ClassSerializerInterceptor, Controller, Delete, Get, Param, Parse
 import { JwtGuard } from "src/auth/guard/jwt.guard";
 import { Channel, ChannelUser, User } from "src/typeorm";
 import { GetChannelUser, GetUser } from "src/utils/decorators";
-import { ChatGateway } from "../chat.gateway";
-import { ChannelPasswordDto } from "../dto/channel-pwd.dto";
-import { ChannelDto } from "../dto/channel.dto";
-import { ChannelPermissionGuard } from "../guards/channel-permission.guard";
-import { InChannelGuard } from "../guards/inChannel.guard";
+import { ChatGateway } from "../gateway/chat.gateway";
+import { ChannelPasswordDto } from "./dto/channel-pwd.dto";
+import { ChannelDto } from "./dto/channel.dto";
+import { ChannelPermissionGuard } from "./guards/channel-permission.guard";
+import { InChannelGuard } from "./guards/inChannel.guard";
 import { ChannelService } from "./channel.service";
 
 @Controller('channel')

@@ -1,12 +1,12 @@
 import { ClassSerializerInterceptor, forwardRef, Module } from '@nestjs/common';
 // import { ChatService } from './chat.service';
-import { ChatGateway } from './chat.gateway';
+import { ChatGateway } from './gateway/chat.gateway';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ChannelService } from './channel/channel.service';
 import { AuthModule } from 'src/auth/auth.module';
 import { Channel, User, ChannelUser, Statistic, ChannelMessage } from 'src/typeorm';
 import { ChannelController } from './channel/channel.controller';
-import { ChatSessionManager } from './chat.session';
+import { ChatSessionManager } from './gateway/chat.session';
 import { UserService } from 'src/user/user.service';
 import { ChannelModule } from './channel/channel.module';
 import { UserModule } from 'src/user/user.module';

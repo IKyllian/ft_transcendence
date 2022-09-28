@@ -4,11 +4,11 @@ import { ClassTransformer } from 'class-transformer';
 import { Channel, User, ChannelUser } from 'src/typeorm';
 import { UserService } from 'src/user/user.service';
 import { Repository } from 'typeorm';
-import { ChannelDto } from '../dto/channel.dto';
+import { ChannelDto } from './dto/channel.dto';
 import { ChannelExistException, ChannelNotFoundException, NotInChannelException, UnauthorizedActionException } from 'src/utils/exceptions';
 import * as argon from 'argon2';
-import { CreateChannelDto } from '../dto/create-channel.dto';
-import { ChannelPasswordDto } from '../dto/channel-pwd.dto';
+import { CreateChannelDto } from './dto/create-channel.dto';
+import { ChannelPasswordDto } from './dto/channel-pwd.dto';
 import { channelOption, channelRole, FindChannelParams } from 'src/utils/types/types';
 import { threadId } from 'worker_threads';
 

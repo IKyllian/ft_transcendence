@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Param, ParseIntPipe, Post, UseGuards } from "@nestjs/common";
 import { JwtGuard } from "src/auth/guard/jwt.guard";
-import { ChatGateway } from "src/chat/chat.gateway";
+import { ChatGateway } from "src/chat/gateway/chat.gateway";
 import { User } from "src/typeorm";
 import { GetUser } from "src/utils/decorators";
 import { ChannelMessageService } from "./ChannelMessage.service";
@@ -19,7 +19,7 @@ export class ChannelMessageController {
 	@Param('id') chanId: number,
 	@GetUser() user: User,
 	@Body() msg: ChannelMessageDto) {
-		return await this.messageService.create(user, msg, chanId);
+		return await this.messageService.create(user, msg);
 	}
 
 	@Get()

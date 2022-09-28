@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { MessageDto } from './dto/message.dto';
+import { MessageDto } from './channel/dto/message.dto';
 
 // @Injectable()
 // export class ChatService {
