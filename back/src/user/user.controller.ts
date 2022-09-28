@@ -34,7 +34,7 @@ export class UserController {
 
 	@UseGuards(JwtGuard)
 	@Post('upload')
-	@UseInterceptors(FileInterceptor('file', avatarStorage))
+	@UseInterceptors(FileInterceptor('image', avatarStorage))
 	uploadFile(@UploadedFile() file, @Request() req) : Observable<Object> {
 		console.log(req.user);
 		console.log(file);
