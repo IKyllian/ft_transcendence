@@ -6,7 +6,7 @@ export class ChannelMessageDto {
 	@IsString()
 	content: string;
 
-	@IsNotEmpty()
-	@IsNumber()
-	destId: number;
+	// @IsNotEmpty()
+	// @IsNumber()
+	// chanId: number;
 }

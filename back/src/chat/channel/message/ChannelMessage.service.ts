@@ -15,14 +15,13 @@ export class ChannelMessageService {
 		private messagesRepo: Repository<ChannelMessage>,
 	) {}
 
-	async create(user: User, messageDto: ChannelMessageDto) {
-		const channel = await this.channelService.findOne({ id: messageDto.destId });
+	async create(user: User, messageDto: ChannelMessageDto, chanId: number) {
+		const channel = await this.channelService.findOne({ id: chanId });
 		if (!channel)
 			throw new ChannelNotFoundException();
 		const channelUser = await this.channelService.getChannelUser(channel, user);
 		if (!channelUser) { throw new NotInChannelException() } 
 		if (channelUser.is_muted) { throw new IsMutedException() }
-
 		const message = this.messagesRepo.create({
 			content: messageDto.content,
 			channel,

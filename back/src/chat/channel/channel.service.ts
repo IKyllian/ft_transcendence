@@ -10,6 +10,7 @@ import * as argon from 'argon2';
 import { CreateChannelDto } from '../dto/create-channel.dto';
 import { ChannelPasswordDto } from '../dto/channel-pwd.dto';
 import { channelOption, channelRole, FindChannelParams } from 'src/utils/types/types';
+import { threadId } from 'worker_threads';
 
 @Injectable()
 export class ChannelService {
@@ -23,6 +24,7 @@ export class ChannelService {
 	 * @param user_id 
 	 * @returns All the channel that the user joined or that is visible
 	 */
+	// TODO -channel that user joined
 	async getVisibleChannels(user_id: number) {
 		const chan = await this.channelRepo.find({
 			relations: {
@@ -31,8 +33,7 @@ export class ChannelService {
 				},
 			},
 			where: [
-			{ channelUsers: { user: { id: user_id } } },
-			{ option: channelOption.PUBLIC },
+			{ option: channelOption.PUBLIC || channelOption.PROTECTED},
 			],
 		});
 		// TODO FIX
@@ -127,6 +128,7 @@ export class ChannelService {
 	}
 
 	async leave(user: User, id: number) {
+		console.log(user, id)
 		const channel = await this.findOne({ id })
 		if (!channel)
 			throw new ChannelNotFoundException();
@@ -135,7 +137,7 @@ export class ChannelService {
 		if (!inChannel)
 			throw new BadRequestException('User not in channel');
 
-			console.log('before leave', channel.channelUsers);
+		console.log('before leave', channel.channelUsers);
 		channel.channelUsers = channel.channelUsers.filter((chanUser) => chanUser.user.id !== user.id);
 			console.log('after leave', channel.channelUsers);
 		await this.channelUserRepo.delete({id: inChannel.id});
@@ -180,6 +182,10 @@ export class ChannelService {
 		// if (!userInChannel)
 		// 	throw new NotInChannelException();
 		return userInChannel;
+	}
+
+	async delete(id: number) {
+		return await this.channelRepo.delete(id);
 	}
 
 	// async banUser(user: ChannelUser, chanId: number, userId: number) {

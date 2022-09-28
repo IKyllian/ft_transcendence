@@ -11,3 +11,9 @@
 
 // User
 	- add list of blocked users
+
+//TODO
+	- Route for editing user / Channels
+	- Check if route for delete channels / User
+	- Fix visible channel route, exclude channel joined by user
+	

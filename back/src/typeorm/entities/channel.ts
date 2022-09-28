@@ -21,13 +21,11 @@ export class Channel {
 
 	@OneToMany(() => ChannelUser, (channelUser) => channelUser.channel, {
 		cascade: true,
-		onDelete: 'CASCADE'
 	})
 	channelUsers: ChannelUser[];
 
 	@OneToMany(() => ChannelMessage, (message) => message.channel, {
 		cascade: ['insert', 'remove'],
-		// onDelete: "CASCADE",
 	})
 	messages: ChannelMessage[];
 

@@ -16,6 +16,6 @@ export class ChannelMessage {
 	@CreateDateColumn()
 	send_at: Date;
 
-	@ManyToOne(() => Channel, (channel) => channel.messages)
+	@ManyToOne(() => Channel, (channel) => channel.messages, { onDelete: 'CASCADE' })
 	channel: Channel;
 }

@@ -11,7 +11,6 @@ export class ChannelUser  {
 
 	@ManyToOne(() => User, (user) => user.channelUser, {
 		nullable: false,
-		// onDelete: 'CASCADE',
 	})
 	user!: User;
 

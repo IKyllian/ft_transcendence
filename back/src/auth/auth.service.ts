@@ -30,7 +30,8 @@ export class AuthService {
 		}
 		const user = await this.userService.create(params);
 		return {
-			token: await this.signToken(user.id, user.username),
+			token: (await this.signToken(user.id, user.username)).access_token,
+
 			user: user,
 		}
 	}
@@ -48,7 +49,7 @@ export class AuthService {
 			throw new UnauthorizedException('Password incorrect');
 		
 		return {
-			token: await this.signToken(user.id, user.username),
+			token: (await this.signToken(user.id, user.username)).access_token,
 			user: user,
 		}
 	}
