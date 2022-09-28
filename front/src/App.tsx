@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Header from "./Components/Header/Header";
@@ -16,8 +17,9 @@ import PrivateRoute from "./Route/Private-Route";
 import UsernameForm from "./Components/Sign/Username-Form";
 
 import { io } from "socket.io-client";
-
-const socket = io;
+import { useAppSelector, useAppDispatch } from './Redux/Hooks'
+import { setSocket } from "./Redux/AuthSlice";
+import { socketUrl } from "./env";
 
 interface RouteProps {
 	path: string,
@@ -65,6 +67,18 @@ const routes: RouteProps[] = [
 ]
 
 function App() {
+    let authDatas = useAppSelector((state) => state.auth);
+    const dispatch = useAppDispatch();
+
+	useEffect(() => {
+		if (authDatas.isAuthenticated && !authDatas.socket) {
+			const newSocket: any = io(`${socketUrl}`, {extraHeaders: {
+                "Authorization": `Bearer ${authDatas.token}`,
+            }});
+			dispatch(setSocket(newSocket));
+		}
+	},[authDatas.isAuthenticated])
+
   return (
 	<div className="app-container">
     	<BrowserRouter>

@@ -26,15 +26,20 @@ function UsersSidebar(props: {usersList: ChannelUser[]}) {
     return (
         <div className="users-sidebar">
             <div className="users-sidebar-wrapper">
-                <h3> Administrators - 1 </h3>
-                <ul>
-                    <UserSidebarItem user={usersList[0]}  />
-                </ul>
-                <h3> Users - {usersList.length - 1} </h3>
+                <h3> Administrators - {usersList.filter((elem) => elem.role === "owner").length} </h3>
                 <ul>
                     {
-                        usersList.map((elem, index) => {
-                            if (index > 0)
+                        usersList.map((elem) =>  {
+                            if (elem.role === "owner")
+                                return <UserSidebarItem key={elem.user.id} user={elem}  />
+                        })
+                    }
+                </ul>
+                <h3> Users - {usersList.filter((elem) => elem.role === "clampin").length} </h3>
+                <ul>
+                    {
+                        usersList.map((elem) => {
+                            if (elem.role === "clampin")
                                 return <UserSidebarItem key={elem.user.id} user={elem} />
                         })
                     }

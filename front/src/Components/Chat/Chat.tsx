@@ -29,6 +29,27 @@ function Chat() {
         if (params.chatId === undefined) {
             setReponsiveSidebar(true);
         }
+
+        if (channelsDatas && channelsDatas.length > 0) {
+            let datasArray: ChannelsInterfaceFront[] = [];
+            for (let i: number = 0; i < channelsDatas.length; i++) {
+                datasArray.push({
+                    channel: channelsDatas[i].channel,
+                    isActive: "false",
+                });
+            }
+            if (params) {
+                let findOpenChat: ChannelsInterfaceFront | undefined = datasArray.find(elem => elem.channel.id === parseInt(params.chatId!, 10));
+                if (findOpenChat) {
+                    findOpenChat.isActive = "true";
+                }
+            }
+            setChannelsDatas(datasArray);
+        }
+    }, [params])
+
+    useEffect(() => {
+        
     }, [params])
 
     useEffect(() => {
@@ -57,16 +78,32 @@ function Chat() {
         }).catch(err => {
             console.log(err);
         })
-       // Fetch to get channels
     }, [])
+
+    const chanClick = (id: number) => {
+        if (channelsDatas !== undefined) {
+            let newArray: ChannelsInterfaceFront[] = [...channelsDatas];
+    
+            let findActiveElem: ChannelsInterfaceFront | undefined =  newArray.find(elem => elem.isActive === "true");
+            if (findActiveElem !== undefined) {
+                findActiveElem.isActive = "false";
+            }
+
+            let elemById: ChannelsInterfaceFront | undefined = newArray.find((elem) => elem.channel.id  === id);
+            if (elemById !== undefined) {
+                elemById.isActive = "true";
+            }
+            setChannelsDatas(newArray);
+        }
+    }
 
     return !channelsDatas ? (
         <LoadingSpin classContainer="chat-page-container" />
     ) : (
         <SidebarContext.Provider value={{sidebar: responsiveSidebar, setSidebarStatus: handleClick}}>
-            <ChatModal showModal={showModal} setShowModal={setShowModal}  />
+            <ChatModal showModal={showModal} setShowModal={setShowModal} setChannelsDatas={setChannelsDatas}  />
             <div className={`chat-page-container ${modalStatus.modal.isOpen ? modalStatus.modal.blurClass : ""}`}>
-                <Sidebar setShowModal={setShowModal} showModal={showModal} chanDatas={channelsDatas} />
+                <Sidebar setShowModal={setShowModal} showModal={showModal} chanDatas={channelsDatas} chanClick={chanClick} />
                 {
                     params.chatId === undefined
                     ? 

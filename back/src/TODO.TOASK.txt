@@ -1,0 +1,13 @@
+// Auth:
+	- Store access_token and refresh_token in local storage,
+	on access_token expiration send request to server with refresh_token.
+	If fail redirect to login page.
+	- On logout, remove token from local storage?
+
+//Channels
+	- Add Can add/modify/delete password of a channels
+	- Add Can ban for a limited time
+	- Probably do new entity for private messages
+
+// User
+	- add list of blocked users

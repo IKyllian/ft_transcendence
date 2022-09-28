@@ -153,11 +153,17 @@
                     }
                 }
     
-                .ul-container {
-                    overflow: scroll;
-                    padding-right: 20px;
-                    height: 90%;
+                // .ul-container {
+                    // overflow: scroll;
+                    // padding-right: 20px;
+                    // height: 90%;
                     ul {
+                        overflow-y: scroll;
+                        margin: 0;
+                        padding: 20px;
+                        height: 90%;
+                        display: flex;
+                        flex-direction: column;
                         .message-item {
                             @include flex-row-alignCenter;
                             gap: 15px;
@@ -201,7 +207,7 @@
                             }
                 
                             &-right {
-                                float: right;
+                                flex-direction: row-reverse;
                                 .message-text {
                                     background-color: rgb(173, 113, 22);
                                     border-top-right-radius: 30px;
@@ -211,7 +217,7 @@
                             }
                         }
                     }
-                }
+                // }
             }
         }
         
@@ -221,6 +227,14 @@
             justify-content: space-between;
             width: 90%;
             margin: 0 auto;
+            form {
+                width: 90%;
+                input {
+                    all: unset;
+                    width: 95%;
+                    padding: 18px 20px;
+                }
+            }
             svg {
                 cursor: pointer;
                 background-color: $OrangeProfile;
@@ -229,11 +243,7 @@
                 padding: 5px;
                 background: linear-gradient(112deg, rgba(255,94,0,1) 0%, rgba(255,145,0,1) 50%, rgba(255,154,0,1) 100%);
             }
-            input {
-                all: unset;
-                width: 95%;
-                padding: 18px 20px;
-            }
+           
         }
 
         .users-sidebar {

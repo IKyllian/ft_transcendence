@@ -1,84 +1,91 @@
-import { ForbiddenException, forwardRef, Inject, Injectable } from "@nestjs/common";
+import { ForbiddenException, forwardRef, Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { User } from "src/entities/user.entity";
-import { Friendship, friendShipStatus } from "src/entities/friendship.entity";
-import { Statistic } from "src/entities/statistic.entity";
-import { Avatar } from "src/entities/avatar.entity";
-import { UserDto } from "./dto/user.dto";
 import { AuthService } from "src/auth/auth.service";
-import { use } from "passport";
+import { CreateUserDto } from "./dto/createUser.dto";
+import { Friendship, Statistic, User } from "src/typeorm";
+import { friendShipStatus } from "src/typeorm/entities/friendship";
+import { userStatus } from "src/typeorm/entities/user";
+import { FindUserParams } from "src/utils/types/types";
 
 @Injectable()
 export class UserService {
 	constructor(
-		@InjectRepository(User)
-		private usersRepo: Repository<User>,
-		@InjectRepository(Friendship)
-		private friendshipsRepo: Repository<Friendship>,
-		@InjectRepository(Statistic)
-		private statisticsRepo: Repository<Statistic>,
 		@Inject(forwardRef(() => AuthService))
 		private authService: AuthService,
+		@InjectRepository(User)
+		private userRepo: Repository<User>,
+		@InjectRepository(Statistic)
+		private statisticRepo: Repository<Statistic>,
 	) {}
 
-	async create(userdto: UserDto) {
-		try {
-			console.log(userdto);
-			const user = this.usersRepo.create(userdto);
-			user.statistic = await this.statisticsRepo.save(new Statistic());
-			await this.usersRepo.save(user);
-			return user;
+	async create(dto: CreateUserDto) {
+		console.log(dto)
+		const userExist = await this.findOne({ username: dto.username });
+		if (userExist)
+			throw new ForbiddenException('Username taken');
 
-		} catch (error) {
-			if (error.code === '23505') {
-				throw new ForbiddenException('Username taken');
-			}
-			throw error;
-		}
-	}
-	
-	findById(id: number): Promise<User | undefined> {
-		return this.usersRepo.findOne({ where: { id: id } });
+		const statistic = this.statisticRepo.create();
+		const params = {...dto, statistic};
+		const user = this.userRepo.create(params);
+		return await this.userRepo.save(user);
 	}
 
-	findBy42Id(id42: number): Promise<User | undefined> {
-		return this.usersRepo.findOne({ where: { id42: id42 } });
-	}
-
-	findByUsername(username: string): Promise<User | undefined> {
-		return this.usersRepo.findOne({ where: { username: username } });
+	async findOne(
+		whereParams: FindUserParams,
+		selectAll?: boolean,
+	) {
+		const selections: (keyof User)[] = [
+			'username',
+			'id',
+			'status',
+		];
+		const selectionsWithHash: (keyof User)[] = [...selections, 'hash'];
+		const param = {
+			where: whereParams,
+			select: selectAll ? selectionsWithHash : selections,
+			relations: ['statistic', 'channelUser'],
+		};
+		return await this.userRepo.findOne(param);
 	}
 
 	async editUsername(user: User, name: string) {
 		try {
 			user.username = name;
-			this.usersRepo.save(user);
-			delete user.hash;
-
+			user = await this.userRepo.save(user);
 			return {
 				token: (await this.authService.signToken(user.id, user.username)).access_token,
 				user: user,
 			}
 		} catch(error) {
 			console.log(error.message);
-			throw new ForbiddenException();
+			throw new ForbiddenException('Username taken');
 		}
 	}
 
+	setStatus(user: User, status: userStatus) {
+		user.status = status;
+		this.userRepo.save(user)
+	}
+
 	async getUsers() {
-		return await this.usersRepo.find();
+		return await this.userRepo.find();
 	}
 
 	async getFriendlist(user: User) {
-		const rawFriendList = await this.friendshipsRepo.find({
+		const rawFriendList = await Friendship.find({
 			relations: {
 				requester: true,
 				addressee: true
 			},
 			where: [
-				{ requester: user, status: 'accepted' },
-				{ addressee: user, status: 'accepted' }
+				{ requester: {
+					id: user.id,
+				}, status: 'accepted' },
+
+				{ addressee: {
+					id: user.id,
+				}, status: 'accepted' },
 			]
 		});
 		let friendList: User[] = [];
@@ -93,32 +100,27 @@ export class UserService {
 	}
 
 	async sendFriendRequest(requester: User, addressee: User) {
-		return this.friendshipsRepo.save({ requester, addressee, status: 'requested' });
+		return Friendship.save({ requester, addressee, status: 'requested' });
 	}
 
 	async respondFriendRequest(addressee: User, requester: User, status: friendShipStatus) {
-		const friendship = await this.friendshipsRepo.findOne({
-			where: { addressee, requester, status: 'requested' },
+		const friendship = await Friendship.findOne({
+			where: { addressee: {
+				id: addressee.id,
+			},
+			requester: {
+				id: requester.id,
+			}, status: 'requested' },
 		});
 		if (!friendship) {
 			throw new Error('Request not found');
 		}
 		friendship.status = status;
-		return this.friendshipsRepo.save(friendship);
-	}
-
-	async addWin(user: User) {
-		user.statistic.matchWon++;
-		await this.usersRepo.save(user);
-	}
-
-	async addLoss(user: User) {
-		user.statistic.matchLost++;
-		await this.usersRepo.save(user);
+		return await friendship.save();
 	}
 
 	async updateAvatar(user: User, fileName: string) {
 		user.avatar = fileName;
-		await this.usersRepo.save(user);
+		await this.userRepo.save(user);
 	}
 }

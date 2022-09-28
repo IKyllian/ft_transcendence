@@ -6,6 +6,8 @@ import { useAppSelector } from '../../Redux/Hooks'
 import { baseUrl } from "../../env";
 import { IconX } from '@tabler/icons';
 import { useEffect, useState } from "react";
+import { ChannelsInterfaceFront } from "../../Types/Chat-Types";
+import { useNavigate } from "react-router-dom";
 
 type FormValues = {
     chanMode: string,
@@ -14,11 +16,13 @@ type FormValues = {
     usersIdInvited?: number;
 }
 
-function ChatModal(props: {setShowModal: Function, showModal: number}) {
-    const { register, handleSubmit, formState: {errors} } = useForm<FormValues>();
-    const { setShowModal, showModal } = props;
+function ChatModal(props: {setShowModal: Function, showModal: number, setChannelsDatas: Function}) {
+    const { register, handleSubmit, watch, formState: {errors} } = useForm<FormValues>();
+    const { setShowModal, showModal, setChannelsDatas } = props;
 
+    const channelMode = watch('chanMode');
 
+    const navigate = useNavigate();
     let authDatas = useAppSelector((state) => state.auth);
 
     const formSubmit = handleSubmit((data, e) => {
@@ -31,9 +35,11 @@ function ChatModal(props: {setShowModal: Function, showModal: number}) {
         })
         .then((response) => {
            console.log(response);
-            // dispatch(loginSuccess(payload));
+           setChannelsDatas((state: ChannelsInterfaceFront[]) => [...state, {channel: response.data, isActive: "false"}]);
+           setShowModal(false);
+           navigate(`/chat/${response.data.id}`);
         }).catch(err => {
-            // dispatch(loginError("username or password incorect"));
+            console.log(err);
         })
     })
 
@@ -49,7 +55,6 @@ function ChatModal(props: {setShowModal: Function, showModal: number}) {
                             ["public", "protected" ,"privée"].map((elem, index) => 
                                 <label key={index}>
                                     {elem}
-                                    {/* {index === 0 ? "Public" : "Privée"} */}
                                     <input
                                         type="radio"
                                         value={elem}
@@ -75,10 +80,13 @@ function ChatModal(props: {setShowModal: Function, showModal: number}) {
                         />
                         {errors.chanName && <p className="txt-form-error"> {errors.chanName.message} </p>}
                     </label>
-                    <label className="labelTextInput">
-                        Password (optional):
-                        <input type="password" placeholder="(optional)" {...register("password")} />
-                    </label>
+                    {
+                        channelMode === "protected" && 
+                        <label className="labelTextInput">
+                            Password :
+                            <input type="password" placeholder="password" {...register("password")} />
+                        </label>
+                    }
                     <SearchBarPlayers functionality="chanInvite" register={register} />
                     <div className="chat-modal-buttons">
                         <button onClick={() => setShowModal(false) }> Cancel </button>

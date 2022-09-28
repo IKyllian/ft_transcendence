@@ -20,6 +20,7 @@ export interface AuthState {
     token: string,
     setUsersame: boolean,
     socket?: any
+    // socketId?: string,
 }
 
 export interface LoginPayload {

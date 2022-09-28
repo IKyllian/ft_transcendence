@@ -1,8 +1,9 @@
-import { Body, Controller, Get, Post, Req } from "@nestjs/common";
+import { Body, ClassSerializerInterceptor, Controller, Get, Post, Req, UseInterceptors } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { AuthDto } from "./dto/auth.dto";
 
 @Controller('auth')
+@UseInterceptors(ClassSerializerInterceptor)
 export class AuthController {
 	constructor(private authService: AuthService) {}
 
@@ -16,7 +17,7 @@ export class AuthController {
 		return this.authService.login(dto);
 	}
 
-	@Post('login42')
+	@Post('login42') //create auth42dto
 	login42(@Body() body) {
 		return this.authService.login42(body.authorizationCode);
 	}

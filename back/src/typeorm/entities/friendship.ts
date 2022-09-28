@@ -1,10 +1,10 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
-import { User } from "./user.entity";
+import { BaseEntity, Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { User } from "./user";
 
 export type friendShipStatus = 'requested' | 'accepted' | 'declined';
 
 @Entity()
-export class Friendship {
+export class Friendship extends BaseEntity {
 	
 	@PrimaryGeneratedColumn()
 	id: number;

@@ -27,10 +27,6 @@ export const authSlice = createSlice({
             state.token = payload.token;
             state.isAuthenticated = true;
             state.loading = false;
-            const newSocket: any = io(`http://10.1.9.4:5000`, {extraHeaders: {
-                "Authorization": `Bearer ${state.token}`,
-            }});
-            state.socket = newSocket;
         },
         loginError: (state, {payload}: PayloadAction<string>) => {
             state.error = payload;
@@ -55,6 +51,13 @@ export const authSlice = createSlice({
                 setUsersame: false,
             }
         },
+        setSocket: (state, {payload} : PayloadAction<any>) => {
+            state.socket = payload;
+        },
+        // setSocketId: (state, {payload} : PayloadAction<any>) => {
+        //     console.log(payload);
+        //     state.socketId = payload;
+        // },
 
         // updateUserChannels: (state, {payload}: PayloadAction<Channel>) => {
         //     if (!state.currentUser?.channels) 
@@ -67,4 +70,4 @@ export const authSlice = createSlice({
     }
 });
 
-export const { loginPending, loginSuccess, loginError, setUsername, logoutPending, logoutSuccess } = authSlice.actions;
+export const { loginPending, loginSuccess, loginError, setUsername, logoutPending, logoutSuccess, setSocket } = authSlice.actions;

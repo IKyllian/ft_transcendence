@@ -17,11 +17,12 @@ type FormValues = {
 
 function Sign() {
     const [isSignIn, setIsSignIn] = useState<boolean>(true);
-    const { register, handleSubmit, reset, formState: {errors}} = useForm<FormValues>();
-    let navigate = useNavigate();
+    const { register, handleSubmit, reset, formState: {errors} } = useForm<FormValues>();
+
+    const navigate = useNavigate();
     const dispatch = useAppDispatch();
-    let authDatas = useAppSelector((state) => state.auth);
     const [searchParams] = useSearchParams();
+    let authDatas = useAppSelector((state) => state.auth);
 
     const onSignIn = handleSubmit(async (data, e) => {
         e?.preventDefault();
@@ -56,11 +57,11 @@ function Sign() {
     });
 
     useEffect(() => {
+        console.log(authDatas);
         const authorizationCode = searchParams.get('code');
-        console.log(`${baseUrl}/auth/login42`);
         if (authorizationCode) {
-            if (authDatas.setUsersame)
-                navigate(-1);
+            if (authDatas.setUsersame || authDatas.error || !authDatas.loading)
+                navigate("/sign");
             dispatch(loginPending());
             axios.post(`${baseUrl}/auth/login42`, { authorizationCode })
             .then((response) => {

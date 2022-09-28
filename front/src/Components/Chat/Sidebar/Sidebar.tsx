@@ -1,12 +1,12 @@
-import { useEffect, useState, useContext, useRef } from "react";
+import { useEffect, useContext, useRef } from "react";
 import { useParams } from "react-router-dom";
-import { ChannelsDatas, ChannelsPublicDatas } from "../../../Types/Datas-Examples";
+import { ChannelsPublicDatas } from "../../../Types/Datas-Examples";
 import { ChannelsInterfaceFront, Channel } from "../../../Types/Chat-Types";
 import SidebarItem from "./Sidebar-Item";
 import { SidebarContext } from "../Chat";
 
-function Sidebar(props: {showModal: number, setShowModal: Function, chanDatas: ChannelsInterfaceFront[]}) {
-    const {showModal, setShowModal, chanDatas} = props;
+function Sidebar(props: {showModal: number, setShowModal: Function, chanDatas: ChannelsInterfaceFront[], chanClick: Function}) {
+    const {showModal, setShowModal, chanDatas, chanClick} = props;
     // const [chanDatas, setChanDatas] = useState<ChannelsInterfaceFront[] | undefined>(undefined);
 
     const sidebarStatus = useContext(SidebarContext);
@@ -27,41 +27,6 @@ function Sidebar(props: {showModal: number, setShowModal: Function, chanDatas: C
         };
     }, [sidebarStatus, sidebarStatus.setSidebarStatus, params.chatId]);
 
-    // useEffect(() => {
-    //     if (ChannelsDatas.length > 0) {
-            // let datasArray: ChannelsInterfaceFront[] = [];
-            // for (let i: number = 0; i < ChannelsDatas.length; i++) {
-            //     datasArray.push({
-            //         channel: ChannelsDatas[i],
-            //         isActive: "false",
-            //     });
-            // }
-            // if (params) {
-            //     let findOpenChat: ChannelsInterfaceFront | undefined = datasArray.find(elem => elem.channel.id === parseInt(params.chatId!, 10));
-            //     if (findOpenChat) {
-            //         findOpenChat.isActive = "true";
-            //     }
-            // }
-            // setChanDatas(datasArray);
-    //     }
-    // }, [params])
-
-    const chanClick = (id: number) => {
-        if (chanDatas !== undefined) {
-            // let newArray: ChannelsInterfaceFront[] = [...chanDatas];
-    
-            // let findActiveElem: ChannelsInterfaceFront | undefined =  newArray.find(elem => elem.isActive === "true");
-            // if (findActiveElem !== undefined) {
-            //     findActiveElem.isActive = "false";
-            // }
-
-            // let elemById: ChannelsInterfaceFront | undefined = newArray.find((elem) => elem.channel.id  === id);
-            // if (elemById !== undefined) {
-            //     elemById.isActive = "true";
-            // }
-            // setChanDatas(newArray);
-        }
-    }
  
     return (
         <div ref={ref} className={`chat-sidebar ${sidebarStatus.sidebar ? "chat-sidebar-responsive" : ""}`}>

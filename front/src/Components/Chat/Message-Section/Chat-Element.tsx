@@ -8,8 +8,10 @@ import MessageItem from "./Message-Item";
 import ChatHeader from "./Chat-Header";
 import UsersSidebar from "./Users-Sidebar";
 import axios from "axios";
-import { baseUrl } from "../../../env";
+import { baseUrl, socketUrl } from "../../../env";
 import { useAppSelector } from '../../../Redux/Hooks'
+import LoadingSpin from "../../Utils/Loading-Spin";
+import { ChatMessage } from "../../../Types/Chat-Types";
 
 
 function ChatElement() {
@@ -34,43 +36,81 @@ function ChatElement() {
     // }, [params]);
 
     useEffect(() => {
-        console.log(params);
+        // const getDatas = async () => {
+        //     await authDatas.socket.emit("JoinChannelRoom", {
+        //         chanId: params.chatId,
+        //     });
+
+        //     await authDatas.socket.on('roomData', (data: any) => {
+        //         console.log(data);
+        //         setChatDatas(data);
+        //     });
+        // }
         if (params) {
+            // getDatas();
             axios.get(`${baseUrl}/channel/${params.chatId}`, {
                 headers: {
                     "Authorization": `Bearer ${authDatas.token}`,
                 }
             })
-            .then((response) => {
-                console.log(response); 
+            .then(async (response) => {
+                console.log(response);
+                await authDatas.socket.emit("JoinChannelRoom", {
+                    chanId: params.chatId,
+                });
                 setChatDatas(response.data);
             }).catch(err => {
                 console.log(err);
             })
         }
+
+        return () => {
+            return authDatas.socket.emit("LeaveChannelRoom", {
+                chanId: params.chatId,
+            });
+        }
     }, [params])
 
     useEffect(() => {
-        authDatas.socket.on('message', (data: any) => {
-            console.log("On socket", data);
-        });
-    }, [authDatas.socket])
+        const listener = (data: any) => {
+            setChatDatas((prev: any) => {
+                return {...prev, messages: [...prev!.messages, data]}
+            });
+        }
+        authDatas.socket.on('NewChannelMessage', listener);
+    }, [])
 
     //Quand l'url change emit un event onLeaveRoom avec l'id de la room
 
     const handleSubmit = (e: any) => {
         e.preventDefault();
+        // const submitMessage = async () => {
+        //     await authDatas.socket.emit("ChannelMessage", {
+        //         content: inputMessage,
+        //         chanId: params.chatId,
+        //     });
+        //     setInputMessage('');
+
+        //     // await authDatas.socket.on('roomData', (data: any) => {
+        //     //     setChatDatas(data);
+        //     // });
+        // }
         if (inputMessage.length > 0) {
+            // submitMessage();
             axios.post(`${baseUrl}/channel/${params.chatId}/messages`, {content: inputMessage}, {
                 headers: {
                     "Authorization": `Bearer ${authDatas.token}`,
                 }
             })
-            .then((response) => {
+            .then(async (response) => {
                 console.log(response);
-                let newArray = chatDatas;
-                chatDatas?.messages.push(response.data);
-                setChatDatas(newArray);
+                await authDatas.socket.emit("ChannelMessage", {
+                    msg: response.data,
+                });
+                setChatDatas((prev: any) => {
+                    return {...prev, messages: [...prev!.messages, response.data]}
+                });
+                setInputMessage('');
             })
             .catch((err) => {
                 console.log(err);
@@ -79,15 +119,13 @@ function ChatElement() {
     } 
 
     return (chatDatas === undefined) ? (
-        <div className="no-target-message">
-            <p> Sélectionnez un message ou un channel </p>
-        </div>
+        <LoadingSpin classContainer="chat-page-container" />
     ) : (
         <div className="message-container">
             <div className="message-container-main">
                 <div className="message-wrapper">
                     <ChatHeader chatItem={chatDatas} showUsersSidebar={showUsersSidebar} changeSidebarStatus={changeSidebarStatus} />
-                    <div className="ul-container">
+                    {/* <div className="ul-container"> */}
                         <ul>
                             {
                                 chatDatas!.messages.map((elem, index) =>
@@ -96,7 +134,7 @@ function ChatElement() {
                             }
                         </ul>
                         {/* <div ref={messagesEndRef} /> */}
-                    </div>
+                    {/* </div> */}
                 </div>
                 <div className="message-input-container">
                     <form onSubmit={handleSubmit}>
@@ -106,8 +144,7 @@ function ChatElement() {
                     <IconSend />
                 </div>
             </div>
-            <UsersSidebar usersList={chatDatas.channelUsers} />
-            {/* { showUsersSidebar && chatDatas.isChannel && <UsersSidebar usersList={chatDatas.users} /> } */}
+            { showUsersSidebar && <UsersSidebar usersList={chatDatas.channelUsers} /> }
         </div>
     );
 }
