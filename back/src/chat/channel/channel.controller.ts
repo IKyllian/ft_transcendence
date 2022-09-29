@@ -16,23 +16,23 @@ export class ChannelController {
 		private chatGateway: ChatGateway,
 		) {}
 
-	@Get('visible')
-	@UseGuards(JwtGuard)
-	getVisibleChannels(@GetUser('id') user_id: number) {
-		return this.channelService.getVisibleChannels(user_id);
-	}
 
 	@Get('my_channels')
 	@UseGuards(JwtGuard)
-	getChannelsByUser(@GetUser('id') id: number) {
-		return this.channelService.getChannelsByUser(id);
+	async getMyChannels(@GetUser('id') id: number) {
+		return await this.channelService.getMyChannels(id);
+	}
+
+	@Get('search')
+	@UseGuards(JwtGuard)
+	async searchChannel(@GetUser('id') userId: number) {
+		return await this.channelService.searchChannel(userId);
 	}
 
 	@Post()
 	@UseGuards(JwtGuard)
-	createChannel(@GetUser() user: User, @Body() channelDto: ChannelDto) {
-		console.log('test')
-		return this.channelService.create(user, channelDto);
+	async createChannel(@GetUser() user: User, @Body() channelDto: ChannelDto) {
+		return await this.channelService.create(user, channelDto);
 	}
 
 	@Post(':id/join')

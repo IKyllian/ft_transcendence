@@ -4,7 +4,7 @@ import { User } from "./user";
 export type friendShipStatus = 'requested' | 'accepted' | 'declined';
 
 @Entity()
-export class Friendship extends BaseEntity {
+export class Friendship {
 	
 	@PrimaryGeneratedColumn()
 	id: number;
@@ -14,9 +14,6 @@ export class Friendship extends BaseEntity {
 
 	@ManyToOne(() => User, (user) => user.id)
 	addressee: User;
-
-	@Column({ default: false })
-	blocked: boolean;
 
 	@Column({ nullable: true })
 	status: friendShipStatus;

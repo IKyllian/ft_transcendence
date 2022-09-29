@@ -16,4 +16,15 @@
 	- Route for editing user / Channels
 	- Check if route for delete channels / User
 	- Fix visible channel route, exclude channel joined by user
+
+// GAME
+	- When inviting someone to play from friendlist or chat, oponent get a notif to accept or decline. If accepted, Both got a 'popup'
+	with limited time to get ready ?
+
+// server
+	- Error with unknown request
+
+// SOCKET CLIENT
+	-when messages received do an emit to check if user is blocked ? or
+	filter the messages in server and return messages with attribute visible
 	

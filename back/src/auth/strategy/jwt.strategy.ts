@@ -21,6 +21,15 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
 		sub: number;
 		username: string;
 	}) {
-		return await this.userService.findOne({ id: payload.sub });
+		return await this.userService.findOne({
+			relations: {
+				channelUser: true,
+				blocked: true,
+				statistic: true,
+			},
+			where: {
+				id: payload.sub,
+			}
+		});
 	}
 }

@@ -74,7 +74,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       const payload = this.authService.decodeJwt(socket.handshake.headers.authorization.split(' ')[1]) as JwtPayload;
       // get usersocket instance instead of call db ?
       this.session.removeUserSocket(socket.id);
-      const user = await this.userService.findOne({id: payload.sub });
+      const user = await this.userService.findOneBy({ id: payload.sub });
       if (user) {
         this.userService.setStatus(user, 'offline');
         socket.emit('statusUpdate', { user, status: 'offline' });

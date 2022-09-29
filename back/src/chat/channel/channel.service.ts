@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ClassTransformer } from 'class-transformer';
 import { Channel, User, ChannelUser } from 'src/typeorm';
 import { UserService } from 'src/user/user.service';
-import { Repository } from 'typeorm';
+import { In, Not, Repository } from 'typeorm';
 import { ChannelDto } from './dto/channel.dto';
 import { ChannelExistException, ChannelNotFoundException, NotInChannelException, UnauthorizedActionException } from 'src/utils/exceptions';
 import * as argon from 'argon2';
@@ -22,34 +22,29 @@ export class ChannelService {
 	) {}
 	/**
 	 * @param user_id 
-	 * @returns All the channel that the user joined or that is visible
+	 * @returns All the channel that the user did not joined or that is visible
 	 */
-	// TODO -channel that user joined
-	async getVisibleChannels(user_id: number) {
-		const chan = await this.channelRepo.find({
+	searchChannel(userId: number) {
+		return this.channelRepo.find({
 			relations: {
 				channelUsers: {
 					user: true,
 				},
 			},
-			where: [
-			{ option: channelOption.PUBLIC || channelOption.PROTECTED},
-			],
-		});
-		// TODO FIX
-		console.log('channel joined', chan);
-		return chan;
-	}
-
-	async getChannelsByUser(id: number) {
-		return await this.channelRepo.find({
 			where: {
+				option: In([channelOption.PUBLIC, channelOption.PROTECTED]),
 				channelUsers: {
 					user: {
-						id,
+						id: Not(userId),
 					}
 				}
-			}
+			},
+		});
+	}
+
+	getMyChannels(id: number) {
+		return this.channelRepo.find({
+			where: { channelUsers: { user: { id } } }
 		});
 	}
 
@@ -95,9 +90,7 @@ export class ChannelService {
 			nb: 1,
 		};
 		const channel = this.channelRepo.create(params);
-		const chan = await this.channelRepo.save(channel);
-		console.log(chan)
-		return chan
+		return this.channelRepo.save(channel);
 	}
 
 	isInChannel(channel: Channel, id: number) {
