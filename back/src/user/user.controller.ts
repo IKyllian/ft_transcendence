@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Patch, Post, Request, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, ForbiddenException, Get, Patch, Post, Request, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { Observable, of } from "rxjs";
 import { GetUser } from "src/auth/decorator/get-user.decorator";
@@ -38,6 +38,10 @@ export class UserController {
 	uploadFile(@UploadedFile() file, @Request() req) : Observable<Object> {
 		console.log(req.user);
 		console.log(file);
+		if (!file)
+			throw new ForbiddenException('Image is missing')
+		if (file.mimetype != 'image/png' && file.mimetype != 'image/jpeg' && file.mimetype != 'image/jpg')
+			throw new ForbiddenException('Invalid file extension ' + file.mimetype)
 		this.userService.updateAvatar(req.user, file.path);
 		return of({imagePath: file.path})
 	}
