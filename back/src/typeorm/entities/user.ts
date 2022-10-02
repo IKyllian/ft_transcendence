@@ -3,6 +3,7 @@ import { Exclude } from "class-transformer";
 import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn, Unique, ManyToMany, JoinTable, ManyToOne, BaseEntity } from "typeorm";
 import { Avatar } from "./avatar";
 import { ChannelUser } from "./channelUser";
+import { Friendship } from "./friendship";
 import { Statistic } from "./statistic";
 
 export type userStatus = 'online' | 'offline' | 'in_game';
@@ -28,23 +29,21 @@ export class User {
 	
 	@OneToOne(() => Statistic, (statistic) => statistic.user, {
 		cascade: true,
-		// eager: true,
-		// onDelete: 'CASCADE'
 	})
 	statistic: Statistic;
 
 	@OneToMany(() => ChannelUser, (channelUser) => channelUser.user)
 	channelUser: ChannelUser[];
 
-	// @Exclude()
-	// @OneToOne(() => UserHash, (userHash) => userHash.hash, {
-	// 	cascade: true,
-	// })
-	// hash: UserHash;
-
 	@ManyToMany(() => User)
 	@JoinTable({ name: 'blocked_users' })
 	blocked: User[];
+
+	@OneToMany(() => Friendship, (friendship) => friendship.requester)
+	friendshipSend: Friendship[];
+
+	@OneToMany(() => Friendship, (friendship) => friendship.addressee)
+	friendshipReceived: Friendship[];
 
 	@Exclude()
 	@Column({nullable: true, select: false })

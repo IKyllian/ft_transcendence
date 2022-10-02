@@ -12,20 +12,47 @@ export class FriendshipService {
 		private userService: UserService,
 	) {}
 
-	async getFriendRequest(user: User) {
-		return await this.friendshipRepo.find({
+	getFriendRequest(user: User) {
+		return this.friendshipRepo.find({
 			relations: {
 				requester: true,
 			},
 			where: {
 				addressee: { id: user.id },
 				status: 'requested',
-			}
+			},
 		});
 	}
 
-	getUsersToRequest(user: User) {
-		
+	//pas fou mais ca marche
+	async searchUsersToAdd(user: User) {
+		const relation = await this.friendshipRepo.find({
+			relations: {
+				requester: true,
+				addressee: true
+			},
+			where: [
+				{
+					requester: { id: user.id }
+				},
+				{
+					addressee: { id: user.id }
+				},
+			]
+		});
+		let userRelation: Number[] = [user.id];
+		relation.forEach((relation) => {
+			if (relation.requester.id === user.id) {
+				userRelation.push(relation.addressee.id);
+			} else {
+				userRelation.push(relation.requester.id);
+			}
+		});
+		return this.userService.find({
+			where: {
+				id: Not(In(userRelation))
+			}
+		});
 	}
 
 	async sendFriendRequest(requester: User, addresseeId: number) {
@@ -47,39 +74,38 @@ export class FriendshipService {
 		const request = this.friendshipRepo.create({ requester, addressee, status: 'requested' });
 		return await this.friendshipRepo.save(request);
 	}
+
+
+
+	async getFriendlist(user: User) {
+		const friendRequestAccepted = await this.friendshipRepo.find({
+			relations: {
+				requester: true,
+				addressee: true
+			},
+			where: [
+				{ requester: {
+					id: user.id,
+				}, status: 'accepted' },
+
+				{ addressee: {
+					id: user.id,
+				}, status: 'accepted' },
+			]
+		});
+		let friendList: User[] = [];
+		friendRequestAccepted.forEach((friendship) => {
+			if (friendship.requester.id === user.id) {
+				friendList.push(friendship.addressee);
+			} else {
+				friendList.push(friendship.requester);
+			}
+		});
+		return friendList;
+	}
+
 }
 
-
-// async getFriendlist(user: User) {
-// 	const rawFriendList = await Friendship.find({
-// 		relations: {
-// 			requester: true,
-// 			addressee: true
-// 		},
-// 		where: [
-// 			{ requester: {
-// 				id: user.id,
-// 			}, status: 'accepted' },
-
-// 			{ addressee: {
-// 				id: user.id,
-// 			}, status: 'accepted' },
-// 		]
-// 	});
-// 	let friendList: User[] = [];
-// 	rawFriendList.forEach((friendship) => {
-// 		if (friendship.requester.id === user.id) {
-// 			friendList.push(friendship.addressee);
-// 		} else {
-// 			friendList.push(friendship.requester);
-// 		}
-// 	});
-// 	return friendList;
-// }
-
-// async sendFriendRequest(requester: User, addressee: User) {
-// 	return Friendship.save({ requester, addressee, status: 'requested' });
-// }
 
 // async respondFriendRequest(addressee: User, requester: User, status: friendShipStatus) {
 // 	const friendship = await Friendship.findOne({

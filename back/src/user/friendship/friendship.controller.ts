@@ -10,11 +10,15 @@ export class friendshipController {
 
 	@UseGuards(JwtGuard)
 	@Get('request')
-	getFriendRequest(
-		@GetUser() user: User,
-	) {
+	async getFriendRequest(@GetUser() user: User) {
 		console.log(user.username)
-		return this.friendshipService.getFriendRequest(user);
+		return await this.friendshipService.getFriendRequest(user);
+	}
+
+	@UseGuards(JwtGuard)
+	@Get('search')
+	async searchUserToAdd(@GetUser() user: User) {
+		return await this.friendshipService.searchUsersToAdd(user);
 	}
 
 	@UseGuards(JwtGuard)
@@ -23,6 +27,7 @@ export class friendshipController {
 		@GetUser() user: User,
 		@Param('id', ParseIntPipe) userId: number,
 	) {
+		// Not returning anything i think
 		return this.friendshipService.sendFriendRequest(user, userId);
 	}
 }

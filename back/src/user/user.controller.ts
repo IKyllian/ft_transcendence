@@ -30,7 +30,15 @@ export class UserController {
 	@Get('me')
 	getMe(@GetUser() user: User) {
 		console.log('me')
-		return user;
+		return this.userService.findOne({
+			relations: {
+				friendshipReceived: {requester: true},
+				friendshipSend: {addressee : true},
+			},
+			where: {
+				id: user.id,
+			}
+		});
 	}
 
 	@UseGuards(JwtGuard)
@@ -93,15 +101,8 @@ export class UserController {
 	//test
 	// @UseGuards(JwtGuard)
 	@Delete(':id')
-	async deleteUser(@Param('id', ParseIntPipe) id: number) {
+	deleteUser(@Param('id', ParseIntPipe) id: number) {
 		this.userService.deleteUser(id);
 		console.log('deleting user')
-		// return await this.userRepo.delete(id);
-		// return await User
-		// .createQueryBuilder()
-		// .delete()
-		// .from(User)
-		// .where("id = :id", { id: id })
-		// .execute()
 	}
 }

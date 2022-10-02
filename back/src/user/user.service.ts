@@ -1,6 +1,6 @@
 import { BadRequestException, ForbiddenException, forwardRef, Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { FindOneOptions, FindOptionsWhere, Repository } from "typeorm";
+import { FindManyOptions, FindOneOptions, FindOptionsWhere, Repository } from "typeorm";
 import { AuthService } from "src/auth/auth.service";
 import { CreateUserDto } from "./dto/createUser.dto";
 import { Statistic, User } from "src/typeorm";
@@ -19,18 +19,14 @@ export class UserService {
 		private statisticRepo: Repository<Statistic>,
 	) {}
 
-	async create(dto: CreateUserDto) {
-		const userExist = await this.findOneBy({ username: dto.username });
-		if (userExist)
-			throw new ForbiddenException('Username taken');
-
+	create(dto: CreateUserDto) {
 		const statistic = this.statisticRepo.create();
 		const params = {...dto, statistic};
 		const user = this.userRepo.create(params);
-		return await this.userRepo.save(user);
+		return this.userRepo.save(user);
 	}
 
-	async findOne(options: FindOneOptions<User>, selectAll?: Boolean): Promise<User | null> {
+	findOne(options: FindOneOptions<User>, selectAll?: Boolean): Promise<User | null> {
 		if (selectAll) {
 			options.select = [
 				'avatar',
@@ -40,11 +36,15 @@ export class UserService {
 				'hash',
 			];
 		}
-		return await this.userRepo.findOne(options);
+		return this.userRepo.findOne(options);
 	}
 
-	async findOneBy(where: FindOptionsWhere<User> | FindOptionsWhere<User>[]): Promise<User | null> {
-		return await this.userRepo.findOneBy(where);
+	findOneBy(where: FindOptionsWhere<User> | FindOptionsWhere<User>[]): Promise<User | null> {
+		return this.userRepo.findOneBy(where);
+	}
+
+	find(options?: FindManyOptions<User>): Promise<User[]> {
+		return this.userRepo.find(options);
 	}
 
 	// async findOne(

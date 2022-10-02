@@ -21,7 +21,10 @@ export class AuthService {
 	) {}
 
 	async signup(dto: AuthDto) {
-		
+		const userExist = await this.userService.findOneBy({ username: dto.username });
+		if (userExist)
+			throw new ForbiddenException('Username taken');
+
 		const hash = await argon.hash(dto.password);
 		const params = {
 			username: dto.username,
@@ -121,7 +124,6 @@ export class AuthService {
 				secret: this.config.get('JWT_SECRET')
 			},
 		);
-
 		return {
 			access_token: token
 		};
