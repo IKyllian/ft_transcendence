@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Friendship, User } from "src/typeorm";
-import { Any, In, Not, Repository } from "typeorm";
+import { In, Not, Repository } from "typeorm";
 import { UserService } from "../user.service";
 
 @Injectable()
@@ -25,12 +25,17 @@ export class FriendshipService {
 	}
 
 	//pas fou mais ca marche
+	/**
+	 * @param user 
+	 * @returns List of users who can receive friend request
+	 */
 	async searchUsersToAdd(user: User) {
 		const relation = await this.friendshipRepo.find({
 			relations: {
 				requester: true,
 				addressee: true
 			},
+			// TODO, not include decline request ?
 			where: [
 				{
 					requester: { id: user.id }

@@ -22,7 +22,7 @@ export class ChannelService {
 	) {}
 	/**
 	 * @param user_id 
-	 * @returns All the channel that the user did not joined or that is visible
+	 * @returns All the channel that the user did not joined and that is visible
 	 */
 	searchChannel(userId: number) {
 		return this.channelRepo.find({

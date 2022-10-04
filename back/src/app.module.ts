@@ -12,7 +12,7 @@ import entities from './typeorm';
   imports: [
     AuthModule,
     UserModule,
-    // ChatModule,
+    ChatModule,
     ConfigModule.forRoot({ envFilePath: '.env', isGlobal: true }),
     TypeOrmModule.forRoot({
       type: 'postgres',
