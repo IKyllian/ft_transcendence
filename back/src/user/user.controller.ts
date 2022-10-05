@@ -29,7 +29,16 @@ export class UserController {
 	@UseGuards(JwtGuard)
 	@Get('me')
 	getMe(@GetUser() user: User) {
-		return user;
+		console.log('me')
+		return this.userService.findOne({
+			relations: {
+				friendshipReceived: {requester: true},
+				friendshipSend: {addressee : true},
+			},
+			where: {
+				id: user.id,
+			}
+		});
 	}
 
 	@UseGuards(JwtGuard)
@@ -59,26 +68,41 @@ export class UserController {
 	// test
  	// @UseGuards(JwtGuard)
 	@Get(':id')
-	getUserById(@Param('id') id: number) {
-		return this.userService.findOne({id}, true);
+	getUserById(@Param('id', ParseIntPipe) id: number) {
+		console.log('get user by id route')
+		return this.userService.findOneBy({ id });
 	}
 
 	@UseGuards(JwtGuard)
 	@Get(':username')
 	getUserbyName(@Param('username') username: string) {
-		return this.userService.findOne({ username });
+		return this.userService.findOneBy({ username });
+	}
+
+	//probably going to be socked sided
+	@Post(':id/block')
+	@UseGuards(JwtGuard)
+	async blockUser(
+		@Param('id', ParseIntPipe) id: number,
+		@GetUser() user: User,
+	) {
+		return await this.userService.blockUser(user, id);
+	}
+
+	@Post(':id/deblock')
+	@UseGuards(JwtGuard)
+	async deblockUser(
+		@Param('id', ParseIntPipe) id: number,
+		@GetUser() user: User,
+	) {
+		return await this.userService.deblockUser(user, id);
 	}
 
 	//test
+	// @UseGuards(JwtGuard)
 	@Delete(':id')
-	async deleteUser(@Param('id', ParseIntPipe) id: number) {
+	deleteUser(@Param('id', ParseIntPipe) id: number) {
+		this.userService.deleteUser(id);
 		console.log('deleting user')
-		// return await this.userRepo.delete(id);
-		// return await User
-		// .createQueryBuilder()
-		// .delete()
-		// .from(User)
-		// .where("id = :id", { id: id })
-		// .execute()
 	}
 }

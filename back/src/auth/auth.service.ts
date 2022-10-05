@@ -9,8 +9,7 @@ import { lastValueFrom } from "rxjs";
 import { UserService } from "src/user/user.service";
 import { ChannelService } from "src/chat/channel/channel.service";
 import { Statistic, User } from "src/typeorm";
-import { ChannelDto } from "src/chat/dto/channel.dto";
-import e from "express";
+import { ChannelDto } from "src/chat/channel/dto/channel.dto";
 
 @Injectable()
 export class AuthService {
@@ -22,7 +21,10 @@ export class AuthService {
 	) {}
 
 	async signup(dto: AuthDto) {
-		
+		const userExist = await this.userService.findOneBy({ username: dto.username });
+		if (userExist)
+			throw new ForbiddenException('Username taken');
+
 		const hash = await argon.hash(dto.password);
 		const params = {
 			username: dto.username,
@@ -37,7 +39,18 @@ export class AuthService {
 	}
 
 	async login(dto: AuthDto) {
-		const user = await this.userService.findOne({username: dto.username}, true)
+		const user = await this.userService.findOne({
+			relations: {
+				channelUser: {
+					channel: true,
+				},
+				statistic: true,
+				blocked: true,
+			},
+			where: {
+				username: dto.username,
+			}
+		}, true);
 		if (!user)
 			throw new NotFoundException('User not found')
 
@@ -68,7 +81,6 @@ export class AuthService {
 			));
 			return response.data.access_token;
 		} catch(error) {
-			console.log("error", error.message)
 			throw new UnauthorizedException();
 		}
 	}
@@ -76,7 +88,18 @@ export class AuthService {
 	async login42(code: string) {
 		const token = await this.get42token(code);
 		const response = await lastValueFrom(this.httpService.get(`https://api.intra.42.fr/v2/me?access_token=${token}`));
-		let user = await this.userService.findOne({ id42: response.data.id });
+		let user = await this.userService.findOne({
+			relations: {
+				channelUser: {
+					channel: true,
+				},
+				statistic: true,
+				blocked: true,
+			},
+			where: {
+				id42: response.data.id,
+			}
+		});
 		if (!user) {
 			console.log('user 42 not found, creating a new one');
 			user = await this.userService.create({ id42 : response.data.id });
@@ -100,7 +123,6 @@ export class AuthService {
 				secret: this.config.get('JWT_SECRET')
 			},
 		);
-
 		return {
 			access_token: token
 		};
@@ -111,7 +133,16 @@ export class AuthService {
 			const decoded = this.jwt.verify(token, {
 				secret: this.config.get('JWT_SECRET')
 			});
-			return await this.userService.findOne({ id: decoded.sub });
+			return await this.userService.findOne({
+				relations: {
+					statistic: true,
+					channelUser: true,
+					blocked: true,
+				},
+				where: {
+					id: decoded.sub,
+				}
+			});
 		}
 		catch(e) {
 			return null;

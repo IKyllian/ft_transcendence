@@ -1,12 +1,12 @@
-import { ForbiddenException, forwardRef, Inject, Injectable, NotFoundException } from "@nestjs/common";
+import { BadRequestException, ForbiddenException, forwardRef, Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { FindManyOptions, FindOneOptions, FindOptionsWhere, Repository } from "typeorm";
 import { AuthService } from "src/auth/auth.service";
 import { CreateUserDto } from "./dto/createUser.dto";
-import { Friendship, Statistic, User } from "src/typeorm";
-import { friendShipStatus } from "src/typeorm/entities/friendship";
+import { Statistic, User } from "src/typeorm";
 import { userStatus } from "src/typeorm/entities/user";
-import { FindUserParams } from "src/utils/types/types";
+import { EditUserDto } from "./dto/editUser.dto";
+import * as argon from 'argon2';
 
 @Injectable()
 export class UserService {
@@ -19,34 +19,69 @@ export class UserService {
 		private statisticRepo: Repository<Statistic>,
 	) {}
 
-	async create(dto: CreateUserDto) {
-		console.log(dto)
-		const userExist = await this.findOne({ username: dto.username });
-		if (userExist)
-			throw new ForbiddenException('Username taken');
-
+	create(dto: CreateUserDto) {
 		const statistic = this.statisticRepo.create();
 		const params = {...dto, statistic};
 		const user = this.userRepo.create(params);
-		return await this.userRepo.save(user);
+		return this.userRepo.save(user);
 	}
 
-	async findOne(
-		whereParams: FindUserParams,
-		selectAll?: boolean,
-	) {
-		const selections: (keyof User)[] = [
-			'username',
-			'id',
-			'status',
-		];
-		const selectionsWithHash: (keyof User)[] = [...selections, 'hash'];
-		const param = {
-			where: whereParams,
-			select: selectAll ? selectionsWithHash : selections,
-			relations: ['statistic', 'channelUser'],
-		};
-		return await this.userRepo.findOne(param);
+	findOne(options: FindOneOptions<User>, selectAll?: Boolean): Promise<User | null> {
+		if (selectAll) {
+			options.select = [
+				'avatar',
+				'id',
+				'username',
+				'status',
+				'hash',
+			];
+		}
+		return this.userRepo.findOne(options);
+	}
+
+	findOneBy(where: FindOptionsWhere<User> | FindOptionsWhere<User>[]): Promise<User | null> {
+		return this.userRepo.findOneBy(where);
+	}
+
+	find(options?: FindManyOptions<User>): Promise<User[]> {
+		return this.userRepo.find(options);
+	}
+
+	// async findOne(
+	// 	whereParams: FindUserParams,
+	// 	selectAll?: boolean,
+	// ) {
+	// 	const selections: (keyof User)[] = [
+	// 		'username',
+	// 		'id',
+	// 		'status',
+	// 	];
+	// 	const selectionsWithHash: (keyof User)[] = [...selections, 'hash'];
+	// 	const param = {
+	// 		where: whereParams,
+	// 		select: selectAll ? selectionsWithHash : selections,
+	// 		relations: ['statistic', 'channelUser'],
+	// 	};
+	// 	return await this.userRepo.findOne(param);
+	// }
+
+	// TODO ask if usefull
+	async editUser(user: User, dto: EditUserDto) {
+		switch (dto) {
+			case dto.username:
+				const nameTaken = await this.findOneBy({ username: dto.username });
+				if (nameTaken)
+					throw new ForbiddenException('Username taken');
+				user.username = dto.username;
+			case dto.password:
+				const hash = await argon.hash(dto.password);
+				user.hash = hash; // probably wont work cause hash is not selected
+			case dto.avatar:
+				user.avatar = dto.avatar;
+			default:
+				break;
+		}
+		return this.userRepo.save(user);
 	}
 
 	async editUsername(user: User, name: string) {
@@ -72,55 +107,36 @@ export class UserService {
 		return await this.userRepo.find();
 	}
 
-	async getFriendlist(user: User) {
-		const rawFriendList = await Friendship.find({
-			relations: {
-				requester: true,
-				addressee: true
-			},
-			where: [
-				{ requester: {
-					id: user.id,
-				}, status: 'accepted' },
-
-				{ addressee: {
-					id: user.id,
-				}, status: 'accepted' },
-			]
-		});
-		let friendList: User[] = [];
-		rawFriendList.forEach((friendship) => {
-			if (friendship.requester.id === user.id) {
-				friendList.push(friendship.addressee);
-			} else {
-				friendList.push(friendship.requester);
-			}
-		});
-		return friendList;
-	}
-
-	async sendFriendRequest(requester: User, addressee: User) {
-		return Friendship.save({ requester, addressee, status: 'requested' });
-	}
-
-	async respondFriendRequest(addressee: User, requester: User, status: friendShipStatus) {
-		const friendship = await Friendship.findOne({
-			where: { addressee: {
-				id: addressee.id,
-			},
-			requester: {
-				id: requester.id,
-			}, status: 'requested' },
-		});
-		if (!friendship) {
-			throw new Error('Request not found');
-		}
-		friendship.status = status;
-		return await friendship.save();
-	}
-
 	async updateAvatar(user: User, fileName: string) {
 		user.avatar = fileName;
 		await this.userRepo.save(user);
+	}
+
+	async deleteUser(id: number) {
+		const user = await this.findOneBy({ id });
+		if (!user)
+			throw new NotFoundException('User not found');
+		await this.userRepo.delete(user.id)
+	}
+
+	async blockUser(user: User, id: number) {
+		const toBlock = await this.findOneBy({ id });
+		if (!toBlock)
+			throw new NotFoundException('User not found');
+		if (this.isBlocked(user, id))
+			throw new BadRequestException('User already blocked');
+		user.blocked = [...user.blocked, toBlock];
+		return this.userRepo.save(user);
+	}
+
+	async deblockUser(user: User, id: number) {
+		user.blocked = user.blocked.filter((blocked) => blocked.id !== id);
+		console.log(user.blocked)
+		return this.userRepo.save(user);
+	}
+
+	async isBlocked(user: User, id: number) {
+		const isblocked = user.blocked.find((blocked) => blocked.id === id);
+		return isblocked ? true : false;
 	}
 }

@@ -1,6 +1,6 @@
 import { CanActivate, ExecutionContext, Injectable } from "@nestjs/common";
 import { NotInChannelException } from "src/utils/exceptions";
-import { ChannelService } from "../channel/channel.service";
+import { ChannelService } from "../channel.service";
 
 @Injectable()
 export class InChannelGuard implements CanActivate {

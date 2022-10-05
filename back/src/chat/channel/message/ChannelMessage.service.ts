@@ -15,8 +15,8 @@ export class ChannelMessageService {
 		private messagesRepo: Repository<ChannelMessage>,
 	) {}
 
-	async create(user: User, messageDto: ChannelMessageDto, chanId: number) {
-		const channel = await this.channelService.findOne({ id: chanId });
+	async create(user: User, messageDto: ChannelMessageDto) {
+		const channel = await this.channelService.findOne({ id: messageDto.chanId });
 		if (!channel)
 			throw new ChannelNotFoundException();
 		const channelUser = await this.channelService.getChannelUser(channel, user);
