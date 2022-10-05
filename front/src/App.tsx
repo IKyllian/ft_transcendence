@@ -15,6 +15,7 @@ import { ModalProvider } from "./Components/Utils/ModalProvider";
 import PublicRoute from "./Route/Public-Route";
 import PrivateRoute from "./Route/Private-Route";
 import UsernameForm from "./Components/Sign/Username-Form";
+import ChannelsList from "./Components/Chat/Channels-List";
 
 import { io } from "socket.io-client";
 import { useAppSelector, useAppDispatch } from './Redux/Hooks'
@@ -63,21 +64,21 @@ const routes: RouteProps[] = [
 			<PrivateRoute>
 				<ChannelSettings />
 			</PrivateRoute>,
-	}
+	},
 ]
 
 function App() {
-    let authDatas = useAppSelector((state) => state.auth);
-    const dispatch = useAppDispatch();
+    // let authDatas = useAppSelector((state) => state.auth);
+    // const dispatch = useAppDispatch();
 
-	useEffect(() => {
-		if (authDatas.isAuthenticated && !authDatas.socket) {
-			const newSocket: any = io(`${socketUrl}`, {extraHeaders: {
-                "Authorization": `Bearer ${authDatas.token}`,
-            }});
-			dispatch(setSocket(newSocket));
-		}
-	},[authDatas.isAuthenticated])
+	// useEffect(() => {
+	// 	if (authDatas.isAuthenticated && !authDatas.socket) {
+	// 		const newSocket: any = io(`${socketUrl}`, {extraHeaders: {
+    //             "Authorization": `Bearer ${authDatas.token}`,
+    //         }});
+	// 		dispatch(setSocket(newSocket));
+	// 	}
+	// },[authDatas.isAuthenticated])
 
   return (
 	<div className="app-container">
@@ -105,6 +106,14 @@ function App() {
 								element= {
 									<PrivateRoute>
 										<ChatElement />
+									</PrivateRoute>
+								}
+							/>
+							<Route
+								path="channels-list"
+								element= {
+									<PrivateRoute>
+										<ChannelsList />
 									</PrivateRoute>
 								}
 							/>

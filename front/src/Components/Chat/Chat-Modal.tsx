@@ -2,12 +2,11 @@ import SearchBarPlayers from "../SearchBarPlayers";
 import { useForm } from 'react-hook-form';
 import axios from "axios";
 
-import { useAppSelector } from '../../Redux/Hooks'
+import { useAppSelector, useAppDispatch } from '../../Redux/Hooks'
 import { baseUrl } from "../../env";
 import { IconX } from '@tabler/icons';
-import { useEffect, useState } from "react";
-import { ChannelsInterfaceFront } from "../../Types/Chat-Types";
 import { useNavigate } from "react-router-dom";
+import { addChannel } from "../../Redux/ChatSlice";
 
 type FormValues = {
     chanMode: string,
@@ -16,26 +15,39 @@ type FormValues = {
     usersIdInvited?: number;
 }
 
-function ChatModal(props: {setShowModal: Function, showModal: number, setChannelsDatas: Function}) {
+function ChatModal(props: {setShowModal: Function, showModal: number}) {
     const { register, handleSubmit, watch, formState: {errors} } = useForm<FormValues>();
-    const { setShowModal, showModal, setChannelsDatas } = props;
+    const { setShowModal, showModal } = props;
 
     const channelMode = watch('chanMode');
 
     const navigate = useNavigate();
     let authDatas = useAppSelector((state) => state.auth);
 
+    const dispatch = useAppDispatch();
+
     const formSubmit = handleSubmit((data, e) => {
         e?.preventDefault();
-        console.log(data);
-        axios.post(`${baseUrl}/channel`, {name: data.chanName, option: data.chanMode}, {
+        let body: {
+            name: string,
+            option: string,
+            password?: string,
+        }
+        body = {
+            name: data.chanName,
+            option: data.chanMode,
+        }
+        if (data.chanMode === "protected")
+            body = {...body, password: data.password}
+        axios.post(`${baseUrl}/channel`, body, {
             headers: {
                 "Authorization": `Bearer ${authDatas.token}`,
             }
         })
         .then((response) => {
            console.log(response);
-           setChannelsDatas((state: ChannelsInterfaceFront[]) => [...state, {channel: response.data, isActive: "false"}]);
+           dispatch(addChannel({channel: response.data, isActive: "false"}));
+        //    setChannelsDatas((state: ChannelsInterfaceFront[]) => [...state, {channel: response.data, isActive: "false"}]);
            setShowModal(false);
            navigate(`/chat/${response.data.id}`);
         }).catch(err => {

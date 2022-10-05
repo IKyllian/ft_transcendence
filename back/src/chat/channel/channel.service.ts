@@ -33,7 +33,8 @@ export class ChannelService {
 				},
 			},
 			where: [
-			{ option: channelOption.PUBLIC || channelOption.PROTECTED},
+				{ option: channelOption.PUBLIC },
+				{ option: channelOption.PROTECTED },
 			],
 		});
 		// TODO FIX

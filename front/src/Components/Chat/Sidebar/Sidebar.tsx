@@ -1,13 +1,12 @@
 import { useEffect, useContext, useRef } from "react";
 import { useParams } from "react-router-dom";
-import { ChannelsPublicDatas } from "../../../Types/Datas-Examples";
 import { ChannelsInterfaceFront, Channel } from "../../../Types/Chat-Types";
 import SidebarItem from "./Sidebar-Item";
 import { SidebarContext } from "../Chat";
+import { Link } from "react-router-dom";
 
 function Sidebar(props: {showModal: number, setShowModal: Function, chanDatas: ChannelsInterfaceFront[], chanClick: Function}) {
     const {showModal, setShowModal, chanDatas, chanClick} = props;
-    // const [chanDatas, setChanDatas] = useState<ChannelsInterfaceFront[] | undefined>(undefined);
 
     const sidebarStatus = useContext(SidebarContext);
     const ref = useRef<HTMLHeadingElement>(null);
@@ -35,28 +34,22 @@ function Sidebar(props: {showModal: number, setShowModal: Function, chanDatas: C
                     index={0}
                     title="Channels"
                     datasArray={chanDatas}
-                    // datasArray={chanDatas === undefined ? undefined : chanDatas.filter((elem) => elem.channel.isChannel)}
                     setShowModal={setShowModal}
                     showModal={showModal}
                     chanClick={chanClick}
                 />
-                <SidebarItem
+                {/* <SidebarItem
                     index={1}
                     title="Messages Privées"
                     // datasArray={chanDatas === undefined ? undefined : chanDatas.filter((elem) => !elem.channel.isChannel)}
                     setShowModal={setShowModal}
                     showModal={showModal}
                     chanClick={chanClick}
-                />
-                <SidebarItem
-                    index={2}
-                    title="Public Channels"
-                    publicChanArray={ChannelsPublicDatas}
-                    setShowModal={setShowModal}
-                    showModal={showModal}
-                    chanClick={chanClick}
-                />
+                /> */}
             </ul>
+            <Link className="explore-button" to="/chat/channels-list">
+                Explore other channels
+            </Link>
         </div>
     );
 }

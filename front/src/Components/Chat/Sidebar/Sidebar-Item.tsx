@@ -1,7 +1,6 @@
 import { useState } from "react";
 
-import { ChannelsInterfaceFront, Channel } from "../../../Types/Chat-Types";
-import { ChatInterface } from "../../../Types/Datas-Examples";
+import { ChannelsInterfaceFront } from "../../../Types/Chat-Types";
 import ItemHeader from "./Item-Header";
 import ItemContent from "./Item-Content";
 
@@ -9,8 +8,6 @@ interface SidebarItemProps {
     index: number,
     title: string,
     datasArray?: ChannelsInterfaceFront[],
-    // datasArray?: Channel[],
-    publicChanArray?: ChatInterface[],
     setShowModal?: Function,
     showModal?: number,
     chanClick?: Function,
@@ -18,32 +15,22 @@ interface SidebarItemProps {
 
 function SidebarItem(props: SidebarItemProps) {
     const [sidebarOpen, setSidebarOpen] = useState<boolean>(true);
-
-    const {index, title, datasArray, publicChanArray, setShowModal, showModal, chanClick} = props;
+    const {index, title, datasArray, setShowModal, showModal, chanClick} = props;
 
     const handleClick = () => {
         setSidebarOpen(!sidebarOpen);
     }
 
     const modalStatus = () => {
-        if (showModal! > 0)
-            setShowModal!(0);
-        else
-            setShowModal!(index === 0 ? 1 : 2);
+            setShowModal!(index === 0 ? 1 : 0);
     }
 
     return (
         <li className="ul-wrapper-elem">
-            {datasArray && <ItemHeader title={title} publicItem={false} sidebarOpen={sidebarOpen} handleClick={handleClick} modalStatus={modalStatus} />}
-            {publicChanArray && <ItemHeader title={title} publicItem={true} sidebarOpen={sidebarOpen} handleClick={handleClick} />}
-            
+            {datasArray && <ItemHeader title={title} sidebarOpen={sidebarOpen} handleClick={handleClick} modalStatus={modalStatus} />}            
             {
                datasArray !== undefined && sidebarOpen && 
                <ItemContent datasArray={datasArray} chanClick={chanClick!} />
-            }
-            {
-               publicChanArray !== undefined && sidebarOpen && 
-               <ItemContent publicChanArray={publicChanArray} />
             }
         </li>
     );

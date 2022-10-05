@@ -1,19 +1,16 @@
 import { useContext } from "react";
 import { Link } from "react-router-dom";
 
-import { IconUser, IconPlus } from "@tabler/icons";
-import { ChannelsInterfaceFront, Channel } from "../../../Types/Chat-Types";
-import { ChatInterface } from "../../../Types/Datas-Examples";
+import { ChannelsInterfaceFront } from "../../../Types/Chat-Types";
 import { SidebarContext } from '../Chat';
 
 interface Props {
     datasArray?: ChannelsInterfaceFront[],
-    publicChanArray?: ChatInterface[],
     chanClick?: Function,
 }
 
 function ItemContent(props: Props) {
-    const {datasArray, publicChanArray, chanClick} = props;
+    const {datasArray, chanClick} = props;
     const sidebarStatus = useContext(SidebarContext);
     return (
         <ul className="ul-collapse">
@@ -26,20 +23,6 @@ function ItemContent(props: Props) {
                             {elem.channel.isChannel ? elem.channel.channelName : elem.channel.users[0].username} */}
                         </li>
                     </Link>
-                )
-            }
-            {
-                publicChanArray && publicChanArray.map((elem) => 
-                    <div key={elem.id} className="list-item-container">
-                        <li key={elem.id} className="public-chan-item">
-                            # {elem.isChannel ? elem.channelName : elem.users[0].username}
-                            <div className="icon-container">
-                                <IconUser />
-                                <span> {elem.users.length} </span>
-                                <IconPlus />
-                            </div>
-                        </li>
-                    </div>
                 )
             }
         </ul>

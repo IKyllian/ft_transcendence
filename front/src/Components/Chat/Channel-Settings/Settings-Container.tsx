@@ -3,26 +3,30 @@ import { IconX } from "@tabler/icons";
 
 import SidebarSettings from "./Sidebar-Settings";
 import RenderSettingPage from "./Render-Setting-Page";
-import { useNavigate, useParams } from "react-router-dom";
-import { ChannelsDatas, ChatInterface } from "../../../Types/Datas-Examples";
-
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { Channel } from "../../../Types/Chat-Types"
+import LoadingSpin from "../../Utils/Loading-Spin";
 
 function ChannelSettings() {
     const [sidebarItem, setSidebarItem] = useState<string>("Settings");
-    const [channelDatas, setChannelDatas] = useState<ChatInterface | undefined>(undefined);
-    const [loading, setLoading] = useState<boolean>(true);
-     
-    let params = useParams();
+    const [channelDatas, setChannelDatas] = useState<Channel | undefined>(undefined);
+
+    const params = useParams();
+    const location = useLocation();
     const navigate = useNavigate();
 
     useEffect(() => {
-        setChannelDatas(ChannelsDatas.find((elem) => elem.id === parseInt(params!.channelId!, 10)));
-        setLoading(false);
-    }, [params])
+        if (location && location.state) {
+            const locationState = location.state as Channel;
+            setChannelDatas(locationState);
+        }
+    }, [params, location])
 
-    if (loading) {
+    if (!channelDatas) {
         return (
-            <h2> Loading.... </h2>
+            <div className="channel-setting-container">
+                <LoadingSpin />
+            </div>
         );
     } else {
         return (
@@ -30,7 +34,7 @@ function ChannelSettings() {
                 <SidebarSettings setSidebarItem={setSidebarItem} channelDatas={channelDatas} />
                 <div className="content-setting-container">
                     <div className="content-wrapper">
-                        <RenderSettingPage item={sidebarItem} />
+                        <RenderSettingPage item={sidebarItem} channelDatas={channelDatas} />
                     </div>
                 </div>
                 <IconX className="leave-icon" onClick={() => navigate(-1)} />

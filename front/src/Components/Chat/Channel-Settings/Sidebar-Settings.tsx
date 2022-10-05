@@ -1,21 +1,15 @@
 import { useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { ChatInterface } from "../../../Types/Datas-Examples";
+import { useParams } from "react-router-dom";
 import axios from "axios";
 import { baseUrl } from "../../../env";
 import { useAppSelector } from '../../../Redux/Hooks'
+import { Channel } from "../../../Types/Chat-Types"
 
-function SidebarSettings(props: {setSidebarItem: Function, channelDatas: ChatInterface | undefined}) {
+function SidebarSettings(props: {setSidebarItem: Function, channelDatas: Channel}) {
     const {setSidebarItem, channelDatas} = props;
 
-    const navigate = useNavigate();
     const params = useParams();
     let authDatas = useAppSelector((state) => state.auth);
-
-    useEffect(() => {
-        if (channelDatas === undefined || !channelDatas.isChannel)
-            navigate(-1);
-    }, [channelDatas, navigate]);
 
     const leaveChannel = () => {
         console.log(authDatas.token);
@@ -33,16 +27,13 @@ function SidebarSettings(props: {setSidebarItem: Function, channelDatas: ChatInt
         })
     }
 
-    return (channelDatas === undefined) ? (
-        <> </> // A revoir pour le faire plus proprement
-    ) : (
+    return (
         <div className="sidebar-setting">
             <div className="sidebar-wrapper">
-                <p> # {channelDatas!.isChannel && 
-                    channelDatas!.channelName!} </p>
+                <p> # {channelDatas!.name} </p>
                 <ul>
                     <li onClick={() => setSidebarItem("Settings")}> Settings </li>
-                    <li onClick={() => setSidebarItem("Users")}> Users (4) </li>
+                    <li onClick={() => setSidebarItem("Users")}> Users ({channelDatas.channelUsers.length}) </li>
                     <li onClick={() => setSidebarItem("Invitations")}> Invitations </li>
                 </ul>
                 <div className="separate-line"> </div>

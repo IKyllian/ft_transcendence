@@ -13,13 +13,27 @@
     flex-direction: row;
     flex-flow: row;
     .chat-sidebar {
-        width: 300px;
+        @include width-height(300px, 100%);
+        min-width: 250px;
         background-color: $LightDarkPalette;
         border-right: 1px solid $WhitePalette;
+        position: relative;
+        
+        .explore-button {
+           background-color: $LightBluePalette;
+           padding: 15px;
+           position: absolute;
+           bottom: 0;
+           left: 0;
+           right: 0;
+           text-align: center;
+        }
 
         .ul-wrapper {
+            position: relative;
             list-style-type: none;
             margin-right: 30px;
+            
             &-elem {
                 .collapse-button {
                     @include flex-row-alignCenter;
@@ -153,71 +167,66 @@
                     }
                 }
     
-                // .ul-container {
-                    // overflow: scroll;
-                    // padding-right: 20px;
-                    // height: 90%;
-                    ul {
-                        overflow-y: scroll;
-                        margin: 0;
-                        padding: 20px;
-                        height: 90%;
-                        display: flex;
-                        flex-direction: column;
-                        .message-item {
-                            @include flex-row-alignCenter;
-                            gap: 15px;
+                ul {
+                    overflow-y: scroll;
+                    margin: 0;
+                    padding: 20px;
+                    height: 90%;
+                    display: flex;
+                    flex-direction: column;
+                    .message-item {
+                        @include flex-row-alignCenter;
+                        gap: 15px;
+
+                        &:not(&:first-child) {
+                            margin-top: 15px;
+                        }
+            
+                        img {
+                            @include avatar-player(50px);
+                        }
+
+                        &-info {
+                            p {
+                                margin: 0;
+                            }
+                            .message-text {
+                                padding: 10px 15px;
+                                background-color: $LightBluePalette;
+                                margin: 0;
+                            }
     
-                            &:not(&:first-child) {
-                                margin-top: 15px;
+                            .message-sender {
+                                cursor: pointer;
+                                font-size: 10px;
+                                color: #a5abb0;
+                                margin-top: 5px;
+                                text-decoration: none;
+                                position: relative;
                             }
-                
-                            img {
-                                @include avatar-player(50px);
+                        }
+            
+                        &-left {
+                            float: left;
+                            width: 100%;
+                            .message-text {
+                                border-top-right-radius: 30px;
+                                border-bottom-right-radius: 30px;
+                                border-top-left-radius: 30px;
                             }
-    
-                            &-info {
-                                p {
-                                    margin: 0;
-                                }
-                                .message-text {
-                                    padding: 10px 15px;
-                                    background-color: $LightBluePalette;
-                                    margin: 0;
-                                }
-        
-                                .message-sender {
-                                    cursor: pointer;
-                                    font-size: 10px;
-                                    color: #a5abb0;
-                                    margin-top: 5px;
-                                    text-decoration: none;
-                                    position: relative;
-                                }
-                            }
-                
-                            &-left {
-                                float: left;
-                                width: 100%;
-                                .message-text {
-                                    border-top-right-radius: 30px;
-                                    border-bottom-right-radius: 30px;
-                                    border-top-left-radius: 30px;
-                                }
-                            }
-                
-                            &-right {
-                                flex-direction: row-reverse;
-                                .message-text {
-                                    background-color: rgb(173, 113, 22);
-                                    border-top-right-radius: 30px;
-                                    border-bottom-left-radius: 30px;
-                                    border-top-left-radius: 30px;
-                                }
+                        }
+            
+                        &-right {
+                            flex-direction: row-reverse;
+                            .message-text {
+                                background-color: rgb(173, 113, 22);
+                                border-top-right-radius: 30px;
+                                border-bottom-left-radius: 30px;
+                                border-top-left-radius: 30px;
                             }
                         }
                     }
-                // }
+                }
             }
         }
         
@@ -297,6 +306,80 @@
             }
         }
     }
+
+    .channels-list-wrapper {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin: auto;
+        overflow-y: scroll;
+        height: 100%;
+        .channels-card-wrapper {
+            background-color: $DarkPalette;
+            width: 300px;
+            height: 320px;
+            position: relative;
+
+            .channel-banner {
+                height: 110px;
+                background: url('../../Images-Icons//Backgrounds/background-42.jpg') no-repeat center;
+                background-size: cover;
+            }
+
+            .card-content {
+                padding: 10px;
+
+                .channel-name {
+                    margin: 0;
+                    font-size: 19px;
+                    font-weight: bold;
+                    span {
+                        font-size: 10px;
+                    }
+                }
+
+                .channel-description {
+                    font-size: 12px;
+                    font-family: OpenSans;
+                }
+    
+                .item-bottom {
+                    width: 90%;
+                    position: absolute;
+                    display: flex;
+                    flex-direction: row;
+                    align-items: center;
+                    justify-content: space-between;
+                    bottom: 0;
+                    p {
+                        font-size: 14px;
+                    }
+                    &-right {
+                        display: flex;
+                        align-items: center;
+                        gap: 5px;
+                        svg {
+                            cursor: pointer;
+                            background-color: $OrangeProfile;
+                            border-radius: 50%;
+                            @include width-height(25px, 25px);
+                            padding: 3px;
+                            background: linear-gradient(112deg, rgba(255,94,0,1) 0%, rgba(255,145,0,1) 50%, rgba(255,154,0,1) 100%);
+                        }
+                        input {
+                            all: unset;
+                            border: 1px solid white;
+                            border-radius: 5px;
+                            padding: 3px;
+                            width: 100px;
+                            font-size: 13px;
+                        }
+                    }
+                    
+                }
+            } 
+        }
+    }
 }
 
 @media screen and (max-width: $BreakPoint_800) {
@@ -309,6 +392,7 @@
             position: absolute;
             z-index: 99;
             height: 100%;
+            width: 250px;
         }
         .chat-sidebar-responsive {
             display: block;

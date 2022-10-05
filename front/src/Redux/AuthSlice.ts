@@ -2,9 +2,8 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { AuthState } from '../Types/User-Types';
 import { LoginPayload } from '../Types/User-Types';
 import { Channel } from '../Types/Chat-Types';
-// import { ServerToClientEvents, ClientToServerEvents } from '../Types/User-Types';
 import { io, Socket } from 'socket.io-client';
-import { baseUrl } from '../env';
+import { baseUrl, socketUrl } from '../env';
 
 const defaultState: AuthState = {
     currentUser: undefined,
@@ -27,6 +26,10 @@ export const authSlice = createSlice({
             state.token = payload.token;
             state.isAuthenticated = true;
             state.loading = false;
+            const newSocket: any = io(`${socketUrl}`, {extraHeaders: {
+                "Authorization": `Bearer ${payload.token}`,
+            }});
+            state.socket = newSocket;
         },
         loginError: (state, {payload}: PayloadAction<string>) => {
             state.error = payload;

@@ -29,19 +29,19 @@ function UsersSidebar(props: {usersList: ChannelUser[]}) {
                 <h3> Administrators - {usersList.filter((elem) => elem.role === "owner").length} </h3>
                 <ul>
                     {
-                        usersList.map((elem) =>  {
-                            if (elem.role === "owner")
-                                return <UserSidebarItem key={elem.user.id} user={elem}  />
-                        })
+                        usersList.filter((elem) => elem.role === "owner")
+                        .map((elem) =>
+                            <UserSidebarItem key={elem.user.id} user={elem}  />
+                        )
                     }
                 </ul>
                 <h3> Users - {usersList.filter((elem) => elem.role === "clampin").length} </h3>
                 <ul>
                     {
-                        usersList.map((elem) => {
-                            if (elem.role === "clampin")
-                                return <UserSidebarItem key={elem.user.id} user={elem} />
-                        })
+                        usersList.filter((elem) => elem.role === "clampin")
+                        .map((elem) =>
+                            <UserSidebarItem key={elem.user.id} user={elem} />
+                        )
                     }
                 </ul>
             </div>
