@@ -92,10 +92,10 @@ function Chat() {
                 findActiveElem.isActive = "false";
             }
 
-            let elemById: ChannelsInterfaceFront | undefined = newArray.find((elem) => elem.channel.id  === id);
-            if (elemById !== undefined) {
-                elemById.isActive = "true";
-            }
+            // let elemById: ChannelsInterfaceFront | undefined = newArray.find((elem) => elem.channel.id  === id);
+            // if (elemById !== undefined) {
+            //     elemById.isActive = "true";
+            // }
             dispatch(copyChannelsArray(newArray));
             // setChannelsDatas(newArray);
         }

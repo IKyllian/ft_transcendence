@@ -108,7 +108,6 @@ export class FriendshipService {
 		});
 		return friendList;
 	}
-
 }
 
 

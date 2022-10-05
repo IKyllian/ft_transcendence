@@ -63,7 +63,7 @@ function ChannelsList() {
     let authDatas = useAppSelector((state) => state.auth);
 
     useEffect(() => {
-        axios.get(`${baseUrl}/channel/visible`, {
+        axios.get(`${baseUrl}/channel/search`, {
             headers: {
                 "Authorization": `Bearer ${authDatas.token}`,
             }

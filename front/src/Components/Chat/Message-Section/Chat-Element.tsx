@@ -36,37 +36,41 @@ function ChatElement() {
     // }, [params]);
 
     useEffect(() => {
-        // const getDatas = async () => {
-        //     await authDatas.socket.emit("JoinChannelRoom", {
-        //         chanId: params.chatId,
-        //     });
+        const getDatas = async () => {
+            authDatas.socket.emit("JoinChannelRoom", {
+                id: parseInt(params.chatId!),
+            });
 
-        //     await authDatas.socket.on('roomData', (data: any) => {
-        //         console.log(data);
-        //         setChatDatas(data);
-        //     });
-        // }
+            await authDatas.socket.on('exception', (data: any) => {
+                console.log(data);
+            });
+
+            await authDatas.socket.on('roomData', (data: any) => {
+                console.log(data);
+                setChatDatas(data);
+            });
+        }
         if (params) {
-            // getDatas();
-            axios.get(`${baseUrl}/channel/${params.chatId}`, {
-                headers: {
-                    "Authorization": `Bearer ${authDatas.token}`,
-                }
-            })
-            .then(async (response) => {
-                console.log(response);
-                await authDatas.socket.emit("JoinChannelRoom", {
-                    chanId: params.chatId,
-                });
-                setChatDatas(response.data);
-            }).catch(err => {
-                console.log(err);
-            })
+            getDatas();
+            // axios.get(`${baseUrl}/channel/${params.chatId}`, {
+            //     headers: {
+            //         "Authorization": `Bearer ${authDatas.token}`,
+            //     }
+            // })
+            // .then(async (response) => {
+            //     console.log(response);
+            //     await authDatas.socket.emit("JoinChannelRoom", {
+            //         chanId: params.chatId,
+            //     });
+            //     setChatDatas(response.data);
+            // }).catch(err => {
+            //     console.log(err);
+            // })
         }
 
         return () => {
             return authDatas.socket.emit("LeaveChannelRoom", {
-                chanId: params.chatId,
+                id: parseInt(params.chatId!),
             });
         }
     }, [params])
@@ -84,37 +88,33 @@ function ChatElement() {
 
     const handleSubmit = (e: any) => {
         e.preventDefault();
-        // const submitMessage = async () => {
-        //     await authDatas.socket.emit("ChannelMessage", {
-        //         content: inputMessage,
-        //         chanId: params.chatId,
-        //     });
-        //     setInputMessage('');
-
-        //     // await authDatas.socket.on('roomData', (data: any) => {
-        //     //     setChatDatas(data);
-        //     // });
-        // }
+        const submitMessage = async () => {
+            await authDatas.socket.emit("ChannelMessage", {
+                content: inputMessage,
+                chanId: parseInt(params.chatId!),
+            });
+            setInputMessage('');
+        }
         if (inputMessage.length > 0) {
-            // submitMessage();
-            axios.post(`${baseUrl}/channel/${params.chatId}/messages`, {content: inputMessage}, {
-                headers: {
-                    "Authorization": `Bearer ${authDatas.token}`,
-                }
-            })
-            .then(async (response) => {
-                console.log(response);
-                await authDatas.socket.emit("ChannelMessage", {
-                    msg: response.data,
-                });
-                setChatDatas((prev: any) => {
-                    return {...prev, messages: [...prev!.messages, response.data]}
-                });
-                setInputMessage('');
-            })
-            .catch((err) => {
-                console.log(err);
-            })
+            submitMessage();
+            // axios.post(`${baseUrl}/channel/${params.chatId}/messages`, {content: inputMessage}, {
+            //     headers: {
+            //         "Authorization": `Bearer ${authDatas.token}`,
+            //     }
+            // })
+            // .then(async (response) => {
+            //     console.log(response);
+            //     await authDatas.socket.emit("ChannelMessage", {
+            //         msg: response.data,
+            //     });
+            //     setChatDatas((prev: any) => {
+            //         return {...prev, messages: [...prev!.messages, response.data]}
+            //     });
+            //     setInputMessage('');
+            // })
+            // .catch((err) => {
+            //     console.log(err);
+            // })
         }
     } 
 
