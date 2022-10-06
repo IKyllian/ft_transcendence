@@ -10,12 +10,11 @@ interface SidebarItemProps {
     datasArray?: ChannelsInterfaceFront[],
     setShowModal?: Function,
     showModal?: number,
-    chanClick?: Function,
 }
 
 function SidebarItem(props: SidebarItemProps) {
     const [sidebarOpen, setSidebarOpen] = useState<boolean>(true);
-    const {index, title, datasArray, setShowModal, showModal, chanClick} = props;
+    const {index, title, datasArray, setShowModal, showModal} = props;
 
     const handleClick = () => {
         setSidebarOpen(!sidebarOpen);
@@ -30,7 +29,7 @@ function SidebarItem(props: SidebarItemProps) {
             {datasArray && <ItemHeader title={title} sidebarOpen={sidebarOpen} handleClick={handleClick} modalStatus={modalStatus} />}            
             {
                datasArray !== undefined && sidebarOpen && 
-               <ItemContent datasArray={datasArray} chanClick={chanClick!} />
+               <ItemContent datasArray={datasArray} />
             }
         </li>
     );

@@ -6,19 +6,24 @@ import RenderSettingPage from "./Render-Setting-Page";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Channel } from "../../../Types/Chat-Types"
 import LoadingSpin from "../../Utils/Loading-Spin";
+import { useAppSelector } from "../../../Redux/Hooks";
 
 function ChannelSettings() {
     const [sidebarItem, setSidebarItem] = useState<string>("Settings");
     const [channelDatas, setChannelDatas] = useState<Channel | undefined>(undefined);
+    const [loggedUserIsOwner, setLoggedUserIsOwner] = useState<boolean>(false);
 
     const params = useParams();
     const location = useLocation();
     const navigate = useNavigate();
+    const authDatas = useAppSelector((state) => state.auth);
 
     useEffect(() => {
         if (location && location.state) {
             const locationState = location.state as Channel;
             setChannelDatas(locationState);
+            if (locationState.channelUsers.find((elem) => elem.user.id === authDatas.currentUser?.id && (elem.role === "owner" || elem.role === "moderator")))
+                setLoggedUserIsOwner(true);
         }
     }, [params, location])
 
@@ -31,10 +36,10 @@ function ChannelSettings() {
     } else {
         return (
             <div className="channel-setting-container">
-                <SidebarSettings setSidebarItem={setSidebarItem} channelDatas={channelDatas} />
+                <SidebarSettings setSidebarItem={setSidebarItem} channelDatas={channelDatas} loggedUserIsOwner={loggedUserIsOwner} />
                 <div className="content-setting-container">
                     <div className="content-wrapper">
-                        <RenderSettingPage item={sidebarItem} channelDatas={channelDatas} />
+                        <RenderSettingPage item={sidebarItem} channelDatas={channelDatas} loggedUserIsOwner={loggedUserIsOwner} />
                     </div>
                 </div>
                 <IconX className="leave-icon" onClick={() => navigate(-1)} />

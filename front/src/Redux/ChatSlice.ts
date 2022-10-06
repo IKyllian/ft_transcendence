@@ -1,9 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { AuthState } from '../Types/User-Types';
-import { LoginPayload } from '../Types/User-Types';
-import { Channel, ChannelsInterfaceFront, ChatMessage } from '../Types/Chat-Types';
-import { io, Socket } from 'socket.io-client';
-import { baseUrl } from '../env';
+import { ChannelsInterfaceFront } from '../Types/Chat-Types';
 
 interface ChannelState {
     channels?: ChannelsInterfaceFront[],
@@ -38,7 +34,19 @@ export const chatSlice = createSlice({
                 state.channels = state.channels.filter(elem => elem.channel.id !== payload);
             }
         },
+        changeActiveElement: (state, {payload}: PayloadAction<number>) => {
+            if (state.channels) {
+                const newArray: ChannelsInterfaceFront[] = state.channels.map(elem => {
+                    if (payload === elem.channel.id)
+                        return {...elem, isActive: 'true'};
+                    else if (elem.isActive === 'true' && elem.channel.id !== payload)
+                        return {...elem, isActive: 'false'}
+                    return elem;
+                })
+                state.channels = newArray;
+            }
+        }
     }
 });
 
-export const { loadingDatas, copyChannelsArray, addChannel, removeChannel } = chatSlice.actions;
+export const { loadingDatas, copyChannelsArray, addChannel, removeChannel, changeActiveElement } = chatSlice.actions;

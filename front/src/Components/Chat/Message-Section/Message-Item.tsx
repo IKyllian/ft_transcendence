@@ -1,12 +1,13 @@
 import { useState } from "react";
-import ProfilPic from "../../../Images-Icons/pp.jpg"; 
+import ProfilPic from "../../../Images-Icons/pp.jpg";
+import { Link } from "react-router-dom";
 
-import { ExampleUser, UserInterface } from "../../../Types/User-Types";
+import { UserInterface } from "../../../Types/User-Types";
 import DropdownContainer from "../../Utils/Dropdown-Container";
 import { useAppSelector } from '../../../Redux/Hooks'
 
-function MessageItem(props: {sender: UserInterface, message: string}) {
-    const {sender, message} = props;
+function MessageItem(props: {sender: UserInterface, message: string, loggedUserIsOwner: boolean}) {
+    const {sender, message, loggedUserIsOwner} = props;
     const [showDropdown, setShowDropdown] = useState<boolean>(false);
 
     let authDatas = useAppSelector((state) => state.auth);
@@ -24,10 +25,17 @@ function MessageItem(props: {sender: UserInterface, message: string}) {
                     <div className="message-sender">
                         <p className="message-sender" onClick={() => handleClick()}> {sender.username} </p>
                         <DropdownContainer show={showDropdown} onClickOutside={handleClick}>
-                            <p> profile </p>
+                            <Link to={`/profile/${sender.username}`}>
+                                <p> profile </p>
+                            </Link>
                             <p> block </p>
-                            <p> mute </p>
-                            <p> kick </p>
+                            {
+                                loggedUserIsOwner &&
+                                <>
+                                    <p> mute </p>
+                                    <p> kick </p>
+                                </>
+                            }
                         </DropdownContainer>
                     </div>
                 }           

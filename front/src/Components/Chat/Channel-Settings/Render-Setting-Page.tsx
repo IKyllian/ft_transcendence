@@ -3,8 +3,8 @@ import ChannelUsers from "./Channel-Users";
 import GlobalSettings from "./Global-Settings";
 import { Channel } from "../../../Types/Chat-Types";
 
-function RenderSettingPage(props: {item: string, channelDatas: Channel}) {
-    const { item, channelDatas } = props;
+function RenderSettingPage(props: {item: string, channelDatas: Channel, loggedUserIsOwner: boolean}) {
+    const { item, channelDatas, loggedUserIsOwner } = props;
 
     if (item === "Invitations") {
         return (
@@ -16,7 +16,7 @@ function RenderSettingPage(props: {item: string, channelDatas: Channel}) {
         );
     } else {
         return (
-            <ChannelUsers users={channelDatas.channelUsers} />
+            <ChannelUsers users={channelDatas.channelUsers} loggedUserIsOwner={loggedUserIsOwner} />
         );
     }
 }

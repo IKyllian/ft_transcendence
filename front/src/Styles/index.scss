@@ -94,7 +94,9 @@ button {
     .red-item {
       color: red;
     }
-  
+    a {
+      color: #a5abb0;
+    }
     p {
       margin: 0;
       font-size: 13px;
@@ -102,6 +104,7 @@ button {
       padding: 5px;
       border-radius: 5px;
       cursor: pointer;
+      color: #a5abb0;
 
       &:hover {
         background-color: $LightDarkPalette;

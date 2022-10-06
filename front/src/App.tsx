@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, createContext, useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Header from "./Components/Header/Header";
@@ -17,14 +17,16 @@ import PrivateRoute from "./Route/Private-Route";
 import UsernameForm from "./Components/Sign/Username-Form";
 import ChannelsList from "./Components/Chat/Channels-List";
 
-import { io } from "socket.io-client";
-import { useAppSelector, useAppDispatch } from './Redux/Hooks'
-import { setSocket } from "./Redux/AuthSlice";
+import { io, Socket } from "socket.io-client";
+import { useAppSelector } from './Redux/Hooks'
 import { socketUrl } from "./env";
 
 interface RouteProps {
 	path: string,
 	element: JSX.Element,
+}
+interface SocketContextType {
+	socket : Socket | undefined;
 }
 
 const routes: RouteProps[] = [
@@ -52,83 +54,89 @@ const routes: RouteProps[] = [
 			<PrivateRoute>
 				<Profile />
 			</PrivateRoute>,
-	},  {
+	}, {
 		path: '/leaderboard',
 		element:
 			<PrivateRoute>
 				<Leaderboard />
 			</PrivateRoute>,
-	},  {
+	}, {
 		path: '/chat/:channelId/settings',
 		element:
 			<PrivateRoute>
 				<ChannelSettings />
 			</PrivateRoute>,
+	}, {
+		path: '*',
+		element:
+			<PrivateRoute>
+				<Error404 />
+			</PrivateRoute>
 	},
 ]
 
-function App() {
-    // let authDatas = useAppSelector((state) => state.auth);
-    // const dispatch = useAppDispatch();
+export const SocketContext = createContext<SocketContextType>({socket: undefined});
 
-	// useEffect(() => {
-	// 	if (authDatas.isAuthenticated && !authDatas.socket) {
-	// 		const newSocket: any = io(`${socketUrl}`, {extraHeaders: {
-    //             "Authorization": `Bearer ${authDatas.token}`,
-    //         }});
-	// 		dispatch(setSocket(newSocket));
-	// 	}
-	// },[authDatas.isAuthenticated])
+function App() {
+	const [socket, setSocket] = useState<Socket | undefined>(undefined);
+    const {token, isAuthenticated} = useAppSelector((state) => state.auth);
+
+	const connectSocket = () => {
+		const newSocket: Socket = io(`${socketUrl}`, {extraHeaders: {
+			"Authorization": `Bearer ${token}`,
+		}});
+		setSocket(newSocket);
+	}
+
+	useEffect(() => {
+		if (isAuthenticated && socket === undefined) {
+			connectSocket();
+		}
+	}, [isAuthenticated])
 
   return (
 	<div className="app-container">
     	<BrowserRouter>
-        	<ModalProvider>
-				<AddFriendModal/>
-				<Header />
-				<main className="page-container">
-					<Routes>
-						{
-							routes.map((elem, index) => 
-								<Route key={index} path={elem.path} element={elem.element} />
-							)
-						}
-						<Route
-							path='/chat'
-							element= {
-								<PrivateRoute>
-									<Chat />
-								</PrivateRoute>
+			<SocketContext.Provider value={{socket: socket}} >
+				<ModalProvider>
+					<AddFriendModal/>
+					<Header />
+					<main className="page-container">
+						<Routes>
+							{
+								routes.map((elem, index) => 
+									<Route key={index} path={elem.path} element={elem.element} />
+								)
 							}
-						>
 							<Route
-								path=":chatId"
+								path='/chat'
 								element= {
 									<PrivateRoute>
-										<ChatElement />
+										<Chat />
 									</PrivateRoute>
 								}
-							/>
-							<Route
-								path="channels-list"
-								element= {
-									<PrivateRoute>
-										<ChannelsList />
-									</PrivateRoute>
-								}
-							/>
-						</Route>
-						<Route
-							path='*'
-							element= {
-								<PrivateRoute>
-									<Error404 />
-								</PrivateRoute>
-							}
-						/>
-					</Routes>
-				</main>
-        	</ModalProvider>
+							>
+								<Route
+									path=":chatId"
+									element= {
+										<PrivateRoute>
+											<ChatElement />
+										</PrivateRoute>
+									}
+								/>
+								<Route
+									path="channels-list"
+									element= {
+										<PrivateRoute>
+											<ChannelsList />
+										</PrivateRoute>
+									}
+								/>
+							</Route>
+						</Routes>
+					</main>
+				</ModalProvider>
+			</SocketContext.Provider>
     	</BrowserRouter>
     </div>
   );

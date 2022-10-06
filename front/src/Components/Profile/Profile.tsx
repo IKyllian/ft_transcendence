@@ -10,6 +10,7 @@ import { UserInterface } from "../../Types/User-Types";
 import { useAppSelector } from '../../Redux/Hooks';
 import { useParams } from "react-router-dom";
 import axios from "axios";
+import { baseUrl } from "../../env";
 
 import { getMatchPlayed, getWinRate } from "../../Utils/Utils-User";
 
@@ -41,19 +42,19 @@ function Profile() {
     useEffect(() => {
         if (params.username === currentUser?.username)
             setUserDatas(currentUser);
-        // else {
-        //     axios.get('http://localhost:5000/api/users/get-user', {
-        //         headers: {
-        //             "Authorization": `Bearer ${token}`,
-        //         }
-        //     })
-        //     .then(response => {
-        //         console.log(response);
-        //     })
-        //     .catch(err => {
-        //         console.log(err);
-        //     })
-        // }
+        else {
+            axios.get(`${baseUrl}/users/?${params.username}`, {
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                }
+            })
+            .then(response => {
+                console.log(response);
+            })
+            .catch(err => {
+                console.log(err);
+            })
+        }
     }, [userDatas, params])
 
     return !userDatas ? (

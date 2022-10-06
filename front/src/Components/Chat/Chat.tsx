@@ -9,7 +9,7 @@ import LoadingSpin from "../Utils/Loading-Spin";
 import axios from "axios";
 import { baseUrl } from "../../env";
 import { useAppSelector, useAppDispatch } from '../../Redux/Hooks'
-import { loadingDatas, copyChannelsArray } from "../../Redux/ChatSlice"
+import { loadingDatas, copyChannelsArray, changeActiveElement } from "../../Redux/ChatSlice"
 
 export const SidebarContext = createContext({sidebar: false, setSidebarStatus: () => {}});
 
@@ -33,24 +33,7 @@ function Chat() {
         if (params.chatId === undefined) {
             setReponsiveSidebar(true);
         }
-
-        if (chatDatas.channels && chatDatas.channels.length > 0) {
-            let datasArray: ChannelsInterfaceFront[] = [];
-            for (let i: number = 0; i < chatDatas.channels.length; i++) {
-                datasArray.push({
-                    channel: chatDatas.channels[i].channel,
-                    isActive: "false",
-                });
-            }
-            if (params) {
-                let findOpenChat: ChannelsInterfaceFront | undefined = datasArray.find(elem => elem.channel.id === parseInt(params.chatId!, 10));
-                if (findOpenChat) {
-                    findOpenChat.isActive = "true";
-                }
-            }
-            dispatch(copyChannelsArray(datasArray));
-            // setChannelsDatas(datasArray);
-        }
+        dispatch(changeActiveElement(parseInt(params.chatId!, 10)));
     }, [params])
 
     useEffect(() => {
@@ -83,31 +66,13 @@ function Chat() {
         })
     }, [])
 
-    const chanClick = (id: number) => {
-        if (chatDatas.channels !== undefined) {
-            let newArray: ChannelsInterfaceFront[] = [...chatDatas.channels];
-    
-            let findActiveElem: ChannelsInterfaceFront | undefined =  newArray.find(elem => elem.isActive === "true");
-            if (findActiveElem !== undefined) {
-                findActiveElem.isActive = "false";
-            }
-
-            // let elemById: ChannelsInterfaceFront | undefined = newArray.find((elem) => elem.channel.id  === id);
-            // if (elemById !== undefined) {
-            //     elemById.isActive = "true";
-            // }
-            dispatch(copyChannelsArray(newArray));
-            // setChannelsDatas(newArray);
-        }
-    }
-
     return !chatDatas.channels ? (
         <LoadingSpin classContainer="chat-page-container" />
     ) : (
         <SidebarContext.Provider value={{sidebar: responsiveSidebar, setSidebarStatus: handleClick}}>
             <ChatModal showModal={showModal} setShowModal={setShowModal}  />
             <div className={`chat-page-container ${modalStatus.modal.isOpen ? modalStatus.modal.blurClass : ""}`}>
-                <Sidebar setShowModal={setShowModal} showModal={showModal} chanDatas={chatDatas.channels} chanClick={chanClick} />
+                <Sidebar setShowModal={setShowModal} showModal={showModal} chanDatas={chatDatas.channels} />
                 {
                     params.chatId === undefined && location.pathname === "/chat"
                     ?

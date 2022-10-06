@@ -5,8 +5,8 @@ import SidebarItem from "./Sidebar-Item";
 import { SidebarContext } from "../Chat";
 import { Link } from "react-router-dom";
 
-function Sidebar(props: {showModal: number, setShowModal: Function, chanDatas: ChannelsInterfaceFront[], chanClick: Function}) {
-    const {showModal, setShowModal, chanDatas, chanClick} = props;
+function Sidebar(props: {showModal: number, setShowModal: Function, chanDatas: ChannelsInterfaceFront[]}) {
+    const {showModal, setShowModal, chanDatas} = props;
 
     const sidebarStatus = useContext(SidebarContext);
     const ref = useRef<HTMLHeadingElement>(null);
@@ -36,7 +36,6 @@ function Sidebar(props: {showModal: number, setShowModal: Function, chanDatas: C
                     datasArray={chanDatas}
                     setShowModal={setShowModal}
                     showModal={showModal}
-                    chanClick={chanClick}
                 />
                 {/* <SidebarItem
                     index={1}

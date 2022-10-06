@@ -1,25 +1,24 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useContext } from "react";
 import { useParams } from "react-router-dom";
 import { IconSend } from "@tabler/icons";
 
-import { ChatInterface, ChannelsDatas} from "../../../Types/Datas-Examples";
 import { Channel } from "../../../Types/Chat-Types";
 import MessageItem from "./Message-Item";
 import ChatHeader from "./Chat-Header";
 import UsersSidebar from "./Users-Sidebar";
-import axios from "axios";
-import { baseUrl, socketUrl } from "../../../env";
 import { useAppSelector } from '../../../Redux/Hooks'
 import LoadingSpin from "../../Utils/Loading-Spin";
-import { ChatMessage } from "../../../Types/Chat-Types";
-
+import { SocketContext } from "../../../App";
 
 function ChatElement() {
     const [chatDatas, setChatDatas] = useState<Channel | undefined>(undefined);
     const [showUsersSidebar, setShowUsersSidebar] = useState<boolean>(false);
     const [inputMessage, setInputMessage] = useState<string>('');
+    const [loggedUserIsOwner, setLoggedUserIsOwner] = useState<boolean>(false);
 
     let authDatas = useAppSelector((state) => state.auth);
+
+    const {socket} = useContext(SocketContext);
 
     const changeSidebarStatus = () => {
         setShowUsersSidebar(!showUsersSidebar);
@@ -36,40 +35,27 @@ function ChatElement() {
     // }, [params]);
 
     useEffect(() => {
-        const getDatas = async () => {
-            authDatas.socket.emit("JoinChannelRoom", {
+        const getDatas = () => {
+            socket!.emit("JoinChannelRoom", {
                 id: parseInt(params.chatId!),
             });
 
-            await authDatas.socket.on('exception', (data: any) => {
+            socket!.on('exception', (data: any) => {
                 console.log(data);
             });
 
-            await authDatas.socket.on('roomData', (data: any) => {
-                console.log(data);
+            socket!.on('roomData', (data: Channel) => {
                 setChatDatas(data);
+                if (data.channelUsers.find((elem) => elem.user.id === authDatas.currentUser?.id && (elem.role === "owner" || elem.role === "moderator")))
+                    setLoggedUserIsOwner(true);
             });
         }
         if (params) {
             getDatas();
-            // axios.get(`${baseUrl}/channel/${params.chatId}`, {
-            //     headers: {
-            //         "Authorization": `Bearer ${authDatas.token}`,
-            //     }
-            // })
-            // .then(async (response) => {
-            //     console.log(response);
-            //     await authDatas.socket.emit("JoinChannelRoom", {
-            //         chanId: params.chatId,
-            //     });
-            //     setChatDatas(response.data);
-            // }).catch(err => {
-            //     console.log(err);
-            // })
         }
 
         return () => {
-            return authDatas.socket.emit("LeaveChannelRoom", {
+            socket!.emit("LeaveChannelRoom", {
                 id: parseInt(params.chatId!),
             });
         }
@@ -81,15 +67,13 @@ function ChatElement() {
                 return {...prev, messages: [...prev!.messages, data]}
             });
         }
-        authDatas.socket.on('NewChannelMessage', listener);
+        socket!.on('NewChannelMessage', listener);
     }, [])
-
-    //Quand l'url change emit un event onLeaveRoom avec l'id de la room
 
     const handleSubmit = (e: any) => {
         e.preventDefault();
-        const submitMessage = async () => {
-            await authDatas.socket.emit("ChannelMessage", {
+        const submitMessage = () => {
+            socket!.emit("ChannelMessage", {
                 content: inputMessage,
                 chanId: parseInt(params.chatId!),
             });
@@ -97,29 +81,13 @@ function ChatElement() {
         }
         if (inputMessage.length > 0) {
             submitMessage();
-            // axios.post(`${baseUrl}/channel/${params.chatId}/messages`, {content: inputMessage}, {
-            //     headers: {
-            //         "Authorization": `Bearer ${authDatas.token}`,
-            //     }
-            // })
-            // .then(async (response) => {
-            //     console.log(response);
-            //     await authDatas.socket.emit("ChannelMessage", {
-            //         msg: response.data,
-            //     });
-            //     setChatDatas((prev: any) => {
-            //         return {...prev, messages: [...prev!.messages, response.data]}
-            //     });
-            //     setInputMessage('');
-            // })
-            // .catch((err) => {
-            //     console.log(err);
-            // })
         }
     } 
 
     return (chatDatas === undefined) ? (
-        <LoadingSpin classContainer="chat-page-container" />
+        <div style={{width: "100%"}}>
+            <LoadingSpin classContainer="chat-page-container"/>
+        </div>
     ) : (
         <div className="message-container">
             <div className="message-container-main">
@@ -129,7 +97,7 @@ function ChatElement() {
                         <ul>
                             {
                                 chatDatas!.messages.map((elem, index) =>
-                                    <MessageItem key={index} sender={elem.sender} message={elem.content} />
+                                    <MessageItem key={index} sender={elem.sender} message={elem.content} loggedUserIsOwner={loggedUserIsOwner} />
                                 )
                             }
                         </ul>
