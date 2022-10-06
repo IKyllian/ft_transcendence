@@ -74,8 +74,9 @@ export class UserController {
 	}
 
 	@UseGuards(JwtGuard)
-	@Get(':username')
+	@Get('name/:username')
 	getUserbyName(@Param('username') username: string) {
+		console.log('find by username')
 		return this.userService.findOneBy({ username });
 	}
 

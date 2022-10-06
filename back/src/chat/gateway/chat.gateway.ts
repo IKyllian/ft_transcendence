@@ -30,7 +30,7 @@ class GatewayExceptionFilter extends BaseWsExceptionFilter {
 @UsePipes(new ValidationPipe())
 @WebSocketGateway({
   cors: {
-    origin: ['http://localhost:3000'],
+    // origin: ['http://localhost:3000'],
     credential: true,
   }
 })

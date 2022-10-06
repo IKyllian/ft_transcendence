@@ -25,26 +25,26 @@ export class ChannelService {
 	 * @returns All the channel that the user did not joined and that is visible
 	 */
 	searchChannel(user: User) {
-		// return this.channelRepo.find({
-		// 	relations: {
-		// 		channelUsers: {
-		// 			user: true,
-		// 		},
-		// 	},
-		// 	where: {
-		// 		option: In([channelOption.PUBLIC, channelOption.PROTECTED]),
-		// 		// channelUsers: {
-		// 		// 	user: {
-		// 		// 		id: Not(In([user.id])),
-		// 		// 	}
-		// 		// }
-		// 	},
-		// });
-		return this.channelRepo
-			.createQueryBuilder("channel")
-			.where("channel.option IN (:...channelOption)", { channelOption: [channelOption.PROTECTED, channelOption.PUBLIC] })
-			.andWhere("channel.")
-			.getMany();
+		return this.channelRepo.find({
+			relations: {
+				channelUsers: {
+					user: true,
+				},
+			},
+			where: {
+				option: In([channelOption.PUBLIC, channelOption.PROTECTED]),
+				// channelUsers: {
+				// 	user: {
+				// 		id: Not(In([user.id])),
+				// 	}
+				// }
+			},
+		});
+		// return this.channelRepo
+		// 	.createQueryBuilder("channel")
+		// 	.where("channel.option IN (:...channelOption)", { channelOption: [channelOption.PROTECTED, channelOption.PUBLIC] })
+		// 	.andWhere("channel.")
+		// 	.getMany();
 	}
 
 	getMyChannels(id: number) {
