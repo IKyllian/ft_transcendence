@@ -25,8 +25,11 @@ export class ChannelController {
 
 	@Get('search')
 	@UseGuards(JwtGuard)
-	async searchChannel(@GetUser('id') userId: number) {
-		return await this.channelService.searchChannel(userId);
+	async searchChannel(@GetUser() user: User) {
+		console.log('searching channel')
+		const chan =  await this.channelService.searchChannel(user);
+		console.log(chan)
+		return chan
 	}
 
 	@Post()
@@ -41,6 +44,7 @@ export class ChannelController {
 		@GetUser() user: User,
 		@Param('id', ParseIntPipe) id: number,
 		@Body() passDto: ChannelPasswordDto ) {
+			console.log('joining Channel')
 		return this.channelService.join(user, id, passDto);
 	}
 

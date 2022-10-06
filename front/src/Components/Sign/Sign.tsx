@@ -27,7 +27,7 @@ function Sign() {
         e?.preventDefault();
         if (data.password === "" || data.username === "")
             return ;
-        axios.post('http://localhost:5000/api/auth/login', {username: data.username, password: data.password})
+        axios.post('http://localhost:5000/api/auth/signup', {username: data.username, password: data.password})
         .then((response) => {
         console.log('JWT =>', response.data);
             const payload: LoginPayload = {

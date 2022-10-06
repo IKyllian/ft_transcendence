@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ClassTransformer } from 'class-transformer';
 import { Channel, User, ChannelUser } from 'src/typeorm';
 import { UserService } from 'src/user/user.service';
-import { In, Not, Repository } from 'typeorm';
+import { ArrayContainedBy, ArrayContains, In, Not, Repository } from 'typeorm';
 import { ChannelDto } from './dto/channel.dto';
 import { ChannelExistException, ChannelNotFoundException, NotInChannelException, UnauthorizedActionException } from 'src/utils/exceptions';
 import * as argon from 'argon2';
@@ -24,22 +24,27 @@ export class ChannelService {
 	 * @param user_id 
 	 * @returns All the channel that the user did not joined and that is visible
 	 */
-	searchChannel(userId: number) {
-		return this.channelRepo.find({
-			relations: {
-				channelUsers: {
-					user: true,
-				},
-			},
-			where: {
-				option: In([channelOption.PUBLIC, channelOption.PROTECTED]),
-				channelUsers: {
-					user: {
-						id: Not(userId),
-					}
-				}
-			},
-		});
+	searchChannel(user: User) {
+		// return this.channelRepo.find({
+		// 	relations: {
+		// 		channelUsers: {
+		// 			user: true,
+		// 		},
+		// 	},
+		// 	where: {
+		// 		option: In([channelOption.PUBLIC, channelOption.PROTECTED]),
+		// 		// channelUsers: {
+		// 		// 	user: {
+		// 		// 		id: Not(In([user.id])),
+		// 		// 	}
+		// 		// }
+		// 	},
+		// });
+		return this.channelRepo
+			.createQueryBuilder("channel")
+			.where("channel.option IN (:...channelOption)", { channelOption: [channelOption.PROTECTED, channelOption.PUBLIC] })
+			.andWhere("channel.")
+			.getMany();
 	}
 
 	getMyChannels(id: number) {
