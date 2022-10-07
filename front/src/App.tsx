@@ -16,6 +16,7 @@ import PublicRoute from "./Route/Public-Route";
 import PrivateRoute from "./Route/Private-Route";
 import UsernameForm from "./Components/Sign/Username-Form";
 import ChannelsList from "./Components/Chat/Channels-List";
+import NotifGameInvite from "./Components/Notif-Game-Invite";
 
 import { io, Socket } from "socket.io-client";
 import { useAppSelector } from './Redux/Hooks'
@@ -79,6 +80,7 @@ export const SocketContext = createContext<SocketContextType>({socket: undefined
 
 function App() {
 	const [socket, setSocket] = useState<Socket | undefined>(undefined);
+	const [gameInvite, setGameInvite] = useState<boolean>(false);
     const {token, isAuthenticated} = useAppSelector((state) => state.auth);
 
 	const connectSocket = () => {
@@ -88,9 +90,19 @@ function App() {
 		setSocket(newSocket);
 	}
 
+	const gameNotificationLeave = () => {
+		setGameInvite(false);
+	}
+
 	useEffect(() => {
 		if (isAuthenticated && socket === undefined) {
 			connectSocket();
+			setTimeout(function() {
+				setGameInvite(true);
+				setTimeout(function() {
+					gameNotificationLeave();
+				}, 15000);
+			}, 2000);	
 		}
 	}, [isAuthenticated])
 
@@ -100,6 +112,7 @@ function App() {
 			<SocketContext.Provider value={{socket: socket}} >
 				<ModalProvider>
 					<AddFriendModal/>
+					{ gameInvite && <NotifGameInvite notifOnLeave={gameNotificationLeave} /> }
 					<Header />
 					<main className="page-container">
 						<Routes>
