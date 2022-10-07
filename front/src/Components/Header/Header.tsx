@@ -1,15 +1,27 @@
 import { useState, useContext } from 'react';
-import { IconLogout, IconMessages, IconUserPlus, IconChevronDown } from '@tabler/icons';
+import { IconLogout, IconMessages, IconUserPlus, IconChevronDown, IconBell } from '@tabler/icons';
 
 import { ModalContext } from '../Utils/ModalProvider';
 import ProfilPic from "../../Images-Icons/pp.jpg"
 import { Link, useLocation } from 'react-router-dom';
 import { useAppSelector } from '../../Redux/Hooks';
+import DropdownNotification from './Dropdown-Notification';
 
 import ResponsiveMenu from './Responsive-Menu';
 
+function NotifIcon(props: {setShowNotifDropdown: Function}) {
+    const {setShowNotifDropdown} = props;
+    return (
+        <div className='badge-wrapper'>
+            <div className='badge-notif'> 5 </div>
+            <IconBell onClick={() => setShowNotifDropdown((state: boolean) => !state)} />
+        </div>
+    );
+}
+
 function Header() {
     const [showMenu, setShowMenu] = useState<boolean>(false);
+    const [showNotifDropdown, setShowNotifDropdown] = useState<boolean>(false);
     let location = useLocation();
     let { currentUser } = useAppSelector(state => state.auth);
 
@@ -23,11 +35,13 @@ function Header() {
         <> </>
     ) : (
         <header className={`header ${modalStatus.modal.isOpen ? modalStatus.modal.blurClass : ""}`} >
+            { showNotifDropdown && <DropdownNotification />}
             <Link className='header-logo' to="/">
                 pong
             </Link>
             <div className='header-right'>
                 <div className='icons-header'>
+                    <NotifIcon setShowNotifDropdown={setShowNotifDropdown} />
                     <IconUserPlus onClick={() => modalStatus.setStatus()} />
                     <Link to="/chat">
                         <IconMessages />
@@ -40,6 +54,7 @@ function Header() {
                 <IconLogout />
             </div>
             <div className='header-right-responsive'>
+                    <NotifIcon setShowNotifDropdown={setShowNotifDropdown} />
                     <img className='header-picture' src={ProfilPic} alt="profil pic" />
                     <IconChevronDown onClick={() => setShowMenu(!showMenu)} />
                     <ResponsiveMenu show={showMenu} handleClick={handleClick} headerModal={modalStatus.setStatus} />
