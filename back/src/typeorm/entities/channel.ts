@@ -19,7 +19,6 @@ export class Channel {
 	@Column({ default: 0 })
 	nb: number;
 
-
 	@OneToMany(() => ChannelUser, (channelUser) => channelUser.channel, {
 		cascade: true,
 	})
@@ -33,6 +32,5 @@ export class Channel {
 	@Column({ nullable: true, select: false })
 	@Exclude()
 	hash?: string;
-
 }
 

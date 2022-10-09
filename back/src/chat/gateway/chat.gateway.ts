@@ -13,6 +13,8 @@ import { GetUser } from 'src/utils/decorators';
 import { ChannelMessageService } from '../channel/message/ChannelMessage.service';
 import { ChannelMessageDto } from '../channel/message/dto/channelMessage.dto';
 import { RoomDto } from './dto/room.dto';
+import { PrivateMessageService } from '../conversation/message/private-msg.sevice';
+import { PrivateMessageDto } from '../conversation/message/dto/privateMessage.dto';
 
 @Catch()
 class GatewayExceptionFilter extends BaseWsExceptionFilter {
@@ -42,6 +44,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(
     // private readonly chatService: ChatService,
     private channelMsgService: ChannelMessageService,
+    private privateMsgService: PrivateMessageService,
     private authService: AuthService,
     private channelService: ChannelService,
     private readonly session: ChatSessionManager,
@@ -119,6 +122,19 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     //   console.log('clients in room: ', clients)
       const message = await this.channelMsgService.create(user, data);
       this.server.to(`channel-${ data.chanId }`).emit('NewChannelMessage', message);
+  }
+
+  @UseGuards(WsJwtGuard)
+  @SubscribeMessage('PrivateMessage')
+  async sendPrivateMessage(
+    @GetUser() user: User,
+    @MessageBody() data: PrivateMessageDto,
+    ) {
+      const message = await this.privateMsgService.create(user, data);
+      this.server
+        .to(`user-${user.id}`)
+        .to(`user-${data.adresseeId}`)
+        .emit('NewPrivateMessage', message);
   }
 }
 

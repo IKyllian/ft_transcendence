@@ -1,16 +1,14 @@
 import { BadRequestException, ClassSerializerInterceptor, ConflictException, ForbiddenException, Injectable, NotFoundException, UnauthorizedException, UseInterceptors } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ClassTransformer } from 'class-transformer';
 import { Channel, User, ChannelUser } from 'src/typeorm';
 import { UserService } from 'src/user/user.service';
-import { ArrayContainedBy, ArrayContains, In, Not, Repository } from 'typeorm';
+import { ArrayContainedBy, ArrayContains, In, Not, NotBrackets, Repository } from 'typeorm';
 import { ChannelDto } from './dto/channel.dto';
 import { ChannelExistException, ChannelNotFoundException, NotInChannelException, UnauthorizedActionException } from 'src/utils/exceptions';
 import * as argon from 'argon2';
 import { CreateChannelDto } from './dto/create-channel.dto';
 import { ChannelPasswordDto } from './dto/channel-pwd.dto';
 import { channelOption, channelRole, FindChannelParams } from 'src/utils/types/types';
-import { threadId } from 'worker_threads';
 
 @Injectable()
 export class ChannelService {
@@ -21,10 +19,16 @@ export class ChannelService {
 		private channelUserRepo: Repository<ChannelUser>,
 	) {}
 	/**
+	 * TODO C PAS FOU
 	 * @param user_id 
 	 * @returns All the channel that the user did not joined and that is visible
 	 */
-	searchChannel(user: User) {
+	async searchChannel(user: User) {
+		const userChannel = await this.getMyChannels(user.id);
+		let userChannelId: Number[] = [];
+		userChannel.forEach((element) => {
+			userChannelId.push(element.id);
+		});
 		return this.channelRepo.find({
 			relations: {
 				channelUsers: {
@@ -33,18 +37,16 @@ export class ChannelService {
 			},
 			where: {
 				option: In([channelOption.PUBLIC, channelOption.PROTECTED]),
-				// channelUsers: {
-				// 	user: {
-				// 		id: Not(In([user.id])),
-				// 	}
-				// }
+				id: Not(In(userChannelId))
 			},
 		});
-		// return this.channelRepo
-		// 	.createQueryBuilder("channel")
-		// 	.where("channel.option IN (:...channelOption)", { channelOption: [channelOption.PROTECTED, channelOption.PUBLIC] })
-		// 	.andWhere("channel.")
-		// 	.getMany();
+		return this.channelRepo
+			.createQueryBuilder("channel")
+			.leftJoinAndSelect("channel.channelUsers", "channelUser")
+			.leftJoinAndSelect("channelUser.user", "users")
+			.where("channel.option IN (:...channelOption)", { channelOption: [channelOption.PROTECTED, channelOption.PUBLIC] })
+			.andWhere("channelUser.user.id != :id", { id: user.id })
+			.getMany();
 	}
 
 	getMyChannels(id: number) {
