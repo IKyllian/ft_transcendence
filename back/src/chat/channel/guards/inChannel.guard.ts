@@ -8,7 +8,7 @@ export class InChannelGuard implements CanActivate {
 	async canActivate(context: ExecutionContext): Promise<boolean> {
 		const req = context.switchToHttp().getRequest();
 		const chanId = req.params.id;
-		const channelUser = await this.channelService.getChannelUser({ id: chanId}, req.user);
+		const channelUser = await this.channelService.getChannelUser({ id: chanId }, req.user);
 		if (!channelUser)
 			throw new NotInChannelException();
 		req.channelUser = channelUser;

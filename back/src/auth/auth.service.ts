@@ -1,5 +1,4 @@
-import { ForbiddenException, forwardRef, Inject, Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
+import { ForbiddenException, Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { AuthDto } from "./dto/auth.dto";
 import * as argon from 'argon2';
 import { JwtService } from "@nestjs/jwt";
@@ -7,9 +6,7 @@ import { ConfigService } from "@nestjs/config";
 import { HttpService } from "@nestjs/axios";
 import { lastValueFrom } from "rxjs";
 import { UserService } from "src/user/user.service";
-import { ChannelService } from "src/chat/channel/channel.service";
-import { Statistic, User } from "src/typeorm";
-import { ChannelDto } from "src/chat/channel/dto/channel.dto";
+import { Auth42Dto } from "./dto/auth42.dto";
 
 @Injectable()
 export class AuthService {
@@ -33,7 +30,6 @@ export class AuthService {
 		const user = await this.userService.create(params);
 		return {
 			token: (await this.signToken(user.id, user.username)).access_token,
-
 			user: user,
 		}
 	}
@@ -81,12 +77,13 @@ export class AuthService {
 			));
 			return response.data.access_token;
 		} catch(error) {
-			throw new UnauthorizedException();
+			console.log(error.message)
+			throw new UnauthorizedException('Failed to retreive 42 token');
 		}
 	}
 
-	async login42(code: string) {
-		const token = await this.get42token(code);
+	async login42(dto: Auth42Dto) {
+		const token = await this.get42token(dto.authorizationCode);
 		const response = await lastValueFrom(this.httpService.get(`https://api.intra.42.fr/v2/me?access_token=${token}`));
 		let user = await this.userService.findOne({
 			relations: {

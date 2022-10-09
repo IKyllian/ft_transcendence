@@ -1,19 +1,18 @@
-import { Body, ClassSerializerInterceptor, Controller, Delete, Get, Param, ParseIntPipe, Post, UseGuards, UseInterceptors } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, UseGuards } from "@nestjs/common";
 import { JwtGuard } from "src/auth/guard/jwt.guard";
-import { Channel, ChannelUser, User } from "src/typeorm";
-import { GetChannelUser, GetUser } from "src/utils/decorators";
-import { ChatGateway } from "../gateway/chat.gateway";
+import { User } from "src/typeorm";
+import { GetUser } from "src/utils/decorators";
 import { ChannelPasswordDto } from "./dto/channel-pwd.dto";
-import { ChannelDto } from "./dto/channel.dto";
 import { ChannelPermissionGuard } from "./guards/channel-permission.guard";
 import { InChannelGuard } from "./guards/inChannel.guard";
 import { ChannelService } from "./channel.service";
+import { BanUserDto } from "./dto/banUser.dto";
+import { CreateChannelDto } from "./dto/create-channel.dto";
 
 @Controller('channel')
 export class ChannelController {
 	constructor(
 		private channelService: ChannelService,
-		private chatGateway: ChatGateway,
 		) {}
 
 
@@ -34,18 +33,18 @@ export class ChannelController {
 
 	@Post()
 	@UseGuards(JwtGuard)
-	async createChannel(@GetUser() user: User, @Body() channelDto: ChannelDto) {
+	async createChannel(@GetUser() user: User, @Body() channelDto: CreateChannelDto) {
 		return await this.channelService.create(user, channelDto);
 	}
 
 	@Post(':id/join')
 	@UseGuards(JwtGuard)
-	joinChannel(
+	async joinChannel(
 		@GetUser() user: User,
 		@Param('id', ParseIntPipe) id: number,
 		@Body() passDto: ChannelPasswordDto ) {
 			console.log('joining Channel')
-		return this.channelService.join(user, id, passDto);
+		return await this.channelService.join(user, id, passDto);
 	}
 
 	@Post(':id/leave')
@@ -74,22 +73,30 @@ export class ChannelController {
 	) {
 		return await this.channelService.delete(id);
 	}
-	// @UseGuards(JwtGuard, InChannelGuard, ChannelPermissionGuard)
-	// @Post(':id/ban/:userId')
-	// banUser(
-	// @GetChannelUser() user: ChannelUser,
-	// @Param('id', ParseIntPipe) channelId: number,
-	// @Param('userId', ParseIntPipe) userId: number) {
-	// 	return this.channelService.banUser(user, channelId, userId);
-	// }
 
 	// @UseGuards(JwtGuard, InChannelGuard, ChannelPermissionGuard)
-	// @Post(':id/unban/:userId')
-	// unbanUser(
-	// @GetChannelUser() user: ChannelUser,
+	// @Post(':id/ban/:userId')
+	// async banUser(
+	// @GetUser() user: User,
 	// @Param('id', ParseIntPipe) channelId: number,
 	// @Param('userId', ParseIntPipe) userId: number) {
-	// 	return this.channelService.unbanUser(user, channelId, userId);
+	// 	return await this.channelService.banUser(user, channelId, userId);
 	// }
+
+	// TODO redo channel guard for websocket
+	@UseGuards(JwtGuard)
+	@Post('ban')
+	async banUser(
+	@GetUser() user: User,
+	@Body() dto: BanUserDto) {
+		return await this.channelService.banUser(user, dto);
+	}
+
+	@UseGuards(JwtGuard, InChannelGuard, ChannelPermissionGuard)
+	@Post('unban')
+	unbanUser(
+	@Body() dto: BanUserDto) {
+		return this.channelService.unbanUser(dto);
+	}
 }
 

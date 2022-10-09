@@ -1,7 +1,7 @@
 import { ClassSerializerInterceptor, forwardRef, Module } from "@nestjs/common";
 import { APP_INTERCEPTOR } from "@nestjs/core";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { Channel, ChannelMessage, ChannelUser } from "src/typeorm";
+import { BannedUser, Channel, ChannelMessage, ChannelUser } from "src/typeorm";
 import { ChatModule } from "../chat.module";
 import { ChannelController } from "./channel.controller";
 import { ChannelService } from "./channel.service";
@@ -15,6 +15,7 @@ import { ChannelMessageService } from "./message/ChannelMessage.service";
 			Channel,
 			ChannelUser,
 			ChannelMessage,
+			BannedUser,
 		])
 	],
 	providers: [ChannelService, ChannelMessageService,

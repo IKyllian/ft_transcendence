@@ -1,4 +1,5 @@
 import { Avatar } from "./entities/avatar"
+import { BannedUser } from "./entities/bannedUser"
 import { Channel } from "./entities/channel"
 import { ChannelMessage } from "./entities/channelMessage"
 import { ChannelUser } from "./entities/channelUser"
@@ -18,6 +19,7 @@ const entities = [
 	Avatar,
 	Conversation,
 	PrivateMessage,
+	BannedUser,
 ];
 
 export default entities;
@@ -32,4 +34,5 @@ export {
 	Avatar,
 	Conversation,
 	PrivateMessage,
+	BannedUser,
 }

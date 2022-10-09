@@ -3,6 +3,7 @@
 	on access_token expiration send request to server with refresh_token.
 	If fail redirect to login page.
 	- On logout, remove token from local storage?
+	- Problem with 42 sign in (Unauthorized)
 
 //Channels
 	- Add Can add/modify/delete password of a channels
