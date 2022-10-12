@@ -2,6 +2,7 @@ import { Body, Controller, Get, Post, Req, UseInterceptors } from "@nestjs/commo
 import { AuthService } from "./auth.service";
 import { AuthDto } from "./dto/auth.dto";
 import { Auth42Dto } from "./dto/auth42.dto";
+import { RefreshTokenDto } from "./dto/refresh-token.dto";
 
 @Controller('auth')
 export class AuthController {
@@ -22,4 +23,8 @@ export class AuthController {
 		return this.authService.login42(dto);
 	}
 	
+	@Post('refresh')
+	refresh(@Body() dto: RefreshTokenDto) {
+		return this.authService.refresh(dto);
+	}
 }

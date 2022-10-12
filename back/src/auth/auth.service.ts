@@ -7,9 +7,14 @@ import { HttpService } from "@nestjs/axios";
 import { lastValueFrom } from "rxjs";
 import { UserService } from "src/user/user.service";
 import { Auth42Dto } from "./dto/auth42.dto";
+import RefreshToken from "./refresh-token.entity";
+import { RefreshTokenDto } from "./dto/refresh-token.dto";
 
 @Injectable()
 export class AuthService {
+
+	private refreshTokens: RefreshToken[] = [];
+
 	constructor(
 		private jwt: JwtService,
 		private config: ConfigService,
@@ -28,8 +33,10 @@ export class AuthService {
 			hash,
 		}
 		const user = await this.userService.create(params);
+		const tokens = await this.signToken(user.id, user.username);
 		return {
-			token: (await this.signToken(user.id, user.username)).access_token,
+			token: tokens.access_token,
+			refresh: tokens.refresh_token,
 			user: user,
 		}
 	}
@@ -56,9 +63,11 @@ export class AuthService {
 		);
 		if (!pwdMatches)
 			throw new UnauthorizedException('Password incorrect');
-		
+
+		const tokens = await this.signToken(user.id, user.username);
 		return {
-			token: (await this.signToken(user.id, user.username)).access_token,
+			token: tokens.access_token,
+			refresh: tokens.refresh_token,
 			user: user,
 		}
 	}
@@ -101,14 +110,17 @@ export class AuthService {
 			console.log('user 42 not found, creating a new one');
 			user = await this.userService.create({ id42 : response.data.id });
 		}
+
+		const tokens = await this.signToken(user.id, user.username);
 		return {
-			token: (await this.signToken(user.id, user.username)).access_token,
+			token: tokens.access_token,
+			refresh: tokens.refresh_token,
 			user: user,
 			usernameSet: user.username ? true : false,
 		}
 	}
 	
-	async signToken(userId: number, username: string): Promise<{ access_token: string }> {
+	async signToken(userId: number, username: string): Promise<{ access_token: string, refresh_token: string }> {
 		const payload = {
 			sub: userId,
 			username
@@ -121,7 +133,17 @@ export class AuthService {
 				secret: this.config.get('JWT_SECRET')
 			},
 		);
+		const refreshObject = new RefreshToken({
+			id:
+			  this.refreshTokens.length === 0
+				? 0
+				: this.refreshTokens[this.refreshTokens.length - 1].id + 1,
+			userId,
+		  });
+		  
+		  this.refreshTokens.push(refreshObject);
 		return {
+			refresh_token: refreshObject.sign(),
 			access_token: token
 		};
 	}
@@ -149,5 +171,38 @@ export class AuthService {
 
 	decodeJwt(token: string) {
 		return this.jwt.decode(token);
+	}
+
+	async refresh(dto: RefreshTokenDto) {
+
+		const refreshStr = dto.refreshToken;
+		const refreshToken = await this.retrieveRefreshToken(refreshStr);
+
+		if (!refreshToken) throw new NotFoundException('token not found')
+
+		const user = await this.userService.findOne({
+			where: {
+				id: refreshToken.userId,
+			}
+		});
+
+		if (!user) throw new NotFoundException('user not found')
+
+		const token = { userId: user.id }
+		const tokens = await this.signToken(user.id, user.username);
+		
+		return { token: tokens.refresh_token };
+	}
+
+	private retrieveRefreshToken(refreshStr: string) {
+		try {
+			const decode = this.jwt.verify(refreshStr, { secret: this.config.get('REFRESH_SECRET') });
+
+			if (typeof decode === 'string') return undefined
+
+			return Promise.resolve(this.refreshTokens.find(token => token.id === decode.id));
+		} catch (error) {
+			return undefined;
+		}
 	}
 }
