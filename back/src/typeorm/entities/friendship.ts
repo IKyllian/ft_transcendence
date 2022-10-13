@@ -9,10 +9,10 @@ export class Friendship {
 	@PrimaryGeneratedColumn()
 	id: number;
 
-	@ManyToOne(() => User, (user) => user.friendshipSend, { cascade: true })
+	@ManyToOne(() => User, (user) => user, { cascade: true })
 	requester: User;
 
-	@ManyToOne(() => User, (user) => user.friendshipReceived, { cascade: true })
+	@ManyToOne(() => User, (user) => user, { cascade: true })
 	addressee: User;
 
 	@Column({ nullable: true })
