@@ -15,7 +15,7 @@ function CardInfo(props: {userState: ProfileState}) {
                 userState.isLoggedUser ? <IconEdit /> : 
                 <>
                     <IconUserPlus className="friend-icone friend-icone-add" />
-                    <Link className="send-message-icon" to="/profile">
+                    <Link className="send-message-icon" to="/chat" state={{userIdToSend: userState.user.id}}>
                         <IconMessage />
                     </Link>
                     <Link className="fight-button" to="/profile">

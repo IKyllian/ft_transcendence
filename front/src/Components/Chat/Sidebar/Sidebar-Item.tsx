@@ -33,7 +33,7 @@ function SidebarItem(props: SidebarItemProps) {
             }
             {
                 privateConvs !== undefined && sidebarOpen &&
-                <ItemContent chanDatas={chanDatas} />
+                <ItemContent privateConvs={privateConvs} />
             }
         </li>
     );
