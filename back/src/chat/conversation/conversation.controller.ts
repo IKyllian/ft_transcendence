@@ -21,8 +21,7 @@ export class ConversationController {
 	@UseGuards(JwtGuard)
 	async getConversations(
 		@GetUser() user: User,
-		@Param('id', ParseIntPipe) id: number,
 	) {
-		return await this.getConversations(user, id);
+		return await this.getConversations(user);
 	}
 }
