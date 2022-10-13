@@ -14,7 +14,7 @@ export class ConversationController {
 		@GetUser() user: User,
 		@Param('id', ParseIntPipe) id: number,
 	) {
-		return await this.getConversation(user, id);
+		return await this.convService.getConversation(user, id);
 	}
 
 	@Get()
@@ -22,6 +22,6 @@ export class ConversationController {
 	async getConversations(
 		@GetUser() user: User,
 	) {
-		return await this.getConversations(user);
+		return await this.convService.getConversations(user);
 	}
 }
