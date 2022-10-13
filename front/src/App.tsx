@@ -10,6 +10,7 @@ import AddFriendModal from './Components/Friends-Modal';
 import Chat from './Components/Chat/Chat';
 import ChannelSettings from './Components/Chat/Channel-Settings/Settings-Container';
 import ChatElement from "./Components/Chat/Message-Section/Chat-Element";
+import PrivateMessageElement from "./Components/Chat/Message-Section/Private-Message-Element";
 import Error404 from "./Components/404-Error";
 import { ModalProvider } from "./Components/Utils/ModalProvider";
 import PublicRoute from "./Route/Public-Route";
@@ -62,7 +63,7 @@ const routes: RouteProps[] = [
 				<Leaderboard />
 			</PrivateRoute>,
 	}, {
-		path: '/chat/:channelId/settings',
+		path: '/chat/channel/:channelId/settings',
 		element:
 			<PrivateRoute>
 				<ChannelSettings />
@@ -130,13 +131,29 @@ function App() {
 								}
 							>
 								<Route
-									path=":chatId"
+									path="channel/:channelId"
 									element= {
 										<PrivateRoute>
 											<ChatElement />
 										</PrivateRoute>
 									}
 								/>
+								<Route
+									path="private-message/:convId"
+									element= {
+										<PrivateRoute>
+											<PrivateMessageElement />
+										</PrivateRoute>
+									}
+								/>
+								{/* <Route
+									path="channel/:channelId/settings"
+									element= {
+										<PrivateRoute>
+											<ChannelSettings />
+										</PrivateRoute>
+									}
+								/> */}
 								<Route
 									path="channels-list"
 									element= {

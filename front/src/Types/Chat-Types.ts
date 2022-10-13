@@ -6,6 +6,11 @@ export interface ChannelsInterfaceFront {
     channel: Channel,
 }
 
+export interface ConversationInterfaceFront {
+    isActive: string,
+    conversation: Conversation,
+}
+
 export interface ChannelUser {
     role: string,
     user: UserInterface,
@@ -27,4 +32,19 @@ export interface Channel {
     nb: number,
     channelUsers: ChannelUser[],
     messages: ChatMessage[],
+}
+
+export interface Conversation {
+    id: number,
+    user1: UserInterface,
+    user2: UserInterface,
+    messages: PrivateMessage[],
+}
+
+interface PrivateMessage {
+    id: number,
+    sender: UserInterface,
+    content: string,
+    send_at: string,
+    // conversation: Conversation[],
 }

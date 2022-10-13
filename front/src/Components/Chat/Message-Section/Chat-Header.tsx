@@ -26,7 +26,7 @@ function ChatHeader(props: Props) {
             />
             <p className="chan-name"> # {chatItem?.name} </p>
             <div className="message-header-right-side">
-                <Link to={`/chat/${chatItem?.id}/settings`} state={chatItem} >
+                <Link to={`/chat/channel/${chatItem?.id}/settings`} state={chatItem} >
                     <IconSettings />
                 </Link>
                 {!showUsersSidebar && <IconChevronLeft onClick={() => changeSidebarStatus()} />}

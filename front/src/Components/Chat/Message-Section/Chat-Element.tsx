@@ -15,20 +15,20 @@ function ChatElement() {
     const [showUsersSidebar, setShowUsersSidebar] = useState<boolean>(false);
     const [inputMessage, setInputMessage] = useState<string>('');
     const [loggedUserIsOwner, setLoggedUserIsOwner] = useState<boolean>(false);
+    const messagesEndRef = useRef<null | HTMLDivElement>(null);
 
     let authDatas = useAppSelector((state) => state.auth);
-
+    const params = useParams();
     const {socket} = useContext(SocketContext);
 
     const changeSidebarStatus = () => {
         setShowUsersSidebar(!showUsersSidebar);
     }
-    const messagesEndRef = useRef<null | HTMLDivElement>(null);
-    let params = useParams();
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }
+
     useEffect(() => {
         scrollToBottom();
     }, [chatDatas]);
@@ -36,7 +36,7 @@ function ChatElement() {
     useEffect(() => {
         const getDatas = () => {
             socket!.emit("JoinChannelRoom", {
-                id: parseInt(params.chatId!),
+                id: parseInt(params.channelId!),
             });
 
             socket!.on('exception', (data: any) => {
@@ -55,7 +55,7 @@ function ChatElement() {
 
         return () => {
             socket!.emit("LeaveChannelRoom", {
-                id: parseInt(params.chatId!),
+                id: parseInt(params.channelId!),
             });
             socket!.off("exception");
             socket!.off("roomData");
@@ -80,7 +80,7 @@ function ChatElement() {
         const submitMessage = () => {
             socket!.emit("ChannelMessage", {
                 content: inputMessage,
-                chanId: parseInt(params.chatId!),
+                chanId: parseInt(params.channelId!),
             });
             setInputMessage('');
         }
@@ -89,7 +89,7 @@ function ChatElement() {
         }
     } 
 
-    return (chatDatas === undefined || (chatDatas && chatDatas.id !== parseInt(params.chatId!))) ? (
+    return (chatDatas === undefined || (chatDatas && chatDatas.id !== parseInt(params.channelId!))) ? (
         <div style={{width: "100%"}}>
             <LoadingSpin classContainer="chat-page-container"/>
         </div>

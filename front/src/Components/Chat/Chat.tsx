@@ -2,14 +2,14 @@ import { useState, useContext, createContext, useEffect } from "react";
 
 import Sidebar from "./Sidebar/Sidebar";
 import ChatModal from "./Chat-Modal";
-import { Outlet, useLocation, useParams } from "react-router-dom";
+import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
 import { ModalContext } from "../Utils/ModalProvider";
 import { Channel, ChannelsInterfaceFront } from "../../Types/Chat-Types";
 import LoadingSpin from "../Utils/Loading-Spin";
 import axios from "axios";
 import { baseUrl } from "../../env";
 import { useAppSelector, useAppDispatch } from '../../Redux/Hooks'
-import { loadingDatas, copyChannelsArray, changeActiveElement } from "../../Redux/ChatSlice"
+import { loadingDatas, copyChannelsArray, copyPrivateConvArray, changeActiveElement } from "../../Redux/ChatSlice"
 
 export const SidebarContext = createContext({sidebar: false, setSidebarStatus: () => {}});
 
@@ -22,6 +22,7 @@ function Chat() {
     let chatDatas = useAppSelector((state) => state.chat);
     const dispatch = useAppDispatch();
     const params = useParams();
+    const navigate = useNavigate();
     const location = useLocation();
     const modalStatus = useContext(ModalContext);
 
@@ -60,19 +61,25 @@ function Chat() {
                 }
             }
             dispatch(copyChannelsArray(datasArray));
+            dispatch(copyPrivateConvArray([]));
             // setChannelsDatas(datasArray);
         }).catch(err => {
             console.log(err);
         })
+        if (location && location.state) {
+            const locationState = location.state as {userIdToSend: number};
+            //Check si la conv avec userToSend exist deja. Si oui, redirect sur la conv avec l'id que le back nous à renvoyer, sinon redirect sur une nouvelle conv
+            
+        }
     }, [])
 
-    return !chatDatas.channels ? (
+    return !chatDatas.channels || !chatDatas.privateConv ? (
         <LoadingSpin classContainer="chat-page-container" />
     ) : (
         <SidebarContext.Provider value={{sidebar: responsiveSidebar, setSidebarStatus: handleClick}}>
             <ChatModal showModal={showModal} setShowModal={setShowModal}  />
             <div className={`chat-page-container ${modalStatus.modal.isOpen ? modalStatus.modal.blurClass : ""}`}>
-                <Sidebar setShowModal={setShowModal} showModal={showModal} chanDatas={chatDatas.channels} />
+                <Sidebar setShowModal={setShowModal} chanDatas={chatDatas.channels} privateConvs={chatDatas.privateConv} />
                 {
                     params.chatId === undefined && location.pathname === "/chat"
                     ?

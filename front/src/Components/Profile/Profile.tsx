@@ -43,22 +43,22 @@ function Profile() {
         if (params.username === currentUser?.username) {
             // setUserDatas(currentUser);
             setUserState({
-                isLoggedUser: false,
+                isLoggedUser: true,
                 user: currentUser!,
             });
         }
         else {
-            axios.get(`${baseUrl}/users/?${params.username}`, {
+            axios.get(`${baseUrl}/users/name/${params.username}`, {
                 headers: {
                     "Authorization": `Bearer ${token}`,
                 }
             })
             .then(response => {
                 console.log(response);
-                // setUserState({
-                //     isLoggedUser: false,
-                //     user: response.data,
-                // });
+                setUserState({
+                    isLoggedUser: false,
+                    user: response.data,
+                });
             })
             .catch(err => {
                 console.log(err);
@@ -72,8 +72,10 @@ function Profile() {
         <div className={`profile-container ${modalStatus.modal.isOpen ? modalStatus.modal.blurClass : ""}`}>
             <div className="profile-header">
                 <div className='stats-infos'>
-                    <StatsInfoItem label="Games Played" value={getMatchPlayed(userState.user).toString()} />
-                    <StatsInfoItem label="Win Rate" value={`${getWinRate(userState.user).toString()}%`} />
+                    {/* <StatsInfoItem label="Games Played" value={getMatchPlayed(userState.user).toString()} />
+                    <StatsInfoItem label="Win Rate" value={`${getWinRate(userState.user).toString()}%`} /> */}
+                    <StatsInfoItem label="Games Played" value="0" />
+                    <StatsInfoItem label="Win Rate" value="0" />
                     <StatsInfoItem label="Rank" value="#3" />
                 </div>
                 <CardInfo userState={userState} />

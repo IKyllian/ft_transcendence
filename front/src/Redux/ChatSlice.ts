@@ -1,14 +1,16 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { ChannelsInterfaceFront } from '../Types/Chat-Types';
+import { ChannelsInterfaceFront, ConversationInterfaceFront } from '../Types/Chat-Types';
 
 interface ChannelState {
     channels?: ChannelsInterfaceFront[],
+    privateConv?: ConversationInterfaceFront[],
     loading: boolean,
     error?: string,
 }
 
 const defaultState: ChannelState = {
     channels: undefined,
+    privateConv: undefined,
     loading: false,
     error: undefined,
 }
@@ -23,15 +25,29 @@ export const chatSlice = createSlice({
         copyChannelsArray: (state, {payload}: PayloadAction<ChannelsInterfaceFront[]>) => {
             state.channels = [...payload];
         },
+        copyPrivateConvArray: (state, {payload}: PayloadAction<ConversationInterfaceFront[]>) => {
+            state.privateConv = [...payload];
+        },
         addChannel: (state, {payload}: PayloadAction<ChannelsInterfaceFront>) => {
             if (state.channels)
                 state.channels = [...state.channels, payload];
             else
                 state.channels = [payload];
         },
+        addPrivateConv: (state, {payload}: PayloadAction<ConversationInterfaceFront>) => {
+            if (state.privateConv)
+                state.privateConv = [...state.privateConv, payload];
+            else
+                state.privateConv = [payload];
+        },
         removeChannel: (state, {payload}: PayloadAction<number>) => {
             if (state.channels) {                
                 state.channels = state.channels.filter(elem => elem.channel.id !== payload);
+            }
+        },
+        removePrivateConv: (state, {payload}: PayloadAction<number>) => {
+            if (state.privateConv) {                
+                state.privateConv = state.privateConv.filter(elem => elem.conversation.id !== payload);
             }
         },
         changeActiveElement: (state, {payload}: PayloadAction<number>) => {
@@ -49,4 +65,13 @@ export const chatSlice = createSlice({
     }
 });
 
-export const { loadingDatas, copyChannelsArray, addChannel, removeChannel, changeActiveElement } = chatSlice.actions;
+export const {
+    loadingDatas,
+    copyChannelsArray,
+    copyPrivateConvArray,
+    addChannel,
+    addPrivateConv,
+    removeChannel,
+    removePrivateConv,
+    changeActiveElement,
+} = chatSlice.actions;
