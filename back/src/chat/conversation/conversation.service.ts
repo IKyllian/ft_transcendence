@@ -51,7 +51,7 @@ export class ConversationService {
 			return await this.createConversation(user, user2);
 	}
 
-	getConversations(user: User, id: number) {
+	getConversations(user: User) {
 		return this.convRepo.find({
 			relations: {
 				user1: true,
@@ -61,10 +61,8 @@ export class ConversationService {
 			where: [
 				{
 					user1: { id: user.id },
-					user2: { id },
 				},
 				{
-					user1: { id },
 					user2: { id: user.id },
 				},
 			]
