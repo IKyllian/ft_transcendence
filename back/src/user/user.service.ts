@@ -136,7 +136,6 @@ export class UserService {
 		return this.userRepo.save(user);
 	}
 
-	// await isBlocked(user: User, id: number): boolean {
 	isBlocked(user: User, id: number): boolean {
 		const isblocked = user.blocked.find((blocked) => blocked.id === id);
 		console.log(isblocked);

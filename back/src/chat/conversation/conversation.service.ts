@@ -50,4 +50,24 @@ export class ConversationService {
 		else
 			return await this.createConversation(user, user2);
 	}
+
+	getConversations(user: User, id: number) {
+		return this.convRepo.find({
+			relations: {
+				user1: true,
+				user2: true,
+				messages: true,
+			},
+			where: [
+				{
+					user1: { id: user.id },
+					user2: { id },
+				},
+				{
+					user1: { id },
+					user2: { id: user.id },
+				},
+			]
+		});
+	}
 }
