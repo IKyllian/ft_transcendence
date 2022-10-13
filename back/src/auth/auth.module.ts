@@ -9,6 +9,7 @@ import { UserModule } from "src/user/user.module";
 import { AuthController } from "./auth.controller";
 import { AuthService } from "./auth.service";
 import { JwtStrategy } from "./strategy/jwt.strategy";
+import { RtStrategy } from "./strategy/rt.strategy";
 
 @Module({
 	imports: [
@@ -16,17 +17,14 @@ import { JwtStrategy } from "./strategy/jwt.strategy";
 		HttpModule,
 		UserModule,
 		// forwardRef(() => UserModule),
-		JwtModule.register({
-			secret: process.env.JWT_SECRET,
-			signOptions: { expiresIn: '200m' }
-		}),
+		JwtModule.register({}),
 		TypeOrmModule.forFeature([
 			User,
 			Statistic,
 		])
 	],
 	controllers: [AuthController],
-	providers: [AuthService, JwtStrategy,
+	providers: [AuthService, RtStrategy, JwtStrategy,
 	{
 		provide: APP_INTERCEPTOR,
 		useClass: ClassSerializerInterceptor,
