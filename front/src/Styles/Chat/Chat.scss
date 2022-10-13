@@ -20,7 +20,7 @@
         position: relative;
         
         .explore-button {
-           background-color: $LightBluePalette;
+           background-color: $DarkPalette;
            padding: 15px;
            position: absolute;
            bottom: 0;
@@ -121,7 +121,7 @@
                     align-items: center;
                     justify-content: space-between;
                     border-bottom: 1px solid $WhitePalette;
-    
+
                     &-right-side {
                         margin-right: 20px;
                         svg {
@@ -151,7 +151,7 @@
                     background-color: $LightDarkPalette;
                     border-bottom: 1px solid $WhitePalette;
                     @include flex-row-alignCenter;
-    
+
                     .burger-icon-responsive {
                         display: none;
                     }
@@ -237,22 +237,26 @@
             width: 90%;
             margin: 0 auto;
             form {
-                width: 90%;
+                width: 100%;
+                @include flex-row-alignCenter();
                 input {
                     all: unset;
                     width: 95%;
                     padding: 18px 20px;
                 }
+
+                button {
+                    all: unset;
+                    svg {
+                        cursor: pointer;
+                        background-color: $OrangeProfile;
+                        border-radius: 50%;
+                        @include width-height(30px, 30px);
+                        padding: 5px;
+                        background: linear-gradient(112deg, rgba(255,94,0,1) 0%, rgba(255,145,0,1) 50%, rgba(255,154,0,1) 100%);
+                    }
+                }  
             }
-            svg {
-                cursor: pointer;
-                background-color: $OrangeProfile;
-                border-radius: 50%;
-                @include width-height(30px, 30px);
-                padding: 5px;
-                background: linear-gradient(112deg, rgba(255,94,0,1) 0%, rgba(255,145,0,1) 50%, rgba(255,154,0,1) 100%);
-            }
-           
         }
 
         .users-sidebar {
@@ -312,12 +316,17 @@
         grid-template-columns: repeat(3, 1fr);
         gap: 10px;
         margin: auto;
+        padding: 16px 0;
         overflow-y: scroll;
         height: 100%;
+        // position: relative;
+
+        .sidebar-button {
+            display: none;
+        }
         .channels-card-wrapper {
             background-color: $DarkPalette;
-            width: 300px;
-            height: 320px;
+            @include width-height(300px, 320px);
             position: relative;
 
             .channel-banner {
@@ -346,9 +355,7 @@
                 .item-bottom {
                     width: 90%;
                     position: absolute;
-                    display: flex;
-                    flex-direction: row;
-                    align-items: center;
+                    @include flex-row-alignCenter();
                     justify-content: space-between;
                     bottom: 0;
                     p {
@@ -375,9 +382,19 @@
                             font-size: 13px;
                         }
                     }
-                    
                 }
             } 
+        }
+    }
+}
+
+@media screen and (max-width: 1230px) {
+    .chat-page-container {
+        .channels-list-wrapper {
+            grid-template-columns: repeat(2, 1fr);
+            .channels-card-wrapper {
+                @include width-height(270px, 290px);
+            }
         }
     }
 }
@@ -448,6 +465,23 @@
                 }
             } 
         }
+
+        .channels-list-wrapper {
+            .sidebar-button {
+                display: block;
+                position: absolute;
+                left: -24px;
+                top: 25px;
+                z-index: 99;
+                border-radius: 50%;
+                @include width-height(45px, 45px);
+                display: flex;
+                align-items: center;
+                justify-content: flex-end;
+                background-color: $DarkPalette;
+                cursor: pointer;
+            }
+        }
     }
 }
 
@@ -470,6 +504,49 @@
                     padding-left: $HeaderResponsive500Marge;
                     }
                 }
+            }
+        }
+
+        .channels-list-wrapper {
+            .channels-card-wrapper {
+                @include width-height(220px, 240px);
+                .card-content {
+                    .channel-name {
+                        font-size: 13px;
+                    }
+
+                    .channel-description {
+                        font-size: 10px;
+                    }
+
+                    .item-bottom {
+                        p {
+                            font-size: 10px;
+                        }
+
+                        &-right {
+                            svg {
+                                @include width-height(20px, 20px);
+                            }
+                            input {
+                                padding: 3px;
+                                width: 80px;
+                                font-size: 10px;
+                            }
+                        }
+                    }
+                }                
+            }
+        }
+    }
+}
+
+@media screen and (max-width: 470px) {
+    .chat-page-container {
+        .channels-list-wrapper {
+            grid-template-columns: repeat(1, 1fr);
+            .channels-card-wrapper {
+                @include width-height(250px, 270px);
             }
         }
     }

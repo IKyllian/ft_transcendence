@@ -4,10 +4,14 @@ import { IconDotsVertical } from '@tabler/icons';
 import { useState } from "react";
 import DropdownContainer from "../../Utils/Dropdown-Container";
 import { Link } from "react-router-dom";
+import BlockButton from "../../Utils/Block-Button";
+import { useAppSelector } from "../../../Redux/Hooks";
 
 function ChannelUserItem(props: {userDatas: ChannelUser, loggedUserIsOwner: boolean}) {
     const { userDatas, loggedUserIsOwner } = props;
     const [showDropdown, setShowDropdown] = useState<boolean>(false);
+
+    const {currentUser} = useAppSelector((state) => state.auth);
 
     const closeDropdown = () => {
         setShowDropdown(false);
@@ -25,7 +29,10 @@ function ChannelUserItem(props: {userDatas: ChannelUser, loggedUserIsOwner: bool
                     <Link to={`/profile/${userDatas.user.username}`}>
                         <p> profile </p>
                     </Link>
-                    <p> block </p>
+                    <BlockButton
+                        senderIsBlock={currentUser!.blocked.find(elem => elem.id === userDatas.user.id) ? true : false }
+                        senderId={userDatas.user.id}
+                    />
                     {
                         loggedUserIsOwner && 
                         <> 

@@ -1,31 +1,31 @@
-import { IconEdit, IconUserPlus, IconMessage } from '@tabler/icons';
-import { UserInterface } from '../../Types/User-Types';
+import { IconEdit, IconUserPlus, IconMessage, IconBrandAppleArcade } from '@tabler/icons';
+import { ProfileState } from '../../Types/User-Types';
 
 import ProfilePic from "../../Images-Icons/pp.jpg"
 import { Link } from "react-router-dom";
 
-function CardInfo(props: {userDatas: UserInterface}) {
-    const {userDatas} = props;
-    const isConnectedUser: boolean = true;
+function CardInfo(props: {userState: ProfileState}) {
+    const { userState } = props;
     return (
         <div className="card-info">
             <img className='profile-avatar' src={ProfilePic} alt="profil pic" />
             <div className="player-status player-status-online"> </div>
-            <p> {userDatas.username} </p>
+            <p> {userState.user.username} </p>
             {
-                isConnectedUser ? <IconEdit /> : 
+                userState.isLoggedUser ? <IconEdit /> : 
                 <>
                     <IconUserPlus className="friend-icone friend-icone-add" />
                     <Link className="send-message-icon" to="/profile">
                         <IconMessage />
                     </Link>
                     <Link className="fight-button" to="/profile">
-                        Défier
+                        Play
+                        <IconBrandAppleArcade />
                     </Link>
-                     <Link className="fight-button" to="/profile">
-                        Watch Game
+                     {/* <Link className="fight-button" to="/profile">
+                        Watch Game */}
                         {/* <IconEye /> */}
-                    </Link>
+                    {/* </Link> */}
                 </>
             }
         </div>

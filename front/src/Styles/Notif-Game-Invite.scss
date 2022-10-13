@@ -2,19 +2,25 @@
 
 @keyframes notifFromRight {
 	0% {
-	  transform: translateX(100%);
+	    transform: translateX(100%);
 	}
-	100% {
-	  transform: translateX(0);
+	5% {
+	    transform: translateX(0);
 	}
+    94% {
+	    transform: translateX(0);
+    }
+    100% {
+        transform: translateX(100%);
+    }
 }
 
 @keyframes progressBar {
 	0% {
-	  width: 0%;
+	    width: 0%;
 	}
 	100% {
-	  width: 100%;
+	    width: 100%;
 	}
 }
 
@@ -32,7 +38,7 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-	animation: 0.8s ease-out 0s 1 notifFromRight;
+	animation: 15s ease-in 0s 1 notifFromRight;
     .notif-top {
         @include flex-row-alignCenter();
         gap: 20px;
@@ -56,7 +62,7 @@
         height: 1px;
         background-color: #ccd5dc;
         margin: 5px 0;
-	    animation: 15s ease-out 0s 1 progressBar;
+	    animation: 15s linear 0s 1 progressBar;
     }
     .notif-bottom {
         @include flex-row-alignCenter();

@@ -1,19 +1,21 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { Channel } from "../../Types/Chat-Types";
 import LoadingSpin from "../Utils/Loading-Spin";
 import { baseUrl } from "../../env";
 import { useAppSelector, useAppDispatch } from "../../Redux/Hooks";
-import { IconPlus } from "@tabler/icons";
+import { IconPlus, IconChevronRight } from "@tabler/icons";
 import { useForm } from "react-hook-form";
 import { addChannel } from "../../Redux/ChatSlice"
 import { useNavigate } from "react-router-dom";
+import { SidebarContext } from "./Chat";
 
 function ChannelItem(props: {channelData: Channel, token: string}) {
     const { register, handleSubmit, reset, formState: {errors} } = useForm<{password?: string}>();
     const { channelData, token } = props;
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
+
 
     const handleClick = handleSubmit((data, e) => {
         e?.preventDefault();
@@ -61,6 +63,11 @@ function ChannelItem(props: {channelData: Channel, token: string}) {
 function ChannelsList() {
     const [channelsList, setChannelsList] = useState<undefined | Channel[]>(undefined);
     let authDatas = useAppSelector((state) => state.auth);
+    const sidebarStatus = useContext(SidebarContext);
+
+    // useEffect(() => {
+    //     sidebarStatus.setSidebarStatus();
+    // }, [])
 
     useEffect(() => {
         axios.get(`${baseUrl}/channel/search`, {
@@ -83,6 +90,12 @@ function ChannelsList() {
        </div>
     ) : (
         <div className="channels-list-wrapper">
+            {
+                sidebarStatus.sidebar === false &&
+                <div className="sidebar-button" onClick={() => sidebarStatus.setSidebarStatus()}>
+                    <IconChevronRight />
+                </div>
+            }
             {
                 channelsList.map((elem) => 
                     <ChannelItem  key={elem.id} channelData={elem} token={authDatas.token} />

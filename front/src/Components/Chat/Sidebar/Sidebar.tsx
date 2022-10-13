@@ -1,5 +1,5 @@
 import { useEffect, useContext, useRef } from "react";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { ChannelsInterfaceFront, Channel } from "../../../Types/Chat-Types";
 import SidebarItem from "./Sidebar-Item";
 import { SidebarContext } from "../Chat";
@@ -10,13 +10,16 @@ function Sidebar(props: {showModal: number, setShowModal: Function, chanDatas: C
 
     const sidebarStatus = useContext(SidebarContext);
     const ref = useRef<HTMLHeadingElement>(null);
-    let params = useParams();
+    const params = useParams();
+    const location = useLocation();
 
     useEffect(() => {
         const handleClickOutside = (event: any) => {
-            if (ref.current && !ref.current.contains(event.target)) {
-                sidebarStatus.sidebar && sidebarStatus.setSidebarStatus 
-                && params.chatId !== undefined && sidebarStatus.setSidebarStatus();
+            if (ref.current && !ref.current.contains(event.target) 
+                && sidebarStatus.sidebar && sidebarStatus.setSidebarStatus 
+                && (params.chatId !== undefined || location.pathname === "/chat/channels-list")) {
+                
+                    sidebarStatus.setSidebarStatus();
             }
         };
         document.addEventListener('click', handleClickOutside, true);
@@ -46,7 +49,7 @@ function Sidebar(props: {showModal: number, setShowModal: Function, chanDatas: C
                     chanClick={chanClick}
                 /> */}
             </ul>
-            <Link className="explore-button" to="/chat/channels-list">
+            <Link className="explore-button" to="/chat/channels-list" onClick={() => sidebarStatus.setSidebarStatus()}>
                 Explore other channels
             </Link>
         </div>

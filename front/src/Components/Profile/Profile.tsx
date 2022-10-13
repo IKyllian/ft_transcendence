@@ -6,7 +6,7 @@ import RenderProfileBlock from "./Render-Profile-Block";
 import CardInfo from "./Card-Info";
 import LoadingSpin from "../Utils/Loading-Spin";
 
-import { UserInterface } from "../../Types/User-Types";
+import { ProfileState } from "../../Types/User-Types";
 import { useAppSelector } from '../../Redux/Hooks';
 import { useParams } from "react-router-dom";
 import axios from "axios";
@@ -14,18 +14,18 @@ import { baseUrl } from "../../env";
 
 import { getMatchPlayed, getWinRate } from "../../Utils/Utils-User";
 
-interface profileMenuButtons {
+interface ProfileMenuButtons {
     title: string;
     isActive: string;
 }
 
 function Profile() {
-    const [attributes, setAttributes] = useState<profileMenuButtons[]>([
+    const [attributes, setAttributes] = useState<ProfileMenuButtons[]>([
         { title: "Achievements", isActive: "true" },
         { title: "Matches", isActive: "false" },
         { title: "Friends", isActive: "false" }
     ]);
-    const [userDatas, setUserDatas] = useState<UserInterface | undefined>(undefined);
+    const [userState, setUserState] = useState<ProfileState | undefined>(undefined);
     
     const params = useParams();
     const modalStatus = useContext(ModalContext);
@@ -40,8 +40,13 @@ function Profile() {
     }
 
     useEffect(() => {
-        if (params.username === currentUser?.username)
-            setUserDatas(currentUser);
+        if (params.username === currentUser?.username) {
+            // setUserDatas(currentUser);
+            setUserState({
+                isLoggedUser: false,
+                user: currentUser!,
+            });
+        }
         else {
             axios.get(`${baseUrl}/users/?${params.username}`, {
                 headers: {
@@ -50,24 +55,28 @@ function Profile() {
             })
             .then(response => {
                 console.log(response);
+                // setUserState({
+                //     isLoggedUser: false,
+                //     user: response.data,
+                // });
             })
             .catch(err => {
                 console.log(err);
             })
         }
-    }, [userDatas, params])
+    }, [params])
 
-    return !userDatas ? (
+    return !userState?.user ? (
        <LoadingSpin classContainer="profile-container" />
     ) : (
         <div className={`profile-container ${modalStatus.modal.isOpen ? modalStatus.modal.blurClass : ""}`}>
             <div className="profile-header">
                 <div className='stats-infos'>
-                    <StatsInfoItem label="Games Played" value={getMatchPlayed(userDatas).toString()} />
-                    <StatsInfoItem label="Win Rate" value={`${getWinRate(userDatas).toString()}%`} />
+                    <StatsInfoItem label="Games Played" value={getMatchPlayed(userState.user).toString()} />
+                    <StatsInfoItem label="Win Rate" value={`${getWinRate(userState.user).toString()}%`} />
                     <StatsInfoItem label="Rank" value="#3" />
                 </div>
-                <CardInfo userDatas={userDatas} />
+                <CardInfo userState={userState} />
             </div>
             <div className="profile-main">
                 <div className="profile-main-menu">
@@ -77,7 +86,7 @@ function Profile() {
                         )
                     }
                 </div>
-                <RenderProfileBlock blockTitle={attributes.find(elem => elem.isActive === "true")!.title} userDatas={userDatas} />
+                <RenderProfileBlock blockTitle={attributes.find(elem => elem.isActive === "true")!.title} userDatas={userState.user} />
             </div>
         </div>
     );

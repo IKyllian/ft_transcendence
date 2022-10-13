@@ -30,7 +30,7 @@ function Chat() {
     }
 
     useEffect(() => {
-        if (params.chatId === undefined) {
+        if (params.chatId === undefined && location.pathname !== "/chat/channels-list") {
             setReponsiveSidebar(true);
         }
         dispatch(changeActiveElement(parseInt(params.chatId!, 10)));

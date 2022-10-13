@@ -31,9 +31,15 @@ export interface UserInterface {
     avatar: string,
     statistic: Statistic,
     channels?: Channel[],
+    blocked: UserInterface[];
 }
 
 interface Statistic {
     matchWon: number,
     matchLost: number,
+}
+
+export interface ProfileState {
+    isLoggedUser: boolean,
+    user: UserInterface,
 }

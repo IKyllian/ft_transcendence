@@ -3,10 +3,10 @@ function LoadingSpin(props: {classContainer?: string}) {
     const {classContainer} = props;
     return classContainer ? (
         <div className={classContainer}>
-            <div className="loading-spin"></div>
+            <span className="loader"></span>
         </div>
     ) : (
-        <div className="loading-spin"></div>
+        <span className="loader"></span>
     );
 }
 

@@ -23,16 +23,15 @@ function ChatElement() {
     const changeSidebarStatus = () => {
         setShowUsersSidebar(!showUsersSidebar);
     }
-    // const messagesEndRef = useRef<null | HTMLDivElement>(null);
+    const messagesEndRef = useRef<null | HTMLDivElement>(null);
     let params = useParams();
 
-    // const scrollToBottom = () => {
-    //     console.log(messagesEndRef);
-    //     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    // }
-    // useEffect(() => {
-    //     scrollToBottom()
-    // }, [params]);
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+    useEffect(() => {
+        scrollToBottom();
+    }, [chatDatas]);
 
     useEffect(() => {
         const getDatas = () => {
@@ -58,6 +57,8 @@ function ChatElement() {
             socket!.emit("LeaveChannelRoom", {
                 id: parseInt(params.chatId!),
             });
+            socket!.off("exception");
+            socket!.off("roomData");
         }
     }, [params])
 
@@ -68,6 +69,10 @@ function ChatElement() {
             });
         }
         socket!.on('NewChannelMessage', listener);
+
+        return () => {
+            socket!.off("NewChannelMessage");
+        }
     }, [])
 
     const handleSubmit = (e: any) => {
@@ -84,7 +89,7 @@ function ChatElement() {
         }
     } 
 
-    return (chatDatas === undefined) ? (
+    return (chatDatas === undefined || (chatDatas && chatDatas.id !== parseInt(params.chatId!))) ? (
         <div style={{width: "100%"}}>
             <LoadingSpin classContainer="chat-page-container"/>
         </div>
@@ -93,23 +98,20 @@ function ChatElement() {
             <div className="message-container-main">
                 <div className="message-wrapper">
                     <ChatHeader chatItem={chatDatas} showUsersSidebar={showUsersSidebar} changeSidebarStatus={changeSidebarStatus} />
-                    {/* <div className="ul-container"> */}
-                        <ul>
-                            {
-                                chatDatas!.messages.map((elem, index) =>
-                                    <MessageItem key={index} sender={elem.sender} message={elem.content} loggedUserIsOwner={loggedUserIsOwner} />
-                                )
-                            }
-                        </ul>
-                        {/* <div ref={messagesEndRef} /> */}
-                    {/* </div> */}
+                    <ul>
+                        {
+                            chatDatas!.messages.map((elem, index) =>
+                                <MessageItem key={index} sender={elem.sender} message={elem.content} loggedUserIsOwner={loggedUserIsOwner} />
+                            )
+                        }
+                        <div ref={messagesEndRef} /> 
+                    </ul>
                 </div>
                 <div className="message-input-container">
                     <form onSubmit={handleSubmit}>
                         <input type="text" placeholder="Type Your Message..." value={inputMessage} onChange={(e) => setInputMessage(e.target.value)} />
-                        {/* <button> <IconSend /> </button> */}
+                        <button type="submit"> <IconSend /> </button>
                     </form>
-                    <IconSend />
                 </div>
             </div>
             { showUsersSidebar && <UsersSidebar usersList={chatDatas.channelUsers} /> }
