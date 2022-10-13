@@ -11,12 +11,14 @@ export class ChannelUser  {
 
 	@ManyToOne(() => User, (user) => user.channelUser, {
 		nullable: false,
-		onDelete: 'CASCADE'
+		onDelete: 'CASCADE',
+		orphanedRowAction: 'delete',
 	})
 	user!: User;
 
 	@ManyToOne(() => Channel, (channel) => channel.channelUsers, {
-		onDelete: 'CASCADE'
+		onDelete: 'CASCADE',
+		orphanedRowAction: 'delete',
 	})
 	channel!: Channel;
 	

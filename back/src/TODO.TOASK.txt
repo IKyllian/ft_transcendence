@@ -3,6 +3,7 @@
 	on access_token expiration send request to server with refresh_token.
 	If fail redirect to login page.
 	- On logout, remove token from local storage?
+	- Problem with 42 sign in (Unauthorized)
 
 //Channels
 	- Add Can add/modify/delete password of a channels
@@ -11,9 +12,6 @@
 
 // User
 
-//TODO
-	- Route for editing user / Channels
-	- Check routes for delete channels / User
 
 // GAME
 	- When inviting someone to play from friendlist or chat, oponent get a notif to accept or decline. If accepted, Both got a 'popup'
@@ -26,3 +24,7 @@
 	-when messages received do an emit to check if user is blocked ? or
 	filter the messages in server and return messages with attribute visible
 	
+//TODO
+	- Route for editing user / Channels
+	- Check routes for delete channels / User
+	- error when trying to connect with a login 42 with a password

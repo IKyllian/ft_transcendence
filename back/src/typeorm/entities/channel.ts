@@ -1,6 +1,7 @@
 import { Exclude } from "class-transformer";
 import { channelOption } from "src/utils/types/types";
 import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { BannedUser } from "./bannedUser";
 import { ChannelMessage } from "./channelMessage";
 import { ChannelUser } from "./channelUser";
 import { User } from "./user";
@@ -16,10 +17,6 @@ export class Channel {
 	@Column({ default: 'public' })
 	option: channelOption;
 
-	@Column({ default: 0 })
-	nb: number;
-
-
 	@OneToMany(() => ChannelUser, (channelUser) => channelUser.channel, {
 		cascade: true,
 	})
@@ -34,5 +31,9 @@ export class Channel {
 	@Exclude()
 	hash?: string;
 
+	@OneToMany(() => BannedUser, (bannedUser) => bannedUser.channel, {
+		cascade: true,
+	})
+	bannedUsers: BannedUser[];
 }
 
