@@ -72,10 +72,8 @@ function Profile() {
         <div className={`profile-container ${modalStatus.modal.isOpen ? modalStatus.modal.blurClass : ""}`}>
             <div className="profile-header">
                 <div className='stats-infos'>
-                    {/* <StatsInfoItem label="Games Played" value={getMatchPlayed(userState.user).toString()} />
-                    <StatsInfoItem label="Win Rate" value={`${getWinRate(userState.user).toString()}%`} /> */}
-                    <StatsInfoItem label="Games Played" value="0" />
-                    <StatsInfoItem label="Win Rate" value="0" />
+                    <StatsInfoItem label="Games Played" value={getMatchPlayed(userState.user).toString()} />
+                    <StatsInfoItem label="Win Rate" value={`${getWinRate(userState.user).toString()}%`} />
                     <StatsInfoItem label="Rank" value="#3" />
                 </div>
                 <CardInfo userState={userState} />

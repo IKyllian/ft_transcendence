@@ -9,8 +9,8 @@ import Leaderboard from './Components/Leaderboard/Leaderboard';
 import AddFriendModal from './Components/Friends-Modal';
 import Chat from './Components/Chat/Chat';
 import ChannelSettings from './Components/Chat/Channel-Settings/Settings-Container';
-import ChatElement from "./Components/Chat/Message-Section/Chat-Element";
-import PrivateMessageElement from "./Components/Chat/Message-Section/Private-Message-Element";
+import ChatChannel from "./Components/Chat/Chat-Section/Chat-Channel";
+import ChatPrivateMessage from "./Components/Chat/Chat-Section/Chat-Private-Message";
 import Error404 from "./Components/404-Error";
 import { ModalProvider } from "./Components/Utils/ModalProvider";
 import PublicRoute from "./Route/Public-Route";
@@ -98,12 +98,12 @@ function App() {
 	useEffect(() => {
 		if (isAuthenticated && socket === undefined) {
 			connectSocket();
-			setTimeout(function() {
-				setGameInvite(true);
-				setTimeout(function() {
-					gameNotificationLeave();
-				}, 15000);
-			}, 2000);	
+			// setTimeout(function() {
+			// 	setGameInvite(true);
+			// 	setTimeout(function() {
+			// 		gameNotificationLeave();
+			// 	}, 15000);
+			// }, 2000);	
 		}
 	}, [isAuthenticated])
 
@@ -134,7 +134,7 @@ function App() {
 									path="channel/:channelId"
 									element= {
 										<PrivateRoute>
-											<ChatElement />
+											<ChatChannel />
 										</PrivateRoute>
 									}
 								/>
@@ -142,7 +142,7 @@ function App() {
 									path="private-message/:convId"
 									element= {
 										<PrivateRoute>
-											<PrivateMessageElement />
+											<ChatPrivateMessage />
 										</PrivateRoute>
 									}
 								/>

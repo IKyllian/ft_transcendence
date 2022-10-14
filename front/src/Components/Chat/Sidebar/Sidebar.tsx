@@ -15,11 +15,9 @@ function Sidebar(props: {setShowModal: Function, chanDatas: ChannelsInterfaceFro
 
     useEffect(() => {
         const handleClickOutside = (event: any) => {
-            if (ref.current && !ref.current.contains(event.target) 
-                && sidebarStatus.sidebar && sidebarStatus.setSidebarStatus 
-                && (params.chatId !== undefined || location.pathname === "/chat/channels-list")) {
-                
-                    sidebarStatus.setSidebarStatus();
+            if (ref.current && !ref.current.contains(event.target)) {
+                sidebarStatus.sidebar && sidebarStatus.setSidebarStatus 
+                && sidebarStatus.setSidebarStatus();
             }
         };
         document.addEventListener('click', handleClickOutside, true);
@@ -27,7 +25,7 @@ function Sidebar(props: {setShowModal: Function, chanDatas: ChannelsInterfaceFro
         return () => {
             document.removeEventListener('click', handleClickOutside, true);
         };
-    }, [sidebarStatus, sidebarStatus.setSidebarStatus, params.chatId]);
+    }, [sidebarStatus, sidebarStatus.setSidebarStatus, params.channelId, params.convId]);
 
  
     return (

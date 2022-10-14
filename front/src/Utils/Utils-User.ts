@@ -10,3 +10,7 @@ export function getWinRate(user: UserInterface): number {
         return ((user.statistic.matchWon / getMatchPlayed(user)) * 100);
     return (0);
 }
+
+export function userIdIsBlocked(connectedUser: UserInterface, secondUserId: number): boolean {
+    return (connectedUser.blocked.find(elem => elem.id === secondUserId) ? true : false);
+}

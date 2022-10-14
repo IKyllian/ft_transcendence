@@ -22,7 +22,7 @@ export interface ChatMessage {
     id: number,
     sender: UserInterface,
     content: string,
-    send_at: string,
+    send_at: Date,
 }
 
 export interface Channel {
@@ -45,6 +45,6 @@ interface PrivateMessage {
     id: number,
     sender: UserInterface,
     content: string,
-    send_at: string,
+    send_at: Date,
     // conversation: Conversation[],
 }

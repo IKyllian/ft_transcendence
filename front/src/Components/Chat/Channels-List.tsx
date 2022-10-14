@@ -32,7 +32,7 @@ function ChannelItem(props: {channelData: Channel, token: string}) {
         .then((response) => {
             console.log(response);
             dispatch(addChannel({channel: response.data, isActive: 'false'}));
-            navigate(`/chat/${response.data.id}`);
+            navigate(`/chat/channel/${response.data.id}`);
         })
         .catch((err) => {
             console.log(err);
@@ -64,10 +64,6 @@ function ChannelsList() {
     const [channelsList, setChannelsList] = useState<undefined | Channel[]>(undefined);
     let authDatas = useAppSelector((state) => state.auth);
     const sidebarStatus = useContext(SidebarContext);
-
-    // useEffect(() => {
-    //     sidebarStatus.setSidebarStatus();
-    // }, [])
 
     useEffect(() => {
         axios.get(`${baseUrl}/channel/search`, {

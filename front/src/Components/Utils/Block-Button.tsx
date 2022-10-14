@@ -2,11 +2,13 @@ import axios from "axios";
 import { baseUrl } from "../../env";
 import { useAppDispatch, useAppSelector } from "../../Redux/Hooks";
 import { replaceUserObject } from "../../Redux/AuthSlice";
+import { userIdIsBlocked } from "../../Utils/Utils-User";
 
-function BlockButton(props: {senderIsBlock: boolean, senderId: number}) {
-    const {senderIsBlock, senderId} = props;
+function BlockButton(props: {senderId: number}) {
+    const {senderId} = props;
 
     const authDatas = useAppSelector((state) => state.auth);
+    const senderIsBlock = userIdIsBlocked(authDatas.currentUser!, senderId);
     const dispatch = useAppDispatch();
 
     const onBlock = () => {

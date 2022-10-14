@@ -14,7 +14,8 @@
     flex-flow: row;
     .chat-sidebar {
         @include width-height(300px, 100%);
-        min-width: 250px;
+        min-width: 280px;
+        max-width: 280px;
         background-color: $LightDarkPalette;
         border-right: 1px solid $WhitePalette;
         position: relative;
@@ -102,7 +103,7 @@
     }
 
     .message-container {
-        width: 80%;
+        width: 100%;
         display: flex;
         flex-direction: row;
         .message-container-main {
@@ -154,6 +155,7 @@
 
                     .burger-icon-responsive {
                         display: none;
+                        cursor: pointer
                     }
                     .player-container {
                         @include flex-row-alignCenter;
@@ -197,12 +199,21 @@
                             }
     
                             .message-sender {
-                                cursor: pointer;
                                 font-size: 10px;
                                 color: #a5abb0;
                                 margin-top: 5px;
                                 text-decoration: none;
                                 position: relative;
+                                span {
+                                    &:first-child {
+                                        cursor: pointer;
+                                        margin-right: 5px;
+                                    }
+                                    &:last-child {
+                                        font-size: 9px;
+                                        letter-spacing: 0.5px;
+                                    }   
+                                }
                             }
                         }
             
@@ -223,6 +234,14 @@
                                 border-top-right-radius: 30px;
                                 border-bottom-left-radius: 30px;
                                 border-top-left-radius: 30px;
+                            }
+
+                            .message-item-info {
+                                .message-sender {
+                                    span {
+                                        float: right;
+                                    }
+                                }
                             }
                         }
                     }
@@ -319,7 +338,6 @@
         padding: 16px 0;
         overflow-y: scroll;
         height: 100%;
-        // position: relative;
 
         .sidebar-button {
             display: none;
@@ -409,7 +427,21 @@
             position: absolute;
             z-index: 99;
             height: 100%;
-            width: 250px;
+            min-width: 250px;
+            max-width: 250px;
+            font-size: 15px;
+            .ul-wrapper {            
+                &-elem {
+                    .collapse-button {
+                        svg {
+                            @include width-height(20px, 20px);
+                        }
+                        &-name {
+                            font-size: 13px;
+                        }
+                    }
+                }
+            }
         }
         .chat-sidebar-responsive {
             display: block;

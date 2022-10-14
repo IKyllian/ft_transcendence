@@ -5,22 +5,19 @@ import LoadingSpin from "../../Utils/Loading-Spin";
 import { SocketContext } from "../../../App";
 import { IconSend } from "@tabler/icons";
 import MessageItem from "./Message-Item";
-import { useLocation, useParams } from "react-router-dom";
-import { UserInterface } from "../../../Types/User-Types";
+import { useParams } from "react-router-dom";
 import axios from "axios";
 import { baseUrl } from "../../../env";
 import { useAppSelector } from '../../../Redux/Hooks'
-import { getSecondUserIdOfPM, getSecondUsernameOfPM } from "../../../Utils/Utils-Chat";
+import { getSecondUserIdOfPM, getSecondUserOfPM } from "../../../Utils/Utils-Chat";
 import ChatHeader from "./Chat-Header";
 
-function PrivateMessageElement(props: {}) {
+function ChatPrivateMessage() {
     const [inputMessage, setInputMessage] = useState<string>('');
     const [convDatas, setConvDatas] = useState<Conversation | undefined>(undefined);
 
     let authDatas = useAppSelector((state) => state.auth);
-    const { } = props;
     const messagesEndRef = useRef<null | HTMLDivElement>(null);
-    const location = useLocation();
     const params = useParams();
 
     const { socket } = useContext(SocketContext);
@@ -30,7 +27,11 @@ function PrivateMessageElement(props: {}) {
     }
 
     useEffect(() => {
-        console.log("PARAMS",parseInt(params.convId!));
+        scrollToBottom();
+    }, [convDatas])
+
+    useEffect(() => {
+        setConvDatas(undefined);
         axios.get(`${baseUrl}/conversation/${parseInt(params.convId!)}`, {
             headers: {
                 "Authorization": `Bearer ${authDatas.token}`,
@@ -38,12 +39,14 @@ function PrivateMessageElement(props: {}) {
         })
         .then(response => {
             console.log(response);
-            setConvDatas(response.data);
+            let conv: Conversation = response.data;
+            conv.messages.forEach(elem => elem.send_at = new Date(elem.send_at));
+            setConvDatas(conv);
         })
         .catch(err => {
             console.log(err);
         })
-    }, [params])
+    }, [params.convId])
 
     useEffect(() => {
         const listener = (data: any) => {
@@ -85,11 +88,11 @@ function PrivateMessageElement(props: {}) {
         <div className="message-container">
             <div className="message-container-main">
                 <div className="message-wrapper">
-                    <ChatHeader privateConvUser={getSecondUsernameOfPM(convDatas, authDatas.currentUser!.id)} />
+                    <ChatHeader privateConvUser={getSecondUserOfPM(convDatas, authDatas.currentUser!.id)} />
                     <ul>
                         {
                             convDatas.messages.map((elem, index) =>
-                                <MessageItem key={index} sender={elem.sender} message={elem.content} loggedUserIsOwner={true} />
+                                <MessageItem key={index} isFromChan={false} message={elem} loggedUserIsOwner={true} />
                             )
                         }
                         <div ref={messagesEndRef} /> 
@@ -106,4 +109,4 @@ function PrivateMessageElement(props: {}) {
     );
 }
 
-export default PrivateMessageElement;
+export default ChatPrivateMessage;

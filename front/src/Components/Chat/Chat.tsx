@@ -31,11 +31,11 @@ function Chat() {
     }
 
     useEffect(() => {
-        if (params.chatId === undefined && location.pathname !== "/chat/channels-list") {
+        if ((params.channelId === undefined && params.convId === undefined) && location.pathname !== "/chat/channels-list") {
             setReponsiveSidebar(true);
         }
-        dispatch(changeActiveElement(parseInt(params.chatId!, 10)));
-    }, [params])
+        dispatch(changeActiveElement(parseInt(params.channelId!, 10)));
+    }, [params.channelId, params.convId, location.pathname])
 
     useEffect(() => {
         dispatch(loadingDatas());
@@ -55,7 +55,7 @@ function Chat() {
                 });
             }
             if (params) {
-                let findOpenChat: ChannelsInterfaceFront | undefined = datasArray.find(elem => elem.channel.id === parseInt(params.chatId!, 10));
+                let findOpenChat: ChannelsInterfaceFront | undefined = datasArray.find(elem => elem.channel.id === parseInt(params.channelId!, 10));
                 if (findOpenChat) {
                     findOpenChat.isActive = "true";
                 }
@@ -82,12 +82,6 @@ function Chat() {
                 });
             }
             dispatch(copyPrivateConvArray(datasArray));
-            // if (params) {
-            //     let findOpenChat: ChannelsInterfaceFront | undefined = datasArray.find(elem => elem.channel.id === parseInt(params.chatId!, 10));
-            //     if (findOpenChat) {
-            //         findOpenChat.isActive = "true";
-            //     }
-            // }
         }).catch(err => {
             console.log(err);
         })
@@ -102,7 +96,8 @@ function Chat() {
             })
             .then(response => {
                 console.log(response);
-                dispatch(addPrivateConv({isActive: 'false', conversation: response.data}));
+                if (!chatDatas.privateConv?.find(elem => elem.conversation.id === response.data.id))
+                    dispatch(addPrivateConv({isActive: 'false', conversation: response.data}));
                 navigate(`/chat/private-message/${getSecondUserIdOfPM(response.data, authDatas.currentUser!.id)}`);
             })
             .catch(err => {
@@ -119,7 +114,7 @@ function Chat() {
             <div className={`chat-page-container ${modalStatus.modal.isOpen ? modalStatus.modal.blurClass : ""}`}>
                 <Sidebar setShowModal={setShowModal} chanDatas={chatDatas.channels} privateConvs={chatDatas.privateConv} />
                 {
-                    params.chatId === undefined && location.pathname === "/chat"
+                    params.channelId === undefined && location.pathname === "/chat"
                     ?
                     <div className="no-target-message">
                         <p> Sélectionnez un message ou un channel </p>

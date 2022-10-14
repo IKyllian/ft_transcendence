@@ -10,7 +10,7 @@ import { useAppSelector } from '../../../Redux/Hooks'
 import LoadingSpin from "../../Utils/Loading-Spin";
 import { SocketContext } from "../../../App";
 
-function ChatElement() {
+function ChatChannel() {
     const [chatDatas, setChatDatas] = useState<Channel | undefined>(undefined);
     const [showUsersSidebar, setShowUsersSidebar] = useState<boolean>(false);
     const [inputMessage, setInputMessage] = useState<string>('');
@@ -21,6 +21,7 @@ function ChatElement() {
     const params = useParams();
     const {socket} = useContext(SocketContext);
 
+    console.log("chatDatas state", chatDatas);
     const changeSidebarStatus = () => {
         setShowUsersSidebar(!showUsersSidebar);
     }
@@ -31,9 +32,10 @@ function ChatElement() {
 
     useEffect(() => {
         scrollToBottom();
-    }, [chatDatas]);
+    }, [chatDatas?.messages]);
 
     useEffect(() => {
+        setChatDatas(undefined);
         const getDatas = () => {
             socket!.emit("JoinChannelRoom", {
                 id: parseInt(params.channelId!),
@@ -44,12 +46,14 @@ function ChatElement() {
             });
 
             socket!.on('roomData', (data: Channel) => {
-                setChatDatas(data);
+                let channel: Channel = data;
+                channel.messages.forEach(elem => elem.send_at = new Date(elem.send_at));
+                setChatDatas({...channel});
                 if (data.channelUsers.find((elem) => elem.user.id === authDatas.currentUser?.id && (elem.role === "owner" || elem.role === "moderator")))
                     setLoggedUserIsOwner(true);
             });
         }
-        if (params) {
+        if (params.channelId) {
             getDatas();
         }
 
@@ -60,7 +64,7 @@ function ChatElement() {
             socket!.off("exception");
             socket!.off("roomData");
         }
-    }, [params])
+    }, [params.channelId])
 
     useEffect(() => {
         const listener = (data: any) => {
@@ -89,7 +93,7 @@ function ChatElement() {
         }
     } 
 
-    return (chatDatas === undefined || (chatDatas && chatDatas.id !== parseInt(params.channelId!))) ? (
+    return (chatDatas === undefined) ? (
         <div style={{width: "100%"}}>
             <LoadingSpin classContainer="chat-page-container"/>
         </div>
@@ -101,7 +105,7 @@ function ChatElement() {
                     <ul>
                         {
                             chatDatas!.messages.map((elem, index) =>
-                                <MessageItem key={index} sender={elem.sender} message={elem.content} loggedUserIsOwner={loggedUserIsOwner} />
+                                <MessageItem key={index} isFromChan={true} message={elem} loggedUserIsOwner={loggedUserIsOwner} />
                             )
                         }
                         <div ref={messagesEndRef} /> 
@@ -119,4 +123,4 @@ function ChatElement() {
     );
 }
 
-export default ChatElement;
+export default ChatChannel;

@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import ProfilPic from "../../../Images-Icons/pp.jpg";
-import { ExampleUser } from "../../../Types/User-Types";
 import { ChannelUser } from "../../../Types/Chat-Types";
 
 function UserSidebarItem(props: {user: ChannelUser}) {
