@@ -1,5 +1,5 @@
 import { Navigate } from 'react-router-dom';
-import { IsLog } from "../Service/auth";
+import { IsLog } from '../Utils/Utils-User';
 
 function PrivateRoute({ children }: { children: JSX.Element }) {
     const auth = IsLog();

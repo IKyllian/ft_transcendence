@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { ChannelsInterfaceFront, ConversationInterfaceFront } from '../Types/Chat-Types';
+import { getSecondUserIdOfPM } from "../Utils/Utils-Chat"
 
 interface ChannelState {
     channels?: ChannelsInterfaceFront[],
@@ -50,16 +51,37 @@ export const chatSlice = createSlice({
                 state.privateConv = state.privateConv.filter(elem => elem.conversation.id !== payload);
             }
         },
-        changeActiveElement: (state, {payload}: PayloadAction<number>) => {
-            if (state.channels) {
-                const newArray: ChannelsInterfaceFront[] = state.channels.map(elem => {
-                    if (payload === elem.channel.id)
+        changeActiveElement: (state, {payload}: PayloadAction<{id: number, isChannel: boolean}>) => {
+            if ((payload.isChannel && state.channels)) {
+                state.channels = [...state.channels].map(elem => {
+                    if (payload.id === elem.channel.id)
                         return {...elem, isActive: 'true'};
-                    else if (elem.isActive === 'true' && elem.channel.id !== payload)
+                    else if (elem.isActive === 'true' && elem.channel.id !== payload.id)
                         return {...elem, isActive: 'false'}
                     return elem;
-                })
-                state.channels = newArray;
+                });
+                if (state.privateConv) {
+                    state.privateConv = [...state.privateConv].map(elem => {
+                        if (elem.isActive === 'true')
+                            elem.isActive = 'false';
+                        return elem;
+                    });
+                }
+            } else if ((!payload.isChannel && state.privateConv)) {
+                state.privateConv = [...state.privateConv].map(elem => {
+                    if (payload.id ===  elem.conversation.id)
+                        return {...elem, isActive: 'true'};
+                    else if (elem.isActive === 'true' && elem.conversation.id !== payload.id)
+                        return {...elem, isActive: 'false'}
+                    return elem;
+                });
+                if (state.channels) {
+                    state.channels = [...state.channels].map(elem => {
+                        if (elem.isActive === 'true')
+                            elem.isActive = 'false';
+                        return elem;
+                    });
+                }
             }
         }
     }

@@ -21,7 +21,7 @@ function ChatChannel() {
     const params = useParams();
     const {socket} = useContext(SocketContext);
 
-    console.log("chatDatas state", chatDatas);
+    // console.log("chatDatas state", chatDatas);
     const changeSidebarStatus = () => {
         setShowUsersSidebar(!showUsersSidebar);
     }

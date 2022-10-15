@@ -20,13 +20,9 @@ function SidebarItem(props: SidebarItemProps) {
         setSidebarOpen(!sidebarOpen);
     }
 
-    const modalStatus = () => {
-            setShowModal!(index === 0 ? 1 : 0);
-    }
-
     return (
         <li className="ul-wrapper-elem">
-            <ItemHeader title={title} sidebarOpen={sidebarOpen} handleClick={handleClick} modalStatus={modalStatus} />           
+            <ItemHeader title={title} sidebarOpen={sidebarOpen} handleClick={handleClick} modalStatus={() => setShowModal!(index)} />           
             {
                chanDatas !== undefined && sidebarOpen && 
                <ItemContent chanDatas={chanDatas} />

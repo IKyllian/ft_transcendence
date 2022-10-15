@@ -15,9 +15,9 @@ type FormValues = {
     usersIdInvited?: number;
 }
 
-function ChatModal(props: {setShowModal: Function, showModal: number}) {
+function ChatModal(props: {onCloseModal: Function, showModal: number}) {
     const { register, handleSubmit, watch, formState: {errors} } = useForm<FormValues>();
-    const { setShowModal, showModal } = props;
+    const { onCloseModal, showModal } = props;
 
     const channelMode = watch('chanMode');
 
@@ -32,8 +32,7 @@ function ChatModal(props: {setShowModal: Function, showModal: number}) {
             name: string,
             option: string,
             password?: string,
-        }
-        body = {
+        } = {
             name: data.chanName,
             option: data.chanMode,
         }
@@ -47,8 +46,7 @@ function ChatModal(props: {setShowModal: Function, showModal: number}) {
         .then((response) => {
            console.log(response);
            dispatch(addChannel({channel: response.data, isActive: "false"}));
-        //    setChannelsDatas((state: ChannelsInterfaceFront[]) => [...state, {channel: response.data, isActive: "false"}]);
-           setShowModal(false);
+           onCloseModal();
            navigate(`/chat/${response.data.id}`);
         }).catch(err => {
             console.log(err);
@@ -58,7 +56,7 @@ function ChatModal(props: {setShowModal: Function, showModal: number}) {
     if (showModal === 1) {
         return (
             <div className="chat-modal">
-                <IconX className="modal-exit" onClick={() => setShowModal(false) } />
+                <IconX className="modal-exit" onClick={() => onCloseModal() } />
                 <h3> Create Channel </h3>
                 <form onSubmit={formSubmit}>
                     <div className="checkbox-container">
@@ -101,7 +99,7 @@ function ChatModal(props: {setShowModal: Function, showModal: number}) {
                     }
                     <SearchBarPlayers functionality="chanInvite" register={register} />
                     <div className="chat-modal-buttons">
-                        <button onClick={() => setShowModal(false) }> Cancel </button>
+                        <button onClick={() => onCloseModal() }> Cancel </button>
                         <input type="submit" name="Save" />
                     </div>
                 </form>
@@ -110,7 +108,7 @@ function ChatModal(props: {setShowModal: Function, showModal: number}) {
     } else if (showModal === 2) {
         return (
             <div className="chat-modal">
-                <IconX className="modal-exit" onClick={() => setShowModal(false) } />
+                <IconX className="modal-exit" onClick={() => onCloseModal() } />
                 <SearchBarPlayers functionality="sendMessage" />
             </div>
         );
