@@ -1,12 +1,11 @@
 import { io, Socket } from "socket.io-client";
-import { LobbyStatus, PlayersLobbyData } from './types/shared.types';
+import { GameState, LobbyStatus, PlayerInput, PlayersLobbyData, RoundSetup } from './types/shared.types';
 
 export default class ClientSocketManager
 {
-	private socket? : Socket;
+	private socket?: Socket;
 	private lobby_triggers: any;
 	private pong_triggers: any;
-
 
 	constructor()
 	{
@@ -24,17 +23,33 @@ export default class ClientSocketManager
         this.pong_triggers = data;
     }
 
-
-
-
 	private attempt_connection()
 	{
-//TODO retry until success
+//TODO retry until success ? deja le cas auto ?
 		this.socket = io('http://localhost:6161');
 	}
 
+	//Listens init
 	
-	join_lobby = (lobbydata: PlayersLobbyData) =>
+	private init_listen = () =>
+	{
+		
+		if (this.socket instanceof Socket)
+		{
+			//Lobby
+			this.socket.on('join_lobby_ok', this.onLobbyJoinOk.bind(this));
+			this.socket.on('lobby_all_ready', this.onLobbyAllReady.bind(this));
+			this.socket.on('lobby_status', this.onLobbyStatus.bind(this));
+			//Game
+			this.socket.on('game_state', this.onGameGetState.bind(this));
+			this.socket.on('round_setup', this.onGameGetRoundSetup.bind(this));
+
+		}
+	}
+
+	//Lobby Emits
+	
+	lobby_send_join = (lobbydata: PlayersLobbyData) =>
 	{
 		if (this.socket instanceof Socket)
 		{
@@ -42,7 +57,7 @@ export default class ClientSocketManager
 		}
 	}
 
-	request_lobby_status = (game_id: string) =>
+	lobby_send_request_status = (game_id: string) =>
 	{
 		if (this.socket instanceof Socket)
 		{
@@ -50,26 +65,15 @@ export default class ClientSocketManager
 		}
 	}
 
-
-	send_ready = () =>
+	lobby_send_ready = (game_id: string) =>
 	{
 		if (this.socket instanceof Socket)
 		{
-			this.socket.emit('user_is_ready');
+			this.socket.emit('user_is_ready', game_id);
 		}
 	}
 
-	
-	private init_listen = () =>
-	{
-
-		if (this.socket instanceof Socket)
-		{
-			this.socket.on('join_lobby_ok', this.onLobbyJoinOk.bind(this));
-			this.socket.on('lobby_all_ready', this.onLobbyAllReady.bind(this));
-			this.socket.on('lobby_status', this.onLobbyStatus.bind(this));
-		}
-	}
+	//Lobby Listens
 
 	onLobbyJoinOk = (message: string) =>
 	{
@@ -88,10 +92,37 @@ export default class ClientSocketManager
 		this.lobby_triggers.update_lobby_status(new_status);	
 	}
 
+	//Game Emits
 
-	print_test = () =>
+	game_send_input = (game_id: string, input: PlayerInput) =>
 	{
-		console.log('print_test', this.socket?.id);
+		if (this.socket instanceof Socket)
+		{
+			this.socket.emit('user_game_input', game_id, input);
+		}
 	}
 
+	game_get_round_setup = (game_id: string) =>
+	{
+		if (this.socket instanceof Socket)
+		{
+			this.socket.emit('user_game_get_round_setup', game_id);
+		}
+	}
+
+	//Game Listens
+
+	onGameGetState = (gamestate: GameState) =>
+	{
+	//	console.log("received game state", gamestate);
+		//this.pong_triggers.acknowledge_server_authority(gamestate);
+		this.pong_triggers?.append_server_gamestate(gamestate);
+	}
+
+	onGameGetRoundSetup = (round_setup: RoundSetup) =>
+	{
+		console.log('received round setup', round_setup.start_time.toString());
+		this.lobby_triggers?.store_round_setup(round_setup);
+		this.pong_triggers?.apply_round_setup(round_setup);
+	}
 }

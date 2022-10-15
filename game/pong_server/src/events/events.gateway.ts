@@ -9,10 +9,31 @@ import {
   } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
 import { LobbyFactory } from '../lobby/lobby.factory';
-import { NewGameData, PlayersLobbyData } from '../types/shared.types';
+import { NewGameData, PlayerInput, PlayersLobbyData } from '../types/shared.types';
+
+// @WebSocketGateway(/*{ cors: true }*/ 6161, {cors: true})
+
+//   cors: {
+	//     origin: "https://example.com",
+//     methods: ["GET", "POST"]
+//   }
 
 
-  @WebSocketGateway({ cors: true })
+//   @WebSocketGateway( 6161,  {cors: {
+	//     origin: '*',
+	//     methods: ["GET", "POST"]
+	//   }})
+	
+	
+	
+	
+	// @WebSocketGateway({
+	// 	cors: {
+	// 		origin: ['http://192.168.1.22:6161/'],
+	// 		credential: true,
+	// 	}
+	// })
+	@WebSocketGateway({cors: true})
   export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect
   {
 
@@ -140,9 +161,10 @@ console.log("user join lobby", data);
 	}
 
 	@SubscribeMessage('user_is_ready')
-	async onUserisReady(@ConnectedSocket() client: Socket)
+	async onUserisReady(@ConnectedSocket() client: Socket,
+	@MessageBody() game_id: string)
 	{
-		this.lobbyfactory.lobby_player_ready(client);
+		this.lobbyfactory.lobby_player_ready(client, game_id);
 	}
 
 
@@ -153,6 +175,23 @@ console.log("user join lobby", data);
 		this.lobbyfactory.lobby_request_status(client, game_id);
 	}
 
+	/* ----- Users Game Management ----- */
+
+
+	@SubscribeMessage('user_game_input')
+	async onUserGameInput(@ConnectedSocket() client: Socket,
+	@MessageBody() data: any)
+	{
+		this.lobbyfactory.lobby_game_input(data);
+	}
+
+
+	@SubscribeMessage('user_game_get_round_setup')
+	async onUserGameGetRoundSetup(@ConnectedSocket() client: Socket,
+	@MessageBody() game_id: string)
+	{
+		//this.lobbyfactory.lobby_game_input(data);
+	}
 
   }
 

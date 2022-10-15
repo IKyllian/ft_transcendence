@@ -17,7 +17,7 @@ export type PlayersGameData = {
 	playertype: PlayerType,
 	player_secret: string,
 	game_id: string
-  }
+}
 
 export type PlayersLobbyData = 
 {
@@ -41,6 +41,12 @@ export enum PlayerStatus
 	Ready
 }
 
+export type LobbyStatus =
+{
+	player_A: PlayerStatus,
+	player_B: PlayerStatus
+}
+
 export type ScoreBoard = 
 {
 	player_A: number,
@@ -57,11 +63,60 @@ export type BallData =
 {
 	position: Coordinates,
 	velocity: number,
-	direction: number
+	vector: Coordinates
 }
 
-export type LobbyStatus =
+export enum Movement
 {
-	player_A: PlayerStatus,
-	player_B: PlayerStatus
+	Up,
+	Down,
+	Neutral
+}
+
+export enum Goal
+{
+	None,
+	Player_A,
+	Player_B
+}
+
+export type PlayerInput =
+{
+	playertype: PlayerType,
+	number: number,
+	time: Date,
+	movement: Movement
+}
+
+export type GameState =
+{
+	result: EndResult,
+	goal: Goal,
+	score: ScoreBoard,
+	balldata: BallData,
+	player_A: Coordinates,
+	last_processed_id_A: number,
+	last_processed_time_A: Date,
+	player_B: Coordinates,
+	last_processed_id_B: number,
+	last_processed_time_B: Date
+}
+
+export type RoundSetup =
+{
+	start_time: Date,
+	vector: Coordinates
+}
+
+export enum EndResult
+{
+	Undecided,
+	Player_A_Win,
+	Player_B_Win
+}
+
+export type InterpolationData =
+{
+	pos: Coordinates,
+	time: Date
 }

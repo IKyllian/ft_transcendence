@@ -2,7 +2,7 @@ import { Server } from 'socket.io';
 import { generate } from 'shortid'
 import { Lobby } from './lobby';
 import { Socket } from 'socket.io';
-import { PlayersLobbyData,  NewGameData } from 'src/types/shared.types';
+import { PlayersLobbyData,  NewGameData, PlayerInput } from 'src/types/shared.types';
 
 export class LobbyFactory
 {
@@ -12,6 +12,26 @@ export class LobbyFactory
 
 	lobby_create(data: {player_A: string, player_B: string}): NewGameData
 	{
+
+
+		if (data.player_A === 'Mario' && data.player_B === 'Luigi')
+		{
+			let ret:NewGameData =
+			{
+				player_A: 'Mario',
+				player_A_secret: '9rzx9PAs0r',
+				player_B: 'Luigi',
+				player_B_secret: 'oVugmgY4Ck',
+				game_id: 'aKnHwyr8z'
+			}
+			const lobby = new Lobby(ret);
+			this.lobby_list.set(lobby.game_id, lobby);
+	
+			return ret;
+		}
+
+
+
 		const game_id: string = generate();
 		const player_A_secret: string = generate();
 		const player_B_secret: string = generate();
@@ -98,14 +118,27 @@ export class LobbyFactory
 		this.lobby_list.get(game_id)?.lobby_send_lobby_status(client);
 	}
 
-	lobby_player_ready(client: Socket)
+	lobby_player_ready(client: Socket, game_id: string)
 	{
-		let game_id: string | undefined = this.locate_client(client);
-		if (game_id !== undefined )
-		{
-			this.lobby_list.get(game_id).player_ready(client);
+		// let game_id: string | undefined = this.locate_client(client);
+		// if (game_id !== undefined )
+		// {
+			this.lobby_list.get(game_id)?.player_ready(client);
 			
-		}
+		//}
+	}
+
+	lobby_game_input(data: any)
+	{
+//console.log("in factory input ", data);
+		this.lobby_list.get(data[0])?.game_receive_input(data[1]);
+	}
+
+
+
+	lobby_game_get_round_setup(client: Socket, game_id: string)
+	{
+		this.lobby_list.get(game_id)?.game_send_round_setup(client);
 	}
 
 }
