@@ -12,7 +12,7 @@ import { JwtStrategy } from "./strategy/jwt.strategy";
 
 @Module({
 	imports: [
-		forwardRef(() => ChatModule),
+		forwardRef(() => ChatModule), // TODO pq deja?
 		HttpModule,
 		UserModule,
 		// forwardRef(() => UserModule),

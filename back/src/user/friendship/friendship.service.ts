@@ -80,8 +80,7 @@ export class FriendshipService {
 		return await this.friendshipRepo.save(request);
 	}
 
-
-
+	//TODO try with query builder
 	async getFriendlist(user: User) {
 		const friendRequestAccepted = await this.friendshipRepo.find({
 			relations: {
@@ -110,7 +109,6 @@ export class FriendshipService {
 	}
 
 }
-
 
 // async respondFriendRequest(addressee: User, requester: User, status: friendShipStatus) {
 // 	const friendship = await Friendship.findOne({

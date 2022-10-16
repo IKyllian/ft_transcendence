@@ -8,11 +8,13 @@ import { ChannelModule } from './channel/channel.module';
 import { UserModule } from 'src/user/user.module';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { ConversationModule } from './conversation/conversation.module';
+import { NotificationModule } from 'src/notification/notification.module';
 
 @Module({
   imports: [
     ChannelModule,
     ConversationModule,
+    NotificationModule,
     UserModule,
     forwardRef(() => AuthModule),
     TypeOrmModule.forFeature([

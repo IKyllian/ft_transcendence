@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, forwardRef, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Channel, User, ChannelUser, BannedUser } from 'src/typeorm';
 import { In, Not, Repository } from 'typeorm';
@@ -6,18 +6,23 @@ import { ChannelExistException, ChannelNotFoundException, NotInChannelException,
 import * as argon from 'argon2';
 import { CreateChannelDto } from './dto/create-channel.dto';
 import { ChannelPasswordDto } from './dto/channel-pwd.dto';
-import { channelOption, channelRole, FindChannelParams } from 'src/utils/types/types';
+import { channelOption, channelRole, FindChannelParams, ResponseType } from 'src/utils/types/types';
 import { BanUserDto } from './dto/banUser.dto';
+import { NotificationService } from 'src/notification/notification.service';
+import { ResponseDto } from '../gateway/dto/response.dto';
 
 @Injectable()
 export class ChannelService {
 	constructor(
+		// private notifService: NotificationService,
+		@Inject(forwardRef(() => NotificationService))
+		private notifService: NotificationService,
 		@InjectRepository(Channel)
 		private channelRepo: Repository<Channel>,
 		@InjectRepository(ChannelUser)
 		private channelUserRepo: Repository<ChannelUser>,
 		@InjectRepository(BannedUser)
-		private bannedRepo: Repository<BannedUser>
+		private bannedRepo: Repository<BannedUser>,
 	) {}
 	/**
 	 * TODO C PAS FOU
@@ -104,7 +109,7 @@ export class ChannelService {
 		return channel.channelUsers.find((chanUser) => chanUser.user.id === id);
 	}
 
-	async join(user: User, id: number, pwdDto?: ChannelPasswordDto) {
+	async join(user: User, id: number, pwdDto?: ChannelPasswordDto, isInvited: Boolean = false) {
 		const channel = await this.findOne({ id }, true)
 		if (!channel)
 			throw new ChannelNotFoundException();
@@ -116,17 +121,30 @@ export class ChannelService {
 		const isBanned = await this.isBanned(user.id, id);
 		if (isBanned)
 			throw new UnauthorizedException('User is banned from this channel');
-
-		if (channel.option === channelOption.PROTECTED) {
-			if (!pwdDto.password)
-				throw new UnauthorizedException('Password is not provided');
-			const pwdMatches = await argon.verify(channel.hash, pwdDto.password);
-			if (!pwdMatches)
-				throw new UnauthorizedException('Password incorrect');
+		if (!isInvited) {
+			if (channel.option === channelOption.PRIVATE)
+				throw new UnauthorizedException('You need an invite to join this channel');
+			else if (channel.option === channelOption.PROTECTED) {
+				if (!pwdDto.password)
+					throw new UnauthorizedException('Password is not provided');
+				const pwdMatches = await argon.verify(channel.hash, pwdDto.password);
+				if (!pwdMatches)
+					throw new UnauthorizedException('Password incorrect');
+			}
 		}
 		const channelUser = this.channelUserRepo.create({ user });
 		channel.channelUsers = [...channel.channelUsers, channelUser];
 		return this.channelRepo.save(channel);
+	}
+
+	async respondInvite(user: User, dto: ResponseDto) {
+		const invite = await this.notifService.getChannelInvite(user, dto.id);
+		if (!invite)
+			throw new BadRequestException('You are not invite to this channel');
+		this.notifService.delete(invite.id);
+		if (dto.response === ResponseType.ACCEPTED) {
+			return this.join(user, dto.id, {}, true);
+		}
 	}
 
 	async leave(user: User, id: number) {
@@ -143,7 +161,7 @@ export class ChannelService {
 		channel.channelUsers = channel.channelUsers.filter((chanUser) => chanUser.user.id !== user.id);
 			console.log('after leave', channel.channelUsers);
 		await this.channelUserRepo.delete({id: inChannel.id});
-		return await this.channelRepo.save(channel);
+		return this.channelRepo.save(channel);
 	}
 
 	async getChannelById(user: User, id: number) {
@@ -165,7 +183,7 @@ export class ChannelService {
 		return channel;
 	}
 
-	async getChannelUser(channel: { id: number }, user: { id: number }) {
+	async getChannelUser(id: number, userId: number) {
 		const userInChannel = await this.channelUserRepo.findOne({
 			relations: {
 				user: true,
@@ -173,18 +191,18 @@ export class ChannelService {
 			},
 			where: {
 				channel: {
-					id: channel.id,
+					id,
 				},
 				user: {
-					id: user.id,
+					id: userId
 				}
 			}
 		});
 		return userInChannel;
 	}
 
-	async delete(id: number) {
-		return await this.channelRepo.delete(id);
+	delete(id: number) {
+		return this.channelRepo.delete(id);
 	}
 
 	async banUser(user: User, dto: BanUserDto) {
@@ -203,7 +221,7 @@ export class ChannelService {
 		if (alreadyBanned)
 			throw new BadRequestException('User already banned');
 
-		const userToBan = await this.getChannelUser(channel, { id: dto.userId });
+		const userToBan = await this.getChannelUser(channel.id, dto.userId);
 		if (!userToBan)
 			throw new NotInChannelException();
 		else if (userToBan.role === 'owner' || user.id === dto.userId)

@@ -40,11 +40,7 @@ export class User {
 	@JoinTable({ name: 'blocked_users' })
 	blocked: User[];
 
-	// @OneToMany(() => Friendship, (friendship) => friendship.requester)
-	// friendshipSend: Friendship[];
-
-	// @OneToMany(() => Friendship, (friendship) => friendship.addressee)
-	// friendshipReceived: Friendship[];
+	
 
 	@Exclude()
 	@Column({nullable: true, select: false })

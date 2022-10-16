@@ -17,6 +17,5 @@ export class Message {
 	send_at: Date;
 
 	@ManyToOne(() => Channel, (channel) => channel.messages)
-	// @JoinColumn()
 	channel: Channel;
 }
