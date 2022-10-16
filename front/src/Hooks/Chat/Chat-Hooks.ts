@@ -1,6 +1,6 @@
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useAppSelector, useAppDispatch } from "../../Redux/Hooks";
-import { loadingDatas, changeActiveElement } from "../../Redux/ChatSlice";
+import { changeActiveElement } from "../../Redux/ChatSlice";
 import { useEffect, useState, useCallback } from "react";
 import { fetchUserChannels, fetchUserConvs, fetchConvAndRedirect } from "../../Api/Chat/Chat-Fetch";
 
@@ -9,7 +9,7 @@ export function useLoadChatDatas() {
     const [showModal, setShowModal] = useState<number>(0);
     const [responsiveSidebar, setReponsiveSidebar] = useState<boolean>(false);
 
-    // Appelles aux hooks
+    // Appels aux hooks
     const authDatas = useAppSelector((state) => state.auth);
     const chatDatas = useAppSelector((state) => state.chat);
     const params = useParams();
@@ -47,11 +47,10 @@ export function useLoadChatDatas() {
     }, [channelId, convId, location.pathname])
 
     useEffect(() => {
-        dispatch(loadingDatas());
         fetchUserChannels(authDatas.token, channelId, dispatch); //Recupere les channels d'un user
         fetchUserConvs(authDatas.token, dispatch); //Recupere les convs d'un user
 
-        //Permet de redirect sur une conv (et de la créer si besoin) quand un user click quelque part pour dm quelqu'un
+        //Permet de redirect sur une conv (et de la créer si besoin) dans le cas où un user click quelque part pour dm quelqu'un
         if (location && location.state) {
             const locationState = location.state as {userIdToSend: number};
             fetchConvAndRedirect(

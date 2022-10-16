@@ -1,70 +1,17 @@
-import { useState, useContext, useEffect } from "react";
-import { ModalContext } from "../Utils/ModalProvider";
-
 import StatsInfoItem from "./Stats-Info-Item";
 import RenderProfileBlock from "./Render-Profile-Block";
 import CardInfo from "./Card-Info";
 import LoadingSpin from "../Utils/Loading-Spin";
-
-import { ProfileState } from "../../Types/User-Types";
-import { useAppSelector } from '../../Redux/Hooks';
-import { useParams } from "react-router-dom";
-import axios from "axios";
-import { baseUrl } from "../../env";
-
 import { getMatchPlayed, getWinRate } from "../../Utils/Utils-User";
-
-interface ProfileMenuButtons {
-    title: string;
-    isActive: string;
-}
+import { useProfileHook } from "../../Hooks/Profile/Profile-Hook";
 
 function Profile() {
-    const [attributes, setAttributes] = useState<ProfileMenuButtons[]>([
-        { title: "Achievements", isActive: "true" },
-        { title: "Matches", isActive: "false" },
-        { title: "Friends", isActive: "false" }
-    ]);
-    const [userState, setUserState] = useState<ProfileState | undefined>(undefined);
-    
-    const params = useParams();
-    const modalStatus = useContext(ModalContext);
-    let {currentUser, token} = useAppSelector(state => state.auth);
-    
-    const handleClick = (index: number) => {
-       let newArray = [...attributes];
-
-       newArray.find(elem => elem.isActive === "true")!.isActive = "false";
-       newArray[index].isActive = "true";
-       setAttributes(newArray);
-    }
-
-    useEffect(() => {
-        if (params.username === currentUser?.username) {
-            // setUserDatas(currentUser);
-            setUserState({
-                isLoggedUser: true,
-                user: currentUser!,
-            });
-        }
-        else {
-            axios.get(`${baseUrl}/users/name/${params.username}`, {
-                headers: {
-                    "Authorization": `Bearer ${token}`,
-                }
-            })
-            .then(response => {
-                console.log(response);
-                setUserState({
-                    isLoggedUser: false,
-                    user: response.data,
-                });
-            })
-            .catch(err => {
-                console.log(err);
-            })
-        }
-    }, [params])
+    const {
+        userState,
+        handleClick,
+        modalStatus,
+        attributes,
+    } = useProfileHook();
 
     return !userState?.user ? (
        <LoadingSpin classContainer="profile-container" />

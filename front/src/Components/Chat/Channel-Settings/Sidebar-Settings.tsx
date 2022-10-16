@@ -1,9 +1,7 @@
 import { useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
-import { baseUrl } from "../../../env";
 import { useAppSelector } from '../../../Redux/Hooks'
 import { Channel } from "../../../Types/Chat-Types"
-import { loginError } from "../../../Redux/AuthSlice";
+import { fetchLeaveChannel } from "../../../Api/Chat/Chat-Action";
 
 function SidebarSettings(props: {setSidebarItem: Function, channelDatas: Channel, loggedUserIsOwner: boolean}) {
     const {setSidebarItem, channelDatas, loggedUserIsOwner} = props;
@@ -13,17 +11,9 @@ function SidebarSettings(props: {setSidebarItem: Function, channelDatas: Channel
     let authDatas = useAppSelector((state) => state.auth);
 
     const leaveChannel = () => {
-        axios.post(`${baseUrl}/channel/${parseInt(params.channelId!)}/leave`, {}, {
-            headers: {
-                "Authorization": `Bearer ${authDatas.token}`,
-            }
-        })
-        .then((response) => {
-            navigate("/chat");
-        })
-        .catch((err) => {
-            console.log(err);
-        })
+        if (params.channelId) {
+            fetchLeaveChannel(parseInt(params.channelId), authDatas.token, navigate);
+        }
     }
 
     return (

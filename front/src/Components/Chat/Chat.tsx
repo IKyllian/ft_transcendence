@@ -5,7 +5,7 @@ import ChatModal from "./Chat-Modal";
 import { Outlet} from "react-router-dom";
 import { ModalContext } from "../Utils/ModalProvider";
 import LoadingSpin from "../Utils/Loading-Spin";
-import { useLoadChatDatas } from "../../Hooks/Chat/Chat-Hook";
+import { useLoadChatDatas } from "../../Hooks/Chat/Chat-Hooks";
 
 export const SidebarContext = createContext({sidebar: false, setSidebarStatus: () => {}});
 
@@ -21,8 +21,6 @@ function Chat() {
         paramsChannelId,
         locationPathname,
     } =  useLoadChatDatas();
-
-    console.log("privateConvs", privateConvs);
 
     const modalStatus = useContext(ModalContext);
 

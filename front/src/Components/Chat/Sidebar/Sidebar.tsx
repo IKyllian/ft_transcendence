@@ -1,5 +1,5 @@
 import { useEffect, useContext, useRef } from "react";
-import { useLocation, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { ChannelsInterfaceFront, ConversationInterfaceFront } from "../../../Types/Chat-Types";
 import SidebarItem from "./Sidebar-Item";
 import { SidebarContext } from "../Chat";
@@ -11,7 +11,6 @@ function Sidebar(props: {setShowModal: Function, chanDatas: ChannelsInterfaceFro
     const sidebarStatus = useContext(SidebarContext);
     const ref = useRef<HTMLHeadingElement>(null);
     const params = useParams();
-    const location = useLocation();
 
     useEffect(() => {
         const handleClickOutside = (event: any) => {

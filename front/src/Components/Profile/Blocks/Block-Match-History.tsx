@@ -4,7 +4,6 @@ import ProfilPic from "../../../Images-Icons/pp.jpg"
 import { ExampleUser } from "../../../Types/User-Types";
 import { UserInterface } from "../../../Types/User-Types";
 
-
 interface historyItemProps {
     player: ExampleUser,
     enemyPlayer: ExampleUser,

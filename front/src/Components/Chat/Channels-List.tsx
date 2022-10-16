@@ -1,17 +1,17 @@
-import axios from "axios";
 import { useEffect, useState, useContext } from "react";
 import { Channel } from "../../Types/Chat-Types";
 import LoadingSpin from "../Utils/Loading-Spin";
-import { baseUrl } from "../../env";
 import { useAppSelector, useAppDispatch } from "../../Redux/Hooks";
 import { IconPlus, IconChevronRight } from "@tabler/icons";
 import { useForm } from "react-hook-form";
-import { addChannel } from "../../Redux/ChatSlice"
 import { useNavigate } from "react-router-dom";
 import { SidebarContext } from "./Chat";
 
+import { fetchJoinChannel } from "../../Api/Chat/Chat-Action";
+import { fetchVisibleChannels } from "../../Api/Chat/Chat-Fetch";
+
 function ChannelItem(props: {channelData: Channel, token: string}) {
-    const { register, handleSubmit, reset, formState: {errors} } = useForm<{password?: string}>();
+    const { register, handleSubmit, formState: {errors} } = useForm<{password?: string}>();
     const { channelData, token } = props;
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
@@ -21,22 +21,10 @@ function ChannelItem(props: {channelData: Channel, token: string}) {
         e?.preventDefault();
         let body: {password?: string};
         if (data.password)
-            body = { password: data.password};
+            body = {password: data.password};
         else
             body = {};
-        axios.post(`${baseUrl}/channel/${channelData.id}/join`, body, {
-            headers: {
-                "Authorization": `Bearer ${token}`,
-            }
-        })
-        .then((response) => {
-            console.log(response);
-            dispatch(addChannel({channel: response.data, isActive: 'false'}));
-            navigate(`/chat/channel/${response.data.id}`);
-        })
-        .catch((err) => {
-            console.log(err);
-        })
+        fetchJoinChannel(channelData.id, body, token, dispatch, navigate);
     })
 
     return (
@@ -66,18 +54,7 @@ function ChannelsList() {
     const sidebarStatus = useContext(SidebarContext);
 
     useEffect(() => {
-        axios.get(`${baseUrl}/channel/search`, {
-            headers: {
-                "Authorization": `Bearer ${authDatas.token}`,
-            }
-        })
-        .then((response) => {
-            console.log(response);
-            setChannelsList([...response.data]);
-        })
-        .catch((err) => {
-            console.log(err);
-        })
+        fetchVisibleChannels(authDatas.token, setChannelsList);
     }, [])
 
     return !channelsList ? (

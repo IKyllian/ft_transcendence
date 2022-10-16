@@ -1,12 +1,9 @@
 import SearchBarPlayers from "../SearchBarPlayers";
 import { useForm } from 'react-hook-form';
-import axios from "axios";
-
 import { useAppSelector, useAppDispatch } from '../../Redux/Hooks'
-import { baseUrl } from "../../env";
 import { IconX } from '@tabler/icons';
 import { useNavigate } from "react-router-dom";
-import { addChannel } from "../../Redux/ChatSlice";
+import { fetchCreateChannel } from "../../Api/Chat/Chat-Action";
 
 type FormValues = {
     chanMode: string,
@@ -15,42 +12,30 @@ type FormValues = {
     usersIdInvited?: number;
 }
 
+type BodyRequest = {
+    name: string,
+    option: string,
+    password?: string,
+}
+
 function ChatModal(props: {onCloseModal: Function, showModal: number}) {
     const { register, handleSubmit, watch, formState: {errors} } = useForm<FormValues>();
     const { onCloseModal, showModal } = props;
 
     const channelMode = watch('chanMode');
-
     const navigate = useNavigate();
-    let authDatas = useAppSelector((state) => state.auth);
-
+    const authDatas = useAppSelector((state) => state.auth);
     const dispatch = useAppDispatch();
 
     const formSubmit = handleSubmit((data, e) => {
         e?.preventDefault();
-        let body: {
-            name: string,
-            option: string,
-            password?: string,
-        } = {
+        let body: BodyRequest = {
             name: data.chanName,
             option: data.chanMode,
         }
         if (data.chanMode === "protected")
             body = {...body, password: data.password}
-        axios.post(`${baseUrl}/channel`, body, {
-            headers: {
-                "Authorization": `Bearer ${authDatas.token}`,
-            }
-        })
-        .then((response) => {
-           console.log(response);
-           dispatch(addChannel({channel: response.data, isActive: "false"}));
-           onCloseModal();
-           navigate(`/chat/${response.data.id}`);
-        }).catch(err => {
-            console.log(err);
-        })
+        fetchCreateChannel(body, authDatas.token, dispatch, navigate, onCloseModal);
     })
 
     if (showModal === 1) {

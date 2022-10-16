@@ -1,8 +1,6 @@
-import axios from "axios";
-import { baseUrl } from "../../env";
 import { useAppDispatch, useAppSelector } from "../../Redux/Hooks";
-import { replaceUserObject } from "../../Redux/AuthSlice";
 import { userIdIsBlocked } from "../../Utils/Utils-User";
+import { fetchOnBlockUser, fetchOnUnblockUser } from "../../Api/User-Fetch";
 
 function BlockButton(props: {senderId: number}) {
     const {senderId} = props;
@@ -12,31 +10,11 @@ function BlockButton(props: {senderId: number}) {
     const dispatch = useAppDispatch();
 
     const onBlock = () => {
-        axios.post(`${baseUrl}/users/${senderId}/block`, {}, {
-            headers: {
-                "Authorization": `Bearer ${authDatas.token}`,
-            }
-        })
-        .then((response) => {
-            dispatch(replaceUserObject(response.data));
-        })
-        .catch((err) => {
-            console.log(err);
-        })
+        fetchOnBlockUser({senderId: senderId, token: authDatas.token, dispatch: dispatch});
     }
 
     const onUnblock = () => {
-        axios.post(`${baseUrl}/users/${senderId}/deblock`, {}, {
-            headers: {
-                "Authorization": `Bearer ${authDatas.token}`,
-            }
-        })
-        .then((response) => {
-            dispatch(replaceUserObject(response.data));
-        })
-        .catch((err) => {
-            console.log(err);
-        })
+        fetchOnUnblockUser({senderId: senderId, token: authDatas.token, dispatch: dispatch});
     }
 
     return (

@@ -3,7 +3,7 @@ import { IconX } from "@tabler/icons";
 
 import SidebarSettings from "./Sidebar-Settings";
 import RenderSettingPage from "./Render-Setting-Page";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Channel } from "../../../Types/Chat-Types"
 import LoadingSpin from "../../Utils/Loading-Spin";
 import { useAppSelector } from "../../../Redux/Hooks";
@@ -13,7 +13,6 @@ function ChannelSettings() {
     const [channelDatas, setChannelDatas] = useState<Channel | undefined>(undefined);
     const [loggedUserIsOwner, setLoggedUserIsOwner] = useState<boolean>(false);
 
-    const params = useParams();
     const location = useLocation();
     const navigate = useNavigate();
     const authDatas = useAppSelector((state) => state.auth);
@@ -25,7 +24,7 @@ function ChannelSettings() {
             if (locationState.channelUsers.find((elem) => elem.user.id === authDatas.currentUser?.id && (elem.role === "owner" || elem.role === "moderator")))
                 setLoggedUserIsOwner(true);
         }
-    }, [params, location])
+    }, [location])
 
     if (!channelDatas) {
         return (

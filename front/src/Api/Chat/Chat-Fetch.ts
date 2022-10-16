@@ -80,3 +80,35 @@ export async function fetchConvAndRedirect(
         console.log(err);
     })
 }
+
+export function fetchVisibleChannels(token: string, setChannelsList: Function) {
+    axios.get(`${baseUrl}/channel/search`, {
+        headers: {
+            "Authorization": `Bearer ${token}`,
+        }
+    })
+    .then((response) => {
+        console.log(response);
+        setChannelsList([...response.data]);
+    })
+    .catch((err) => {
+        console.log(err);
+    })
+}
+
+export function fetchPrivateConvDatas(convId: number, token: string, setConvDatas: Function) {
+    axios.get(`${baseUrl}/conversation/${convId}`, {
+        headers: {
+            "Authorization": `Bearer ${token}`,
+        }
+    })
+    .then(response => {
+        console.log(response);
+        let conv: Conversation = response.data;
+        conv.messages.forEach(elem => elem.send_at = new Date(elem.send_at));
+        setConvDatas(conv);
+    })
+    .catch(err => {
+        console.log(err);
+    })
+}
