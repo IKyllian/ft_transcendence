@@ -1,38 +1,39 @@
-import { useState, useContext, createContext, useEffect } from "react";
+import { useContext, createContext } from "react";
 
 import Sidebar from "./Sidebar/Sidebar";
 import ChatModal from "./Chat-Modal";
-import { Outlet, useParams } from "react-router-dom";
-import { ModalContext } from "../ModalProvider";
+import { Outlet} from "react-router-dom";
+import { ModalContext } from "../Utils/ModalProvider";
+import LoadingSpin from "../Utils/Loading-Spin";
+import { useLoadChatDatas } from "../../Hooks/Chat/Chat-Hooks";
 
 export const SidebarContext = createContext({sidebar: false, setSidebarStatus: () => {}});
 
 function Chat() {
-    const [showModal, setShowModal] = useState<number>(0);
-    const [responsiveSidebar, setReponsiveSidebar] = useState<boolean>(false);
-
-    const params = useParams();
-
-    const handleClick = () => {
-        setReponsiveSidebar(!responsiveSidebar);
-    }
+    const {
+        channels,
+        privateConvs,
+        showModal,
+        responsiveSidebar,
+        sidebarOnChange,
+        onCloseModal,
+        changeModalStatus,
+        paramsChannelId,
+        locationPathname,
+    } =  useLoadChatDatas();
 
     const modalStatus = useContext(ModalContext);
 
-    useEffect(() => {
-        if (params.chatId === undefined) {
-            setReponsiveSidebar(true);
-        }
-    }, [params])
-
-    return (
-        <SidebarContext.Provider value={{sidebar: responsiveSidebar, setSidebarStatus: handleClick}}>
-            <ChatModal showModal={showModal} setShowModal={setShowModal}  />
+    return !channels || !privateConvs ? (
+        <LoadingSpin classContainer="chat-page-container" />
+    ) : (
+        <SidebarContext.Provider value={{sidebar: responsiveSidebar, setSidebarStatus: sidebarOnChange}}>
+            <ChatModal onCloseModal={onCloseModal} showModal={showModal}   />
             <div className={`chat-page-container ${modalStatus.modal.isOpen ? modalStatus.modal.blurClass : ""}`}>
-                <Sidebar setShowModal={setShowModal} showModal={showModal} />
+                <Sidebar setShowModal={changeModalStatus} chanDatas={channels} privateConvs={privateConvs} />
                 {
-                    params.chatId === undefined
-                    ? 
+                    paramsChannelId === undefined && locationPathname === "/chat"
+                    ?
                     <div className="no-target-message">
                         <p> Sélectionnez un message ou un channel </p>
                     </div> 
@@ -41,7 +42,7 @@ function Chat() {
                 }
             </div>
         </SidebarContext.Provider>
-    );
+    )
 }
 
 export default Chat;

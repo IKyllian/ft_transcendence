@@ -1,9 +1,8 @@
 @use "./Variables.scss" as *;
 
 .leaderboard-page-container {
-    min-height: 90vh;
     background-color: $LightBluePalette;
-    padding-top: 5px;
+    padding: 10px 0;
     h2 {
         margin: 0;
         font-size: 45px;

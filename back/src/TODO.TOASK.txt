@@ -1,0 +1,28 @@
+// Auth:
+	- Store access_token and refresh_token in local storage,
+	on access_token expiration send request to server with refresh_token.
+	If fail redirect to login page.
+	- On logout, remove token from local storage?
+
+//Channels
+	- Add Can add/modify/delete password of a channels
+	- what to do if inviting a ban user?
+	- Invitation bypass password?
+	- How ban works in front
+	- Invitation on a channel by multiple users ?
+	- On ban, how to handle user
+
+// User
+
+
+// GAME
+	- When inviting someone to play from friendlist or chat, oponent get a notif to accept or decline. If accepted, Both got a 'popup'
+	with limited time to get ready ?
+
+// server
+	- Error with unknown request
+
+//TODO
+	- Route for editing user / Channels
+	- Check routes for delete entities
+	- error when trying to connect with a login 42 with a password

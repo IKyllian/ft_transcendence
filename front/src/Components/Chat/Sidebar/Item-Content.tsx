@@ -1,44 +1,39 @@
 import { useContext } from "react";
 import { Link } from "react-router-dom";
 
-import { IconUser, IconPlus } from "@tabler/icons";
-import { ChannelsInterfaceFront } from "../../../Interfaces/Interface-Chat";
-import { ChatInterface } from "../../../Interfaces/Datas-Examples";
+import { ChannelsInterfaceFront, ConversationInterfaceFront } from "../../../Types/Chat-Types";
 import { SidebarContext } from '../Chat';
+import { useAppSelector } from '../../../Redux/Hooks'
+import { getSecondUserIdOfPM } from "../../../Utils/Utils-Chat";
 
 interface Props {
-    datasArray?: ChannelsInterfaceFront[],
-    publicChanArray?: ChatInterface[],
-    chanClick?: Function,
+    chanDatas?: ChannelsInterfaceFront[],
+    privateConvs?: ConversationInterfaceFront[],
 }
 
 function ItemContent(props: Props) {
-    const {datasArray, publicChanArray, chanClick} = props;
+    const {chanDatas, privateConvs} = props;
     const sidebarStatus = useContext(SidebarContext);
+
+    let {currentUser} = useAppSelector((state) => state.auth);
     return (
         <ul className="ul-collapse">
             {
-                datasArray && datasArray.map((elem) => 
-                    <Link className="list-item-container" key={elem.channel.id} to={`/chat/${elem.channel.id}`} onClick={() => sidebarStatus.setSidebarStatus()}>
-                        <li onClick={() => chanClick!(elem.channel.id)} is-target={elem.isActive}>
-                            {elem.channel.isChannel && "# "}
-                            {elem.channel.isChannel ? elem.channel.channelName : elem.channel.users[0].username}
+                chanDatas && chanDatas.map((elem) => 
+                    <Link className="list-item-container" key={elem.channel.id} to={`/chat/channel/${elem.channel.id}`} onClick={() => sidebarStatus.setSidebarStatus()}>
+                        <li is-target={elem.isActive}>
+                            # {elem.channel.name}
                         </li>
                     </Link>
                 )
             }
             {
-                publicChanArray && publicChanArray.map((elem) => 
-                    <div key={elem.id} className="list-item-container">
-                        <li key={elem.id} className="public-chan-item">
-                            # {elem.isChannel ? elem.channelName : elem.users[0].username}
-                            <div className="icon-container">
-                                <IconUser />
-                                <span> {elem.users.length} </span>
-                                <IconPlus />
-                            </div>
+                privateConvs && privateConvs.map((elem) => 
+                    <Link className="list-item-container" key={elem.conversation.id} to={`/chat/private-message/${getSecondUserIdOfPM(elem.conversation, currentUser!.id)}`} onClick={() => sidebarStatus.setSidebarStatus()}>
+                        <li is-target={elem.isActive}>
+                            {elem.conversation.user1.id !== currentUser?.id ? elem.conversation.user1.username : elem.conversation.user2.username }
                         </li>
-                    </div>
+                    </Link>
                 )
             }
         </ul>

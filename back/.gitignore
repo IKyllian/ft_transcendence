@@ -38,3 +38,4 @@ uploads/
 
 .env
 .env.db
+.vscode

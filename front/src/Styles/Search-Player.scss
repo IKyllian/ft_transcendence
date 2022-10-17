@@ -21,40 +21,6 @@
             cursor: pointer;
         }
     }
-
-    .modal-player-list {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        margin-top: 15px;
-        overflow-y: scroll;
-        &-item {
-            width: 90%;
-            @include flex-row-alignCenter();
-            justify-content: space-between;
-            margin: 0 auto;
-            .item-player-info {
-                display: inline-flex;
-                .modal-picture {
-                    @include avatar-player(50px);
-                    margin-right: 10px;
-                }
-            }
-            button {
-                cursor: pointer;
-                border: none;
-                min-width: 90px;
-                height: 35px;
-                font-size: 15px;
-                border-radius: 4px;
-                background-color: $LightDarkPalette;
-            }
-
-            input {
-                @include width-height(17px, 17px);
-            }
-        }
-    }  
 }
 
 @media screen and (max-width: $BreakPoint_800) {

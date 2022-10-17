@@ -1,73 +1,16 @@
-import { useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom'
-import { useForm } from "react-hook-form";
-import { useAppDispatch, useAppSelector } from '../../Redux/Hooks'
-import { uid } from "../../env";
-import { LoginPayload } from "../../Interfaces/Interface-User";
-
-import LoadingSpin from '../Loading-Spin';
-import axios from 'axios';
-
-import { loginPending, loginSuccess } from "../../Redux/AuthSlice";
-
-type FormValues = {
-    username: string,
-    password: string,
-}
+import LoadingSpin from '../Utils/Loading-Spin';
+import { useSignHook } from '../../Hooks/Sign/Sign-Hook';
 
 function Sign() {
-    const { register, control, handleSubmit } = useForm<FormValues>();
-    let navigate = useNavigate();
-    const dispatch = useAppDispatch();
-    let authDatas = useAppSelector((state) => state.auth);
-    const [searchParams] = useSearchParams();
-
-
-    const onSubmit = handleSubmit(async (data, e) => {
-        e?.preventDefault();
-        if (data.password === "" || data.username === "")
-            return ;
-        axios.post('http://localhost:5000/api/auth/login', {username: data.username, password: data.password})
-        .then((response) => {
-        console.log('JWT =>', response.data);
-            const payload: LoginPayload = {
-                token: response.data.token,
-                user: response.data.user,
-            }
-            dispatch(loginSuccess(payload));
-        })
-    });
-
-    useEffect(() => {
-        const authorizationCode = searchParams.get('code');
-        
-        if (authorizationCode) {
-            dispatch(loginPending());
-            axios.post('http://localhost:5000/api/auth/login42', { authorizationCode })
-            .then((response) => {
-                console.log('JWT =>', response.data);
-                if (response.data.usernameSet) {
-                    const payload: LoginPayload = {
-                        token: response.data.token,
-                        user: response.data.user,
-                    }
-                    dispatch(loginSuccess(payload));
-                } else {
-                    navigate("/set-username", {state:{token: response.data.token}});
-                }
-            })
-            .catch(err => {
-                // TODO Handle error: Display error message on login page
-            });
-        }
-    }, []);
-
-    const sign42 = async (e: any) => {
-        e.preventDefault();
-        const url: string = "https://api.intra.42.fr/oauth/authorize";
-        const params: string = `?client_id=${uid}&redirect_uri=http://localhost:3000/sign&response_type=code`;
-        const ret = window.location.replace(url+params);
-    }
+    const {
+        hookForm,
+        authDatas,
+        isSignIn,
+        changeForm,
+        onSignIn,
+        onSignUp,
+        sign42,
+    } = useSignHook();
 
     return (authDatas.loading) ? (
         <div className="sign-container">
@@ -76,21 +19,45 @@ function Sign() {
     ) : (
         <div className="sign-container">
             <div className='auth-wrapper'>
-                <h2> Sign In </h2>
+                <h2> {isSignIn ? "Sign In" : "Sign Up"} </h2>
                 <button className='sign-42-button' onClick={(e) => sign42(e)}> Sign with 42 </button>
                 <div className='auth-separator'>
                     <span>ou</span>
                 </div>
-                <form className='form-wrapper' onSubmit={onSubmit}>
-                    <label htmlFor="username"> Username </label>
-                    <input id="username" type="text" {...register("username")} />
+                {authDatas.error && <p className='txt-form-error'> {authDatas.error} </p> }
+                <form className='form-wrapper' onSubmit={isSignIn ? onSignIn : onSignUp}>
+                    <label> Username </label>
+                    {hookForm.errors.username && <p className='txt-form-error'> {hookForm.errors.username.message} </p>}
+                    <input
+                        id="username"
+                        type="text"
+                        {...hookForm.register("username", {
+                            required: "Username is required",
+                            minLength: {
+                                value: 2,
+                                message: "Min length is 2"
+                            }
+                        })}
+                    />
 
-                    <label htmlFor="password"> Password </label>
-                    <input id="password" type="password" {...register("password")} />
+                    <label> Password </label>
+                    {hookForm.errors.password && <p className='txt-form-error'> {hookForm.errors.password.message} </p>}
+                    <input
+                        id="password"
+                        type="password"
+                        {...hookForm.register("password", {
+                            required: "Password is required",
+                            minLength: !isSignIn ? { 
+                                value: 5,
+                                message: "Min length is 5"
+                            } : 5
+                        })}
+                    />
                     <button type='submit'>
-                        Login
+                        {isSignIn ? "Login" : "Create Account"}
                     </button>
                 </form>
+                <p className='btn-switch-form' onClick={() => changeForm()}> {isSignIn ? "Pas de compte ? Créez en un" : "Déjà un compte ? Connectez vous"} </p>
             </div>
         </div>
     );

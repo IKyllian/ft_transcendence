@@ -1,4 +1,4 @@
-import DropdownContainer from "../Dropdown-Container";
+import DropdownContainer from "../Utils/Dropdown-Container";
 
 function FriendListModal(props: {show: boolean, onClickOutside: Function}) {
     const { show, onClickOutside } = props;
