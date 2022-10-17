@@ -1,21 +1,26 @@
-import { forwardRef, Module } from "@nestjs/common";
+import { ClassSerializerInterceptor, forwardRef, Module } from "@nestjs/common";
+import { APP_INTERCEPTOR } from "@nestjs/core";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { AuthModule } from "src/auth/auth.module";
-import { Avatar } from "src/entities/avatar.entity";
-import { Friendship } from "src/entities/friendship.entity";
-import { Statistic } from "src/entities/statistic.entity";
-import { User } from "src/entities/user.entity";
+import { Avatar, Friendship, Statistic, User } from "src/typeorm";
+import { friendshipController } from "./friendship/friendship.controller";
+import { FriendshipService } from "./friendship/friendship.service";
 import { UserController } from "./user.controller";
 import { UserService } from "./user.service";
 
 @Module({
 	imports: [
 		forwardRef(() => AuthModule),
-		// AuthModule,
 		TypeOrmModule.forFeature([User, Friendship, Statistic, Avatar]),
 	],
-	providers: [UserService],
-	controllers: [UserController],
-	exports: [UserService]
+	providers: [
+		UserService,
+		FriendshipService,
+	{
+		provide: APP_INTERCEPTOR,
+		useClass: ClassSerializerInterceptor,
+	}],
+	controllers: [UserController, friendshipController],
+	exports: [UserService, FriendshipService]
 })
 export class UserModule {}

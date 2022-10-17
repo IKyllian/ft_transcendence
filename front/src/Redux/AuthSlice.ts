@@ -1,13 +1,15 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { AuthState } from '../Interfaces/Interface-User';
-import { LoginPayload } from '../Interfaces/Interface-User';
+import { AuthState } from '../Types/User-Types';
+import { LoginPayload } from '../Types/User-Types';
+import { UserInterface } from '../Types/User-Types';
 
 const defaultState: AuthState = {
     currentUser: undefined,
     isAuthenticated: false,
-    error: '',
+    error: undefined,
     loading: false,
     token:'',
+    setUsersame: false,
 }
 
 export const authSlice = createSlice({
@@ -22,23 +24,34 @@ export const authSlice = createSlice({
             state.token = payload.token;
             state.isAuthenticated = true;
             state.loading = false;
+            console.log(state.currentUser);
         },
         loginError: (state, {payload}: PayloadAction<string>) => {
             state.error = payload;
             state.isAuthenticated = false;
             state.loading = false;
         },
+        setUsername: (state) => {
+            state.setUsersame = true,
+            state.loading = false;
+        },
         logoutPending: (state) => {
             state.loading = true;
         },
         logoutSuccess: (state) => {
-            state.loading = false
-            state.isAuthenticated = false;
-            state.error = '';
-            state.currentUser = undefined;
-            state.token= '';
+            state = {
+                currentUser: undefined,
+                isAuthenticated: false,
+                error: undefined,
+                loading: false,
+                token:'',
+                setUsersame: false,
+            }
+        },
+        replaceUserObject: (state, {payload}: PayloadAction<UserInterface>) => {
+            state.currentUser = {...payload};
         }
     }
 });
 
-export const { loginPending, loginSuccess, loginError, logoutPending, logoutSuccess } = authSlice.actions;
+export const { loginPending, loginSuccess, loginError, setUsername, logoutPending, logoutSuccess, replaceUserObject } = authSlice.actions;

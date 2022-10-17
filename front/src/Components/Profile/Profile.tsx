@@ -1,44 +1,29 @@
-import { useState, useContext } from "react";
-import { ModalContext } from "../ModalProvider";
-
-import StatsInfoItem from "./Items/Stats-Info-Item";
+import StatsInfoItem from "./Stats-Info-Item";
 import RenderProfileBlock from "./Render-Profile-Block";
 import CardInfo from "./Card-Info";
-
-import { useAppSelector } from '../../Redux/Hooks';
-
-interface profileMenuButtons {
-    title: string;
-    isActive: string;
-}
+import LoadingSpin from "../Utils/Loading-Spin";
+import { getMatchPlayed, getWinRate } from "../../Utils/Utils-User";
+import { useProfileHook } from "../../Hooks/Profile/Profile-Hook";
 
 function Profile() {
-    const [attributes, setAttributes] = useState<profileMenuButtons[]>([
-        { title: "Achievements", isActive: "true" },
-        { title: "Matches", isActive: "false" },
-        { title: "Friends", isActive: "false" }
-    ]);
+    const {
+        userState,
+        handleClick,
+        modalStatus,
+        attributes,
+    } = useProfileHook();
 
-    const modalStatus = useContext(ModalContext);
-    let {currentUser} = useAppSelector(state => state.auth);
-    
-    const handleClick = (index: number) => {
-       let newArray = [...attributes];
-
-       newArray.find(elem => elem.isActive === "true")!.isActive = "false";
-       newArray[index].isActive = "true";
-       setAttributes(newArray);
-    }
-
-    return (
+    return !userState?.user ? (
+       <LoadingSpin classContainer="profile-container" />
+    ) : (
         <div className={`profile-container ${modalStatus.modal.isOpen ? modalStatus.modal.blurClass : ""}`}>
             <div className="profile-header">
                 <div className='stats-infos'>
-                    <StatsInfoItem label="Games Played" value={currentUser!.gamesPlayed.toString()} />
-                    <StatsInfoItem label="Win Rate" value={currentUser!.winRate.toString()} />
+                    <StatsInfoItem label="Games Played" value={getMatchPlayed(userState.user).toString()} />
+                    <StatsInfoItem label="Win Rate" value={`${getWinRate(userState.user).toString()}%`} />
                     <StatsInfoItem label="Rank" value="#3" />
                 </div>
-                <CardInfo />
+                <CardInfo userState={userState} />
             </div>
             <div className="profile-main">
                 <div className="profile-main-menu">
@@ -48,7 +33,7 @@ function Profile() {
                         )
                     }
                 </div>
-                <RenderProfileBlock blockTitle={attributes.find(elem => elem.isActive === "true")!.title} />
+                <RenderProfileBlock blockTitle={attributes.find(elem => elem.isActive === "true")!.title} userDatas={userState.user} />
             </div>
         </div>
     );

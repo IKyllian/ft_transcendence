@@ -13,13 +13,28 @@
     flex-direction: row;
     flex-flow: row;
     .chat-sidebar {
-        width: 300px;
+        @include width-height(300px, 100%);
+        min-width: 280px;
+        max-width: 280px;
         background-color: $LightDarkPalette;
         border-right: 1px solid $WhitePalette;
+        position: relative;
+        
+        .explore-button {
+           background-color: $DarkPalette;
+           padding: 15px;
+           position: absolute;
+           bottom: 0;
+           left: 0;
+           right: 0;
+           text-align: center;
+        }
 
         .ul-wrapper {
+            position: relative;
             list-style-type: none;
             margin-right: 30px;
+            
             &-elem {
                 .collapse-button {
                     @include flex-row-alignCenter;
@@ -88,7 +103,7 @@
     }
 
     .message-container {
-        width: 80%;
+        width: 100%;
         display: flex;
         flex-direction: row;
         .message-container-main {
@@ -107,7 +122,7 @@
                     align-items: center;
                     justify-content: space-between;
                     border-bottom: 1px solid $WhitePalette;
-    
+
                     &-right-side {
                         margin-right: 20px;
                         svg {
@@ -137,9 +152,10 @@
                     background-color: $LightDarkPalette;
                     border-bottom: 1px solid $WhitePalette;
                     @include flex-row-alignCenter;
-    
+
                     .burger-icon-responsive {
                         display: none;
+                        cursor: pointer
                     }
                     .player-container {
                         @include flex-row-alignCenter;
@@ -153,60 +169,78 @@
                     }
                 }
     
-                .ul-container {
-                    overflow: scroll;
-                    padding-right: 20px;
+                ul {
+                    overflow-y: scroll;
+                    margin: 0;
+                    padding: 20px;
                     height: 90%;
-                    ul {
-                        .message-item {
-                            @include flex-row-alignCenter;
-                            gap: 15px;
-    
-                            &:not(&:first-child) {
-                                margin-top: 15px;
+                    display: flex;
+                    flex-direction: column;
+                    .message-item {
+                        @include flex-row-alignCenter;
+                        gap: 15px;
+
+                        &:not(&:first-child) {
+                            margin-top: 15px;
+                        }
+            
+                        img {
+                            @include avatar-player(50px);
+                        }
+
+                        &-info {
+                            p {
+                                margin: 0;
                             }
-                
-                            img {
-                                @include avatar-player(50px);
+                            .message-text {
+                                padding: 10px 15px;
+                                background-color: $LightBluePalette;
+                                margin: 0;
                             }
     
-                            &-info {
-                                p {
-                                    margin: 0;
-                                }
-                                .message-text {
-                                    padding: 10px 15px;
-                                    background-color: $LightBluePalette;
-                                    margin: 0;
-                                }
-        
-                                .message-sender {
+                            .message-sender {
+                                font-size: 10px;
+                                color: #a5abb0;
+                                margin-top: 5px;
+                                text-decoration: none;
+                                position: relative;
+                                .sender-txt {
                                     cursor: pointer;
-                                    font-size: 10px;
-                                    color: #a5abb0;
-                                    margin-top: 5px;
-                                    text-decoration: none;
-                                    position: relative;
+                                    margin-right: 5px;
+                                }
+                                span {
+                                    &:last-child {
+                                        font-size: 9px;
+                                        letter-spacing: 0.5px;
+                                    }   
                                 }
                             }
-                
-                            &-left {
-                                float: left;
-                                width: 100%;
-                                .message-text {
-                                    border-top-right-radius: 30px;
-                                    border-bottom-right-radius: 30px;
-                                    border-top-left-radius: 30px;
-                                }
+                        }
+            
+                        &-left {
+                            float: left;
+                            width: 100%;
+                            .message-text {
+                                border-top-right-radius: 30px;
+                                border-bottom-right-radius: 30px;
+                                border-top-left-radius: 30px;
                             }
-                
-                            &-right {
-                                float: right;
-                                .message-text {
-                                    background-color: rgb(173, 113, 22);
-                                    border-top-right-radius: 30px;
-                                    border-bottom-left-radius: 30px;
-                                    border-top-left-radius: 30px;
+                        }
+            
+                        &-right {
+                            flex-direction: row-reverse;
+                            .message-text {
+                                background-color: rgb(173, 113, 22);
+                                border-top-right-radius: 30px;
+                                border-bottom-left-radius: 30px;
+                                border-top-left-radius: 30px;
+                            }
+
+                            .message-item-info {
+                                .message-sender {
+                                    span {
+                                        float: right;
+                                    }
                                 }
                             }
                         }
@@ -221,18 +255,26 @@
             justify-content: space-between;
             width: 90%;
             margin: 0 auto;
-            svg {
-                cursor: pointer;
-                background-color: $OrangeProfile;
-                border-radius: 50%;
-                @include width-height(30px, 30px);
-                padding: 5px;
-                background: linear-gradient(112deg, rgba(255,94,0,1) 0%, rgba(255,145,0,1) 50%, rgba(255,154,0,1) 100%);
-            }
-            input {
-                all: unset;
-                width: 95%;
-                padding: 18px 20px;
+            form {
+                width: 100%;
+                @include flex-row-alignCenter();
+                input {
+                    all: unset;
+                    width: 95%;
+                    padding: 18px 20px;
+                }
+
+                button {
+                    all: unset;
+                    svg {
+                        cursor: pointer;
+                        background-color: $OrangeProfile;
+                        border-radius: 50%;
+                        @include width-height(30px, 30px);
+                        padding: 5px;
+                        background: linear-gradient(112deg, rgba(255,94,0,1) 0%, rgba(255,145,0,1) 50%, rgba(255,154,0,1) 100%);
+                    }
+                }  
             }
         }
 
@@ -287,6 +329,92 @@
             }
         }
     }
+
+    .channels-list-wrapper {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin: auto;
+        padding: 16px 0;
+        overflow-y: scroll;
+        height: 100%;
+
+        .sidebar-button {
+            display: none;
+        }
+        .channels-card-wrapper {
+            background-color: $DarkPalette;
+            @include width-height(300px, 320px);
+            position: relative;
+
+            .channel-banner {
+                height: 110px;
+                background: url('../../Images-Icons//Backgrounds/background-42.jpg') no-repeat center;
+                background-size: cover;
+            }
+
+            .card-content {
+                padding: 10px;
+
+                .channel-name {
+                    margin: 0;
+                    font-size: 19px;
+                    font-weight: bold;
+                    span {
+                        font-size: 10px;
+                    }
+                }
+
+                .channel-description {
+                    font-size: 12px;
+                    font-family: OpenSans;
+                }
+    
+                .item-bottom {
+                    width: 90%;
+                    position: absolute;
+                    @include flex-row-alignCenter();
+                    justify-content: space-between;
+                    bottom: 0;
+                    p {
+                        font-size: 14px;
+                    }
+                    &-right {
+                        display: flex;
+                        align-items: center;
+                        gap: 5px;
+                        svg {
+                            cursor: pointer;
+                            background-color: $OrangeProfile;
+                            border-radius: 50%;
+                            @include width-height(25px, 25px);
+                            padding: 3px;
+                            background: linear-gradient(112deg, rgba(255,94,0,1) 0%, rgba(255,145,0,1) 50%, rgba(255,154,0,1) 100%);
+                        }
+                        input {
+                            all: unset;
+                            border: 1px solid white;
+                            border-radius: 5px;
+                            padding: 3px;
+                            width: 100px;
+                            font-size: 13px;
+                        }
+                    }
+                }
+            } 
+        }
+    }
+}
+
+@media screen and (max-width: 1230px) {
+    .chat-page-container {
+        .channels-list-wrapper {
+            grid-template-columns: repeat(2, 1fr);
+            .channels-card-wrapper {
+                @include width-height(270px, 290px);
+            }
+        }
+    }
 }
 
 @media screen and (max-width: $BreakPoint_800) {
@@ -299,6 +427,21 @@
             position: absolute;
             z-index: 99;
             height: 100%;
+            min-width: 250px;
+            max-width: 250px;
+            font-size: 15px;
+            .ul-wrapper {            
+                &-elem {
+                    .collapse-button {
+                        svg {
+                            @include width-height(20px, 20px);
+                        }
+                        &-name {
+                            font-size: 13px;
+                        }
+                    }
+                }
+            }
         }
         .chat-sidebar-responsive {
             display: block;
@@ -354,6 +497,23 @@
                 }
             } 
         }
+
+        .channels-list-wrapper {
+            .sidebar-button {
+                display: block;
+                position: absolute;
+                left: -24px;
+                top: 25px;
+                z-index: 99;
+                border-radius: 50%;
+                @include width-height(45px, 45px);
+                display: flex;
+                align-items: center;
+                justify-content: flex-end;
+                background-color: $DarkPalette;
+                cursor: pointer;
+            }
+        }
     }
 }
 
@@ -376,6 +536,49 @@
                     padding-left: $HeaderResponsive500Marge;
                     }
                 }
+            }
+        }
+
+        .channels-list-wrapper {
+            .channels-card-wrapper {
+                @include width-height(220px, 240px);
+                .card-content {
+                    .channel-name {
+                        font-size: 13px;
+                    }
+
+                    .channel-description {
+                        font-size: 10px;
+                    }
+
+                    .item-bottom {
+                        p {
+                            font-size: 10px;
+                        }
+
+                        &-right {
+                            svg {
+                                @include width-height(20px, 20px);
+                            }
+                            input {
+                                padding: 3px;
+                                width: 80px;
+                                font-size: 10px;
+                            }
+                        }
+                    }
+                }                
+            }
+        }
+    }
+}
+
+@media screen and (max-width: 470px) {
+    .chat-page-container {
+        .channels-list-wrapper {
+            grid-template-columns: repeat(1, 1fr);
+            .channels-card-wrapper {
+                @include width-height(250px, 270px);
             }
         }
     }
