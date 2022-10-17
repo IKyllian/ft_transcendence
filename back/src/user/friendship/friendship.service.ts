@@ -9,6 +9,8 @@ export class FriendshipService {
 	constructor(
 		@InjectRepository(Friendship)
 		private friendshipRepo: Repository<Friendship>,
+		@InjectRepository(User)
+		private userRepo: Repository<User>,
 		private userService: UserService,
 	) {}
 
@@ -77,7 +79,7 @@ export class FriendshipService {
 		if (requestFound)
 			throw new BadRequestException('Already ' + requestFound.status);
 		const request = this.friendshipRepo.create({ requester, addressee, status: 'requested' });
-		return await this.friendshipRepo.save(request);
+		return this.friendshipRepo.save(request);
 	}
 
 	//TODO try with query builder
@@ -106,6 +108,11 @@ export class FriendshipService {
 			}
 		});
 		return friendList;
+
+		return this.userRepo
+			.createQueryBuilder("user")
+			.leftJoinAndSelect(Friendship, "friends" , "friends.requester = user")
+			.getMany()
 	}
 
 }
