@@ -32,8 +32,8 @@ export class UserController {
 		console.log('me')
 		return this.userService.findOne({
 			relations: {
-				friendshipReceived: {requester: true},
-				friendshipSend: {addressee : true},
+				// friendshipReceived: {requester: true},
+				// friendshipSend: {addressee : true},
 			},
 			where: {
 				id: user.id,
@@ -68,16 +68,26 @@ export class UserController {
 	// test
  	// @UseGuards(JwtGuard)
 	@Get(':id')
-	getUserById(@Param('id', ParseIntPipe) id: number) {
+	async getUserById(@Param('id', ParseIntPipe) id: number) {
 		console.log('get user by id route')
-		return this.userService.findOneBy({ id });
+		return await this.userService.findOne({
+			relations: {
+				statistic: true,
+			},
+			where: { id },
+		});
 	}
 
 	@UseGuards(JwtGuard)
 	@Get('name/:username')
-	getUserbyName(@Param('username') username: string) {
+	async getUserbyName(@Param('username') username: string) {
 		console.log('find by username')
-		return this.userService.findOneBy({ username });
+		return await this.userService.findOne({
+			relations: {
+				statistic: true,
+			},
+			where: { username },
+		});
 	}
 
 	//probably going to be socked sided

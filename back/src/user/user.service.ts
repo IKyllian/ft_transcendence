@@ -133,6 +133,7 @@ export class UserService {
 		const toBlock = await this.findOneBy({ id });
 		if (!toBlock)
 			throw new NotFoundException('User not found');
+		console.log("REturn", this.isBlocked(user, id));
 		if (this.isBlocked(user, id))
 			throw new BadRequestException('User already blocked');
 		user.blocked = [...user.blocked, toBlock];
@@ -145,8 +146,9 @@ export class UserService {
 		return this.userRepo.save(user);
 	}
 
-	async isBlocked(user: User, id: number) {
+	isBlocked(user: User, id: number): boolean {
 		const isblocked = user.blocked.find((blocked) => blocked.id === id);
+		console.log(isblocked);
 		return isblocked ? true : false;
 	}
 }

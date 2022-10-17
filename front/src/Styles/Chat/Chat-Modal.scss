@@ -1,7 +1,7 @@
 @use '../Variables.scss' as *;
 
 .chat-modal {
-    @include modal-container(550px, 550px, $DarkPalette); // Params => Height, Width, Background-color
+    @include modal-container(620px, 600px, $DarkPalette); // Params => Height, Width, Background-color
     padding: 10px;
 
     .search-player-container {
@@ -10,12 +10,21 @@
         }
     }
 
+    h3 {
+        text-align: center;
+        margin-top: 1px;
+    }
+
     form {
         display: flex;
         flex-direction: column;
-        gap: 15px;
+        gap: 10px;
         margin-bottom: 10px;
-        label {
+        .checkbox-container {
+            display: flex;
+            gap: 5px;
+        }
+        .labelTextInput {
             display: flex;
             flex-direction: column;
             gap: 5px;
@@ -55,6 +64,7 @@
     
                 &:last-child {
                     background-color: rgb(255, 123, 0);
+                    color: $WhitePalette;
                 }
             }
         }
@@ -69,6 +79,6 @@
 
 @media screen and (max-width: $BreakPoint_800) {
     .chat-modal {
-        @include modal-container(550px, 90%, $DarkPalette);
+        @include modal-container(600px, 90%, $DarkPalette);
     }
 }

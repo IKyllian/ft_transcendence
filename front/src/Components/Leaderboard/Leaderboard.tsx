@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
-import { leaderboardDatas } from "../../Interfaces/Datas-Examples"
-import { ExampleUser } from "../../Interfaces/Interface-User";
-import { ModalContext } from "../ModalProvider";
+import { leaderboardDatas } from "../../Types/Datas-Examples"
+import { ExampleUser } from "../../Types/User-Types";
+import { ModalContext } from "../Utils/ModalProvider";
 
 import LeaderboardItem from "./Leaderboard-Item";
 
@@ -26,7 +26,7 @@ function Leaderboard() {
                         <th> Name </th>
                         <th> Games Played </th>
                         <th className="responsive-column"> Win Rate </th>
-                        <th> Points </th>
+                        {/* <th> Points </th> */}
                         <th className="responsive-column"> Status </th>
                     </tr>
                 </thead>
@@ -39,7 +39,7 @@ function Leaderboard() {
                                 name={elem.username}
                                 gamesPlayed={elem.gamesPlayed}
                                 winRate={elem.winRate}
-                                points={elem.points}
+                                // points={elem.points}
                                 isOnline={elem.isOnline}
                                 isInGame={elem.isInGame}
                             />

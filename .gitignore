@@ -1,4 +1,7 @@
 .DS
+.DS_Store
 *.env
 *.env.db
+.vscode
+
 package-lock.json

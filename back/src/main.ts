@@ -11,8 +11,8 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
   await app.listen(5000);
 
-  const userService = await app.resolve(UserService);
-  const channelService = await app.resolve(ChannelService);
+  // const userService = await app.resolve(UserService);
+  // const channelService = await app.resolve(ChannelService);
 
   // let user = await userService.create({ username: 'chak12313' });
   // let channel = await channelService.create(user, {

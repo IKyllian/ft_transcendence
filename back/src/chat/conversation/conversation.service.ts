@@ -25,7 +25,7 @@ export class ConversationService {
 			relations: {
 				user1: true,
 				user2: true,
-				messages: true,
+				messages: { sender: true },
 			},
 			where: [
 				{
@@ -49,5 +49,23 @@ export class ConversationService {
 			return convExist;
 		else
 			return await this.createConversation(user, user2);
+	}
+
+	getConversations(user: User) {
+		return this.convRepo.find({
+			relations: {
+				user1: true,
+				user2: true,
+				messages: true,
+			},
+			where: [
+				{
+					user1: { id: user.id },
+				},
+				{
+					user2: { id: user.id },
+				},
+			]
+		});
 	}
 }

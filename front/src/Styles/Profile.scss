@@ -44,7 +44,7 @@ $FontSizeTextResponsive: 15px;
         .card-info {
             z-index: 0;
             position: absolute;
-            bottom: -58px;
+            bottom: -56px;
             @include flex-row-alignCenter();
             margin-left: $HeaderMarge;
 
@@ -95,11 +95,10 @@ $FontSizeTextResponsive: 15px;
                 gap: 5px;
                 color: $OrangeProfile;
                 margin-left: 20px;
-                min-width: 90px;
-                height: 30px;
                 border-radius: 10px;
                 background-color: $LightDarkPalette;
-                padding: 1em;
+                padding: 5px;
+                font-weight: 600;
 
                 &:hover {
                     background-color: $LightDarkPalette;
@@ -303,7 +302,7 @@ $FontSizeTextResponsive: 15px;
             
             .card-info {
                 margin-left: $HeaderResponsive800Marge;
-                bottom: -35px;
+                bottom: -33px;
                 .profile-avatar {
                     @include avatar-player(100px);
                 }

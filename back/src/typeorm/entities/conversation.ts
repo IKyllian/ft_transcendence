@@ -7,11 +7,15 @@ export class Conversation {
 	@PrimaryGeneratedColumn()
 	id: number;
 
-	@OneToOne(() => User)
+	@OneToOne(() => User, {
+		createForeignKeyConstraints: false,
+	})
 	@JoinColumn()
 	user1: User;
 
-	@OneToOne(() => User)
+	@OneToOne(() => User, {
+		createForeignKeyConstraints: false,
+	})
 	@JoinColumn()
 	user2: User;
 

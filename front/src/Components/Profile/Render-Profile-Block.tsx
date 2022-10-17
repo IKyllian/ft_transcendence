@@ -2,8 +2,10 @@ import BlockMatchHistory from "./Blocks/Block-Match-History";
 import BlockAchievement from "./Blocks/Block-Achievement";
 import BlockFriends from "./Blocks/Block-Friends";
 
-function RenderProfileBlock(props: {blockTitle: string}) {
-    const {blockTitle} = props;
+import { UserInterface } from "../../Types/User-Types";
+
+function RenderProfileBlock(props: {blockTitle: string, userDatas: UserInterface}) {
+    const {blockTitle, userDatas} = props;
 
     if (blockTitle === "Achievements") {
         return (
@@ -11,11 +13,11 @@ function RenderProfileBlock(props: {blockTitle: string}) {
         );
     } else if (blockTitle === "Matches") {
         return (
-            <BlockMatchHistory />
+            <BlockMatchHistory userDatas={userDatas} />
         );
     } else {
         return (
-           <BlockFriends />
+           <BlockFriends userDatas={userDatas} />
         );
     }
 }

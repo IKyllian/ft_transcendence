@@ -13,7 +13,7 @@ import { RtStrategy } from "./strategy/rt.strategy";
 
 @Module({
 	imports: [
-		forwardRef(() => ChatModule),
+		forwardRef(() => ChatModule), // TODO pq deja?
 		HttpModule,
 		UserModule,
 		// forwardRef(() => UserModule),
