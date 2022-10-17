@@ -20,8 +20,11 @@ import ChannelsList from "./Components/Chat/Channels-List";
 import NotifGameInvite from "./Components/Notif-Game-Invite";
 
 import { io, Socket } from "socket.io-client";
-import { useAppSelector } from './Redux/Hooks'
+import { useAppDispatch, useAppSelector } from './Redux/Hooks'
 import { socketUrl } from "./env";
+import { fetchNotifications } from "./Api/User-Fetch";
+import { NotificationInterface } from "./Types/Notification-Types";
+import { addNotification } from "./Redux/NotificationSlice";
 
 interface RouteProps {
 	path: string,
@@ -83,6 +86,7 @@ function App() {
 	const [socket, setSocket] = useState<Socket | undefined>(undefined);
 	const [gameInvite, setGameInvite] = useState<boolean>(false);
     const {token, isAuthenticated} = useAppSelector((state) => state.auth);
+	const dispatch = useAppDispatch();
 
 	const connectSocket = () => {
 		const newSocket: Socket = io(`${socketUrl}`, {extraHeaders: {
@@ -98,18 +102,28 @@ function App() {
 	useEffect(() => {
 		if (isAuthenticated && socket === undefined) {
 			connectSocket();
+			fetchNotifications(token, dispatch);
 			// setTimeout(function() {
 			// 	setGameInvite(true);
 			// 	setTimeout(function() {
 			// 		gameNotificationLeave();
 			// 	}, 15000);
 			// }, 2000);
-
-			// socket!.on('ChannelUpdate', (data: any) => {
-            //     console.log("ChannelUpdate", data);
-            // });
 		}
 	}, [isAuthenticated])
+
+	useEffect(() => {
+		if (socket !== undefined) {
+			socket!.on("NewNotification", (data: NotificationInterface) => {
+				console.log("NewNotification", data);
+				dispatch(addNotification(data));
+			});
+		}
+
+		return () => {
+			socket?.off("NewNotification")
+		}
+	}, [socket])
   return (
 	<div className="app-container">
     	<BrowserRouter>

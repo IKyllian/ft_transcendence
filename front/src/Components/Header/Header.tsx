@@ -11,9 +11,10 @@ import ResponsiveMenu from './Responsive-Menu';
 
 function NotifIcon(props: {setShowNotifDropdown: Function}) {
     const {setShowNotifDropdown} = props;
+    const {notifications} = useAppSelector(state => state.notification);
     return (
         <div className='badge-wrapper'>
-            <div className='badge-notif'> 5 </div>
+            { notifications !== undefined && notifications.length > 0 && <div className='badge-notif'> {notifications?.length} </div> }
             <IconBell onClick={() => setShowNotifDropdown((state: boolean) => !state)} />
         </div>
     );
@@ -22,9 +23,8 @@ function NotifIcon(props: {setShowNotifDropdown: Function}) {
 function Header() {
     const [showMenu, setShowMenu] = useState<boolean>(false);
     const [showNotifDropdown, setShowNotifDropdown] = useState<boolean>(false);
-    let location = useLocation();
-    let { currentUser } = useAppSelector(state => state.auth);
-
+    const location = useLocation();
+    const { currentUser } = useAppSelector(state => state.auth);
     const modalStatus = useContext(ModalContext);
 
     const handleClick = () => {

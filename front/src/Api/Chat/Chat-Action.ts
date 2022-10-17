@@ -1,6 +1,7 @@
 import { AnyAction, Dispatch } from "@reduxjs/toolkit";
 import axios from "axios";
 import { NavigateFunction } from "react-router-dom";
+import { Socket } from "socket.io-client";
 import { baseUrl } from "../../env";
 import { addChannel } from "../../Redux/ChatSlice";
 
@@ -10,17 +11,33 @@ type BodyRequest = {
     password?: string,
 }
 
-export function fetchCreateChannel(body: BodyRequest, token: string, dispatch: Dispatch<AnyAction>, navigate: NavigateFunction, onCloseModal: Function) {
+export function fetchCreateChannel(
+    body: BodyRequest,
+    usersInvited: string[] | undefined,
+    token: string,
+    dispatch: Dispatch<AnyAction>,
+    navigate: NavigateFunction,
+    onCloseModal: Function,
+    socket: Socket) {
+    
     axios.post(`${baseUrl}/channel`, body, {
         headers: {
             "Authorization": `Bearer ${token}`,
         }
     })
     .then((response) => {
-       console.log(response);
-       dispatch(addChannel({channel: response.data, isActive: "false"}));
-       onCloseModal();
-       navigate(`/chat/channel/${response.data.id}`);
+        console.log(response);
+        dispatch(addChannel({channel: response.data, isActive: "false"}));
+        if (usersInvited) {
+            usersInvited.forEach(element => {
+                socket?.emit("ChannelInvite", {
+                    chanId: response.data.id,
+                    userId: parseInt(element),
+                });
+            });
+        }
+        onCloseModal();
+        navigate(`/chat/channel/${response.data.id}`);
     }).catch(err => {
         console.log(err);
     })

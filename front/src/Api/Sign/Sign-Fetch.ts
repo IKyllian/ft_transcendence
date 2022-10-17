@@ -16,7 +16,7 @@ export function fetchSignIn({username, password, dispatch}: SignParameter) {
     .then((response) => {
         console.log('JWT =>', response.data);
         const payload: LoginPayload = {
-            token: response.data.token,
+            token: response.data.access_token,
             user: response.data.user,
         }
         dispatch(loginSuccess(payload));
@@ -30,7 +30,7 @@ export function fetchSignUp({username, password, dispatch}: SignParameter) {
     .then((response) => {
         console.log('JWT =>', response.data);
         const payload: LoginPayload = {
-            token: response.data.token,
+            token: response.data.access_token,
             user: response.data.user,
         }
         dispatch(loginSuccess(payload));
@@ -42,19 +42,20 @@ export function fetchSignUp({username, password, dispatch}: SignParameter) {
 export function fetchLogin42(authorizationCode: string, dispatch: Dispatch<AnyAction>, navigate: NavigateFunction) {
     axios.post(`${baseUrl}/auth/login42`, { authorizationCode })
     .then((response) => {
-        console.log('JWT =>', response.data);
+        console.log('JWT =>', response.data.access_token);
         if (response.data.usernameSet) {
             const payload: LoginPayload = {
-                token: response.data.token,
+                token: response.data.access_token,
                 user: response.data.user,
             }
             dispatch(loginSuccess(payload));
         } else {
             dispatch(setUsername());
-            navigate("/set-username", {state:{token: response.data.token}});
+            navigate("/set-username", {state:{token: response.data.access_token}});
         }
     })
     .catch(err => {
+        console.log(err);
         dispatch(loginError("Error while login with 42"));
     });
 }
@@ -68,7 +69,7 @@ export function fetchSetUsername(username: string, token: string, dispatch: Disp
     .then((response) => {
         const payload: LoginPayload = {
             user: response.data.user,
-            token: response.data.token,
+            token: response.data.access_token,
         }
         dispatch(loginSuccess(payload));
     })

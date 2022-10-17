@@ -5,12 +5,13 @@ import { IconX } from '@tabler/icons';
 import { useNavigate } from "react-router-dom";
 import { fetchCreateChannel } from "../../Api/Chat/Chat-Action";
 import { useContext } from "react";
+import { SocketContext } from "../../App";
 
 type FormValues = {
     chanMode: string,
     chanName: string,
     password?: string,
-    usersIdInvited?: number;
+    usersIdInvited?: string[];
 }
 
 type BodyRequest = {
@@ -20,13 +21,17 @@ type BodyRequest = {
 }
 
 function ChatModal(props: {onCloseModal: Function, showModal: number}) {
-    const { register, handleSubmit, watch, formState: {errors} } = useForm<FormValues>();
+    const { register, handleSubmit, watch, reset, formState: {errors} } = useForm<FormValues>();
     const { onCloseModal, showModal } = props;
 
     const channelMode = watch('chanMode');
     const navigate = useNavigate();
     const authDatas = useAppSelector((state) => state.auth);
     const dispatch = useAppDispatch();
+    const {socket} = useContext(SocketContext);
+
+    const usersInvited = watch("usersIdInvited");
+    console.log(usersInvited);
 
     const formSubmit = handleSubmit((data, e) => {
         e?.preventDefault();
@@ -36,7 +41,8 @@ function ChatModal(props: {onCloseModal: Function, showModal: number}) {
         }
         if (data.chanMode === "protected")
             body = {...body, password: data.password}
-        fetchCreateChannel(body, authDatas.token, dispatch, navigate, onCloseModal);
+        fetchCreateChannel(body, data.usersIdInvited,authDatas.token, dispatch, navigate, onCloseModal, socket!);
+        reset();
     })
 
     if (showModal === 1) {
@@ -52,6 +58,7 @@ function ChatModal(props: {onCloseModal: Function, showModal: number}) {
                                 <label key={index}>
                                     {elem}
                                     <input
+                                        defaultChecked={index === 0 ? true : false}
                                         type="radio"
                                         value={elem}
                                         {...register("chanMode", {required: "This is required"})}
