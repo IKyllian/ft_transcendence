@@ -1,20 +1,23 @@
 import { useEffect, useState, useRef, useContext } from "react";
 import { useParams } from "react-router-dom";
 import { Channel } from "../../Types/Chat-Types";
-import { useAppSelector } from '../../Redux/Hooks'
+import { useAppDispatch, useAppSelector } from '../../Redux/Hooks'
 import { SocketContext } from "../../App";
+import { addChannel } from "../../Redux/ChatSlice";
 
 export function useChannelHook() {
     const [chatDatas, setChatDatas] = useState<Channel | undefined>(undefined);
-    const [showUsersSidebar, setShowUsersSidebar] = useState<boolean>(false);
+    const [showUsersSidebar, setShowUsersSidebar] = useState<boolean>(true);
     const [inputMessage, setInputMessage] = useState<string>('');
     const [loggedUserIsOwner, setLoggedUserIsOwner] = useState<boolean>(false);
 
     const messagesEndRef = useRef<null | HTMLDivElement>(null);
     let authDatas = useAppSelector((state) => state.auth);
+    let {channels} = useAppSelector((state) => state.chat);
     const params = useParams();
     const {socket} = useContext(SocketContext);
     const channelId: number | undefined = params.channelId ? parseInt(params.channelId!, 10) : undefined;
+    const dispatch = useAppDispatch();
 
     const changeSidebarStatus = () => {
         setShowUsersSidebar(!showUsersSidebar);
@@ -35,6 +38,13 @@ export function useChannelHook() {
                 id: channelId,
             });
 
+            socket!.on('ChannelUpdate', (data: Channel) => {
+                setChatDatas((prev: any) => {
+                    return {...prev, channelUsers: [...data.channelUsers]}
+                });
+                console.log(data);
+            });
+
             socket!.on('exception', (data: any) => {
                 console.log(data);
             });
@@ -42,7 +52,9 @@ export function useChannelHook() {
             socket!.on('roomData', (data: Channel) => {
                 let channel: Channel = data;
                 channel.messages.forEach(elem => elem.send_at = new Date(elem.send_at));
-                setChatDatas({...channel});
+                setChatDatas(channel);
+                if (!channels?.find(elem => elem.channel.id === channel.id))
+                    dispatch(addChannel({isActive: 'true', channel: data}));
                 if (data.channelUsers.find((elem) => elem.user.id === authDatas.currentUser?.id && (elem.role === "owner" || elem.role === "moderator")))
                     setLoggedUserIsOwner(true);
             });
@@ -57,6 +69,7 @@ export function useChannelHook() {
             });
             socket!.off("exception");
             socket!.off("roomData");
+            socket!.off("ChannelUpdate");
         }
     }, [channelId])
 

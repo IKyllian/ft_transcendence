@@ -1,5 +1,5 @@
 import { ArgumentsHost, BadRequestException, Catch, ClassSerializerInterceptor, ExceptionFilter, HttpException, UseFilters, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
-import { WebSocketGateway, SubscribeMessage, MessageBody, WebSocketServer, ConnectedSocket, OnGatewayConnection, OnGatewayDisconnect, WsException, BaseWsExceptionFilter } from '@nestjs/websockets';
+import { WebSocketGateway, MessageBody, WebSocketServer, ConnectedSocket, OnGatewayConnection, OnGatewayDisconnect, WsException, BaseWsExceptionFilter, SubscribeMessage } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { AuthService } from 'src/auth/auth.service';
 import { WsJwtGuard } from 'src/auth/guard/ws-jwt.guard';
@@ -15,6 +15,12 @@ import { ChannelMessageDto } from '../channel/message/dto/channelMessage.dto';
 import { RoomDto } from './dto/room.dto';
 import { PrivateMessageService } from '../conversation/message/private-msg.sevice';
 import { PrivateMessageDto } from '../conversation/message/dto/privateMessage.dto';
+import { UserIdDto } from './dto/user-id.dto';
+import { FriendshipService } from 'src/user/friendship/friendship.service';
+import { NotificationService } from 'src/notification/notification.service';
+import { ResponseDto } from './dto/response.dto';
+import { ChannelPasswordDto } from '../channel/dto/channel-pwd.dto';
+import { ChannelInviteDto } from './dto/channel-invite.dto';
 
 @Catch()
 class GatewayExceptionFilter extends BaseWsExceptionFilter {
@@ -42,13 +48,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   server: Server;
 
   constructor(
-    // private readonly chatService: ChatService,
     private channelMsgService: ChannelMessageService,
     private privateMsgService: PrivateMessageService,
     private authService: AuthService,
     private channelService: ChannelService,
     private readonly session: ChatSessionManager,
     private userService: UserService,
+    private friendshipService: FriendshipService,
+    private notificationService: NotificationService,
     ) {}
 
   async handleConnection(socket: Socket) {
@@ -91,23 +98,23 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @UseGuards(WsJwtGuard)
   @SubscribeMessage('JoinChannelRoom')
   async joinChannelRoom(
-    @ConnectedSocket() client: Socket,
+    @ConnectedSocket() socket: Socket,
     @GetUser() user: User,
     @MessageBody() room: RoomDto,
   ) {
     console.log(user.username + ' joined room')
     const chanInfo = await this.channelService.getChannelById(user, room.id);
-    client.emit('roomData', chanInfo);
-    client.join(`channel-${ chanInfo.id }`);
+    socket.emit('roomData', chanInfo);
+    socket.join(`channel-${ chanInfo.id }`);
   }
 
   @UseGuards(WsJwtGuard)
   @SubscribeMessage('LeaveChannelRoom')
   leaveChannelRoom(
-    @ConnectedSocket() client: Socket,
+    @ConnectedSocket() socket: Socket,
     @GetUser() user: User,
     @MessageBody() room: RoomDto) {
-    client.leave(`channel-${ room.id }`);
+    socket.leave(`channel-${ room.id }`);
     console.log(user.username + ' left room')
   }
 
@@ -118,8 +125,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @GetUser() user: User,
     @MessageBody() data: ChannelMessageDto,
     ) {
-    //   const clients = (await this.server.in(`channel-${ data.chanId }`).fetchSockets()).map(client => client.id)
-    //   console.log('clients in room: ', clients)
+    //   const sockets = (await this.server.in(`channel-${ data.chanId }`).fetchSockets()).map(socket => socket.id)
+    //   console.log('sockets in room: ', sockets)
       const message = await this.channelMsgService.create(user, data);
       this.server.to(`channel-${ data.chanId }`).emit('NewChannelMessage', message);
   }
@@ -136,5 +143,65 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         .to(`user-${data.adresseeId}`)
         .emit('NewPrivateMessage', message);
   }
-}
 
+  @UseGuards(WsJwtGuard)
+  @SubscribeMessage('FriendRequest')
+  async sendFriendRequest(
+    @GetUser() user: User,
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() dto: UserIdDto,
+  ) {
+    const friendRequest = await this.friendshipService.sendFriendRequest(user, dto.id);
+    const notif = await this.notificationService.createFriendRequestNotif(friendRequest);
+    socket.to(`user-${dto.id}`).emit('NewNotication', notif);
+  }
+
+  @UseGuards(WsJwtGuard)
+  @SubscribeMessage('JoinChannel')
+  async joinChannel(
+    @GetUser() user: User,
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() channel: RoomDto,
+    @MessageBody() pwdDto?: ChannelPasswordDto,
+  ) {
+    const updatedChan = await this.channelService.join(user, channel.id, pwdDto);
+    this.server.to(`channel-${channel.id}`).emit('ChannelUpdate', updatedChan);
+    socket.to(`user-${user.id}`).emit('OnJoin', updatedChan);
+  }
+
+  @UseGuards(WsJwtGuard)
+  @SubscribeMessage('LeaveChannel')
+  async leaveChannel(
+    @GetUser() user: User,
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() channel: RoomDto,
+  ) {
+    const updatedChan = await this.channelService.leave(user, channel.id);
+    this.server.to(`channel-${channel.id}`).emit('ChannelUpdate', updatedChan);
+    socket.to(`user-${user.id}`).emit('OnLeave', updatedChan);
+  }
+
+  @UseGuards(WsJwtGuard)
+  @SubscribeMessage('ChannelInvite')
+  async channelInvite(
+    @GetUser() user: User,
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() dto: ChannelInviteDto,
+  ) {
+    const notif = await this.notificationService.createChanInviteNotif(user, dto);
+    socket.to(`user-${dto.userId}`).emit('NewNotification', notif);
+  }
+
+  //TODO inform front to delete notif?
+  @UseGuards(WsJwtGuard)
+  @SubscribeMessage('ChannelInviteResponse')
+  async respondToChannelInvite(
+    @GetUser() user: User,
+    @MessageBody() dto: ResponseDto
+  ) {
+    const updatedChan = await this.channelService.respondInvite(user, dto);
+    if (updatedChan)
+      this.server.to(`channel-${dto.id}`).emit('ChannelUpdate', updatedChan);
+  }
+
+}

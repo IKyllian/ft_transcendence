@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { ChannelsInterfaceFront, ConversationInterfaceFront } from '../Types/Chat-Types';
+import { channel } from 'diagnostics_channel';
+import { Channel, ChannelsInterfaceFront, ConversationInterfaceFront } from '../Types/Chat-Types';
 import { getSecondUserIdOfPM } from "../Utils/Utils-Chat"
 
 interface ChannelState {
@@ -29,6 +30,19 @@ export const chatSlice = createSlice({
         copyPrivateConvArray: (state, {payload}: PayloadAction<ConversationInterfaceFront[]>) => {
             state.privateConv = [...payload];
         },
+        updateChannel: (state, {payload}: PayloadAction<Channel>) => {
+            if (state.channels) {
+                const index: number = state.channels.findIndex(elem => elem.channel.id === payload.id);
+                if (index >= 0) {
+                    let newArray = state.channels;
+                    newArray[index].channel = payload; 
+                    state.channels = [...newArray];
+                } else {
+                    state.channels = [...state.channels, {isActive: 'false', channel: payload}];    
+                }
+            } else 
+                state.channels = [{isActive: 'false', channel: payload}];
+        },
         addChannel: (state, {payload}: PayloadAction<ChannelsInterfaceFront>) => {
             if (state.channels)
                 state.channels = [...state.channels, payload];
@@ -42,7 +56,7 @@ export const chatSlice = createSlice({
                 state.privateConv = [payload];
         },
         removeChannel: (state, {payload}: PayloadAction<number>) => {
-            if (state.channels) {                
+            if (state.channels) {
                 state.channels = state.channels.filter(elem => elem.channel.id !== payload);
             }
         },
@@ -91,6 +105,7 @@ export const {
     loadingDatas,
     copyChannelsArray,
     copyPrivateConvArray,
+    updateChannel,
     addChannel,
     addPrivateConv,
     removeChannel,

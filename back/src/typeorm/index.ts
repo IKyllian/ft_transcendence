@@ -8,6 +8,7 @@ import { Friendship } from "./entities/friendship"
 import { PrivateMessage } from "./entities/privateMessage"
 import { Statistic } from "./entities/statistic"
 import { User } from "./entities/user"
+import { Notification } from "./entities/notification"
 
 const entities = [
 	User,
@@ -20,6 +21,7 @@ const entities = [
 	Conversation,
 	PrivateMessage,
 	BannedUser,
+	Notification,
 ];
 
 export default entities;
@@ -35,4 +37,5 @@ export {
 	Conversation,
 	PrivateMessage,
 	BannedUser,
+	Notification,
 }

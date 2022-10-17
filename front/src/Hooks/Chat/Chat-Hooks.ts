@@ -1,8 +1,10 @@
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useAppSelector, useAppDispatch } from "../../Redux/Hooks";
-import { changeActiveElement } from "../../Redux/ChatSlice";
-import { useEffect, useState, useCallback } from "react";
+import { addChannel, changeActiveElement, removeChannel } from "../../Redux/ChatSlice";
+import { useEffect, useState, useCallback, useContext } from "react";
 import { fetchUserChannels, fetchUserConvs, fetchConvAndRedirect } from "../../Api/Chat/Chat-Fetch";
+import { SocketContext } from "../../App";
+import { Channel } from "../../Types/Chat-Types";
 
 export function useLoadChatDatas() {
     //States
@@ -16,9 +18,11 @@ export function useLoadChatDatas() {
     const location = useLocation();
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
+    const {socket} = useContext(SocketContext);
     
     const channelId: number | undefined = params.channelId ? parseInt(params.channelId!, 10) : undefined;
     const convId: number | undefined = params.convId ? parseInt(params.convId!, 10) : undefined;
+  
 
     // Functions pour le composant
     const sidebarOnChange = useCallback( () => {
@@ -35,6 +39,15 @@ export function useLoadChatDatas() {
 
     // Les useEffect pour les call api etc..
     useEffect(() => {
+        if (channelId !== undefined) {
+            socket?.on("OnLeave", (data: Channel) => {
+                if (channelId && channelId === data.id) {
+                    navigate(`/chat`);
+                }
+                dispatch(removeChannel(data.id));
+            });
+        }
+
         // Permet d'afficher la sidebar si aucun channel ou aucune conv n'est selectionner (en responsive)
         if ((channelId === undefined && convId === undefined) && location.pathname !== "/chat/channels-list") {
             setReponsiveSidebar(true);
@@ -47,6 +60,10 @@ export function useLoadChatDatas() {
     }, [channelId, convId, location.pathname])
 
     useEffect(() => {
+        socket?.on("OnJoin", (data: Channel) => {
+            dispatch(addChannel({isActive: 'true', channel: data}));
+        });
+
         fetchUserChannels(authDatas.token, channelId, dispatch); //Recupere les channels d'un user
         fetchUserConvs(authDatas.token, dispatch); //Recupere les convs d'un user
 
@@ -61,6 +78,11 @@ export function useLoadChatDatas() {
                 dispatch,
                 navigate
             );
+        }
+
+        return () => {
+            socket?.off("OnJoin");
+            socket?.off("OnLeave");
         }
     }, [])
 

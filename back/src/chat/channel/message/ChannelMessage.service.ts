@@ -19,7 +19,7 @@ export class ChannelMessageService {
 		const channel = await this.channelService.findOne({ id: messageDto.chanId });
 		if (!channel)
 			throw new ChannelNotFoundException();
-		const channelUser = await this.channelService.getChannelUser(channel, user);
+		const channelUser = await this.channelService.getChannelUser(channel.id, user.id);
 		if (!channelUser) { throw new NotInChannelException() } 
 		if (channelUser.is_muted) { throw new IsMutedException() }
 		const message = this.messagesRepo.create({
@@ -34,7 +34,7 @@ export class ChannelMessageService {
 		const channel = await this.channelService.findOne({ id: chanId });
 		if (!channel)
 			throw new ChannelNotFoundException();
-		const channelUser = await this.channelService.getChannelUser(channel, user);
+		const channelUser = await this.channelService.getChannelUser(channel.id, user.id);
 		if (!channelUser) { throw new NotInChannelException() }
 
 		return await this.messagesRepo.find({

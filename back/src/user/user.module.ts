@@ -21,6 +21,6 @@ import { UserService } from "./user.service";
 		useClass: ClassSerializerInterceptor,
 	}],
 	controllers: [UserController, friendshipController],
-	exports: [UserService]
+	exports: [UserService, FriendshipService]
 })
 export class UserModule {}

@@ -30,7 +30,10 @@ function MessageItem(props: {isFromChan: boolean, message: ChatMessage, loggedUs
                     <p className="message-text"> { message.content } </p>
                 }
                 <div className="message-sender">
-                    {message.sender.id !== authDatas.currentUser?.id && isFromChan && <span onClick={() => handleClick()}> {message.sender.username} </span>}
+                    {   
+                        message.sender.id !== authDatas.currentUser?.id && isFromChan &&
+                        <span className="sender-txt" onClick={() => handleClick()}> {message.sender.username} </span>
+                    }
                     <span> {getMessageDateString(message.send_at)} </span>
                     {
                         message.sender.id !== authDatas.currentUser?.id &&

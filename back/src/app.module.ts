@@ -6,6 +6,7 @@ import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { UserModule } from './user/user.module';
 import { ChatModule } from './chat/chat.module';
+import { NotificationModule } from './notification/notification.module';
 import entities from './typeorm';
 
 @Module({
@@ -14,6 +15,7 @@ import entities from './typeorm';
     UserModule,
     ChatModule,
     ConfigModule.forRoot({ envFilePath: '.env', isGlobal: true }),
+    NotificationModule,
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.POSTGRES_HOST,

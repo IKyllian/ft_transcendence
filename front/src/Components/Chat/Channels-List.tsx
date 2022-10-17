@@ -1,21 +1,19 @@
 import { useEffect, useState, useContext } from "react";
 import { Channel } from "../../Types/Chat-Types";
 import LoadingSpin from "../Utils/Loading-Spin";
-import { useAppSelector, useAppDispatch } from "../../Redux/Hooks";
+import { useAppSelector } from "../../Redux/Hooks";
 import { IconPlus, IconChevronRight } from "@tabler/icons";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { SidebarContext } from "./Chat";
-
-import { fetchJoinChannel } from "../../Api/Chat/Chat-Action";
+import { SocketContext } from "../../App";
 import { fetchVisibleChannels } from "../../Api/Chat/Chat-Fetch";
 
 function ChannelItem(props: {channelData: Channel, token: string}) {
     const { register, handleSubmit, formState: {errors} } = useForm<{password?: string}>();
     const { channelData, token } = props;
-    const dispatch = useAppDispatch();
     const navigate = useNavigate();
-
+    const {socket} = useContext(SocketContext);
 
     const handleClick = handleSubmit((data, e) => {
         e?.preventDefault();
@@ -24,8 +22,21 @@ function ChannelItem(props: {channelData: Channel, token: string}) {
             body = {password: data.password};
         else
             body = {};
-        fetchJoinChannel(channelData.id, body, token, dispatch, navigate);
+        socket?.emit("JoinChannel", {id: channelData.id, pwdDto: body});
+        setTimeout(function() {
+            navigate(`/chat/channel/${channelData.id}`);
+		}, 50);
     })
+
+    useEffect(() => {
+        socket!.on('exception', (data: any) => {
+            console.log("exception", data);
+        });
+
+        return () => {
+            socket?.off('exception');
+        }
+    }, [])
 
     return (
         <div className="channels-card-wrapper">

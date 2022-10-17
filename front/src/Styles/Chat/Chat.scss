@@ -204,11 +204,11 @@
                                 margin-top: 5px;
                                 text-decoration: none;
                                 position: relative;
+                                .sender-txt {
+                                    cursor: pointer;
+                                    margin-right: 5px;
+                                }
                                 span {
-                                    &:first-child {
-                                        cursor: pointer;
-                                        margin-right: 5px;
-                                    }
                                     &:last-child {
                                         font-size: 9px;
                                         letter-spacing: 0.5px;

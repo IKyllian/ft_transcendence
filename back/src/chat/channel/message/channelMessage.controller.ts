@@ -10,7 +10,6 @@ import { ChannelMessageDto } from "./dto/channelMessage.dto";
 export class ChannelMessageController {
 	constructor(
 		private messageService: ChannelMessageService,
-		private chatGateway: ChatGateway,
 	) {}
 
 	@Post()

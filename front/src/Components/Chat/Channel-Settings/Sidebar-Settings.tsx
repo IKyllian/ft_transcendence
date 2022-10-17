@@ -1,18 +1,28 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { useAppSelector } from '../../../Redux/Hooks'
+import { useAppDispatch, useAppSelector } from '../../../Redux/Hooks'
 import { Channel } from "../../../Types/Chat-Types"
-import { fetchLeaveChannel } from "../../../Api/Chat/Chat-Action";
+import { SocketContext } from "../../../App";
+import { useContext } from "react";
+import { removeChannel } from "../../../Redux/ChatSlice";
 
 function SidebarSettings(props: {setSidebarItem: Function, channelDatas: Channel, loggedUserIsOwner: boolean}) {
     const {setSidebarItem, channelDatas, loggedUserIsOwner} = props;
 
     const params = useParams();
     const navigate = useNavigate();
+    const dispatch = useAppDispatch();
     let authDatas = useAppSelector((state) => state.auth);
+
+    const {socket} = useContext(SocketContext);
 
     const leaveChannel = () => {
         if (params.channelId) {
-            fetchLeaveChannel(parseInt(params.channelId), authDatas.token, navigate);
+            const chanId: number = parseInt(params.channelId);
+            socket?.emit("LeaveChannel", {id: chanId});
+            dispatch(removeChannel(chanId));
+            setTimeout(function() {
+                navigate(`/chat`);
+            }, 50);
         }
     }
 

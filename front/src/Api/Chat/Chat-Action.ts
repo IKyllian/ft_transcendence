@@ -10,22 +10,6 @@ type BodyRequest = {
     password?: string,
 }
 
-export function fetchJoinChannel(channelId: number, body: {password?: string}, token: string, dispatch: Dispatch<AnyAction>, navigate: NavigateFunction) {
-    axios.post(`${baseUrl}/channel/${channelId}/join`, body, {
-        headers: {
-            "Authorization": `Bearer ${token}`,
-        }
-    })
-    .then((response) => {
-        console.log(response);
-        dispatch(addChannel({channel: response.data, isActive: 'false'}));
-        navigate(`/chat/channel/${response.data.id}`);
-    })
-    .catch((err) => {
-        console.log(err);
-    })
-}
-
 export function fetchCreateChannel(body: BodyRequest, token: string, dispatch: Dispatch<AnyAction>, navigate: NavigateFunction, onCloseModal: Function) {
     axios.post(`${baseUrl}/channel`, body, {
         headers: {

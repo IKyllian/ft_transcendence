@@ -77,11 +77,10 @@ export class FriendshipService {
 		if (requestFound)
 			throw new BadRequestException('Already ' + requestFound.status);
 		const request = this.friendshipRepo.create({ requester, addressee, status: 'requested' });
-		return await this.friendshipRepo.save(request);
+		return this.friendshipRepo.save(request);
 	}
 
-
-
+	//TODO try with query builder
 	async getFriendlist(user: User) {
 		const friendRequestAccepted = await this.friendshipRepo.find({
 			relations: {
@@ -109,7 +108,6 @@ export class FriendshipService {
 		return friendList;
 	}
 }
-
 
 // async respondFriendRequest(addressee: User, requester: User, status: friendShipStatus) {
 // 	const friendship = await Friendship.findOne({
