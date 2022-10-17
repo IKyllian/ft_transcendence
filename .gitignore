@@ -1,3 +1,4 @@
 .DS
 *.env
 *.env.db
+package-lock.json
