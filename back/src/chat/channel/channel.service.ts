@@ -143,7 +143,7 @@ export class ChannelService {
 			throw new BadRequestException('You are not invite to this channel');
 		this.notifService.delete(invite.id);
 		if (dto.response === ResponseType.ACCEPTED) {
-			return this.join(user, dto.id, {}, true);
+			return await this.join(user, dto.chanId, {}, true);
 		}
 	}
 

@@ -26,7 +26,7 @@ export const notificationSlice = createSlice({
         },
         deleteNotification: (state, {payload}: PayloadAction<number>) => {
             if (state.notifications)
-                state.notifications = state.notifications.filter(elem => elem.id === payload);
+                state.notifications = state.notifications.filter(elem => elem.id !== payload);
         },
     }
 });

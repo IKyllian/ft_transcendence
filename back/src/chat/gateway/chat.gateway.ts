@@ -202,7 +202,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ) {
     const updatedChan = await this.channelService.respondInvite(user, dto);
     if (updatedChan) {
-      this.server.to(`channel-${dto.id}`).emit('ChannelUpdate', updatedChan);
+      this.server.to(`channel-${updatedChan.id}`).emit('ChannelUpdate', updatedChan);
       socket.to(`user-${user.id}`).emit('OnJoin', updatedChan);
     }
   }

@@ -9,6 +9,8 @@ export class FriendshipService {
 	constructor(
 		@InjectRepository(Friendship)
 		private friendshipRepo: Repository<Friendship>,
+		@InjectRepository(User)
+		private userRepo: Repository<User>,
 		private userService: UserService,
 	) {}
 
@@ -106,6 +108,11 @@ export class FriendshipService {
 			}
 		});
 		return friendList;
+
+		return this.userRepo
+			.createQueryBuilder("user")
+			.leftJoinAndSelect(Friendship, "friends" , "friends.requester = user")
+			.getMany()
 	}
 }
 

@@ -71,11 +71,11 @@ export class NotificationService {
 		});
 	}
 
-	getChannelInvite(user: User, chanId: number) {
+	getChannelInvite(user: User, id: number) {
 		return this.notifRepo.findOne({
 			where: {
-				addressee: { id: user.id},
-				channel: { id: chanId },
+				addressee: { id: user.id },
+				id,
 			}
 		});
 	}

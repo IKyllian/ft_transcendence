@@ -8,6 +8,7 @@ import { v4 as uuidv4 } from "uuid";
 import * as path from 'path';
 import { UserService } from "./user.service";
 import { GetUser } from "src/utils/decorators";
+import { SearchDto } from "./dto/search.dto";
 
 export const avatarStorage = {
 	storage: diskStorage({
@@ -107,6 +108,15 @@ export class UserController {
 		@GetUser() user: User,
 	) {
 		return await this.userService.deblockUser(user, id);
+	}
+
+	@Post('search')
+	@UseGuards(JwtGuard)
+	async searchUser(
+		@GetUser() user: User,
+		@Body() searchDto: SearchDto,
+	) {
+		return await this.userService.search(user, searchDto);
 	}
 
 	//test

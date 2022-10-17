@@ -21,13 +21,20 @@ export class friendshipController {
 		return await this.friendshipService.searchUsersToAdd(user);
 	}
 
+	//TODO delete
 	@UseGuards(JwtGuard)
 	@Post(':id/add')
-	sendFriendRequest(
+	async sendFriendRequest(
 		@GetUser() user: User,
 		@Param('id', ParseIntPipe) userId: number,
 	) {
 		// Not returning anything i think
-		return this.friendshipService.sendFriendRequest(user, userId);
+		return await this.friendshipService.sendFriendRequest(user, userId);
+	}
+
+	@UseGuards(JwtGuard)
+	@Get()
+	async getFriendList(@GetUser() user: User) {
+		return await this.friendshipService.getFriendlist(user);
 	}
 }

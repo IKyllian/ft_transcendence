@@ -34,12 +34,9 @@ export class ChannelController {
 	@Get(':id/invite')
 	@UseGuards(JwtGuard, InChannelGuard)
 	async getUsersToInvite(
-		@GetUser() user: User,
 		@Param('id', ParseIntPipe) id: number,
 	) {
-		const userlist = await this.channelService.getUsersToInvite(id);
-		console.log(userlist)
-		return userlist;
+		return await this.channelService.getUsersToInvite(id);
 	}
 
 	@Post()
@@ -110,4 +107,3 @@ export class ChannelController {
 		return this.channelService.unbanUser(dto);
 	}
 }
-

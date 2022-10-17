@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { IconSearch } from "@tabler/icons";
-
-import { usersArray } from "../Types/Datas-Examples"
-// import { ExampleUser } from "../Types/User-Types";
 import UserFindItem from "./User-Find-Item";
+import { UserInterface } from "../Types/User-Types";
+import axios from "axios";
+import { baseUrl } from "../env";
+import { useAppSelector } from "../Redux/Hooks";
+import Avatar from "../Images-Icons/pp.jpg"
 
 function SearchBarButtons(props: {functionality: string, userId?: number, register?: any}) {
     const { functionality, userId, register } = props;
@@ -29,23 +31,31 @@ function SearchBarButtons(props: {functionality: string, userId?: number, regist
 
 function SearchBarPlayers(props: {functionality: string, register?: any}) {
     const [inputText, setInputText] = useState<string>("");
-    // const [arrayResult, setArrayResult] = useState<ExampleUser[]>([]);
+    const [usersList, setUsersList] = useState<UserInterface[] | undefined>(undefined);
     const {functionality, register} = props;
+    const {token} = useAppSelector(state => state.auth);
 
     const handleChange = (e: any) => {
         setInputText(e.target.value);
     }
 
-    // useEffect(() => {
-    //     if (inputText.length > 0) {
-    //         let newArray: ExampleUser[] = [];
-
-    //         newArray = usersArray.filter(elem => ((elem.username.toLowerCase().includes(inputText.toLowerCase())) === true));
-    //         setArrayResult(newArray);
-    //     } else {
-    //         setArrayResult([]);
-    //     }
-    // }, [inputText])
+    useEffect(() => {
+        if (inputText.length > 0) {
+            axios.post(`${baseUrl}/users/search`, {str: inputText}, {
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                }
+            })
+            .then((response) => {
+                setUsersList(response.data);   
+            })
+            .catch((err) => {
+                console.log(err);
+            })
+        } else
+            setUsersList([]);
+       
+    }, [inputText])
 
     return (
         <div className='search-player-container'>
@@ -55,11 +65,9 @@ function SearchBarPlayers(props: {functionality: string, register?: any}) {
             </div>
             <div className="modal-player-list">
                 {
-                    // arrayResult.map((elem, index) =>
-                    inputText.length > 0 &&
-                    [...usersArray].filter(elem => ((elem.username.toLowerCase().includes(inputText.toLowerCase())) === true))
-                    .map((elem, index) =>
-                        <UserFindItem key={index} avatar={elem.profilPic} name={elem.username} >
+                    usersList && usersList.length > 0 &&
+                    usersList.map((elem, index) =>
+                        <UserFindItem key={index} avatar={Avatar} name={elem.username} >
                             {
                                 functionality === "chanInvite"
                                 ? <SearchBarButtons functionality={functionality} userId={elem.id} register={register} />
