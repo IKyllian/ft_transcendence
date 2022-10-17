@@ -7,9 +7,11 @@ import { HttpService } from "@nestjs/axios";
 import { lastValueFrom } from "rxjs";
 import { UserService } from "src/user/user.service";
 import { Auth42Dto } from "./dto/auth42.dto";
+import { User } from "src/typeorm";
 
 @Injectable()
 export class AuthService {
+
 	constructor(
 		private jwt: JwtService,
 		private config: ConfigService,
@@ -28,8 +30,11 @@ export class AuthService {
 			hash,
 		}
 		const user = await this.userService.create(params);
+		const tokens = await this.signTokens(user.id, user.username);
+		this.updateRefreshHash(user, tokens.refresh_token);
 		return {
-			token: (await this.signToken(user.id, user.username)).access_token,
+			access_token: tokens.access_token,
+			refresh_token: tokens.refresh_token,
 			user: user,
 		}
 	}
@@ -47,18 +52,21 @@ export class AuthService {
 				username: dto.username,
 			}
 		}, true);
-		if (!user)
-			throw new NotFoundException('User not found')
+		if (!user) 
+			throw new NotFoundException('invalid credentials')
 
 		const pwdMatches = await argon.verify(
 			user.hash,
 			dto.password,
 		);
 		if (!pwdMatches)
-			throw new UnauthorizedException('Password incorrect');
-		
+			throw new UnauthorizedException('invalid credentials');
+
+		const tokens = await this.signTokens(user.id, user.username);
+		this.updateRefreshHash(user, tokens.refresh_token);
 		return {
-			token: (await this.signToken(user.id, user.username)).access_token,
+			access_token: tokens.access_token,
+			refresh_token: tokens.refresh_token,
 			user: user,
 		}
 	}
@@ -101,29 +109,44 @@ export class AuthService {
 			console.log('user 42 not found, creating a new one');
 			user = await this.userService.create({ id42 : response.data.id });
 		}
+
+		const tokens = await this.signTokens(user.id, user.username);
+		this.updateRefreshHash(user, tokens.refresh_token);
 		return {
-			token: (await this.signToken(user.id, user.username)).access_token,
+			access_token: tokens.access_token,
+			refresh_token: tokens.refresh_token,
 			user: user,
 			usernameSet: user.username ? true : false,
 		}
 	}
 	
-	async signToken(userId: number, username: string): Promise<{ access_token: string }> {
-		const payload = {
-			sub: userId,
-			username
-		};
+	async signTokens(userId: number, username: string): Promise<{ access_token: string, refresh_token: string }> {
+		const [access_token, refresh_token] = await Promise.all([
+			this.jwt.signAsync(
+				{ sub: userId, username },
+				{ expiresIn: '200m', secret: this.config.get('ACCESS_SECRET') }
+			),
+			this.jwt.signAsync(
+				{ sub: userId, username },
+				{ expiresIn: '7d', secret: this.config.get('REFRESH_SECRET') }
+			),
+			
+		])
+		return { access_token, refresh_token };
+	}
 
-		const token = await this.jwt.signAsync(
-			payload,
-			{
-				expiresIn: '200m',
-				secret: this.config.get('JWT_SECRET')
-			},
-		);
-		return {
-			access_token: token
-		};
+	async refreshTokens(userId: number, refreshToken: string) {
+		const user = await this.userService.findOneBy({ id: userId })
+		if (!user || !user.refresh_hash) // user doesn't exists OR user is logged out
+			throw new NotFoundException('user not found')
+
+		const tokensMatches = await argon.verify(user.refresh_hash, refreshToken);
+		if (!tokensMatches)
+			throw new UnauthorizedException('invalid token')
+		
+		const tokens = await this.signTokens(user.id, user.username);
+		this.updateRefreshHash(user, tokens.refresh_token);
+		return tokens;
 	}
 
 	async verify(token: string) {
@@ -149,5 +172,17 @@ export class AuthService {
 
 	decodeJwt(token: string) {
 		return this.jwt.decode(token);
+	}
+
+	async updateRefreshHash(user: User, refreshToken: string) {
+		const hash = await argon.hash(refreshToken);
+		this.userService.updateRefreshHash(user, hash);
+	}
+
+	async logout(user: User) {
+		if (user.refresh_hash == null) return;
+
+		this.userService.logout(user);
+		return { success: true, message: "logged out successfuly" };
 	}
 }

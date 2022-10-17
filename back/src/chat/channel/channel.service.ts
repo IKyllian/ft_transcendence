@@ -75,13 +75,12 @@ export class ChannelService {
 			where: whereParams,
 			select: selectAll ? selectionsWithHash : selections,
 			relations: {
-				channelUsers: {
-					user: true,
-				}
+				channelUsers: { user: true },
+				// messages: { sender: true },
+				// bannedUsers: true,
 			},
 		};
-		const channel = await this.channelRepo.findOne(param);
-		return channel;
+		return this.channelRepo.findOne(param);
 	}
 
 	async create(user: User, dto: CreateChannelDto) {

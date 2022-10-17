@@ -160,21 +160,25 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('JoinChannel')
   async joinChannel(
     @GetUser() user: User,
+    @ConnectedSocket() socket: Socket,
     @MessageBody() channel: RoomDto,
     @MessageBody() pwdDto?: ChannelPasswordDto,
   ) {
     const updatedChan = await this.channelService.join(user, channel.id, pwdDto);
     this.server.to(`channel-${channel.id}`).emit('ChannelUpdate', updatedChan);
+    socket.to(`user-${user.id}`).emit('OnJoin', updatedChan);
   }
 
   @UseGuards(WsJwtGuard)
   @SubscribeMessage('LeaveChannel')
   async leaveChannel(
     @GetUser() user: User,
+    @ConnectedSocket() socket: Socket,
     @MessageBody() channel: RoomDto,
   ) {
     const updatedChan = await this.channelService.leave(user, channel.id);
     this.server.to(`channel-${channel.id}`).emit('ChannelUpdate', updatedChan);
+    socket.to(`user-${user.id}`).emit('OnLeave', updatedChan);
   }
 
   @UseGuards(WsJwtGuard)

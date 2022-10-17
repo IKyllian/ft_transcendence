@@ -9,6 +9,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 0 $HeaderMarge;
+    position: relative;
 
     .header-logo {
         font-family: Silkscreen;
@@ -53,6 +54,7 @@
         display: none;
         .header-picture {
             @include avatar-player(40px);
+            margin-left: 8px;
         }
 
         .responsive-menu-drawer {
@@ -81,6 +83,79 @@
             }
         }
     }
+
+    .notif-dropdown-wrapper {
+        position: absolute;
+        right: 200px;
+        top: 70px;
+        border-radius: 5px;
+        background-color: $DarkPalette;
+        width: 330px;
+        height: 350px;
+        z-index: 101;
+        padding: 5px;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        overflow-y: scroll;
+        .notif-dropdown-item {
+            background-color: $LightDarkPalette;
+            padding: 10px;
+            border-radius: 5px;
+            @include flex-row-alignCenter();
+            justify-content: space-between;
+            .profile-avatar {
+                @include avatar-player(40px);
+            }
+            .notif-content {
+                p {
+                    margin: 0;
+                    &:first-child {
+                        font-size: 16px;
+                        margin-bottom: 5px;
+                    }
+                    &:last-child {
+                        font-size: 11px;
+                    }
+                }
+            }
+            .notif-buttons {
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+                button {
+                    all: unset;
+                    cursor: pointer;
+                    font-size: 12px;
+                    text-align: center;
+                    padding: 4px;
+                    &:first-child {
+                        background-color: rgb(185, 129, 24);
+                    }
+                    &:last-child {
+                        background-color: #424549;
+                    }
+                }
+            }
+        }
+    }
+}
+
+.badge-wrapper {
+    display: flex;
+    position: relative;
+    cursor: pointer;
+    .badge-notif {
+        position: absolute;
+        border-radius: 50%;
+        @include width-height(15px, 15px);
+        background-color: red;
+        right: -3px;
+        top: -4px;
+        text-align: center;
+        font-size: 10px;
+        font-weight: bold;
+    }
 }
 
 @media screen and (max-width: $BreakPoint_800) {
@@ -96,6 +171,10 @@
             position: relative;
             gap: 3px;
         }
+
+        .notif-dropdown-wrapper {
+            right: 20px;
+        }
     }
 }
 
@@ -104,4 +183,3 @@
         padding: 0 $HeaderResponsive500Marge;
     }
 }
-

@@ -6,13 +6,13 @@ interface LeaderboardItemProps {
     name: string,
     gamesPlayed: number,
     winRate: number,
-    points: number,
+    // points: number,
     isOnline: boolean,
     isInGame: boolean
 }
 
 function LeaderboardItem(props: LeaderboardItemProps) {
-    const { pos, name, gamesPlayed, winRate, points, isOnline, isInGame } = props;
+    const { pos, name, gamesPlayed, winRate, isOnline, isInGame } = props;
 
     return (
         <tr>
@@ -24,7 +24,7 @@ function LeaderboardItem(props: LeaderboardItemProps) {
             </td>
             <td> { gamesPlayed } </td>
             <td className="responsive-column"> { winRate }% </td>
-            <td> { points } </td>
+            {/* <td> { points } </td> */}
             <td className="leaderboard-status responsive-column"> 
                 <div className={`player-status player-status-${isOnline ? "online" : "offline"}`}> </div>
             </td>

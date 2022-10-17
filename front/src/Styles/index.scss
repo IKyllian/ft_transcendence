@@ -3,12 +3,13 @@
 @use "./Sign.scss";
 @use "./Profile.scss";
 @use "./Leaderboard.scss";
-@use "./Add-Friend-Modal.scss";
+@use "./Friends-Modal.scss";
 @use "./Chat/Chat.scss";
 @use "./Chat/Chat-Modal.scss";
 @use "./Search-Player.scss";
 @use "./Chat/Channel-Settings.scss";
 @use "./Loading-Spin.scss";
+@use "./Notif-Game-Invite.scss";
 @use "./Variables.scss" as *;
 
 body {
@@ -71,10 +72,6 @@ button {
   cursor: pointer;
 }
 
-input, button {
-  all: unset;
-}
-
 .blur-background {
   filter: blur(5px);
 }
@@ -98,7 +95,9 @@ input, button {
     .red-item {
       color: red;
     }
-  
+    a {
+      color: #a5abb0;
+    }
     p {
       margin: 0;
       font-size: 13px;
@@ -106,10 +105,25 @@ input, button {
       padding: 5px;
       border-radius: 5px;
       cursor: pointer;
+      color: #a5abb0;
 
       &:hover {
         background-color: $LightDarkPalette;
       }
     }
   }
+}
+
+.err-no-datas {
+  color: $WhitePalette;
+  text-align: center;
+  font-size: 25px;
+}
+
+.txt-form-error {
+  color: red;
+  // margin: 0 0 1em 0;
+  margin: 0;
+  font-size: 14px;
+  letter-spacing: 1px;
 }

@@ -45,4 +45,7 @@ export class User {
 	@Exclude()
 	@Column({nullable: true, select: false })
 	hash?: string
+
+	@Column({nullable: true})
+	refresh_hash?: string
 } 

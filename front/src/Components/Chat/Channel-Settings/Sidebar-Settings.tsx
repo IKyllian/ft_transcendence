@@ -1,30 +1,42 @@
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { ChatInterface } from "../../../Interfaces/Datas-Examples";
+import { useNavigate, useParams } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from '../../../Redux/Hooks'
+import { Channel } from "../../../Types/Chat-Types"
+import { SocketContext } from "../../../App";
+import { useContext } from "react";
+import { removeChannel } from "../../../Redux/ChatSlice";
 
-function SidebarSettings(props: {setSidebarItem: Function, channelDatas: ChatInterface | undefined}) {
-    const {setSidebarItem, channelDatas} = props;
+function SidebarSettings(props: {setSidebarItem: Function, channelDatas: Channel, loggedUserIsOwner: boolean}) {
+    const {setSidebarItem, channelDatas, loggedUserIsOwner} = props;
+
+    const params = useParams();
     const navigate = useNavigate();
+    const dispatch = useAppDispatch();
+    let authDatas = useAppSelector((state) => state.auth);
 
-    useEffect(() => {
-        if (channelDatas === undefined || !channelDatas.isChannel)
-            navigate(-1);
-    }, [channelDatas, navigate]);
+    const {socket} = useContext(SocketContext);
 
-    return (channelDatas === undefined) ? (
-        <> </> // A revoir pour le faire plus proprement
-    ) : (
+    const leaveChannel = () => {
+        if (params.channelId) {
+            const chanId: number = parseInt(params.channelId);
+            socket?.emit("LeaveChannel", {id: chanId});
+            dispatch(removeChannel(chanId));
+            setTimeout(function() {
+                navigate(`/chat`);
+            }, 50);
+        }
+    }
+
+    return (
         <div className="sidebar-setting">
             <div className="sidebar-wrapper">
-                <p> # {channelDatas!.isChannel && 
-                    channelDatas!.channelName!} </p>
+                <p> # {channelDatas!.name} </p>
                 <ul>
-                    <li onClick={() => setSidebarItem("Settings")}> Settings </li>
-                    <li onClick={() => setSidebarItem("Users")}> Users (4) </li>
-                    <li onClick={() => setSidebarItem("Invitations")}> Invitations </li>
+                    {loggedUserIsOwner && <li onClick={() => setSidebarItem("Settings")}> Settings </li>}
+                    <li onClick={() => setSidebarItem("Users")}> Users ({channelDatas.channelUsers.length}) </li>
+                    {loggedUserIsOwner && <li onClick={() => setSidebarItem("Invitations")}> Invitations </li>}
                 </ul>
                 <div className="separate-line"> </div>
-                <button> Leave Channel </button>
+                <button onClick={() => leaveChannel()}> Leave Channel </button>
             </div>
         </div>
     );

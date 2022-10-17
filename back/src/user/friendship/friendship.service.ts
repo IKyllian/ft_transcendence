@@ -114,7 +114,6 @@ export class FriendshipService {
 			.leftJoinAndSelect(Friendship, "friends" , "friends.requester = user")
 			.getMany()
 	}
-
 }
 
 // async respondFriendRequest(addressee: User, requester: User, status: friendShipStatus) {

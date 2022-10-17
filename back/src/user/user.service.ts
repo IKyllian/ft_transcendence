@@ -1,6 +1,6 @@
 import { BadRequestException, ForbiddenException, forwardRef, Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { FindManyOptions, FindOneOptions, FindOptionsWhere, Repository } from "typeorm";
+import { FindManyOptions, FindOneOptions, FindOptionsWhere, IsNull, Not, Repository } from "typeorm";
 import { AuthService } from "src/auth/auth.service";
 import { CreateUserDto } from "./dto/createUser.dto";
 import { Statistic, User } from "src/typeorm";
@@ -89,7 +89,7 @@ export class UserService {
 			user.username = name;
 			user = await this.userRepo.save(user);
 			return {
-				token: (await this.authService.signToken(user.id, user.username)).access_token,
+				token: (await this.authService.signTokens(user.id, user.username)).access_token,
 				user: user,
 			}
 		} catch(error) {
@@ -112,6 +112,16 @@ export class UserService {
 		await this.userRepo.save(user);
 	}
 
+	async logout(user: User) {
+		user.refresh_hash = null;
+		this.userRepo.save(user);
+	}
+
+	async updateRefreshHash(user: User, hash: string) {
+		user.refresh_hash = hash;
+		await this.userRepo.save(user);
+	}
+
 	async deleteUser(id: number) {
 		const user = await this.findOneBy({ id });
 		if (!user)
@@ -123,6 +133,7 @@ export class UserService {
 		const toBlock = await this.findOneBy({ id });
 		if (!toBlock)
 			throw new NotFoundException('User not found');
+		console.log("REturn", this.isBlocked(user, id));
 		if (this.isBlocked(user, id))
 			throw new BadRequestException('User already blocked');
 		user.blocked = [...user.blocked, toBlock];
@@ -135,8 +146,9 @@ export class UserService {
 		return this.userRepo.save(user);
 	}
 
-	isBlocked(user: User, id: number) {
+	isBlocked(user: User, id: number): boolean {
 		const isblocked = user.blocked.find((blocked) => blocked.id === id);
+		console.log(isblocked);
 		return isblocked ? true : false;
 	}
 }
