@@ -5,7 +5,7 @@ services:
     ports:
       - '5432:5432'
     env_file:
-      - .env.db
+      - .env
     networks:
       - dev-net
     restart: always

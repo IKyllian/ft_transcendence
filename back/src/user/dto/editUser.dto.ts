@@ -21,4 +21,9 @@ export class EditUserDto {
 	@IsNotEmpty()
 	@IsOptional()
 	password?: string;
+
+	@IsString()
+	@IsNotEmpty()
+	@IsOptional()
+	refresh_hash?: string;
 }
