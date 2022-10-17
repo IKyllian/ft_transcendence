@@ -24,13 +24,13 @@ export default class Lobby extends Phaser.Scene
 	player_B_indicator: Phaser.GameObjects.Shape;
 	ready_button: Phaser.GameObjects.Image;
 	countdown: Phaser.GameObjects.Text;
-	me?: PlayerType;
+	me?: PlayerType = PlayerType.Spectator;
 	lobbystatus: LobbyStatus = 
 	{
 		player_A: PlayerStatus.Absent,
 		player_B: PlayerStatus.Absent
 	}
-	//anti_spam_count = 0;
+	anti_spam_count :number = 0;
 	// player_A_status: PlayerStatus = PlayerStatus.Absent;
 	// player_B_status: PlayerStatus = PlayerStatus.Absent;
 	
@@ -114,6 +114,12 @@ export default class Lobby extends Phaser.Scene
 //TODO ne pas spam request et attendre reponse server, request une fois a l'init puis rarement au cas ou
 		//this.socketmanager.lobby_send_request_status(this.registry.get('players_data').game_id);
 
+		this.anti_spam_count++;
+		if (this.anti_spam_count >= 5)
+		{
+			this.socketmanager.lobby_send_request_status(this.registry.get('players_data').game_id);
+			this.anti_spam_count = 0;
+		}
 	}
 
 	click_event = (pointer: Phaser.Input.Pointer ,gameobject :Phaser.GameObjects.GameObject) =>
@@ -183,6 +189,8 @@ export default class Lobby extends Phaser.Scene
 				fontFamily: 'Arial'
 			}
 
+			// this.game.registry.get('players_data').game_id
+			this.socketmanager.game_get_round_setup(this.game.registry.get('players_data').game_id);
 			this.countdown = this.add.text(400, 100, timer.toString(), style);
 
 			this.time.addEvent({

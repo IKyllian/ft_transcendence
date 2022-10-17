@@ -148,7 +148,10 @@ export default class Pong extends Phaser.Scene
 	{
 		//let now :Date = new Date();
 		if (this.next_round_setup === undefined)
+		{
+			this.socketmanager?.game_get_round_setup(this.game_id!);
 			return;
+		}
 		// if (new Date(this.next_round_setup.start_time).getTime() > now.getTime())
 		// 	return;
 
@@ -236,16 +239,18 @@ export default class Pong extends Phaser.Scene
 				}
 			}, this);
 			this.server_stock = [];
-	
-			this.input_stock = this.input_stock.filter(function(elem: PlayerInput)
+			if (this.me !== PlayerType.Spectator)
 			{
-				return (elem.number > this.latest_serv_response);
-			}, this);
-	
-			this.input_stock.forEach(function(elem: PlayerInput)
-			{
-				this.core.apply_input(elem);
-			}, this);
+				this.input_stock = this.input_stock.filter(function(elem: PlayerInput)
+				{
+					return (elem.number > this.latest_serv_response);
+				}, this);
+		
+				this.input_stock.forEach(function(elem: PlayerInput)
+				{
+					this.core.apply_input(elem);
+				}, this);
+			}
 
 		}
 		else
@@ -345,7 +350,7 @@ export default class Pong extends Phaser.Scene
 		}
 		else
 		{
-console.log("dans le if spectateur");
+//console.log("dans le if spectateur");
 			if ( this.asset_player_A !== undefined
 				&& this.asset_player_B !== undefined
 				&& this.asset_ball !== undefined )
@@ -353,7 +358,7 @@ console.log("dans le if spectateur");
 
 					if(new Date(this.past_stock[0].last_processed_time_A).getTime() > past_date.getTime() )
 					{
-console.log("dans le if de delay");
+//console.log("dans le if de delay");
 						this.asset_player_A.x = this.past_stock[0].player_A.x;
 						this.asset_player_A.y = this.past_stock[0].player_A.y;
 						this.asset_player_B.x = this.past_stock[0].player_B.x;

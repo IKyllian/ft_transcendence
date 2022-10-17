@@ -191,6 +191,7 @@ console.log("user join lobby", data);
 	@MessageBody() game_id: string)
 	{
 		//this.lobbyfactory.lobby_game_input(data);
+		this.lobbyfactory.lobby_game_get_round_setup(client, game_id);
 	}
 
   }

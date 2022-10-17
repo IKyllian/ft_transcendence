@@ -17,7 +17,7 @@ export class Lobby
 	public player_B_id?: string = '';
 	player_B_status: PlayerStatus = PlayerStatus.Absent;
 	
-	//already_started: boolean = false;
+	already_started: boolean = false;
 
 	constructor(
 		public gamedata: NewGameData
@@ -161,8 +161,9 @@ export class Lobby
 		{
 			// if (spectator instanceof Socket)
 			// {
+// console.log("spectator data: ", spectator.id);	
 				spectator.emit(message, data);
-				//console.log('sending to spectator', message);
+	//			console.log('sending to spectator(BC)', message, data);
 			//}
 		});
 	}
@@ -186,7 +187,7 @@ export class Lobby
 			// if (spectator instanceof Socket)
 			// {
 				spectator.emit(message);
-				console.log('sending to spectator', message);
+			//	console.log('sending to spectator', message);
 			//}
 		});
 	}
@@ -215,8 +216,9 @@ export class Lobby
 			//both players ready
 			console.log("both players ready ", this.game_id);
 			this.lobby_broadcast_message('lobby_all_ready');
-			//this.already_started = true;
-			this.game.start();
+			if (!this.already_started)
+				this.game.start();
+			this.already_started = true;
 		}
 	}
 
