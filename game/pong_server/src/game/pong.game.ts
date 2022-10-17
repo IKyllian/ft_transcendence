@@ -1,4 +1,4 @@
-import { GameState, Goal, RoundSetup } from "../types/shared.types";
+import { EndResult, GameState, Goal, RoundSetup } from "../types/shared.types";
 import { Lobby } from "../lobby/lobby";
 import PongCore from "./pong.core"
 
@@ -43,8 +43,19 @@ export class PongGame
 
 		if (gamestate.goal !== Goal.None)
 		{
-			let setup: RoundSetup = this.core.get_round_setup();
-			this.lobby.lobby_broadcast_data('round_setup', setup);
+			if (gamestate.result === EndResult.Undecided)
+			{
+				let setup: RoundSetup = this.core.get_round_setup();
+				this.lobby.lobby_broadcast_data('round_setup', setup);
+			}
+			else
+			{
+				//game ended
+				this.lobby.lobby_broadcast_data('match_winner', gamestate.result);
+				clearInterval(this.update_interval);
+			}
+
+
 		}
 	}
 

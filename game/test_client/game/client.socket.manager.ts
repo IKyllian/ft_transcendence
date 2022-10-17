@@ -1,5 +1,5 @@
 import { io, Socket } from "socket.io-client";
-import { GameState, LobbyStatus, PlayerInput, PlayersLobbyData, RoundSetup } from './types/shared.types';
+import { EndResult, GameState, LobbyStatus, PlayerInput, PlayersLobbyData, RoundSetup } from './types/shared.types';
 
 export default class ClientSocketManager
 {
@@ -43,6 +43,7 @@ export default class ClientSocketManager
 			//Game
 			this.socket.on('game_state', this.onGameGetState.bind(this));
 			this.socket.on('round_setup', this.onGameGetRoundSetup.bind(this));
+			this.socket.on('match_winner', this.onGameGetMatchWinner.bind(this));
 
 		}
 	}
@@ -121,5 +122,10 @@ export default class ClientSocketManager
 	{
 		this.lobby_triggers?.store_round_setup(round_setup);
 		this.pong_triggers?.apply_round_setup(round_setup);
+	}
+
+	onGameGetMatchWinner = (result: EndResult) =>
+	{
+		this.pong_triggers?.game_end(result);
 	}
 }

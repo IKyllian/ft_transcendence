@@ -13,7 +13,7 @@ export default class PongCore
 	paddle_speed: number = 13; // pixels per update
 	ball_start_speed: number = 5; //pixels per update
 	ball_acceleration: number = 1; //pixels per update per collision
-	point_for_victory: number = 5;
+	point_for_victory: number = 2;
 	update_rate: number = 60; //per second
 	round_delay: number = 4;
 
@@ -316,37 +316,41 @@ export default class PongCore
 
 	check_goal = () =>
 	{
-		let goal: boolean = false;
+		this.goal = Goal.None;
 		//left
 		if (this.ball_data.position.x < 0)
 		{
-			goal = true;
+			this.goal = Goal.Player_B;
 			this.score_board.player_B += 1;
 		}
 
 		//right
 		if (this.ball_data.position.x > this.field_width)
 		{
-			goal = true;
+			this.goal = Goal.Player_A;
 			this.score_board.player_A += 1;
 		}
 
-		if (goal)
+		if (this.goal !== Goal.None)
 		{
 			//check score
 			if (this.score_board.player_A >= this.point_for_victory)
 			{
 				//playerA Win
+				this.result = EndResult.Player_A_Win;
+				//???
+				return;
 				//end game
 			}
 			if (this.score_board.player_B >= this.point_for_victory)
 			{
 				//playerB Win
+				this.result = EndResult.Player_B_Win;
+				//???
+				return;
 				//end game
 			}
 			//prepare next round
-
-//disable if client
 //wait for server ?
 			this.do_round_setup();
 		}

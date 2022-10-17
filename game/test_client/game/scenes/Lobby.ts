@@ -24,7 +24,7 @@ export default class Lobby extends Phaser.Scene
 	player_B_indicator: Phaser.GameObjects.Shape;
 	ready_button: Phaser.GameObjects.Image;
 	countdown: Phaser.GameObjects.Text;
-	me?: PlayerType = PlayerType.Spectator;
+	me: PlayerType = PlayerType.Spectator;
 	lobbystatus: LobbyStatus = 
 	{
 		player_A: PlayerStatus.Absent,

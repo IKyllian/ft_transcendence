@@ -84,7 +84,8 @@ export default class Pong extends Phaser.Scene
 		{
 			this.socketmanager.set_pong_triggers({
 				append_server_gamestate: this.append_server_gamestate.bind(this),
-				apply_round_setup: this.apply_round_setup.bind(this)
+				apply_round_setup: this.apply_round_setup.bind(this),
+				game_end: this.game_end.bind(this)
 	
 			});
 
@@ -366,6 +367,14 @@ export default class Pong extends Phaser.Scene
 			this.asset_lag_icon!.setAlpha(1);
 		else
 			this.asset_lag_icon!.setAlpha(0);
+	}
+
+
+	game_end = (winner: PlayerType) =>
+	{
+		this.game.registry.set('winner', winner);
+
+		this.scene.start('MatchResult');
 	}
 
 }
