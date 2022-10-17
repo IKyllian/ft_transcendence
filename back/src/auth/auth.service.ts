@@ -152,7 +152,7 @@ export class AuthService {
 	async verify(token: string) {
 		try {
 			const decoded = this.jwt.verify(token, {
-				secret: this.config.get('JWT_SECRET')
+				secret: this.config.get('ACCESS_SECRET')
 			});
 			return await this.userService.findOne({
 				relations: {

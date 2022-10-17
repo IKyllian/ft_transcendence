@@ -197,11 +197,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('ChannelInviteResponse')
   async respondToChannelInvite(
     @GetUser() user: User,
-    @MessageBody() dto: ResponseDto
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() dto: ResponseDto,
   ) {
     const updatedChan = await this.channelService.respondInvite(user, dto);
-    if (updatedChan)
+    if (updatedChan) {
       this.server.to(`channel-${dto.id}`).emit('ChannelUpdate', updatedChan);
+      socket.to(`user-${user.id}`).emit('OnJoin', updatedChan);
+    }
   }
 
 }

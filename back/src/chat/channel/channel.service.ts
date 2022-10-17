@@ -8,13 +8,14 @@ import { CreateChannelDto } from './dto/create-channel.dto';
 import { ChannelPasswordDto } from './dto/channel-pwd.dto';
 import { channelOption, channelRole, FindChannelParams, ResponseType } from 'src/utils/types/types';
 import { BanUserDto } from './dto/banUser.dto';
+import { UserService } from 'src/user/user.service';
 import { NotificationService } from 'src/notification/notification.service';
 import { ResponseDto } from '../gateway/dto/response.dto';
 
 @Injectable()
 export class ChannelService {
 	constructor(
-		// private notifService: NotificationService,
+		private userService: UserService,
 		@Inject(forwardRef(() => NotificationService))
 		private notifService: NotificationService,
 		@InjectRepository(Channel)
@@ -31,7 +32,7 @@ export class ChannelService {
 	 */
 	async searchChannel(user: User) {
 		const userChannel = await this.getMyChannels(user.id);
-		let userChannelId: Number[] = [];
+		let userChannelId: number[] = [];
 		userChannel.forEach((element) => {
 			userChannelId.push(element.id);
 		});
@@ -274,5 +275,27 @@ export class ChannelService {
 			}
 		}
 		return isBanned ? isBanned : false;
+	}
+
+	//TODO what if banned?
+	async getUsersToInvite(channelId: number) {
+		const channel = await this.channelRepo.findOne({
+			relations: {
+				channelUsers: { user: true },
+			},
+			where: { id: channelId },
+		});
+		if (!channel)
+			throw new ChannelNotFoundException();
+
+		const usersId: number[] = [];
+		channel.channelUsers.forEach((chanUser) => {
+			usersId.push(chanUser.user.id);
+		})
+		return this.userService.find({
+			where: {
+				id: Not(In(usersId)),
+			}
+		});
 	}
 }

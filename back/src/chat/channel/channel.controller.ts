@@ -31,6 +31,17 @@ export class ChannelController {
 		return chan
 	}
 
+	@Get(':id/invite')
+	@UseGuards(JwtGuard, InChannelGuard)
+	async getUsersToInvite(
+		@GetUser() user: User,
+		@Param('id', ParseIntPipe) id: number,
+	) {
+		const userlist = await this.channelService.getUsersToInvite(id);
+		console.log(userlist)
+		return userlist;
+	}
+
 	@Post()
 	@UseGuards(JwtGuard)
 	async createChannel(@GetUser() user: User, @Body() channelDto: CreateChannelDto) {
