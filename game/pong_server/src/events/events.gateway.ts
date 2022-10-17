@@ -78,18 +78,12 @@ import { NewGameData, PlayerInput, PlayersLobbyData } from '../types/shared.type
 		client.emit('pong');
 	}
 
-
-
-
-
 	/* ----- Administration ----- */
 
 	@SubscribeMessage('admin_authenticate')
 	async onAdminAuthenticate(@ConnectedSocket() client: Socket,
 	@MessageBody() data: string)
 	{
-//		console.log("admin password received:", data);
-
 		if (data == this.admin_secret)
 		{
 			this.admin = client;
@@ -107,8 +101,6 @@ import { NewGameData, PlayerInput, PlayersLobbyData } from '../types/shared.type
 	async onAdminNewGame(@ConnectedSocket() client: Socket,
 	@MessageBody() data: {player_A: string, player_B: string})
 	{
-		// console.log('in onAdminNewGame');
-		// console.log(data);
 		if (client['id'] == this.admin['id'])
 		{
 			const gamedata: NewGameData = this.lobbyfactory.lobby_create(data);
@@ -156,7 +148,7 @@ import { NewGameData, PlayerInput, PlayersLobbyData } from '../types/shared.type
 	async onUserJoinLobby(@ConnectedSocket() client: Socket,
 	@MessageBody() data: PlayersLobbyData)
 	{
-console.log("user join lobby", data);
+		console.log("user join lobby", data);
 		this.lobbyfactory.lobby_join(client, data);
 	}
 
@@ -195,11 +187,3 @@ console.log("user join lobby", data);
 	}
 
   }
-
-
-//   @SubscribeMessage('set-broadcaster')
-//  async setBroadcaster(@ConnectedSocket() client: Socket, @MessageBody() data: {client_id: string, password: string}) {
-
-
-//   @SubscribeMessage('join')
-//  async onJoin(@ConnectedSocket() client: Socket, @MessageBody() data: ChatMessage) {}

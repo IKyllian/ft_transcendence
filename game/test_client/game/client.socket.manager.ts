@@ -114,14 +114,11 @@ export default class ClientSocketManager
 
 	onGameGetState = (gamestate: GameState) =>
 	{
-	//	console.log("received game state", gamestate);
-		//this.pong_triggers.acknowledge_server_authority(gamestate);
 		this.pong_triggers?.append_server_gamestate(gamestate);
 	}
 
 	onGameGetRoundSetup = (round_setup: RoundSetup) =>
 	{
-		console.log('received round setup', round_setup.start_time.toString());
 		this.lobby_triggers?.store_round_setup(round_setup);
 		this.pong_triggers?.apply_round_setup(round_setup);
 	}

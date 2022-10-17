@@ -28,7 +28,6 @@ export class Lobby
 
 	lobby_add(client: Socket, player_secret: string)
 	{
-//console.log("in lobby add ", player_secret);
 		if (player_secret === this.gamedata.player_A_secret)
 		{
 			this.player_A = client;
@@ -55,13 +54,12 @@ export class Lobby
 	{
 		if (client.id === this.player_A_id)
 		{
-			//playerA left
 			console.log("player A left from game ", this.game_id);
 			this.player_A_status = PlayerStatus.Absent;
 			this.player_A = undefined;
 			this.player_A_id = '';
 			//if game_has_started
-			//abort game
+			//start timer for abort game
 		}
 		else if (client.id === this.player_B_id)
 		{
@@ -71,7 +69,7 @@ export class Lobby
 			this.player_B = undefined;
 			this.player_B_id = '';
 			//if game_has_started
-			//abort game
+			//start timer for abort game
 		}
 		else
 		{
@@ -91,20 +89,12 @@ export class Lobby
 		}
 		this.spectators.forEach(function(spectator)
 		{
-			// if (spectator instanceof Socket)
-			// {
-				spectator.disconnect();
-			//}
+			spectator.disconnect();
 		});
 	}
 
 	lobby_send_lobby_status(client: Socket)
 	{
-		// if (this.already_started)
-		// {
-		// 	client.emit('lobby_already_started');
-		// }
-
 		if (this.player_A_status === PlayerStatus.Ready
 			&& this.player_B_status === PlayerStatus.Ready)
 		{
@@ -123,11 +113,6 @@ export class Lobby
 
 	lobby_broadcast_lobby_status()
 	{
-		// if (this.already_started)
-		// {
-		// 	this.lobby_broadcast_message('lobby_already_started');
-		// }
-
 		if (this.player_A_status === PlayerStatus.Ready
 			&& this.player_B_status === PlayerStatus.Ready)
 		{
@@ -146,25 +131,17 @@ export class Lobby
 
 	lobby_broadcast_data(message: string, data: any)
 	{
-	//	console.log("in lobby broadcast data");
 		if (this.player_A_status !== PlayerStatus.Absent)
 		{
 			this.player_A.emit(message, data);
-			//console.log('sending to player A', message);
 		}
 		if (this.player_B_status !== PlayerStatus.Absent)
 		{
 			this.player_B.emit(message, data);
-			//console.log('sending to player B', message);
 		}
 		this.spectators.forEach(function(spectator)
 		{
-			// if (spectator instanceof Socket)
-			// {
-// console.log("spectator data: ", spectator.id);	
-				spectator.emit(message, data);
-	//			console.log('sending to spectator(BC)', message, data);
-			//}
+			spectator.emit(message, data);
 		});
 	}
 
@@ -184,11 +161,7 @@ export class Lobby
 		}
 		this.spectators.forEach(function(spectator)
 		{
-			// if (spectator instanceof Socket)
-			// {
-				spectator.emit(message);
-			//	console.log('sending to spectator', message);
-			//}
+			spectator.emit(message);
 		});
 	}
 
@@ -224,7 +197,6 @@ export class Lobby
 
 	game_receive_input(input: PlayerInput)
 	{
-		//this.game.core.apply_input(input);
 		this.game.core.append_input(input);
 	}
 

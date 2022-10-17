@@ -11,8 +11,6 @@ export default class PongCore
 	goalkeep_advance: number = 20; //pixels
 	paddle_size_h: number = 150; //pixels
 	paddle_speed: number = 13; // pixels per update
-	//padde_size_w: number = 20; 
-	//ball_size: number = 10; //pixels
 	ball_start_speed: number = 5; //pixels per update
 	ball_acceleration: number = 1; //pixels per update per collision
 	point_for_victory: number = 5;
@@ -44,47 +42,31 @@ export default class PongCore
 		x: this.goalkeep_advance,
 		y: ( this.field_height / 2 )
 	};
-	//player_A_mov: Movement = Movement.Neutral;
 	last_processed_id_A: number = 0;
-	//last_processed_time_A: Date = new Date();
 	
 	player_B_pos: Coordinates =
 	{ 
 		x: ( this.field_width - this.goalkeep_advance ),
 		y: ( this.field_height / 2 )
 	};
-	//player_B_mov: Movement = Movement.Neutral;
 	last_processed_id_B: number = 0;
-	// player_B_inputstock: Array<PlayerInput> = new Array();
-	//last_processed_time_B: Date = new Date();
-	//next_round_setup: RoundSetup = undefined;
 	playing: boolean = false;
 	player_inputstock: Array<PlayerInput> = new Array();
 	result: EndResult
 	next_round_setup: RoundSetup | undefined = undefined;	
+
 	constructor()
 	{
 
     }
 
-	// genrateRandomNumber = (min: number, max: number) => {
-
-	// 	// min: number = Math.ceil(min);
-	
-	// 	// max: number = Math.floor(max);
-	
-	// 	return Math.floor(Math.random() * (max - min + 1)) + min; 
-	
-	// }
-
 	get_round_setup = (): RoundSetup =>
 	{
-		return this.next_round_setup;
+		return this.next_round_setup!;
 	}
 
 	do_round_setup = (): RoundSetup =>
 	{
-		// re-initialise everything needed
 		this.goal = Goal.None;
 		this.ball_data =
 		{
@@ -97,13 +79,11 @@ export default class PongCore
 			x: this.goalkeep_advance,
 			y: ( this.field_height / 2 )
 		};
-		// this.player_A_mov = Movement.Neutral;
 		this.player_B_pos =
 		{ 
 			x: ( this.field_width - this.goalkeep_advance ),
 			y: ( this.field_height / 2 )
 		};
-		// this.player_B_mov = Movement.Neutral;
 		this.playing = false;
 
 		//purge input table
@@ -114,7 +94,6 @@ export default class PongCore
 		
 		//add delay to next round
 		t.setSeconds(t.getSeconds() + this.round_delay);
-
 
 		let vec: Coordinates = { x: 0, y: 0 };
 
@@ -212,9 +191,6 @@ export default class PongCore
 		let now: Date = new Date();
 		if (this.next_round_setup === undefined)
 			return;
-		// if (new Date(this.next_round_setup.start_time).getTime() > now.getTime())
-		// 	return;
-			// var res = new Date(dat1).getTime() > new Date(dat2).getTime()
 		this.player_inputstock = this.player_inputstock.sort((a, b) => {
 			if (new Date(a.time).getTime() > new Date(b.time).getTime()) {
 				return 1;
@@ -223,7 +199,7 @@ export default class PongCore
 				return -1;
 			}
 			return 0;
-		} );
+		});
 
 		this.player_inputstock.forEach(function(elem: PlayerInput)
 		{
@@ -231,13 +207,10 @@ export default class PongCore
 		}, this);
 		this.player_inputstock = [];
 
-
 		if (new Date(this.next_round_setup.start_time).getTime() > now.getTime())
 			return;
 
-
 		this.move_ball();
-	//	this.check_collisions();
 		this.check_goal();
 	}
 
@@ -245,9 +218,6 @@ export default class PongCore
 	{
 		this.ball_data.position.x += this.ball_data.vector.x * this.ball_data.velocity;
 		this.ball_data.position.y += this.ball_data.vector.y * this.ball_data.velocity;
-
-
-		//wall bounce are simple, paddle bounce depends on impact point (how ?)
 
 		//check up wall
 		if (this.ball_data.position.y <= this.up_down_border)
@@ -298,7 +268,6 @@ export default class PongCore
 
 	apply_input = (input: PlayerInput) =>
 	{
-//console.log("on est la");
 		if (input.playertype === PlayerType.Player_A)
 		{
 			if (input.movement === Movement.Up)
@@ -343,9 +312,6 @@ export default class PongCore
 			}
 			this.last_processed_id_B = input.number;
 		}
-
-		// this.check_goal();
-		// this.check_collisions();
 	}
 
 	check_goal = () =>
@@ -379,12 +345,10 @@ export default class PongCore
 				//end game
 			}
 			//prepare next round
+
+//disable if client
+//wait for server ?
 			this.do_round_setup();
 		}
 	}
-
-	// check_collisions = () =>
-	// {
-
-	// }
 }

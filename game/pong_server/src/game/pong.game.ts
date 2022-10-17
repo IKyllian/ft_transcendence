@@ -33,19 +33,6 @@ export class PongGame
 				self.send_state();
 			}; })(this),
 		  1000 / 60);
-
-
-		// //server update interval loop
-		// clearInterval(this.update_interval);
-		// this.update_interval = setInterval(
-		//   (function(self) { return function() { self.core.update_gamestate(); }; })(this),
-		//   1000 / 30);
-
-		// //send state interval loop
-		// clearInterval(this.send_interval);
-		// this.send_interval = setInterval(
-		//   (function(self) { return function() { self.send_state(); }; })(this),
-		//   1000 / 30);
 	}
 
 	send_state = () =>

@@ -31,23 +31,21 @@ export default class Lobby extends Phaser.Scene
 		player_B: PlayerStatus.Absent
 	}
 	anti_spam_count :number = 0;
-	// player_A_status: PlayerStatus = PlayerStatus.Absent;
-	// player_B_status: PlayerStatus = PlayerStatus.Absent;
 	
 	preload ()
 	{
-	  this.load.image(
-		'player_a_avatar',
-		this.game.registry.get('players_data').player_A.avatar
-	  );
-	  this.load.image(
-		'player_b_avatar',
-		this.game.registry.get('players_data').player_B.avatar
-	  );
-	  this.load.image(
-		'ready_button',
-		'assets/button.png'
-	  ); 
+		this.load.image(
+			'player_a_avatar',
+			this.game.registry.get('players_data').player_A.avatar
+			);
+		this.load.image(
+			'player_b_avatar',
+			this.game.registry.get('players_data').player_B.avatar
+			);
+		this.load.image(
+			'ready_button',
+			'assets/button.png'
+			); 
 	}
 
 	create ()
@@ -97,7 +95,6 @@ export default class Lobby extends Phaser.Scene
 			game_id: this.game.registry.get('players_data').game_id
 		};
 
-		//this.socketmanager.print_test();
 		this.socketmanager.lobby_send_join(lobbydata);
 
 		if (this.me !== PlayerType.Spectator)
@@ -107,13 +104,8 @@ export default class Lobby extends Phaser.Scene
 		this.socketmanager.lobby_send_request_status(this.registry.get('players_data').game_id);
 	}
 
-	update(/*time: number, delta: number*/): void {
-
-		//console.log("updating");
-		// this.socketmanager (request updated data)
-//TODO ne pas spam request et attendre reponse server, request une fois a l'init puis rarement au cas ou
-		//this.socketmanager.lobby_send_request_status(this.registry.get('players_data').game_id);
-
+	update(/*time: number, delta: number*/): void
+	{
 		this.anti_spam_count++;
 		if (this.anti_spam_count >= 5)
 		{
@@ -129,8 +121,6 @@ export default class Lobby extends Phaser.Scene
 		console.log("click", gameobject);
 		if (gameobject.name === 'ready')
 		{
-
-			//console.log("object name is ready");
 			this.socketmanager.lobby_send_ready(this.registry.get('players_data').game_id);
 			gameobject.destroy();
 		}
@@ -169,46 +159,41 @@ export default class Lobby extends Phaser.Scene
 
 	ready_to_go = () =>
 	{
+		console.log('ready to start');
 
-		// if (!this.already_started)
-		// {
-		// 	this.already_started = true;
-			console.log('ready to start');
-	
-			this.update_lobby_status(
-				{
-					player_A: PlayerStatus.Ready,
-					player_B: PlayerStatus.Ready
-				});
-	
-			let timer: number = 1;
-			let style: Phaser.Types.GameObjects.Text.TextStyle = 
+		this.update_lobby_status(
 			{
-				fontSize: '40px',
-				color: '#000000',
-				fontFamily: 'Arial'
-			}
+				player_A: PlayerStatus.Ready,
+				player_B: PlayerStatus.Ready
+			});
 
-			// this.game.registry.get('players_data').game_id
-			this.socketmanager.game_get_round_setup(this.game.registry.get('players_data').game_id);
-			this.countdown = this.add.text(400, 100, timer.toString(), style);
+		let timer: number = 1;
+		let style: Phaser.Types.GameObjects.Text.TextStyle = 
+		{
+			fontSize: '40px',
+			color: '#000000',
+			fontFamily: 'Arial'
+		}
 
-			this.time.addEvent({
-				delay: 1000,
-				callback: function()
+		this.socketmanager.game_get_round_setup(this.game.registry.get('players_data').game_id);
+		this.countdown = this.add.text(400, 100, timer.toString(), style);
+
+		this.time.addEvent({
+			delay: 1000,
+			callback: function()
+			{
+				timer -= 1;
+				console.log("countdown:", timer);
+				this.countdown.setText(timer.toString());
+				if (timer <= 0)
 				{
-					timer -= 1;
-					console.log("countdown:", timer);
-					this.countdown.setText(timer.toString());
-					if (timer <= 0)
-					{
-						this.countdown.destroy();
-						this.launch_pong();
-					}
-				},
-				callbackScope: this,
-				loop: true });
-		//}
+					this.countdown.destroy();
+					this.launch_pong();
+				}
+			},
+			callbackScope: this,
+			loop: true });
+
 
 	}
 
@@ -216,11 +201,6 @@ export default class Lobby extends Phaser.Scene
 	{
 		this.game.registry.set('round_setup', round_setup);
 	}
-	// quick_launch = () =>
-	// {
-	// 	this.already_started = true;
-	// 	this.launch_pong();
-	// }
 
 	launch_pong = () =>
 	{
@@ -229,38 +209,3 @@ export default class Lobby extends Phaser.Scene
 		this.scene.start('Pong');
 	}
 }
-
-
-/*
-	// 	if (this.player == PlayerType.Player_A)
-	// 	{
-			
-	// 	}
-	// 	else if (this.player == PlayerType.Player_B)
-	// 	{
-			
-	// 	}
-	// 	else
-	// 	{
-			
-	// 	}
-
-		// this.player = this.game.registry.get('players_data').playertype;
-		// this.socket = io('http://localhost:6161');
-		// this.game.registry.set('socket', this.socket);
-
-	
-    //  Moves the image anchor to the middle, so it centers inside the game properly
-    image.anchor.set(0.5);
-	==>replaced by setorigin in phaser3
-
-    //  Enables all kind of input actions on this image (click, etc)
-    image.inputEnabled = true;
-	==>replace by this.image.setInteractive(); in phaser3
-
-
-var textConfig={fontSize:'20px',color:'#ff0000',fontFamily: 'Arial'};
-this.add.text(game.config.width/2,game.config.height/2,textConfig,"SomeText",textConfig);
-
-
-*/

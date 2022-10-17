@@ -18,8 +18,6 @@ export default class Pong extends Phaser.Scene
 
 	//Displayed elements
 	asset_ball?: Phaser.GameObjects.Image;
-	// asset_player_A?: Phaser.GameObjects.Image;
-	// asset_player_B?: Phaser.GameObjects.Image;
 	asset_player_A?: Phaser.GameObjects.Shape;
 	asset_player_B?: Phaser.GameObjects.Shape;
 	asset_scoreboard?: Phaser.GameObjects.Text;
@@ -33,7 +31,6 @@ export default class Pong extends Phaser.Scene
 
 	input_UP: boolean = false;
 	input_DOWN: boolean = false;
-	// last_move: Movement = Movement.Neutral;
 	input_number: number = 1;
 	latest_serv_response: number = 0;
 	input_stock: Array<PlayerInput> = new Array();
@@ -86,8 +83,6 @@ export default class Pong extends Phaser.Scene
 		if (this.socketmanager !== undefined)
 		{
 			this.socketmanager.set_pong_triggers({
-
-//				acknowledge_server_authority: this.acknowledge_server_authority.bind(this),
 				append_server_gamestate: this.append_server_gamestate.bind(this),
 				apply_round_setup: this.apply_round_setup.bind(this)
 	
@@ -96,14 +91,11 @@ export default class Pong extends Phaser.Scene
 		}
 
 		this.asset_ball = this.add.image(400, 300, 'ball');
-		// this.asset_player_A = this.add.image(100, 300, 'player_A');
-		// this.asset_player_B = this.add.image(700, 300, 'player_B');
 		this.asset_player_A = this.add.rectangle(20, 300, 10, 150, 0x000000);
 		this.asset_player_B = this.add.rectangle(580, 300, 10, 150, 0x000000);
 		this.asset_lag_icon = this.add.image(400, 300, 'lag_icon');
 		this.asset_lag_icon.setAlpha(1);
 
-//		new Rectangle(scene, x, y [, width] [, height] [, fillColor] [, fillAlpha])
 		this.upper_limit = this.add.rectangle(400, 10, 800, 20, 0x000000);
 		this.lower_limit = this.add.rectangle(400, 590, 800, 20, 0x000000);
 
@@ -117,101 +109,71 @@ export default class Pong extends Phaser.Scene
 		let text: string;
 		text = this.game_state.score.player_A.toString() + " - " + this.game_state.score.player_B.toString();
 		this.asset_scoreboard = this.add.text(400, 100, text, style)
-	//	this.asset_scoreboard?.setText(text);
 
 		this.me = this.game.registry.get('players_data').playertype;
-
 
 		this.key_UP = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
 		this.key_DOWN = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
 
-
 		this.socketmanager?.game_get_round_setup(this.game_id!);
 
 
-//test
 		clearInterval(this.update_interval);
 		this.update_interval = setInterval(
 		  (function(self) { return function()
 			{
 				self.test();
-				//self.send_state();
 			}; })(this),
 		  1000 / 60);
-
-
 	}
 
 
 	// update(time: number, delta: number): void
 	test()
 	{
-		//let now :Date = new Date();
 		if (this.next_round_setup === undefined)
 		{
 			this.socketmanager?.game_get_round_setup(this.game_id!);
 			return;
 		}
-		// if (new Date(this.next_round_setup.start_time).getTime() > now.getTime())
-		// 	return;
-
 
 		if (this.me !== PlayerType.Spectator)
 		{
 			
-					let current_move: Movement = Movement.Neutral;
-			
-					if (this.key_UP !== undefined && this.key_DOWN !== undefined)
-					{
-						
-						if (this.key_UP.isDown)
-						{
-							this.input_UP = true;
-						}
-						else 
-						{
-							this.input_UP = false;
-						}
+			let current_move: Movement = Movement.Neutral;
+	
+			if (this.key_UP !== undefined && this.key_DOWN !== undefined)
+			{
 				
-						if (this.key_DOWN.isDown)
-						{
-							this.input_DOWN = true;
-						}
-						else
-						{
-							this.input_DOWN = false;
-						}
-					}
-			
-					if (this.input_UP && this.input_DOWN)
-					{
-						current_move = Movement.Neutral;
-					}
-					else if (this.input_UP)
-					{
-						current_move = Movement.Up;
-					}
-					else if (this.input_DOWN)
-					{
-						current_move = Movement.Down;
-					}
-			
-			
-					let player_input: PlayerInput =
-					{
-						playertype: this.me,
-						number: this.input_number,
-						time: new Date(),
-						movement: current_move
-					};
-					this.input_number++;
-					this.input_stock.push(player_input);
-					this.socketmanager?.game_send_input(this.registry.get('players_data').game_id, player_input);
+				if (this.key_UP.isDown)
+					this.input_UP = true;
+				else 
+					this.input_UP = false;
+		
+				if (this.key_DOWN.isDown)
+					this.input_DOWN = true;
+				else
+					this.input_DOWN = false;
+			}
+	
+			if (this.input_UP && this.input_DOWN)
+				current_move = Movement.Neutral;
+			else if (this.input_UP)
+				current_move = Movement.Up;
+			else if (this.input_DOWN)
+				current_move = Movement.Down;
 
-
-
+			let player_input: PlayerInput =
+			{
+				playertype: this.me,
+				number: this.input_number,
+				time: new Date(),
+				movement: current_move
+			};
+			this.input_number++;
+			this.input_stock.push(player_input);
+			this.socketmanager?.game_send_input(this.registry.get('players_data').game_id, player_input);
 		}
-
 
 
 		if (this.server_stock.length !== 0)
@@ -267,15 +229,8 @@ export default class Pong extends Phaser.Scene
 			this.core.update_gamestate();
 		}
 
-
-
-
-
-
-		//get state and display
 		this.game_state = this.core.get_gamestate();
 		this.past_stock.push(this.game_state);
-
 
 		let past_date: Date = new Date();
 		past_date.setMilliseconds(past_date.getMilliseconds() - 100);
@@ -291,7 +246,6 @@ export default class Pong extends Phaser.Scene
 
 					if(new Date(this.past_stock[0].last_processed_time_B).getTime() > past_date.getTime() )
 					{
-	//console.log("dans le if de delay");
 						this.asset_player_B.x = this.past_stock[0].player_B.x;
 						this.asset_player_B.y = this.past_stock[0].player_B.y;
 						this.past_stock.shift();
@@ -309,8 +263,6 @@ export default class Pong extends Phaser.Scene
 				{
 					let text: string;
 					text = this.game_state.score.player_A.toString() + " - " + this.game_state.score.player_B.toString();
-			
-			
 					this.asset_scoreboard?.setText(text);
 				}
 		}
@@ -325,7 +277,6 @@ export default class Pong extends Phaser.Scene
 
 					if(new Date(this.past_stock[0].last_processed_time_A).getTime() > past_date.getTime() )
 					{
-	//console.log("dans le if de delay");
 						this.asset_player_A.x = this.past_stock[0].player_A.x;
 						this.asset_player_A.y = this.past_stock[0].player_A.y;
 						this.past_stock.shift();
@@ -343,14 +294,11 @@ export default class Pong extends Phaser.Scene
 				{
 					let text: string;
 					text = this.game_state.score.player_A.toString() + " - " + this.game_state.score.player_B.toString();
-			
-			
 					this.asset_scoreboard?.setText(text);
 				}
 		}
 		else
 		{
-//console.log("dans le if spectateur");
 			if ( this.asset_player_A !== undefined
 				&& this.asset_player_B !== undefined
 				&& this.asset_ball !== undefined )
@@ -358,7 +306,6 @@ export default class Pong extends Phaser.Scene
 
 					if(new Date(this.past_stock[0].last_processed_time_A).getTime() > past_date.getTime() )
 					{
-//console.log("dans le if de delay");
 						this.asset_player_A.x = this.past_stock[0].player_A.x;
 						this.asset_player_A.y = this.past_stock[0].player_A.y;
 						this.asset_player_B.x = this.past_stock[0].player_B.x;
@@ -382,37 +329,9 @@ export default class Pong extends Phaser.Scene
 				{
 					let text: string;
 					text = this.game_state.score.player_A.toString() + " - " + this.game_state.score.player_B.toString();
-			
-			
 					this.asset_scoreboard?.setText(text);
 				}
 		}
-
-
-
-
-
-		// if ( this.asset_player_A !== undefined
-		// && this.asset_player_B !== undefined
-		// && this.asset_ball !== undefined )
-		// {
-		// //	console.log("in the crappy if");
-		// 	this.asset_player_A.x = this.game_state.player_A.x;
-		// 	this.asset_player_A.y = this.game_state.player_A.y;
-		// 	this.asset_player_B.x = this.game_state.player_B.x;
-		// 	this.asset_player_B.y = this.game_state.player_B.y;
-		// 	this.asset_ball.x = this.game_state.balldata.position.x;
-		// 	this.asset_ball.y = this.game_state.balldata.position.y;			
-		// }
-
-		// if (this.asset_scoreboard !== undefined)
-		// {
-		// 	let text: string;
-		// 	text = this.game_state.score.player_A.toString() + " - " + this.game_state.score.player_B.toString();
-	
-	
-		// 	this.asset_scoreboard?.setText(text);
-		// }
 		this.lag_check();
 	}
 
@@ -425,9 +344,7 @@ export default class Pong extends Phaser.Scene
 	append_server_gamestate = (gamestate: GameState) =>
 	{
 		this.server_stock.push(gamestate);
-//console.log("server stock size", this.server_stock.length);
 	}
-
 
 	display_score = () =>
 	{

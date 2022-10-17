@@ -94,7 +94,6 @@ export class LobbyFactory
 			client.emit('join_lobby_fail', 'room not found');
 			console.log("unable to join room, not found: ", data.game_id);
 		}
-		//this.lobby_list.get(data.game_id).lobby_add(client, data.player_secret);
 	}
 
 	lobby_quit(client: Socket)
@@ -109,7 +108,6 @@ export class LobbyFactory
 
 	locate_client(client: Socket): string
 	{
-		//console.log(map1.get('bar'));
 		return this.client_list.get(client['id']);
 	}
 
@@ -120,21 +118,13 @@ export class LobbyFactory
 
 	lobby_player_ready(client: Socket, game_id: string)
 	{
-		// let game_id: string | undefined = this.locate_client(client);
-		// if (game_id !== undefined )
-		// {
-			this.lobby_list.get(game_id)?.player_ready(client);
-			
-		//}
+		this.lobby_list.get(game_id)?.player_ready(client);
 	}
 
 	lobby_game_input(data: any)
 	{
-//console.log("in factory input ", data);
 		this.lobby_list.get(data[0])?.game_receive_input(data[1]);
 	}
-
-
 
 	lobby_game_get_round_setup(client: Socket, game_id: string)
 	{
