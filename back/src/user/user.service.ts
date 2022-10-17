@@ -1,12 +1,13 @@
 import { BadRequestException, ForbiddenException, forwardRef, Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { FindManyOptions, FindOneOptions, FindOptionsWhere, IsNull, Not, Repository } from "typeorm";
+import { FindManyOptions, FindOneOptions, FindOptionsWhere, IsNull, Like, Not, Repository } from "typeorm";
 import { AuthService } from "src/auth/auth.service";
 import { CreateUserDto } from "./dto/createUser.dto";
 import { Statistic, User } from "src/typeorm";
 import { userStatus } from "src/typeorm/entities/user";
 import { EditUserDto } from "./dto/editUser.dto";
 import * as argon from 'argon2';
+import { SearchDto } from "./dto/search.dto";
 
 @Injectable()
 export class UserService {
@@ -47,23 +48,14 @@ export class UserService {
 		return this.userRepo.find(options);
 	}
 
-	// async findOne(
-	// 	whereParams: FindUserParams,
-	// 	selectAll?: boolean,
-	// ) {
-	// 	const selections: (keyof User)[] = [
-	// 		'username',
-	// 		'id',
-	// 		'status',
-	// 	];
-	// 	const selectionsWithHash: (keyof User)[] = [...selections, 'hash'];
-	// 	const param = {
-	// 		where: whereParams,
-	// 		select: selectAll ? selectionsWithHash : selections,
-	// 		relations: ['statistic', 'channelUser'],
-	// 	};
-	// 	return await this.userRepo.findOne(param);
-	// }
+	search(user: User, dto: SearchDto) {
+		return this.userRepo.find({
+			where: {
+				id: Not(user.id),
+				username: Like(`%${dto.str}%`),
+			}
+		});
+	}
 
 	// TODO ask if usefull
 	async editUser(user: User, dto: EditUserDto) {

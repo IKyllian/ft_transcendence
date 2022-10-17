@@ -3,6 +3,7 @@ import { APP_INTERCEPTOR } from "@nestjs/core";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { NotificationModule } from "src/notification/notification.module";
 import { BannedUser, Channel, ChannelMessage, ChannelUser } from "src/typeorm";
+import { UserModule } from "src/user/user.module";
 import { ChatModule } from "../chat.module";
 import { ChannelController } from "./channel.controller";
 import { ChannelService } from "./channel.service";
@@ -12,6 +13,7 @@ import { ChannelMessageService } from "./message/ChannelMessage.service";
 @Module({
 	imports: [
 		NotificationModule,
+		UserModule,
 		// forwardRef(() => NotificationModule),
 		TypeOrmModule.forFeature([
 			Channel,
