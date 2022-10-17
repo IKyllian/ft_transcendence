@@ -56,7 +56,7 @@ export class ConversationService {
 			relations: {
 				user1: true,
 				user2: true,
-				messages: true,
+				// messages: true,
 			},
 			where: [
 				{

@@ -137,6 +137,7 @@ export class ChannelService {
 		return this.channelRepo.save(channel);
 	}
 
+	// TODO Change getchannelinvite to find by id
 	async respondInvite(user: User, dto: ResponseDto) {
 		const invite = await this.notifService.getChannelInvite(user, dto.id);
 		if (!invite)

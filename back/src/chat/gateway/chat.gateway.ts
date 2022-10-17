@@ -192,16 +192,19 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     socket.to(`user-${dto.userId}`).emit('NewNotification', notif);
   }
 
-  //TODO inform front to delete notif?
+  //TODO change response dto
   @UseGuards(WsJwtGuard)
   @SubscribeMessage('ChannelInviteResponse')
   async respondToChannelInvite(
     @GetUser() user: User,
-    @MessageBody() dto: ResponseDto
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() dto: ResponseDto,
   ) {
     const updatedChan = await this.channelService.respondInvite(user, dto);
-    if (updatedChan)
-      this.server.to(`channel-${dto.id}`).emit('ChannelUpdate', updatedChan);
+    if (updatedChan) {
+      this.server.to(`channel-${updatedChan.id}`).emit('ChannelUpdate', updatedChan);
+      socket.to(`user-${user.id}`).emit('OnJoin', updatedChan);
+    }
   }
 
 }
