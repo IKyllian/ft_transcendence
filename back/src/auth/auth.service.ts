@@ -8,7 +8,6 @@ import { lastValueFrom } from "rxjs";
 import { UserService } from "src/user/user.service";
 import { Auth42Dto } from "./dto/auth42.dto";
 import { User } from "src/typeorm";
-import { IsNull, Not } from "typeorm";
 
 @Injectable()
 export class AuthService {
