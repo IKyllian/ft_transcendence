@@ -180,16 +180,10 @@ export class AuthService {
 		this.userService.updateRefreshHash(user, hash);
 	}
 
-	async logout(userId: number) {
-		const users = await this.userService.find({
-			where: {
-				id: userId,
-				refresh_hash: Not(IsNull())
-			}
-		})
-		if (users.length == 0)
-			throw new NotFoundException('user not found');
-		this.userService.logout(users[0]);
+	async logout(user: User) {
+		if (user.refresh_hash == null) return;
+
+		this.userService.logout(user);
 		return { success: true, message: "logged out successfuly" };
 	}
 }

@@ -34,13 +34,13 @@ export class AuthController {
 	@HttpCode(HttpStatus.OK)
 	@Post('logout')
 	logout(@GetUser() user: User) {
-		return this.authService.logout(user["sub"]);
+		return this.authService.logout(user);
 	}
 	
 	@UseGuards(RefreshGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('refresh')
 	refresh(@GetUser() user: User) {
-		return this.authService.refreshTokens(user["sub"], user["refreshToken"]);
+		return this.authService.refreshTokens(user["id"], user["refreshToken"]);
 	}
 }
