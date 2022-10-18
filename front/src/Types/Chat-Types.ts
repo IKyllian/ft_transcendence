@@ -1,14 +1,13 @@
-import { ChatInterface } from "./Datas-Examples";
 import { UserInterface } from "./User-Types";
 
 export interface ChannelsInterfaceFront {
     isActive: string,
-    channel: Channel,
+    channel: ChannelInfoSidebar,
 }
 
 export interface ConversationInterfaceFront {
     isActive: string,
-    conversation: Conversation,
+    conversation: ConversationInfoSidebar,
 }
 
 export interface ChannelUser {
@@ -29,9 +28,14 @@ export interface Channel {
     id: number,
     name: string,
     option: string,
-    nb: number,
     channelUsers: ChannelUser[],
     messages: ChatMessage[],
+}
+
+export interface ChannelInfoSidebar {
+    id: number,
+    name: string,
+    option: string,
 }
 
 export interface Conversation {
@@ -41,10 +45,15 @@ export interface Conversation {
     messages: PrivateMessage[],
 }
 
+export interface ConversationInfoSidebar {
+    id: number,
+    user1: UserInterface,
+    user2: UserInterface,
+}
+
 interface PrivateMessage {
     id: number,
     sender: UserInterface,
     content: string,
     send_at: Date,
-    // conversation: Conversation[],
 }

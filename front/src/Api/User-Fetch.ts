@@ -52,3 +52,17 @@ export function fetchNotifications(token: string, dispatch: Dispatch<AnyAction>)
         console.log(err);
     })
 }
+
+export function fetchSearchAllUsers(inputText: string, token :string, setUsersList: Function) {
+    axios.post(`${baseUrl}/users/search`, {str: inputText}, {
+        headers: {
+            "Authorization": `Bearer ${token}`,
+        }
+    })
+    .then((response) => {
+        setUsersList(response.data);   
+    })
+    .catch((err) => {
+        console.log(err);
+    })
+}

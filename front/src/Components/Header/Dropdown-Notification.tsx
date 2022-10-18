@@ -39,7 +39,12 @@ function NotifItem(props: {notification: NotificationInterface}){
             <img className='profile-avatar' src={Avatar} alt="profil pic" />
             <div className="notif-content">
                 <p> {notification.requester.username} </p>
-                <p> {notification.type === "channel_invite" ? `Invited you to ${notification.channel?.name}` : "Sent you a friend request"} </p>
+                <p>
+                    {   notification.type === "channel_invite"
+                        ?`Invited you to ${notification.channel?.name}`
+                        : "Sent you a friend request"
+                    }
+                </p>
             </div>
             <div className="notif-buttons">
                 <button onClick={() => handleClick("accepted")}> Accept </button>
@@ -52,7 +57,7 @@ function NotifItem(props: {notification: NotificationInterface}){
 function DropdownNotification() {
     const {notifications} = useAppSelector(state => state.notification);
     
-    return notifications ? (
+    return notifications && notifications.length > 0 ? (
         <div className="notif-dropdown-wrapper">
             {
                 notifications.map((elem) => 
@@ -62,7 +67,7 @@ function DropdownNotification() {
         </div>
     ) : (
         <div className="notif-dropdown-wrapper">
-            No Notification
+            <p className="no-notif"> No Notification </p>
         </div>
     );
 }

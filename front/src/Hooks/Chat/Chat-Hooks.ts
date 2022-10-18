@@ -29,13 +29,13 @@ export function useLoadChatDatas() {
         setReponsiveSidebar(!responsiveSidebar);
     }, [channelId]);
 
-    const onCloseModal = () => {
+    const onCloseModal = useCallback(() => {
         setShowModal(0);
-    }
+    }, [setShowModal]);
 
-    const changeModalStatus = (index: number) => {
+    const changeModalStatus = useCallback((index: number) => {
         setShowModal(index === 0 ? 1 : 0);
-    }
+    }, [setShowModal]);
 
     // Les useEffect pour les call api etc..
     useEffect(() => {

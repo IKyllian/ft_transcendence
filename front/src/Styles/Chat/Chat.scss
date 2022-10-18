@@ -19,6 +19,9 @@
         background-color: $LightDarkPalette;
         border-right: 1px solid $WhitePalette;
         position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
         
         .explore-button {
            background-color: $DarkPalette;
@@ -34,6 +37,7 @@
             position: relative;
             list-style-type: none;
             margin-right: 30px;
+            overflow-y: scroll;
             
             &-elem {
                 .collapse-button {
@@ -113,134 +117,131 @@
             justify-content: space-between;
             position: relative;
             list-style-type: none;
-            .message-wrapper {
-                height: 90%;
-                .message-header {
-                    @include width-height(100%, 50px);
-                    background-color: $LightDarkPalette;
-                    display: flex;
-                    align-items: center;
-                    justify-content: space-between;
-                    border-bottom: 1px solid $WhitePalette;
+            .message-header {
+                @include width-height(100%, 50px);
+                background-color: $LightDarkPalette;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                border-bottom: 1px solid $WhitePalette;
 
-                    &-right-side {
-                        margin-right: 20px;
-                        svg {
-                            cursor: pointer;
-                            &:first-child {
-                                margin-right: 28px;
-                            }
-                        }
-                    }
-    
-                    .burger-icon-responsive {
-                        display: none;
+                &-right-side {
+                    margin-right: 20px;
+                    svg {
                         cursor: pointer;
-                    }
-    
-                    .chan-name {
-                        margin-left: 20px;
-                    }
-    
-                    a {
-                        margin-right: 10px;
+                        &:first-child {
+                            margin-right: 28px;
+                        }
                     }
                 }
-    
-                .header-user-info {
-                    @include width-height(100%, 50px);
-                    background-color: $LightDarkPalette;
-                    border-bottom: 1px solid $WhitePalette;
+
+                .burger-icon-responsive {
+                    display: none;
+                    cursor: pointer;
+                }
+
+                .chan-name {
+                    margin-left: 20px;
+                }
+
+                a {
+                    margin-right: 10px;
+                }
+            }
+
+            .header-user-info {
+                @include width-height(100%, 50px);
+                background-color: $LightDarkPalette;
+                border-bottom: 1px solid $WhitePalette;
+                @include flex-row-alignCenter;
+
+                .burger-icon-responsive {
+                    display: none;
+                    cursor: pointer
+                }
+                .player-container {
                     @include flex-row-alignCenter;
-
-                    .burger-icon-responsive {
-                        display: none;
-                        cursor: pointer
+                    .profile-avatar {
+                        @include avatar-player(10em);
                     }
-                    .player-container {
-                        @include flex-row-alignCenter;
-                        .profile-avatar {
-                            @include avatar-player(10em);
-                        }
-            
-                        .player-status {
-                            @include player-status;
-                        }
+        
+                    .player-status {
+                        @include player-status;
                     }
                 }
-    
-                ul {
-                    overflow-y: scroll;
-                    margin: 0;
-                    padding: 20px;
-                    height: 90%;
-                    display: flex;
-                    flex-direction: column;
-                    .message-item {
-                        @include flex-row-alignCenter;
-                        gap: 15px;
+            }
 
-                        &:not(&:first-child) {
-                            margin-top: 15px;
+            ul {
+                overflow-y: scroll;
+                margin: 0;
+                padding: 20px;
+                height: 90%;
+                display: flex;
+                flex-direction: column;
+                .message-item {
+                    @include flex-row-alignCenter;
+                    gap: 15px;
+
+                    &:not(&:first-child) {
+                        margin-top: 15px;
+                    }
+        
+                    img {
+                        @include avatar-player(50px);
+                    }
+
+                    &-info {
+                        p {
+                            margin: 0;
                         }
-            
-                        img {
-                            @include avatar-player(50px);
+                        .message-text {
+                            padding: 10px 15px;
+                            background-color: $LightBluePalette;
+                            margin: 0;
                         }
 
-                        &-info {
-                            p {
-                                margin: 0;
+                        .message-sender {
+                            font-size: 10px;
+                            color: #a5abb0;
+                            margin-top: 5px;
+                            text-decoration: none;
+                            position: relative;
+                            .sender-txt {
+                                cursor: pointer;
+                                margin-right: 5px;
                             }
-                            .message-text {
-                                padding: 10px 15px;
-                                background-color: $LightBluePalette;
-                                margin: 0;
+                            span {
+                                &:last-child {
+                                    font-size: 9px;
+                                    letter-spacing: 0.5px;
+                                }   
                             }
-    
+                        }
+                    }
+        
+                    &-left {
+                        float: left;
+                        width: 100%;
+                        .message-text {
+                            border-top-right-radius: 30px;
+                            border-bottom-right-radius: 30px;
+                            border-top-left-radius: 30px;
+                        }
+                    }
+        
+                    &-right {
+                        flex-direction: row-reverse;
+                        .message-text {
+                            background-color: rgb(173, 113, 22);
+                            border-top-right-radius: 30px;
+                            border-bottom-left-radius: 30px;
+                            border-top-left-radius: 30px;
+                        }
+
+                        .message-item-info {
                             .message-sender {
-                                font-size: 10px;
-                                color: #a5abb0;
-                                margin-top: 5px;
-                                text-decoration: none;
-                                position: relative;
-                                .sender-txt {
-                                    cursor: pointer;
-                                    margin-right: 5px;
-                                }
                                 span {
-                                    &:last-child {
-                                        font-size: 9px;
-                                        letter-spacing: 0.5px;
-                                    }   
-                                }
-                            }
-                        }
-            
-                        &-left {
-                            float: left;
-                            width: 100%;
-                            .message-text {
-                                border-top-right-radius: 30px;
-                                border-bottom-right-radius: 30px;
-                                border-top-left-radius: 30px;
-                            }
-                        }
-            
-                        &-right {
-                            flex-direction: row-reverse;
-                            .message-text {
-                                background-color: rgb(173, 113, 22);
-                                border-top-right-radius: 30px;
-                                border-bottom-left-radius: 30px;
-                                border-top-left-radius: 30px;
-                            }
-
-                            .message-item-info {
-                                .message-sender {
-                                    span {
-                                        float: right;
-                                    }
+                                    float: right;
                                 }
                             }
                         }
@@ -250,14 +251,16 @@
         }
         
         .message-input-container {
-            border-top: 1px solid $WhitePalette;
             @include flex-row-alignCenter;
             justify-content: space-between;
-            width: 90%;
+            width: 100%;
             margin: 0 auto;
+            background-color: $LightDarkPalette;
             form {
-                width: 100%;
+                border-top: 1px solid $WhitePalette;
+                width: 90%;
                 @include flex-row-alignCenter();
+                margin: auto;
                 input {
                     all: unset;
                     width: 95%;
@@ -402,6 +405,18 @@
                     }
                 }
             } 
+        }
+    }
+}
+
+@media screen and (max-height: 600px) {
+    .chat-page-container {
+        .message-container {
+            .message-container-main { 
+                .message-wrapper {
+                    height: 80%;
+                }
+            }
         }
     }
 }

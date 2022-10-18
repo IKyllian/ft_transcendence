@@ -54,7 +54,7 @@ export function useChannelHook() {
                 channel.messages.forEach(elem => elem.send_at = new Date(elem.send_at));
                 setChatDatas(channel);
                 if (!channels?.find(elem => elem.channel.id === channel.id))
-                    dispatch(addChannel({isActive: 'true', channel: data}));
+                    dispatch(addChannel({isActive: 'true', channel: {id: data.id, name: data.name, option: data.option}}));
                 if (data.channelUsers.find((elem) => elem.user.id === authDatas.currentUser?.id && (elem.role === "owner" || elem.role === "moderator")))
                     setLoggedUserIsOwner(true);
             });

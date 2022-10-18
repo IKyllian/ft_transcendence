@@ -1,4 +1,4 @@
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { IconLogout, IconMessages, IconUserPlus, IconChevronDown, IconBell } from '@tabler/icons';
 
 import { ModalContext } from '../Utils/ModalProvider';
@@ -9,13 +9,13 @@ import DropdownNotification from './Dropdown-Notification';
 
 import ResponsiveMenu from './Responsive-Menu';
 
-function NotifIcon(props: {setShowNotifDropdown: Function}) {
-    const {setShowNotifDropdown} = props;
+function NotifIcon(props: {handleNotifDropdownClick: Function}) {
+    const {handleNotifDropdownClick} = props;
     const {notifications} = useAppSelector(state => state.notification);
     return (
         <div className='badge-wrapper'>
             { notifications !== undefined && notifications.length > 0 && <div className='badge-notif'> {notifications?.length} </div> }
-            <IconBell onClick={() => setShowNotifDropdown((state: boolean) => !state)} />
+            <IconBell onClick={() => handleNotifDropdownClick()} />
         </div>
     );
 }
@@ -27,9 +27,24 @@ function Header() {
     const { currentUser } = useAppSelector(state => state.auth);
     const modalStatus = useContext(ModalContext);
 
-    const handleClick = () => {
+    const handleMenuClick = () => {
+        if (showNotifDropdown && !showMenu)
+            setShowNotifDropdown(false);
         setShowMenu(!showMenu);
     }
+
+    const handleNotifDropdownClick = () => {
+        if (showMenu && !showNotifDropdown)
+            setShowMenu(false);
+        setShowNotifDropdown(!showNotifDropdown);
+    }
+
+    useEffect(() => {
+        if (showMenu)
+            setShowMenu(false);
+        if (showNotifDropdown)
+            setShowNotifDropdown(false);
+    }, [location.pathname])
 
     return location.pathname === "/sign" || location.pathname === "/set-username" ? (
         <> </>
@@ -41,7 +56,7 @@ function Header() {
             </Link>
             <div className='header-right'>
                 <div className='icons-header'>
-                    <NotifIcon setShowNotifDropdown={setShowNotifDropdown} />
+                    <NotifIcon handleNotifDropdownClick={handleNotifDropdownClick} />
                     <IconUserPlus onClick={() => modalStatus.setStatus()} />
                     <Link to="/chat">
                         <IconMessages />
@@ -54,11 +69,11 @@ function Header() {
                 <IconLogout />
             </div>
             <div className='header-right-responsive'>
-                    <NotifIcon setShowNotifDropdown={setShowNotifDropdown} />
-                    <img className='header-picture' src={ProfilPic} alt="profil pic" />
-                    <IconChevronDown onClick={() => setShowMenu(!showMenu)} />
-                    <ResponsiveMenu show={showMenu} handleClick={handleClick} headerModal={modalStatus.setStatus} />
-                </div>
+                <NotifIcon handleNotifDropdownClick={handleNotifDropdownClick} />
+                <img className='header-picture' src={ProfilPic} alt="profil pic" />
+                <IconChevronDown style={{cursor: "pointer"}} onClick={() => handleMenuClick()} />
+                <ResponsiveMenu show={showMenu} handleClick={handleMenuClick} headerModal={modalStatus.setStatus} />
+            </div>
         </header>
     );
     

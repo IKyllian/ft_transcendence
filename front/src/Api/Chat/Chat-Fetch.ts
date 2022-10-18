@@ -16,9 +16,9 @@ export async function fetchUserChannels(token: string, channelId: number | undef
         const channelArray: Channel[] = response.data;
         let datasArray: ChannelsInterfaceFront[] = [];
 
-        channelArray.forEach(elem => {
+        channelArray.forEach((elem: Channel) => {
             datasArray.push({
-                channel: elem,
+                channel: {id: elem.id, name: elem.name, option: elem.option},
                 isActive: "false",
             });
         })
@@ -47,7 +47,7 @@ export async function fetchUserConvs(token: string, dispatch: Dispatch<AnyAction
         
         convArray.forEach(elem => {
             datasArray.push({
-                conversation: elem,
+                conversation: {id: elem.id, user1: elem.user1, user2: elem.user2},
                 isActive: "false",
             });
         })
@@ -73,8 +73,10 @@ export async function fetchConvAndRedirect(
     })
     .then(response => {
         if (!privateConvs?.find(elem => elem.conversation.id === response.data.id))
-            dispatch(addPrivateConv({isActive: 'false', conversation: response.data}));
-        navigate(`/chat/private-message/${getSecondUserIdOfPM(response.data, loggedUserId)}`);
+            dispatch(addPrivateConv({isActive: 'false', conversation: {id: response.data.id, user1: response.data.user1, user2: response.data.user2}}));
+        let conv: Conversation = response.data;
+        conv.messages.forEach(elem => elem.send_at = new Date(elem.send_at));
+        navigate(`/chat/private-message/${getSecondUserIdOfPM(response.data, loggedUserId)}`, {state: {conv: conv}});
     })
     .catch(err => {
         console.log(err);

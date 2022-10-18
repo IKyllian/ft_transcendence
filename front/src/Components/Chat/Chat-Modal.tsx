@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import SearchBarPlayers from "../SearchBarPlayers";
 import { useForm } from 'react-hook-form';
 import { useAppSelector, useAppDispatch } from '../../Redux/Hooks'
@@ -6,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { fetchCreateChannel } from "../../Api/Chat/Chat-Action";
 import { useContext } from "react";
 import { SocketContext } from "../../App";
+import { UserInterface } from "../../Types/User-Types";
 
 type FormValues = {
     chanMode: string,
@@ -22,6 +24,7 @@ type BodyRequest = {
 
 function ChatModal(props: {onCloseModal: Function, showModal: number}) {
     const { register, handleSubmit, watch, reset, formState: {errors} } = useForm<FormValues>();
+    const [usersInvited, setUsersInvited] = useState<UserInterface[]>([]);
     const { onCloseModal, showModal } = props;
 
     const channelMode = watch('chanMode');
@@ -30,8 +33,12 @@ function ChatModal(props: {onCloseModal: Function, showModal: number}) {
     const dispatch = useAppDispatch();
     const {socket} = useContext(SocketContext);
 
-    const usersInvited = watch("usersIdInvited");
-    console.log(usersInvited);
+    const checkboxOnChange = (val: UserInterface) => {
+        if (usersInvited.find(elem => elem.id === val.id))
+            setUsersInvited(prev => prev.filter(elem => elem.id !== val.id));
+        else
+            setUsersInvited(prev => [...prev, val]);
+    }
 
     const formSubmit = handleSubmit((data, e) => {
         e?.preventDefault();
@@ -41,8 +48,9 @@ function ChatModal(props: {onCloseModal: Function, showModal: number}) {
         }
         if (data.chanMode === "protected")
             body = {...body, password: data.password}
-        fetchCreateChannel(body, data.usersIdInvited,authDatas.token, dispatch, navigate, onCloseModal, socket!);
+        fetchCreateChannel(body, usersInvited, authDatas.token, dispatch, navigate, onCloseModal, socket!);
         reset();
+        setUsersInvited([]);
     })
 
     if (showModal === 1) {
@@ -90,7 +98,9 @@ function ChatModal(props: {onCloseModal: Function, showModal: number}) {
                             <input type="password" placeholder="password" {...register("password")} />
                         </label>
                     }
-                    <SearchBarPlayers functionality="chanInvite" register={register} />
+
+                    <SearchBarPlayers functionality="chanInvite" checkboxOnChange={checkboxOnChange} checkboxArray={usersInvited}  />
+
                     <div className="chat-modal-buttons">
                         <button onClick={() => onCloseModal() }> Cancel </button>
                         <input type="submit" name="Save" />
@@ -112,4 +122,4 @@ function ChatModal(props: {onCloseModal: Function, showModal: number}) {
     }
 }
 
-export default ChatModal;
+export default React.memo(ChatModal);

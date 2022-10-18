@@ -4,6 +4,7 @@ import { NavigateFunction } from "react-router-dom";
 import { Socket } from "socket.io-client";
 import { baseUrl } from "../../env";
 import { addChannel } from "../../Redux/ChatSlice";
+import { UserInterface } from "../../Types/User-Types";
 
 type BodyRequest = {
     name: string,
@@ -13,7 +14,7 @@ type BodyRequest = {
 
 export function fetchCreateChannel(
     body: BodyRequest,
-    usersInvited: string[] | undefined,
+    usersInvited: UserInterface[] | undefined,
     token: string,
     dispatch: Dispatch<AnyAction>,
     navigate: NavigateFunction,
@@ -32,7 +33,7 @@ export function fetchCreateChannel(
             usersInvited.forEach(element => {
                 socket?.emit("ChannelInvite", {
                     chanId: response.data.id,
-                    userId: parseInt(element),
+                    userId: element.id,
                 });
             });
         }
