@@ -214,7 +214,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @ConnectedSocket() socket: Socket,
     @MessageBody() dto: BanUserDto,
   ) {
-      console.log(dto)
       const updatedChan = await this.channelService.banUser(user, dto);
       this.server.to(`channel-${updatedChan.id}`).emit('ChannelUsersUpdate', updatedChan);
       socket.to(`user-${dto.userId}`).emit('OnLeave', updatedChan);

@@ -165,8 +165,11 @@ export class ChannelService {
 			throw new BadRequestException('User already in channel');
 		
 		const isBanned = await this.isBanned(user.id, id);
-		if (isBanned)
+		if (isBanned) {
+			if (isBanned.until)
+				throw new UnauthorizedException(`You are banned from this channel for ${(isBanned.until.getTime() - new Date().getTime()) / 1000} seconds`);
 			throw new UnauthorizedException('User is banned from this channel');
+		}
 		if (!isInvited) {
 			if (channel.option === channelOption.PRIVATE)
 				throw new UnauthorizedException('You need an invite to join this channel');
@@ -221,6 +224,7 @@ export class ChannelService {
 			relations: {
 				channelUsers: { user: true },
 				messages: { sender: true },
+				bannedUsers: { user: true },
 			},
 			where: {
 				id: id,
@@ -274,29 +278,32 @@ export class ChannelService {
 			throw new BadRequestException('User already banned');
 
 		const userToBan = await this.getChannelUser(channel.id, dto.userId);
-		console.log("channelUser", userToBan.user)
 		if (!userToBan)
 			throw new NotInChannelException();
 		else if (userToBan.role === 'owner' || user.id === dto.userId)
 			throw new UnauthorizedActionException();
 
+		let until = null;
+		if (dto.time)
+			until = new Date(new Date().getTime() + dto.time * 1000);
 		const bannedUser = this.bannedRepo.create({
 			user: userToBan.user,
 			channel,
-			time: dto.time,
+			until,
 		});
 		channel.bannedUsers = [...channel.bannedUsers, bannedUser];
 		channel.channelUsers = channel.channelUsers.filter((users) => users.id !== userToBan.id);
+		console.log("bannedUser", bannedUser)
 
 		return this.channelRepo.save(channel)
 	}
 
-	async unbanUser(dto: BanUserDto) {
+	async unbanUser(id: number, userId: number) {
 		let channel = await this.channelRepo.findOne({
 			relations: {
 				bannedUsers: { user: true },
 			},
-			where: { id: dto.chanId }
+			where: { id }
 		});
 		if (!channel)
 			throw new ChannelNotFoundException();
@@ -310,24 +317,24 @@ export class ChannelService {
 		// if (!isBanned)
 		// 	throw new BadRequestException('User is not banned from this channel');
 
-		channel.bannedUsers = channel.bannedUsers.filter((bannedUsers) => bannedUsers.user.id !== dto.userId)
+		channel.bannedUsers = channel.bannedUsers.filter((bannedUsers) => bannedUsers.user.id !== userId)
 		return this.channelRepo.save(channel)
 	}
 
-	async isBanned(userId: number, chanId: number): Promise<BannedUser | Boolean> {
+	async isBanned(userId: number, chanId: number): Promise<BannedUser | undefined> {
 		const isBanned = await this.bannedRepo.findOne({
 			where: {
 				user: { id: userId },
 				channel: { id: chanId }
 			}
 		});
-		if (isBanned && isBanned.time) {
-			if (isBanned.created_at.getTime() + (isBanned.time * 1000) > new Date().getTime()) {
+		if (isBanned && isBanned.until) {
+			if (isBanned.until.getTime() < new Date().getTime()) {
 				this.bannedRepo.delete(isBanned.id);
-				return false;
+				return undefined;
 			}
 		}
-		return isBanned ? isBanned : false;
+		return isBanned;
 	}
 
 	//TODO what if banned?
