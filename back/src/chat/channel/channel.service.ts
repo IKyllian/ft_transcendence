@@ -1,7 +1,7 @@
 import { BadRequestException, forwardRef, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Channel, User, ChannelUser, BannedUser } from 'src/typeorm';
-import { In, Not, Repository } from 'typeorm';
+import { FindManyOptions, FindOneOptions, FindOptionsWhere, In, Like, Not, Repository } from 'typeorm';
 import { ChannelExistException, ChannelNotFoundException, NotInChannelException, UnauthorizedActionException } from 'src/utils/exceptions';
 import * as argon from 'argon2';
 import { CreateChannelDto } from './dto/create-channel.dto';
@@ -11,6 +11,7 @@ import { BanUserDto } from './dto/banUser.dto';
 import { UserService } from 'src/user/user.service';
 import { NotificationService } from 'src/notification/notification.service';
 import { ResponseDto } from '../gateway/dto/response.dto';
+import { SearchToInviteInChanDto } from './dto/search-user-to-invite.dto';
 
 @Injectable()
 export class ChannelService {
@@ -36,6 +37,8 @@ export class ChannelService {
 		userChannel.forEach((element) => {
 			userChannelId.push(element.id);
 		});
+
+
 		return this.channelRepo.find({
 			relations: {
 				channelUsers: {
@@ -47,12 +50,29 @@ export class ChannelService {
 				id: Not(In(userChannelId))
 			},
 		});
+
+
+		// return this.channelUserRepo
+		// 	.createQueryBuilder("channelUser")
+		// 	.innerJoin(qb =>
+		// 		 qb
+		// 		.select("channel")
+		// 		.from(Channel, "channel")
+		// 		.leftJoin("channel.channelUsers", "chUser")
+		// 		.where("chUser.channel = channel.id")
+		// 		.where("channelUser NOT IN channel.channelUsers")
+		// 		, "channelsNotJoined"
+		// 	)
+		// 	.where("channelUser.user = :id", { id: user.id })
+		// 	.getMany()
+
 		return this.channelRepo
 			.createQueryBuilder("channel")
-			.leftJoinAndSelect("channel.channelUsers", "channelUser")
-			.leftJoinAndSelect("channelUser.user", "users")
-			.where("channel.option IN (:...channelOption)", { channelOption: [channelOption.PROTECTED, channelOption.PUBLIC] })
-			.andWhere("channelUser.user.id != :id", { id: user.id })
+			.innerJoin("channel.channelUsers", "channelUser", )
+			.leftJoinAndMapMany("channel.channelUsers", ChannelUser, "channelUser", "channelUser.channel = channel.id")			
+			.where(":id NOT IN (channel.channelUsers)", { id: user.id })
+			//.where("channel.option IN (:...channelOption)", { channelOption: [channelOption.PROTECTED, channelOption.PUBLIC] })
+			//.andWhere(":id NOT IN (channelUsers)", { id: user.id })
 			.getMany();
 	}
 
@@ -62,30 +82,52 @@ export class ChannelService {
 		});
 	}
 
-	async findOne(
-		whereParams: FindChannelParams,
-		selectAll?: boolean,
-	) {
-		const selections: (keyof Channel)[] = [
-			'name',
-			'id',
-			'option',
-		];
-		const selectionsWithHash: (keyof Channel)[] = [...selections, 'hash'];
-		const param = {
-			where: whereParams,
-			select: selectAll ? selectionsWithHash : selections,
-			relations: {
-				channelUsers: { user: true },
-				// messages: { sender: true },
-				// bannedUsers: true,
-			},
-		};
-		return this.channelRepo.findOne(param);
+	findOne(options: FindOneOptions<Channel>, selectAll?: Boolean): Promise<Channel | null> {
+		if (selectAll) {
+			options.select = [
+				'name',
+				'id',
+				'option',
+				'hash',
+			];
+		}
+		return this.channelRepo.findOne(options);
 	}
 
+	findOneBy(where: FindOptionsWhere<Channel> | FindOptionsWhere<Channel>[]): Promise<Channel | null> {
+		return this.channelRepo.findOneBy(where);
+	}
+
+	find(options?: FindManyOptions<Channel>): Promise<Channel[]> {
+		return this.channelRepo.find(options);
+	}
+
+	// async findOne(
+	// 	whereParams: FindChannelParams,
+	// 	selectAll?: boolean,
+	// ) {
+	// 	const selections: (keyof Channel)[] = [
+	// 		'name',
+	// 		'id',
+	// 		'option',
+	// 	];
+	// 	const selectionsWithHash: (keyof Channel)[] = [...selections, 'hash'];
+	// 	const param = {
+	// 		where: whereParams,
+	// 		select: selectAll ? selectionsWithHash : selections,
+	// 		relations: {
+	// 			channelUsers: { user: true },
+	// 			// messages: { sender: true },
+	// 			// bannedUsers: true,
+	// 		},
+	// 	};
+	// 	return this.channelRepo.findOne(param);
+	// }
+
 	async create(user: User, dto: CreateChannelDto) {
-		const channelExist = await this.findOne({ name: dto.name });
+		const channelExist = await this.findOne({
+			where: { name: dto.name }
+		});
 		if (channelExist)
 			throw new ChannelExistException();
 
@@ -110,7 +152,12 @@ export class ChannelService {
 	}
 
 	async join(user: User, id: number, pwdDto?: ChannelPasswordDto, isInvited: Boolean = false) {
-		const channel = await this.findOne({ id }, true)
+		const channel = await this.findOne({
+			relations: {
+				channelUsers: { user: true }
+			},
+			where: { id }
+		}, true)
 		if (!channel)
 			throw new ChannelNotFoundException();
 
@@ -150,7 +197,12 @@ export class ChannelService {
 
 	async leave(user: User, id: number) {
 		console.log(user, id)
-		const channel = await this.findOne({ id })
+		const channel = await this.findOne({
+			relations: {
+				channelUsers: { user: true }
+			},
+			where: { id }
+		});
 		if (!channel)
 			throw new ChannelNotFoundException();
 		
@@ -160,7 +212,7 @@ export class ChannelService {
 
 		console.log('before leave', channel.channelUsers);
 		channel.channelUsers = channel.channelUsers.filter((chanUser) => chanUser.user.id !== user.id);
-			console.log('after leave', channel.channelUsers);
+		console.log('after leave', channel.channelUsers);
 		await this.channelUserRepo.delete({id: inChannel.id});
 		return this.channelRepo.save(channel);
 	}
@@ -188,7 +240,7 @@ export class ChannelService {
 		const userInChannel = await this.channelUserRepo.findOne({
 			relations: {
 				user: true,
-				channel: true,
+				// channel: true,
 			},
 			where: {
 				channel: {
@@ -207,7 +259,6 @@ export class ChannelService {
 	}
 
 	async banUser(user: User, dto: BanUserDto) {
-		console.log(dto)
 		let channel = await this.channelRepo.findOne({
 			relations: {
 				channelUsers: { user: true },
@@ -218,11 +269,13 @@ export class ChannelService {
 		if (!channel)
 			throw new ChannelNotFoundException();
 
-		const alreadyBanned = await this.isBanned(dto.userId, dto.chanId);
+		// const alreadyBanned = await this.isBanned(dto.userId, dto.chanId);
+		const alreadyBanned = channel.bannedUsers.find(userBanned => userBanned.id === dto.userId);
 		if (alreadyBanned)
 			throw new BadRequestException('User already banned');
 
 		const userToBan = await this.getChannelUser(channel.id, dto.userId);
+		console.log("channelUser", userToBan.user)
 		if (!userToBan)
 			throw new NotInChannelException();
 		else if (userToBan.role === 'owner' || user.id === dto.userId)
@@ -234,7 +287,7 @@ export class ChannelService {
 			time: dto.time,
 		});
 		channel.bannedUsers = [...channel.bannedUsers, bannedUser];
-		channel.channelUsers = channel.channelUsers.filter((users) => users.id !== userToBan.id)
+		channel.channelUsers = channel.channelUsers.filter((users) => users.id !== userToBan.id);
 
 		return this.channelRepo.save(channel)
 	}
@@ -279,12 +332,12 @@ export class ChannelService {
 	}
 
 	//TODO what if banned?
-	async getUsersToInvite(channelId: number) {
+	async getUsersToInvite(dto: SearchToInviteInChanDto) {
 		const channel = await this.channelRepo.findOne({
 			relations: {
 				channelUsers: { user: true },
 			},
-			where: { id: channelId },
+			where: { id: dto.chanId },
 		});
 		if (!channel)
 			throw new ChannelNotFoundException();
@@ -296,6 +349,7 @@ export class ChannelService {
 		return this.userService.find({
 			where: {
 				id: Not(In(usersId)),
+				username: Like(`%${dto.str}%`),
 			}
 		});
 	}

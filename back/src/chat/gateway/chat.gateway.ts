@@ -3,13 +3,13 @@ import { WebSocketGateway, MessageBody, WebSocketServer, ConnectedSocket, OnGate
 import { Server, Socket } from 'socket.io';
 import { AuthService } from 'src/auth/auth.service';
 import { WsJwtGuard } from 'src/auth/guard/ws-jwt.guard';
-import { ChannelMessage, User } from 'src/typeorm';
+import { ChannelMessage, ChannelUser, User } from 'src/typeorm';
 import { ChannelService } from '../channel/channel.service';
 import { ChatSessionManager } from './chat.session';
 import { MessageDto } from '../channel/dto/message.dto';
 import { UserService } from 'src/user/user.service';
 import { JwtPayload } from 'src/utils/types/types';
-import { GetUser } from 'src/utils/decorators';
+import { GetChannelUser, GetUser } from 'src/utils/decorators';
 import { ChannelMessageService } from '../channel/message/ChannelMessage.service';
 import { ChannelMessageDto } from '../channel/message/dto/channelMessage.dto';
 import { RoomDto } from './dto/room.dto';
@@ -21,6 +21,9 @@ import { NotificationService } from 'src/notification/notification.service';
 import { ResponseDto } from './dto/response.dto';
 import { ChannelPasswordDto } from '../channel/dto/channel-pwd.dto';
 import { ChannelInviteDto } from './dto/channel-invite.dto';
+import { BanUserDto } from '../channel/dto/banUser.dto';
+import { ChannelPermissionGuard, InChannelGuard } from '../channel/guards';
+import { WsInChannelGuard } from '../channel/guards/ws-in-channel.guard';
 
 @Catch()
 class GatewayExceptionFilter extends BaseWsExceptionFilter {
@@ -118,16 +121,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     console.log(user.username + ' left room')
   }
 
-  @UseGuards(WsJwtGuard)
+  @UseGuards(WsJwtGuard, WsInChannelGuard)
   @SubscribeMessage('ChannelMessage')
   async sendChannelMessage(
-    @ConnectedSocket() socket: Socket,
-    @GetUser() user: User,
+    @GetChannelUser() chanUser: ChannelUser,
     @MessageBody() data: ChannelMessageDto,
     ) {
-    //   const sockets = (await this.server.in(`channel-${ data.chanId }`).fetchSockets()).map(socket => socket.id)
-    //   console.log('sockets in room: ', sockets)
-      const message = await this.channelMsgService.create(user, data);
+      const message = await this.channelMsgService.create(chanUser, data);
       this.server.to(`channel-${ data.chanId }`).emit('NewChannelMessage', message);
   }
 
@@ -202,9 +202,22 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ) {
     const updatedChan = await this.channelService.respondInvite(user, dto);
     if (updatedChan) {
-      this.server.to(`channel-${updatedChan.id}`).emit('ChannelUpdate', updatedChan);
+      this.server.to(`channel-${updatedChan.id}`).emit('ChannelUsersUpdate', updatedChan);
       socket.to(`user-${user.id}`).emit('OnJoin', updatedChan);
     }
+  }
+
+  @UseGuards(WsJwtGuard, WsInChannelGuard/*, ChannelPermissionGuard*/)
+  @SubscribeMessage('Ban')
+  async banUser(
+    @GetUser() user: User,
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() dto: BanUserDto,
+  ) {
+      console.log(dto)
+      const updatedChan = await this.channelService.banUser(user, dto);
+      this.server.to(`channel-${updatedChan.id}`).emit('ChannelUsersUpdate', updatedChan);
+      socket.to(`user-${dto.userId}`).emit('OnLeave', updatedChan);
   }
 
 }

@@ -28,3 +28,5 @@
 	- error when trying to connect with a login 42 with a password
 	- Affaire de lowercase la
 	- recuperer conv prive avec msg avec l id de la conv
+	- use update instead of save ?
+	- debounce on search input
