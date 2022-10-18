@@ -4,10 +4,11 @@ import { User } from "src/typeorm";
 import { GetUser } from "src/utils/decorators";
 import { ChannelPasswordDto } from "./dto/channel-pwd.dto";
 import { ChannelPermissionGuard } from "./guards/channel-permission.guard";
-import { InChannelGuard } from "./guards/inChannel.guard";
+import { InChannelGuard } from "./guards/in-channel.guard";
 import { ChannelService } from "./channel.service";
 import { BanUserDto } from "./dto/banUser.dto";
 import { CreateChannelDto } from "./dto/create-channel.dto";
+import { SearchToInviteInChanDto } from "./dto/search-user-to-invite.dto";
 
 @Controller('channel')
 export class ChannelController {
@@ -31,12 +32,12 @@ export class ChannelController {
 		return chan
 	}
 
-	@Get(':id/invite')
+	@Post('users_to_invite')
 	@UseGuards(JwtGuard, InChannelGuard)
 	async getUsersToInvite(
-		@Param('id', ParseIntPipe) id: number,
+		@Body() dto: SearchToInviteInChanDto,
 	) {
-		return await this.channelService.getUsersToInvite(id);
+		return await this.channelService.getUsersToInvite(dto);
 	}
 
 	@Post()

@@ -3,6 +3,7 @@ import { JwtGuard } from "src/auth/guard/jwt.guard";
 import { ChatGateway } from "src/chat/gateway/chat.gateway";
 import { User } from "src/typeorm";
 import { GetUser } from "src/utils/decorators";
+import { InChannelGuard } from "../guards";
 import { ChannelMessageService } from "./ChannelMessage.service";
 import { ChannelMessageDto } from "./dto/channelMessage.dto";
 
@@ -12,21 +13,20 @@ export class ChannelMessageController {
 		private messageService: ChannelMessageService,
 	) {}
 
-	@Post()
-	@UseGuards(JwtGuard)
-	async createMessage(
-	@Param('id') chanId: number,
-	@GetUser() user: User,
-	@Body() msg: ChannelMessageDto) {
-		return await this.messageService.create(user, msg);
-	}
+	// @Post()
+	// @UseGuards(JwtGuard)
+	// async createMessage(
+	// @Param('id') chanId: number,
+	// @GetUser() user: User,
+	// @Body() msg: ChannelMessageDto) {
+	// 	return await this.messageService.create(user, msg);
+	// }
 
 	@Get()
-	@UseGuards(JwtGuard)
+	@UseGuards(JwtGuard, InChannelGuard)
 	async getMessages(
-	@Param('id') chanId: number,
-	@GetUser() user: User ) {
-		const msg = await this.messageService.getMessages(chanId, user);
+	@Param('id') chanId: number) {
+		const msg = await this.messageService.getMessages(chanId);
 		// this.chatGateway.sendChannelMessages(data.socketId, msg);
 		return msg;
 	}

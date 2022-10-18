@@ -1,6 +1,6 @@
 import { ClassSerializerInterceptor, Injectable, UseInterceptors } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Channel, ChannelMessage, User } from "src/typeorm";
+import { Channel, ChannelMessage, ChannelUser, User } from "src/typeorm";
 import { ChannelNotFoundException, NotInChannelException, IsMutedException } from "src/utils/exceptions";
 import { Repository } from "typeorm";
 import { ChannelService } from "../channel.service";
@@ -15,27 +15,23 @@ export class ChannelMessageService {
 		private messagesRepo: Repository<ChannelMessage>,
 	) {}
 
-	async create(user: User, messageDto: ChannelMessageDto) {
-		const channel = await this.channelService.findOne({ id: messageDto.chanId });
+	async create(chanUser: ChannelUser, messageDto: ChannelMessageDto) {
+		const channel = await this.channelService.findOneBy({ id: messageDto.chanId });
 		if (!channel)
 			throw new ChannelNotFoundException();
-		const channelUser = await this.channelService.getChannelUser(channel.id, user.id);
-		if (!channelUser) { throw new NotInChannelException() } 
-		if (channelUser.is_muted) { throw new IsMutedException() }
+		if (chanUser.is_muted) { throw new IsMutedException() }
 		const message = this.messagesRepo.create({
 			content: messageDto.content,
 			channel,
-			sender: user,
+			sender: chanUser.user,
 		});
 		return this.messagesRepo.save(message);
 	}
 
-	async getMessages(chanId: number, user: User) {
-		const channel = await this.channelService.findOne({ id: chanId });
+	async getMessages(chanId: number) {
+		const channel = await this.channelService.findOneBy({ id: chanId });
 		if (!channel)
 			throw new ChannelNotFoundException();
-		const channelUser = await this.channelService.getChannelUser(channel.id, user.id);
-		if (!channelUser) { throw new NotInChannelException() }
 
 		return await this.messagesRepo.find({
 			relations: ['sender'],

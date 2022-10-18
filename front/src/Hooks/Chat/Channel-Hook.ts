@@ -38,7 +38,7 @@ export function useChannelHook() {
                 id: channelId,
             });
 
-            socket!.on('ChannelUpdate', (data: Channel) => {
+            socket!.on('ChannelUsersUpdate', (data: Channel) => {
                 setChatDatas((prev: any) => {
                     return {...prev, channelUsers: [...data.channelUsers]}
                 });
@@ -69,7 +69,7 @@ export function useChannelHook() {
             });
             socket!.off("exception");
             socket!.off("roomData");
-            socket!.off("ChannelUpdate");
+            socket!.off("ChannelUsersUpdate");
         }
     }, [channelId])
 

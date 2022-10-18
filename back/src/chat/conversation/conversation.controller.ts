@@ -8,6 +8,7 @@ import { ConversationService } from "./conversation.service";
 export class ConversationController {
 	constructor(private convService: ConversationService) {}
 
+	// TODO change
 	@Get(':id')
 	@UseGuards(JwtGuard)
 	async getConversation(
