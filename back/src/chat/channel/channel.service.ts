@@ -166,9 +166,11 @@ export class ChannelService {
 		
 		const isBanned = await this.isBanned(user.id, id);
 		if (isBanned) {
-			if (isBanned.until)
-				throw new UnauthorizedException(`You are banned from this channel for ${(isBanned.until.getTime() - new Date().getTime()) / 1000} seconds`);
-			throw new UnauthorizedException('User is banned from this channel');
+			if (isBanned.until) {
+				const until = ((isBanned.until.getTime() - Date.now()) / 1000).toFixed(0)
+				throw new UnauthorizedException(`You are banned from this channel for ${until} seconds`);
+			}
+			throw new UnauthorizedException('You are banned from this channel');
 		}
 		if (!isInvited) {
 			if (channel.option === channelOption.PRIVATE)
