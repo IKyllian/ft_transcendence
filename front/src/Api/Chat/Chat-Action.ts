@@ -1,9 +1,11 @@
 import { AnyAction, Dispatch } from "@reduxjs/toolkit";
 import axios from "axios";
+import { Channel } from "diagnostics_channel";
 import { NavigateFunction } from "react-router-dom";
 import { Socket } from "socket.io-client";
 import { baseUrl } from "../../env";
 import { addChannel } from "../../Redux/ChatSlice";
+import { UserInterface } from "../../Types/User-Types";
 
 type BodyRequest = {
     name: string,
@@ -13,7 +15,7 @@ type BodyRequest = {
 
 export function fetchCreateChannel(
     body: BodyRequest,
-    usersInvited: string[] | undefined,
+    usersInvited: UserInterface[] | undefined,
     token: string,
     dispatch: Dispatch<AnyAction>,
     navigate: NavigateFunction,
@@ -32,7 +34,7 @@ export function fetchCreateChannel(
             usersInvited.forEach(element => {
                 socket?.emit("ChannelInvite", {
                     chanId: response.data.id,
-                    userId: parseInt(element),
+                    userId: element.id,
                 });
             });
         }
@@ -53,6 +55,24 @@ export function fetchLeaveChannel(channelId: number, token: string, navigate: Na
         navigate("/chat");
     })
     .catch((err) => {
+        console.log(err);
+    })
+}
+
+export function fetchUnbanUser(token: string, chanId: number, userId: number, setChannelDatas: Function) {
+    console.log("token",token, "chanId", chanId, "userId", userId);
+    axios.post(`${baseUrl}/channel/${chanId}/unban/${userId}`, {chanId: chanId, userId: userId}, {
+        headers: {
+            "Authorization": `Bearer ${token}`,
+        }
+    })
+    .then(response => {
+        console.log(response);
+        setChannelDatas((prev: Channel) => {
+            return {...prev, bannedUsers: [...response.data.bannedUsers]};
+        });
+    })
+    .catch(err => {
         console.log(err);
     })
 }

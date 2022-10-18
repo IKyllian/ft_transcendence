@@ -133,7 +133,25 @@
                             cursor: pointer;
                         }
                     }
-                    
+
+                    .unban-button-wrapper {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 2px;
+                        align-items: center;
+                        button {
+                            all: unset;
+                            cursor: pointer;
+                            background-color: $DarkPalette;
+                            padding: 6px;
+                            border-radius: 5px;
+                            font-size: 12px
+                        }
+                        p {
+                            font-size: 8px;
+                            margin: 0;
+                        }
+                    }
                 }
             }
         }

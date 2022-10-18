@@ -12,7 +12,7 @@ function CardInfo(props: {userState: ProfileState}) {
     const {socket} = useContext(SocketContext);
     const inviteTest = (id: number) => {
         socket?.emit("ChannelInvite", {
-            chanId: 11,
+            chanId: 4,
             userId: id,
         });
     }

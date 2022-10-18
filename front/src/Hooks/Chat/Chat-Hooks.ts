@@ -29,13 +29,13 @@ export function useLoadChatDatas() {
         setReponsiveSidebar(!responsiveSidebar);
     }, [channelId]);
 
-    const onCloseModal = () => {
+    const onCloseModal = useCallback(() => {
         setShowModal(0);
-    }
+    }, [setShowModal]);
 
-    const changeModalStatus = (index: number) => {
+    const changeModalStatus = useCallback((index: number) => {
         setShowModal(index === 0 ? 1 : 0);
-    }
+    }, [setShowModal]);
 
     // Les useEffect pour les call api etc..
     useEffect(() => {
@@ -61,7 +61,9 @@ export function useLoadChatDatas() {
 
     useEffect(() => {
         socket?.on("OnJoin", (data: Channel) => {
+            console.log("ON JOIN");
             dispatch(addChannel({isActive: 'true', channel: data}));
+            navigate(`/chat/channel/${data.id}`);
         });
 
         fetchUserChannels(authDatas.token, channelId, dispatch); //Recupere les channels d'un user
@@ -81,6 +83,7 @@ export function useLoadChatDatas() {
         }
 
         return () => {
+            console.log("OFF ON JOIN");
             socket?.off("OnJoin");
             socket?.off("OnLeave");
         }

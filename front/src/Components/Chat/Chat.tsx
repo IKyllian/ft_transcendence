@@ -22,6 +22,8 @@ function Chat() {
         locationPathname,
     } =  useLoadChatDatas();
 
+    console.log("Chat re Render");
+
     const modalStatus = useContext(ModalContext);
 
     return !channels || !privateConvs ? (

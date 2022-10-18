@@ -91,13 +91,17 @@
         border-radius: 5px;
         background-color: $DarkPalette;
         width: 330px;
-        height: 350px;
+        max-height: 350px;
+        min-height: 50px;
         z-index: 101;
         padding: 5px;
         display: flex;
         flex-direction: column;
         gap: 5px;
         overflow-y: scroll;
+        .no-notif {
+            margin: auto;
+        }
         .notif-dropdown-item {
             background-color: $LightDarkPalette;
             padding: 10px;
@@ -108,6 +112,9 @@
                 @include avatar-player(40px);
             }
             .notif-content {
+                width: 100%;
+                margin: 0 5px 0 10px;
+                overflow: scroll;
                 p {
                     margin: 0;
                     &:first-child {

@@ -1,11 +1,11 @@
-import { Conversation } from "../Types/Chat-Types";
+import { Conversation, ConversationInfoSidebar } from "../Types/Chat-Types";
 import { UserInterface } from "../Types/User-Types";
 
-export function getSecondUserIdOfPM(conversation: Conversation, userConnectedId: number): number {
+export function getSecondUserIdOfPM(conversation: Conversation | ConversationInfoSidebar, userConnectedId: number): number {
     return conversation?.user1.id !== userConnectedId ? conversation?.user1.id : conversation?.user2.id;
 }
 
-export function getSecondUserOfPM(conversation: Conversation, userConnectedId: number): UserInterface {
+export function getSecondUserOfPM(conversation: Conversation | ConversationInfoSidebar, userConnectedId: number): UserInterface {
     return conversation?.user1.id !== userConnectedId ? conversation?.user1 : conversation?.user2;
 }
 
