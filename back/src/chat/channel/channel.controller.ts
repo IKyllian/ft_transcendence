@@ -93,13 +93,13 @@ export class ChannelController {
 	// }
 
 	// TODO redo channel guard for websocket
-	@UseGuards(JwtGuard)
-	@Post('ban')
-	async banUser(
-	@GetUser() user: User,
-	@Body() dto: BanUserDto) {
-		return await this.channelService.banUser(user, dto);
-	}
+	// @UseGuards(JwtGuard)
+	// @Post('ban')
+	// async banUser(
+	// @GetUser() user: User,
+	// @Body() dto: BanUserDto) {
+	// 	return await this.channelService.banUser(user, dto);
+	// }
 
 	@UseGuards(JwtGuard, InChannelGuard, ChannelPermissionGuard)
 	@Post('unban')

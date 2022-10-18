@@ -8,14 +8,21 @@ import { ConversationService } from "./conversation.service";
 export class ConversationController {
 	constructor(private convService: ConversationService) {}
 
-	// TODO change
 	@Get(':id')
 	@UseGuards(JwtGuard)
 	async getConversation(
+		@Param('id', ParseIntPipe) id: number,
+	) {
+		return await this.convService.getConversation(id);
+	}
+
+	@Get('user/:id')
+	@UseGuards(JwtGuard)
+	async getConversationByUserId(
 		@GetUser() user: User,
 		@Param('id', ParseIntPipe) id: number,
 	) {
-		return await this.convService.getConversation(user, id);
+		return await this.convService.getConversationByUserId(user, id);
 	}
 
 	@Get()
