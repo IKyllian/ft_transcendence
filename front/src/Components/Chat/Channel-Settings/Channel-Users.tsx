@@ -6,7 +6,7 @@ import DropdownContainer from "../../Utils/Dropdown-Container";
 import { Link } from "react-router-dom";
 import BlockButton from "../../Utils/Block-Button";
 
-function ChannelUserItem(props: {userDatas: ChannelUser, loggedUserIsOwner: boolean}) {
+export function ChannelUserItem(props: {userDatas: ChannelUser, loggedUserIsOwner: boolean}) {
     const { userDatas, loggedUserIsOwner } = props;
     const [showDropdown, setShowDropdown] = useState<boolean>(false);
 

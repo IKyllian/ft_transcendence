@@ -45,11 +45,12 @@ export function useChannelHook() {
                 console.log(data);
             });
 
-            socket!.on('exception', (data: any) => {
-                console.log(data);
-            });
+            // socket!.on('exception', (data: any) => {
+            //     console.log(data);
+            // });
 
             socket!.on('roomData', (data: Channel) => {
+                console.log(data);
                 let channel: Channel = data;
                 channel.messages.forEach(elem => elem.send_at = new Date(elem.send_at));
                 setChatDatas(channel);

@@ -27,8 +27,8 @@ function ChatChannel() {
                 <ChatHeader chatItem={chatDatas} showUsersSidebar={showUsersSidebar} changeSidebarStatus={changeSidebarStatus} />
                 <ul>
                     {
-                        chatDatas!.messages.map((elem, index) =>
-                            <MessageItem key={index} isFromChan={true} message={elem} loggedUserIsOwner={loggedUserIsOwner} />
+                        chatDatas.messages.map((elem, index) =>
+                            <MessageItem key={index} isFromChan={true} message={elem} loggedUserIsOwner={loggedUserIsOwner} chanId={chatDatas.id} />
                         )
                     }
                     <div ref={messagesEndRef} /> 

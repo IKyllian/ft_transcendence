@@ -17,6 +17,13 @@ export interface ChannelUser {
     is_muted: boolean, 
 }
 
+export interface BannedUser {
+    id: number,
+    user: UserInterface,
+    until?: number,
+    channel: Channel,
+}
+
 export interface ChatMessage {
     id: number,
     sender: UserInterface,
@@ -30,6 +37,7 @@ export interface Channel {
     option: string,
     channelUsers: ChannelUser[],
     messages: ChatMessage[],
+    bannedUsers: BannedUser[],
 }
 
 export interface ChannelInfoSidebar {

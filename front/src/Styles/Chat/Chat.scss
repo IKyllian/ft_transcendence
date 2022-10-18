@@ -161,9 +161,12 @@
                 }
                 .player-container {
                     @include flex-row-alignCenter;
-                    .profile-avatar {
-                        @include avatar-player(10em);
+                    p {
+                        cursor: pointer;
                     }
+                    // .profile-avatar {
+                    //     @include avatar-player(10em);
+                    // }
         
                     .player-status {
                         @include player-status;
