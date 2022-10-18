@@ -40,7 +40,32 @@ export class ConversationService {
 		});
 	}
 
-	async getConversation(user: User, id: number) {
+	async getConversation(id: number) {
+		const conv = await this.convRepo.findOne({
+			relations: {
+				user1: true,
+				user2: true,
+				messages: { sender: true },
+			},
+			where: { id }
+		});
+		if (!conv)
+			throw new NotFoundException('Conversation not found');
+		return conv;
+	}
+
+	async getConversationByUserId(user: User, userId: number) {
+		const user2 = await this.userService.findOneBy({ id: userId });
+		if (!user2)
+			throw new NotFoundException('User not found');
+		const convExist = await this.conversationExist(user, user2);
+		if (convExist)
+			return convExist;
+		else
+			return await this.createConversation(user, user2);
+	}
+
+	async getOrCreateConversation(user: User, id: number) {
 		const user2 = await this.userService.findOneBy({ id });
 		if (!user2)
 			throw new NotFoundException('User not found');

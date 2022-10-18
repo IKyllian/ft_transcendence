@@ -141,7 +141,6 @@ export class ChannelService {
 			channelUsers: [channelUser],
 			option: dto.option,
 			hash,
-			nb: 1,
 		};
 		const channel = this.channelRepo.create(params);
 		return this.channelRepo.save(channel);

@@ -14,7 +14,7 @@ export class PrivateMessageService {
 	) {}
 
 	async create(user: User, dto: PrivateMessageDto) {
-		const conv = await this.convService.getConversation(user, dto.adresseeId);
+		const conv = await this.convService.getOrCreateConversation(user, dto.adresseeId);
 		
 		const msg = this.privateMsgRepo.create({
 			sender: user,
