@@ -62,7 +62,7 @@ export class ConversationService {
 		if (convExist)
 			return convExist;
 		else
-			return await this.createConversation(user, user2);
+			return user2;
 	}
 
 	async getOrCreateConversation(user: User, id: number) {
