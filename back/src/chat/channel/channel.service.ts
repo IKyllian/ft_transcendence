@@ -1,4 +1,4 @@
-import { BadRequestException, forwardRef, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, forwardRef, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Channel, User, ChannelUser, BannedUser } from 'src/typeorm';
 import { FindManyOptions, FindOneOptions, FindOptionsWhere, In, Like, Not, Repository } from 'typeorm';
@@ -7,11 +7,12 @@ import * as argon from 'argon2';
 import { CreateChannelDto } from './dto/create-channel.dto';
 import { ChannelPasswordDto } from './dto/channel-pwd.dto';
 import { channelOption, channelRole, FindChannelParams, ResponseType } from 'src/utils/types/types';
-import { BanUserDto } from './dto/banUser.dto';
+import { BanUserDto } from './dto/ban-user.dto';
 import { UserService } from 'src/user/user.service';
 import { NotificationService } from 'src/notification/notification.service';
 import { ResponseDto } from '../gateway/dto/response.dto';
 import { SearchToInviteInChanDto } from './dto/search-user-to-invite.dto';
+import { MuteUserDto } from './dto/mute-user.dto';
 
 @Injectable()
 export class ChannelService {
@@ -32,48 +33,37 @@ export class ChannelService {
 	 * @returns All the channel that the user did not joined and that is visible
 	 */
 	async searchChannel(user: User) {
-		const userChannel = await this.getMyChannels(user.id);
-		let userChannelId: number[] = [];
-		userChannel.forEach((element) => {
-			userChannelId.push(element.id);
-		});
+		// const userChannel = await this.getMyChannels(user.id);
+		// let userChannelId: number[] = [];
+		// userChannel.forEach((element) => {
+		// 	userChannelId.push(element.id);
+		// });
 
 
-		return this.channelRepo.find({
-			relations: {
-				channelUsers: {
-					user: true,
-				},
-			},
-			where: {
-				option: In([channelOption.PUBLIC, channelOption.PROTECTED]),
-				id: Not(In(userChannelId))
-			},
-		});
+		// return this.channelRepo.find({
+		// 	relations: {
+		// 		channelUsers: {
+		// 			user: true,
+		// 		},
+		// 	},
+		// 	where: {
+		// 		option: In([channelOption.PUBLIC, channelOption.PROTECTED]),
+		// 		id: Not(In(userChannelId))
+		// 	},
+		// });
+
+		const channelsUserHasJoined = this.channelUserRepo
+  		.createQueryBuilder("channelUser")
+  		.select("channelUser.channel.id")
+  		.where("channelUser.user.id = :id", { id: user.id })
 
 
-		// return this.channelUserRepo
-		// 	.createQueryBuilder("channelUser")
-		// 	.innerJoin(qb =>
-		// 		 qb
-		// 		.select("channel")
-		// 		.from(Channel, "channel")
-		// 		.leftJoin("channel.channelUsers", "chUser")
-		// 		.where("chUser.channel = channel.id")
-		// 		.where("channelUser NOT IN channel.channelUsers")
-		// 		, "channelsNotJoined"
-		// 	)
-		// 	.where("channelUser.user = :id", { id: user.id })
-		// 	.getMany()
-
-		return this.channelRepo
-			.createQueryBuilder("channel")
-			.innerJoin("channel.channelUsers", "channelUser", )
-			.leftJoinAndMapMany("channel.channelUsers", ChannelUser, "channelUser", "channelUser.channel = channel.id")			
-			.where(":id NOT IN (channel.channelUsers)", { id: user.id })
-			//.where("channel.option IN (:...channelOption)", { channelOption: [channelOption.PROTECTED, channelOption.PUBLIC] })
-			//.andWhere(":id NOT IN (channelUsers)", { id: user.id })
-			.getMany();
+  		return this.channelRepo
+  		.createQueryBuilder("channel")
+		.innerJoinAndSelect("channel.channelUsers", "channelUsers")
+  		.where("channel.id NOT IN ("+ channelsUserHasJoined.getQuery() +")")
+  		.setParameters(channelsUserHasJoined.getParameters())
+  		.getMany()
 	}
 
 	getMyChannels(id: number) {
@@ -101,28 +91,6 @@ export class ChannelService {
 	find(options?: FindManyOptions<Channel>): Promise<Channel[]> {
 		return this.channelRepo.find(options);
 	}
-
-	// async findOne(
-	// 	whereParams: FindChannelParams,
-	// 	selectAll?: boolean,
-	// ) {
-	// 	const selections: (keyof Channel)[] = [
-	// 		'name',
-	// 		'id',
-	// 		'option',
-	// 	];
-	// 	const selectionsWithHash: (keyof Channel)[] = [...selections, 'hash'];
-	// 	const param = {
-	// 		where: whereParams,
-	// 		select: selectAll ? selectionsWithHash : selections,
-	// 		relations: {
-	// 			channelUsers: { user: true },
-	// 			// messages: { sender: true },
-	// 			// bannedUsers: true,
-	// 		},
-	// 	};
-	// 	return this.channelRepo.findOne(param);
-	// }
 
 	async create(user: User, dto: CreateChannelDto) {
 		const channelExist = await this.findOne({
@@ -274,7 +242,6 @@ export class ChannelService {
 		if (!channel)
 			throw new ChannelNotFoundException();
 
-		// const alreadyBanned = await this.isBanned(dto.userId, dto.chanId);
 		const alreadyBanned = channel.bannedUsers.find(userBanned => userBanned.id === dto.userId);
 		if (alreadyBanned)
 			throw new BadRequestException('User already banned');
@@ -283,7 +250,7 @@ export class ChannelService {
 		if (!userToBan)
 			throw new NotInChannelException();
 		else if (userToBan.role === 'owner' || user.id === dto.userId)
-			throw new UnauthorizedActionException();
+			throw new BadRequestException("You don't have permissions");
 
 		let until = null;
 		if (dto.time)
@@ -337,6 +304,45 @@ export class ChannelService {
 			}
 		}
 		return isBanned;
+	}
+
+	async muteUser(dto: MuteUserDto) {
+		const toMuteChanUser = await this.getChannelUser(dto.chanId, dto.userId);
+		if (!toMuteChanUser)
+			throw new NotInChannelException();
+		else if (toMuteChanUser.role in [channelRole.MODERATOR, channelRole.OWNER])
+			throw new BadRequestException("You don't have permissions");
+		
+		if (dto.time)
+			toMuteChanUser.mutedTime = new Date(new Date().getTime() + dto.time * 1000);
+		toMuteChanUser.is_muted = true;
+		this.channelUserRepo.save(toMuteChanUser);
+	}
+
+	async unMuteUser(dto: MuteUserDto) {
+		const toMuteChanUser = await this.getChannelUser(dto.chanId, dto.userId);
+		if (!toMuteChanUser)
+			throw new NotInChannelException();
+		
+		toMuteChanUser.is_muted = false;
+		toMuteChanUser.mutedTime = null;
+		this.channelUserRepo.save(toMuteChanUser);
+	}
+
+	isMuted(chanUser: ChannelUser) {
+		if (chanUser.is_muted) {
+			if (chanUser.mutedTime && chanUser.mutedTime.getTime() > new Date().getTime()) {
+				const until = ((chanUser.mutedTime.getTime() - Date.now()) / 1000).toFixed(0)
+				throw new ForbiddenException(`You are muted for ${until} seconds`);
+			}
+			else if (!chanUser.mutedTime)
+				throw new ForbiddenException('You are muted')
+			else {
+				chanUser.mutedTime = null;
+				chanUser.is_muted = false;
+				this.channelRepo.save(chanUser);
+			}
+		}
 	}
 
 	//TODO what if banned?

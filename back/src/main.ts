@@ -1,14 +1,19 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { AppModule } from './app.module';
 import { ChannelService } from './chat/channel/channel.service';
+import { ChannelUser, Channel, User } from './typeorm';
 import { UserService } from './user/user.service';
+import { channelOption } from './utils/types/types';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.setGlobalPrefix('api');
   app.enableCors();
   app.useGlobalPipes(new ValidationPipe());
+  
   await app.listen(5000);
 
   // const userService = await app.resolve(UserService);
@@ -38,5 +43,27 @@ async function bootstrap() {
   // channel = await channelService.addUser(channel, user)
   // const channels = await channelService.getChannels(user2.id);
   // console.log(channels);
+
+  // const channelUserRepo= await app.get<any, Repository<ChannelUser>>(getRepositoryToken(ChannelUser));
+  // const channelRepo = await app.get<any, Repository<Channel>>(getRepositoryToken(Channel));
+  // const user = { id: 18 }
+
+
+// Trouver tous les channels dont l'user ne fait pas parti
+
+  // const channelsUserHasJoined = await channelUserRepo
+  // .createQueryBuilder("channelUser")
+  // .select("channelUser.channel.id")
+  // .where("channelUser.user.id = :id", { id: user.id })
+
+  
+  // const channelList = await channelRepo
+  // .createQueryBuilder("channel")
+  // .where("channel.id NOT IN ("+ channelsUserHasJoined.getQuery() +")")
+  // .setParameters(channelsUserHasJoined.getParameters())
+  // .getMany()
+
+
+  // console.log(channelList)
 }
 bootstrap();

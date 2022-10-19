@@ -21,8 +21,8 @@ import { NotificationService } from 'src/notification/notification.service';
 import { ResponseDto } from './dto/response.dto';
 import { ChannelPasswordDto } from '../channel/dto/channel-pwd.dto';
 import { ChannelInviteDto } from './dto/channel-invite.dto';
-import { BanUserDto } from '../channel/dto/banUser.dto';
-import { ChannelPermissionGuard, InChannelGuard } from '../channel/guards';
+import { BanUserDto } from '../channel/dto/ban-user.dto';
+import { ChannelPermissionGuard } from '../channel/guards';
 import { WsInChannelGuard } from '../channel/guards/ws-in-channel.guard';
 
 @Catch()
@@ -160,36 +160,33 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('JoinChannel')
   async joinChannel(
     @GetUser() user: User,
-    @ConnectedSocket() socket: Socket,
     @MessageBody() channel: RoomDto,
     @MessageBody() pwdDto?: ChannelPasswordDto,
   ) {
     const updatedChan = await this.channelService.join(user, channel.id, pwdDto);
     this.server.to(`channel-${channel.id}`).emit('ChannelUpdate', updatedChan);
-    socket.to(`user-${user.id}`).emit('OnJoin', updatedChan);
+    this.server.to(`user-${user.id}`).emit('OnJoin', updatedChan);
   }
 
   @UseGuards(WsJwtGuard)
   @SubscribeMessage('LeaveChannel')
   async leaveChannel(
     @GetUser() user: User,
-    @ConnectedSocket() socket: Socket,
     @MessageBody() channel: RoomDto,
   ) {
     const updatedChan = await this.channelService.leave(user, channel.id);
     this.server.to(`channel-${channel.id}`).emit('ChannelUpdate', updatedChan);
-    socket.to(`user-${user.id}`).emit('OnLeave', updatedChan);
+    this.server.to(`user-${user.id}`).emit('OnLeave', updatedChan);
   }
 
   @UseGuards(WsJwtGuard)
   @SubscribeMessage('ChannelInvite')
   async channelInvite(
     @GetUser() user: User,
-    @ConnectedSocket() socket: Socket,
     @MessageBody() dto: ChannelInviteDto,
   ) {
     const notif = await this.notificationService.createChanInviteNotif(user, dto);
-    socket.to(`user-${dto.userId}`).emit('NewNotification', notif);
+    this.server.to(`user-${dto.userId}`).emit('NewNotification', notif);
   }
 
   //TODO change response dto
@@ -197,13 +194,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('ChannelInviteResponse')
   async respondToChannelInvite(
     @GetUser() user: User,
-    @ConnectedSocket() socket: Socket,
     @MessageBody() dto: ResponseDto,
   ) {
     const updatedChan = await this.channelService.respondInvite(user, dto);
     if (updatedChan) {
       this.server.to(`channel-${updatedChan.id}`).emit('ChannelUsersUpdate', updatedChan);
-      socket.to(`user-${user.id}`).emit('OnJoin', updatedChan);
+      this.server.to(`user-${user.id}`).emit('OnJoin', updatedChan);
     }
   }
 
@@ -211,12 +207,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('Ban')
   async banUser(
     @GetUser() user: User,
-    @ConnectedSocket() socket: Socket,
     @MessageBody() dto: BanUserDto,
   ) {
       const updatedChan = await this.channelService.banUser(user, dto);
       this.server.to(`channel-${updatedChan.id}`).emit('ChannelUsersUpdate', updatedChan);
-      socket.to(`user-${dto.userId}`).emit('OnLeave', updatedChan);
+      this.server.to(`user-${dto.userId}`).emit('OnLeave', updatedChan);
   }
 
 }

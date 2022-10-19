@@ -6,9 +6,10 @@ import { ChannelPasswordDto } from "./dto/channel-pwd.dto";
 import { ChannelPermissionGuard } from "./guards/channel-permission.guard";
 import { InChannelGuard } from "./guards/in-channel.guard";
 import { ChannelService } from "./channel.service";
-import { BanUserDto } from "./dto/banUser.dto";
+import { BanUserDto } from "./dto/ban-user.dto";
 import { CreateChannelDto } from "./dto/create-channel.dto";
 import { SearchToInviteInChanDto } from "./dto/search-user-to-invite.dto";
+import { MuteUserDto } from "./dto/mute-user.dto";
 
 @Controller('channel')
 export class ChannelController {
@@ -83,15 +84,6 @@ export class ChannelController {
 		return await this.channelService.delete(id);
 	}
 
-	// @UseGuards(JwtGuard, InChannelGuard, ChannelPermissionGuard)
-	// @Post(':id/ban/:userId')
-	// async banUser(
-	// @GetUser() user: User,
-	// @Param('id', ParseIntPipe) channelId: number,
-	// @Param('userId', ParseIntPipe) userId: number) {
-	// 	return await this.channelService.banUser(user, channelId, userId);
-	// }
-
 	// TODO redo channel guard for websocket
 	// @UseGuards(JwtGuard)
 	// @Post('ban')
@@ -102,11 +94,27 @@ export class ChannelController {
 	// }
 
 	@UseGuards(JwtGuard, InChannelGuard, ChannelPermissionGuard)
-	@Post(':id/unban/:userId')
+	@Post(':chanId/unban/:userId')
 	unbanUser(
-	@Param('id', ParseIntPipe) id: number,
+	@Param('chanId', ParseIntPipe) chanId: number,
 	@Param('userId', ParseIntPipe) userId: number,
 	) {
-		return this.channelService.unbanUser(id, userId);
+		return this.channelService.unbanUser(chanId, userId);
+	}
+
+	@UseGuards(JwtGuard, InChannelGuard, ChannelPermissionGuard)
+	@Post('mute')
+	muteUser(
+	@Body() dto: MuteUserDto,
+	) {
+		this.channelService.muteUser(dto);
+	}
+
+	@UseGuards(JwtGuard, InChannelGuard, ChannelPermissionGuard)
+	@Post('mute')
+	unMuteUser(
+	@Body() dto: MuteUserDto,
+	) {
+		this.channelService.unMuteUser(dto);
 	}
 }

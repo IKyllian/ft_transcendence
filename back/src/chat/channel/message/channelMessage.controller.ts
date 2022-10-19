@@ -22,10 +22,10 @@ export class ChannelMessageController {
 	// 	return await this.messageService.create(user, msg);
 	// }
 
-	@Get()
+	@Get('chanId')
 	@UseGuards(JwtGuard, InChannelGuard)
 	async getMessages(
-	@Param('id') chanId: number) {
+	@Param('chanId') chanId: number) {
 		const msg = await this.messageService.getMessages(chanId);
 		// this.chatGateway.sendChannelMessages(data.socketId, msg);
 		return msg;
