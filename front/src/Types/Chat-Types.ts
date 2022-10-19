@@ -7,6 +7,7 @@ export interface ChannelsInterfaceFront {
 
 export interface ConversationInterfaceFront {
     isActive: string,
+    temporary: boolean,
     conversation: ConversationInfoSidebar,
 }
 
@@ -29,6 +30,7 @@ export interface ChatMessage {
     sender: UserInterface,
     content: string,
     send_at: Date,
+    channel: Channel,
 }
 
 export interface Channel {
@@ -59,9 +61,10 @@ export interface ConversationInfoSidebar {
     user2: UserInterface,
 }
 
-interface PrivateMessage {
+export interface PrivateMessage {
     id: number,
     sender: UserInterface,
     content: string,
     send_at: Date,
+    conversation: Conversation;
 }

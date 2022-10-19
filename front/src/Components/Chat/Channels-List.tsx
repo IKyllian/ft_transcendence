@@ -9,9 +9,9 @@ import { SidebarContext } from "./Chat";
 import { SocketContext } from "../../App";
 import { fetchVisibleChannels } from "../../Api/Chat/Chat-Fetch";
 
-function ChannelItem(props: {channelData: Channel, token: string, joinError: string | undefined}) {
+function ChannelItem(props: {channelData: Channel, token: string}) {
     const { register, handleSubmit, formState: {errors} } = useForm<{password?: string}>();
-    const { channelData, token, joinError } = props;
+    const { channelData, token } = props;
     const navigate = useNavigate();
     const {socket} = useContext(SocketContext);
 
@@ -23,15 +23,7 @@ function ChannelItem(props: {channelData: Channel, token: string, joinError: str
         else
             body = {};
         socket?.emit("JoinChannel", {id: channelData.id, pwdDto: body});
-        // setTimeout(function() {
-        //     console.log("joinError", joinError);
-        //     // if (joinError === undefined) {
-        //     //     navigate(`/chat/channel/${channelData.id}`);
-        //     // }
-		// }, 1000);
     })
-
-    
 
     return (
         <div className="channels-card-wrapper">
@@ -57,24 +49,24 @@ function ChannelItem(props: {channelData: Channel, token: string, joinError: str
 
 function ChannelsList() {
     const [channelsList, setChannelsList] = useState<undefined | Channel[]>(undefined);
-    const [ joinError, setJoinError] = useState<string | undefined>(undefined);
+    // const [ joinError, setJoinError] = useState<string | undefined>(undefined);
 
     let authDatas = useAppSelector((state) => state.auth);
     const sidebarStatus = useContext(SidebarContext);
     const {socket} = useContext(SocketContext);
 
     useEffect(() => {
-        socket!.on('exception', (data: any) => {
-            console.log("exception", data);
-            console.log(data.message);
-            setJoinError(data.message);
-        });
+        // socket!.on('exception', (data: any) => {
+        //     console.log("exception", data);
+        //     console.log(data.message);
+        //     setJoinError(data.message);
+        // });
 
         fetchVisibleChannels(authDatas.token, setChannelsList);
 
-        return () => {
-            socket?.off('exception');
-        }
+        // return () => {
+        //     socket?.off('exception');
+        // }
     }, [])
 
     // useEffect(() => {
@@ -90,10 +82,6 @@ function ChannelsList() {
     ) : (
         <div className="channels-list-wrapper">
             {
-                joinError !== undefined &&
-                <p> joinError </p>
-            }
-            {
                 sidebarStatus.sidebar === false &&
                 <div className="sidebar-button" onClick={() => sidebarStatus.setSidebarStatus()}>
                     <IconChevronRight />
@@ -101,7 +89,7 @@ function ChannelsList() {
             }
             {
                 channelsList.map((elem) => 
-                    <ChannelItem  key={elem.id} channelData={elem} token={authDatas.token} joinError={joinError} />
+                    <ChannelItem  key={elem.id} channelData={elem} token={authDatas.token} />
                 )
             }
         </div>   

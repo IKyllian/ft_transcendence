@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { PrivateMessage, User } from "src/typeorm";
 import { Repository } from "typeorm";
@@ -14,8 +14,9 @@ export class PrivateMessageService {
 	) {}
 
 	async create(user: User, dto: PrivateMessageDto) {
-		const conv = await this.convService.getOrCreateConversation(user, dto.adresseeId);
-		
+		const conv = await this.convService.conversationExist(user, dto.adresseeId);
+		if (!conv)
+			throw new NotFoundException('Conversation not found');
 		const msg = this.privateMsgRepo.create({
 			sender: user,
 			content: dto.content,

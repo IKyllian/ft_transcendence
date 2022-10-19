@@ -5,13 +5,13 @@ import { Link } from "react-router-dom";
 import DropdownContainer from "../../Utils/Dropdown-Container";
 import { useAppSelector } from '../../../Redux/Hooks'
 import BlockButton from "../../Utils/Block-Button";
-import { ChatMessage } from "../../../Types/Chat-Types";
+import { ChatMessage, PrivateMessage } from "../../../Types/Chat-Types";
 import { userIdIsBlocked } from "../../../Utils/Utils-User";
 import BanButton from "../../Utils/Ban-Button";
 
 import { getMessageDateString } from "../../../Utils/Utils-Chat";
 
-function MessageItem(props: {isFromChan: boolean, message: ChatMessage, loggedUserIsOwner: boolean, chanId?: number}) {
+function MessageItem(props: {isFromChan: boolean, message: ChatMessage | PrivateMessage, loggedUserIsOwner: boolean, chanId?: number}) {
     const {isFromChan, message, loggedUserIsOwner, chanId} = props;
     const [showDropdown, setShowDropdown] = useState<boolean>(false);
 

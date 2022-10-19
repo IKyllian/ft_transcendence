@@ -24,6 +24,7 @@ import { ChannelInviteDto } from './dto/channel-invite.dto';
 import { BanUserDto } from '../channel/dto/ban-user.dto';
 import { ChannelPermissionGuard } from '../channel/guards';
 import { WsInChannelGuard } from '../channel/guards/ws-in-channel.guard';
+import { ConversationService } from '../conversation/conversation.service';
 
 @Catch()
 class GatewayExceptionFilter extends BaseWsExceptionFilter {
@@ -59,6 +60,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private userService: UserService,
     private friendshipService: FriendshipService,
     private notificationService: NotificationService,
+    private convService: ConversationService,
     ) {}
 
   async handleConnection(socket: Socket) {
@@ -139,9 +141,24 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     ) {
       const message = await this.privateMsgService.create(user, data);
       this.server
-        .to(`user-${user.id}`)
-        .to(`user-${data.adresseeId}`)
-        .emit('NewPrivateMessage', message);
+      .to(`user-${user.id}`)
+      .to(`user-${data.adresseeId}`)
+      .emit('NewPrivateMessage', message);
+  }
+
+  @UseGuards(WsJwtGuard)
+  @SubscribeMessage('CreateConversation')
+  async createConversation(
+    @GetUser() user: User,
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() data: PrivateMessageDto,
+    ) {
+      console.log(socket.id)
+      const conv = await this.convService.create(user, data.adresseeId, data.content);
+      this.server
+      .to(`user-${user.id}`)
+      .to(`user-${data.adresseeId}`)
+      .emit('NewConversation', { conv, socketId: socket.id });
   }
 
   @UseGuards(WsJwtGuard)
@@ -164,7 +181,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @MessageBody() pwdDto?: ChannelPasswordDto,
   ) {
     const updatedChan = await this.channelService.join(user, channel.id, pwdDto);
-    this.server.to(`channel-${channel.id}`).emit('ChannelUpdate', updatedChan);
+    this.server.to(`channel-${channel.id}`).emit('ChannelUsersUpdate', updatedChan);
     this.server.to(`user-${user.id}`).emit('OnJoin', updatedChan);
   }
 
@@ -175,7 +192,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @MessageBody() channel: RoomDto,
   ) {
     const updatedChan = await this.channelService.leave(user, channel.id);
-    this.server.to(`channel-${channel.id}`).emit('ChannelUpdate', updatedChan);
+    this.server.to(`channel-${channel.id}`).emit('ChannelUsersUpdate', updatedChan);
     this.server.to(`user-${user.id}`).emit('OnLeave', updatedChan);
   }
 

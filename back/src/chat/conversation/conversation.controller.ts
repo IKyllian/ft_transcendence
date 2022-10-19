@@ -11,9 +11,10 @@ export class ConversationController {
 	@Get(':id')
 	@UseGuards(JwtGuard)
 	async getConversation(
+		@GetUser() user: User,
 		@Param('id', ParseIntPipe) id: number,
 	) {
-		return await this.convService.getConversation(id);
+		return await this.convService.getConversation(user, id);
 	}
 
 	@Get('user/:id')

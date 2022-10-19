@@ -16,6 +16,8 @@ function ChatPrivateMessage() {
         loggedUser,
     } = usePrivateConvHook();
 
+    console.log("convDatas", convDatas);
+    console.log("loggedUser", loggedUser);
     return (convDatas === undefined) ? (
         <div style={{width: "100%"}}>
             <LoadingSpin classContainer="chat-page-container"/>
@@ -24,10 +26,10 @@ function ChatPrivateMessage() {
         <div className="message-container">
             <div className="message-container-main">
                 <div className="message-wrapper">
-                    <ChatHeader privateConvUser={getSecondUserOfPM(convDatas, loggedUser!.id)} />
+                    <ChatHeader privateConvUser={getSecondUserOfPM(convDatas.conv, loggedUser!.id)} />
                     <ul>
                         {
-                            convDatas.messages.map((elem, index) =>
+                            convDatas.conv.messages.map((elem, index) =>
                                 <MessageItem key={index} isFromChan={false} message={elem} loggedUserIsOwner={true} />
                             )
                         }

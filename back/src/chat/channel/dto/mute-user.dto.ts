@@ -9,7 +9,7 @@ export class MuteUserDto {
 
 	@IsNumber()
 	@IsPositive()
-	@IsOptional()
+	// @IsOptional()
 	@Max(1200) // 20 min
-	time?: number;
+	time: number;
 }

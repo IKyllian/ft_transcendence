@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { ChannelsInterfaceFront, ConversationInterfaceFront, ChannelInfoSidebar } from '../Types/Chat-Types';
+import { UserInterface } from '../Types/User-Types';
 
 interface ChannelState {
     channels?: ChannelsInterfaceFront[],
@@ -41,11 +42,19 @@ export const chatSlice = createSlice({
             else
                 state.channels = [payload];
         },
-        addPrivateConv: (state, {payload}: PayloadAction<ConversationInterfaceFront>) => {
+        addPrivateConv: (state, {payload}: PayloadAction<{conv: ConversationInterfaceFront, receiverId: number}>) => {
+            const tempConvExist: ConversationInterfaceFront | undefined = !state.privateConv ? undefined : state.privateConv.find(elem => (elem.conversation.user1.id === payload.receiverId || elem.conversation.user2.id === payload.receiverId));
+            // console.log("tempConvExist", tempConvExist);
+            // console.log("receiverId", payload.receiverId);
+            // console.log("Before state.privateConv", state.privateConv);
+            if (tempConvExist)  {
+                // console.log("CONDITION OUI");
+                state.privateConv = state.privateConv?.filter(elem => elem.conversation.id !== tempConvExist.conversation.id);
+            }
             if (state.privateConv)
-                state.privateConv = [...state.privateConv, payload];
+                state.privateConv = [...state.privateConv, payload.conv];
             else
-                state.privateConv = [payload];
+                state.privateConv = [payload.conv];
         },
         removeChannel: (state, {payload}: PayloadAction<number>) => {
             if (state.channels) {

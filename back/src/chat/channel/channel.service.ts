@@ -267,12 +267,12 @@ export class ChannelService {
 		return this.channelRepo.save(channel)
 	}
 
-	async unbanUser(id: number, userId: number) {
+	async unbanUser(dto: BanUserDto) {
 		let channel = await this.channelRepo.findOne({
 			relations: {
 				bannedUsers: { user: true },
 			},
-			where: { id }
+			where: { id: dto.chanId }
 		});
 		if (!channel)
 			throw new ChannelNotFoundException();
@@ -286,7 +286,7 @@ export class ChannelService {
 		// if (!isBanned)
 		// 	throw new BadRequestException('User is not banned from this channel');
 
-		channel.bannedUsers = channel.bannedUsers.filter((bannedUsers) => bannedUsers.user.id !== userId)
+		channel.bannedUsers = channel.bannedUsers.filter((bannedUsers) => bannedUsers.user.id !== dto.userId)
 		return this.channelRepo.save(channel)
 	}
 
@@ -335,8 +335,8 @@ export class ChannelService {
 				const until = ((chanUser.mutedTime.getTime() - Date.now()) / 1000).toFixed(0)
 				throw new ForbiddenException(`You are muted for ${until} seconds`);
 			}
-			else if (!chanUser.mutedTime)
-				throw new ForbiddenException('You are muted')
+			// else if (!chanUser.mutedTime)
+			// 	throw new ForbiddenException('You are muted')
 			else {
 				chanUser.mutedTime = null;
 				chanUser.is_muted = false;

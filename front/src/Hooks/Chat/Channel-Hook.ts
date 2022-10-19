@@ -33,6 +33,8 @@ export function useChannelHook() {
 
     useEffect(() => {
         setChatDatas(undefined);
+        setLoggedUserIsOwner(false);
+        setInputMessage('');
         const getDatas = () => {
             socket!.emit("JoinChannelRoom", {
                 id: channelId,
@@ -51,13 +53,15 @@ export function useChannelHook() {
 
             socket!.on('roomData', (data: Channel) => {
                 console.log(data);
-                let channel: Channel = data;
-                channel.messages.forEach(elem => elem.send_at = new Date(elem.send_at));
-                setChatDatas(channel);
-                if (!channels?.find(elem => elem.channel.id === channel.id))
-                    dispatch(addChannel({isActive: 'true', channel: {id: data.id, name: data.name, option: data.option}}));
-                if (data.channelUsers.find((elem) => elem.user.id === authDatas.currentUser?.id && (elem.role === "owner" || elem.role === "moderator")))
-                    setLoggedUserIsOwner(true);
+                if (data.id === channelId) {
+                    let channel: Channel = data;
+                    channel.messages.forEach(elem => elem.send_at = new Date(elem.send_at));
+                    setChatDatas(channel);
+                    if (!channels?.find(elem => elem.channel.id === channel.id))
+                        dispatch(addChannel({isActive: 'true', channel: {id: data.id, name: data.name, option: data.option}}));
+                    if (data.channelUsers.find((elem) => elem.user.id === authDatas.currentUser?.id && (elem.role === "owner" || elem.role === "moderator")))
+                        setLoggedUserIsOwner(true);
+                }
             });
         }
         if (channelId) {
@@ -68,7 +72,7 @@ export function useChannelHook() {
             socket!.emit("LeaveChannelRoom", {
                 id: channelId,
             });
-            socket!.off("exception");
+            // socket!.off("exception");
             socket!.off("roomData");
             socket!.off("ChannelUsersUpdate");
         }

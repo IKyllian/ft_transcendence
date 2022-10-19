@@ -19,9 +19,9 @@ function SidebarSettings(props: {setSidebarItem: Function, channelDatas: Channel
             const chanId: number = parseInt(params.channelId);
             socket?.emit("LeaveChannel", {id: chanId});
             dispatch(removeChannel(chanId));
-            setTimeout(function() {
-                navigate(`/chat`);
-            }, 50);
+            // setTimeout(function() {
+            //     navigate(`/chat`);
+            // }, 50);
         }
     }
 

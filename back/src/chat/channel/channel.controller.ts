@@ -94,12 +94,11 @@ export class ChannelController {
 	// }
 
 	@UseGuards(JwtGuard, InChannelGuard, ChannelPermissionGuard)
-	@Post(':chanId/unban/:userId')
+	@Post('unban')
 	unbanUser(
-	@Param('chanId', ParseIntPipe) chanId: number,
-	@Param('userId', ParseIntPipe) userId: number,
+	@Body() dto: BanUserDto,
 	) {
-		return this.channelService.unbanUser(chanId, userId);
+		return this.channelService.unbanUser(dto);
 	}
 
 	@UseGuards(JwtGuard, InChannelGuard, ChannelPermissionGuard)

@@ -1,5 +1,7 @@
-import { useEffect, createContext, useState } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { createContext } from "react";
+import { Routes, Route } from "react-router-dom";
+import { Socket } from "socket.io-client";
+import { useAppHook } from "./Hooks/App-Hook";
 
 import Header from "./Components/Header/Header";
 import Home from './Components/Home/Home';
@@ -18,13 +20,8 @@ import PrivateRoute from "./Route/Private-Route";
 import UsernameForm from "./Components/Sign/Username-Form";
 import ChannelsList from "./Components/Chat/Channels-List";
 import NotifGameInvite from "./Components/Notif-Game-Invite";
+import NotifError from "./Components/Notif-Error";
 
-import { io, Socket } from "socket.io-client";
-import { useAppDispatch, useAppSelector } from './Redux/Hooks'
-import { socketUrl } from "./env";
-import { fetchNotifications } from "./Api/User-Fetch";
-import { NotificationInterface } from "./Types/Notification-Types";
-import { addNotification } from "./Redux/NotificationSlice";
 
 interface RouteProps {
 	path: string,
@@ -83,108 +80,74 @@ const routes: RouteProps[] = [
 export const SocketContext = createContext<SocketContextType>({socket: undefined});
 
 function App() {
-	const [socket, setSocket] = useState<Socket | undefined>(undefined);
-	const [gameInvite, setGameInvite] = useState<boolean>(false);
-    const {token, isAuthenticated} = useAppSelector((state) => state.auth);
-	const dispatch = useAppDispatch();
+	const {
+		socket,
+		eventError,
+		closeEventError,
+		gameInvite,
+		gameNotificationLeave,
+	} = useAppHook();
 
-	const connectSocket = () => {
-		const newSocket: Socket = io(`${socketUrl}`, {extraHeaders: {
-			"Authorization": `Bearer ${token}`,
-		}});
-		setSocket(newSocket);
-	}
-
-	const gameNotificationLeave = () => {
-		setGameInvite(false);
-	}
-
-	useEffect(() => {
-		if (isAuthenticated && socket === undefined) {
-			connectSocket();
-			fetchNotifications(token, dispatch);
-			// setTimeout(function() {
-			// 	setGameInvite(true);
-			// 	setTimeout(function() {
-			// 		gameNotificationLeave();
-			// 	}, 15000);
-			// }, 2000);
-		}
-	}, [isAuthenticated])
-
-	useEffect(() => {
-		if (socket !== undefined) {
-			socket!.on("NewNotification", (data: NotificationInterface) => {
-				console.log("NewNotification", data);
-				dispatch(addNotification(data));
-			});
-		}
-
-		return () => {
-			socket?.off("NewNotification")
-		}
-	}, [socket])
   return (
 	<div className="app-container">
-    	<BrowserRouter>
-			<SocketContext.Provider value={{socket: socket}} >
-				<ModalProvider>
-					<AddFriendModal/>
-					{ gameInvite && <NotifGameInvite notifOnLeave={gameNotificationLeave} /> }
-					<Header />
-					<main className="page-container">
-						<Routes>
-							{
-								routes.map((elem, index) => 
-									<Route key={index} path={elem.path} element={elem.element} />
-								)
+		<SocketContext.Provider value={{socket: socket}} >
+			<ModalProvider>
+				{ eventError !== undefined && <NotifError error={eventError} closeError={closeEventError} />}
+				<AddFriendModal/>
+				{ gameInvite && <NotifGameInvite notifOnLeave={gameNotificationLeave} /> }
+				<Header />
+				<main className="page-container">
+					<Routes>
+						{
+							routes.map((elem, index) => 
+								<Route key={index} path={elem.path} element={elem.element} />
+							)
+						}
+						<Route
+							path='/chat'
+							element= {
+								<PrivateRoute>
+									<Chat />
+								</PrivateRoute>
 							}
+						>
 							<Route
-								path='/chat'
+								path="channel/:channelId"
 								element= {
 									<PrivateRoute>
-										<Chat />
+										<ChatChannel />
 									</PrivateRoute>
 								}
-							>
-								<Route
-									path="channel/:channelId"
-									element= {
-										<PrivateRoute>
-											<ChatChannel />
-										</PrivateRoute>
-									}
-								/>
-								<Route
-									path="private-message/:convId"
-									element= {
-										<PrivateRoute>
-											<ChatPrivateMessage />
-										</PrivateRoute>
-									}
-								/>
-								{/* <Route
-									path="channel/:channelId/settings"
-									element= {
-										<PrivateRoute>
-											<ChannelSettings />
-										</PrivateRoute>
-									}
-								/> */}
-								<Route
-									path="channels-list"
-									element= {
-										<PrivateRoute>
-											<ChannelsList />
-										</PrivateRoute>
-									}
-								/>
-							</Route>
-						</Routes>
-					</main>
-				</ModalProvider>
-			</SocketContext.Provider>
-    	</BrowserRouter>
+							/>
+							<Route
+								path="private-message/:convId"
+								element= {
+									<PrivateRoute>
+										<ChatPrivateMessage />
+									</PrivateRoute>
+								}
+							/>
+							{/* <Route
+								path="channel/:channelId/settings"
+								element= {
+									<PrivateRoute>
+										<ChannelSettings />
+									</PrivateRoute>
+								}
+							/> */}
+							<Route
+								path="channels-list"
+								element= {
+									<PrivateRoute>
+										<ChannelsList />
+									</PrivateRoute>
+								}
+							/>
+						</Route>
+					</Routes>
+				</main>
+			</ModalProvider>
+		</SocketContext.Provider>
     </div>
   );
 }

@@ -40,12 +40,13 @@ export function useLoadChatDatas() {
     // Les useEffect pour les call api etc..
     useEffect(() => {
         if (channelId !== undefined) {
-            socket?.on("OnLeave", (data: Channel) => {
-                if (channelId && channelId === data.id) {
-                    navigate(`/chat`);
-                }
-                dispatch(removeChannel(data.id));
-            });
+            // socket?.on("OnLeave", (data: Channel) => {
+            //     console.log("OnLeave");
+            //     if (channelId && channelId === data.id) {
+            //         navigate(`/chat`);
+            //     }
+            //     dispatch(removeChannel(data.id));
+            // });
         }
 
         // Permet d'afficher la sidebar si aucun channel ou aucune conv n'est selectionner (en responsive)
@@ -60,12 +61,6 @@ export function useLoadChatDatas() {
     }, [channelId, convId, location.pathname])
 
     useEffect(() => {
-        socket?.on("OnJoin", (data: Channel) => {
-            console.log("ON JOIN");
-            dispatch(addChannel({isActive: 'true', channel: data}));
-            navigate(`/chat/channel/${data.id}`);
-        });
-
         fetchUserChannels(authDatas.token, channelId, dispatch); //Recupere les channels d'un user
         fetchUserConvs(authDatas.token, dispatch); //Recupere les convs d'un user
 
@@ -73,7 +68,7 @@ export function useLoadChatDatas() {
         if (location && location.state) {
             const locationState = location.state as {userIdToSend: number};
             fetchConvAndRedirect(
-                authDatas.currentUser!.id,
+                authDatas.currentUser!,
                 locationState.userIdToSend,
                 authDatas.token,
                 chatDatas.privateConv!,
@@ -82,11 +77,9 @@ export function useLoadChatDatas() {
             );
         }
 
-        return () => {
-            console.log("OFF ON JOIN");
-            socket?.off("OnJoin");
-            socket?.off("OnLeave");
-        }
+        // return () => {
+            // socket?.off("OnLeave");
+        // }
     }, [])
 
     // Return tout ce que j'ai besoin pour le composant
