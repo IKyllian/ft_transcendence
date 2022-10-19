@@ -51,12 +51,24 @@ export class PongGame
 			else
 			{
 				//game ended
+				console.log('game has ended', this.lobby.game_id);
 				this.lobby.lobby_broadcast_data('match_winner', gamestate.result);
+				this.lobby.game_set_finished();
 				clearInterval(this.update_interval);
+
+
+				// //destroy le lobby ?
+				// setTimeout(function (){
+
+				// 	this.lobby.factory.lobby_delete(this.lobby.game_id);
+				// }, 5000);
+
+
 			}
 
 
 		}
+
 	}
 
 

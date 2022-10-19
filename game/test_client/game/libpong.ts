@@ -3,6 +3,7 @@ import Pong from './scenes/Pong';
 import Lobby from './scenes/Lobby';
 import { NewGameData, PlayersGameData } from './types/shared.types';
 import { io, Socket } from 'socket.io-client';
+import MatchResult from './scenes/MatchResult';
 
 
 export function admin_new_game(player_A: string, player_B: string): NewGameData | void
@@ -29,7 +30,7 @@ export function launch_game(players_data: PlayersGameData): void
 				game.registry.set('players_data', players_data);
 			}
 		  },
-		scene: [ Lobby, Pong ]
+		scene: [ Lobby, Pong, MatchResult ]
 	};
 	const game = new Phaser.Game(config);
 }

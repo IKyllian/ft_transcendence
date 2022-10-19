@@ -148,7 +148,7 @@ import { NewGameData, PlayerInput, PlayersLobbyData } from '../types/shared.type
 	async onUserJoinLobby(@ConnectedSocket() client: Socket,
 	@MessageBody() data: PlayersLobbyData)
 	{
-		console.log("user join lobby", data);
+	//	console.log("user join lobby", data);
 		this.lobbyfactory.lobby_join(client, data);
 	}
 
@@ -174,7 +174,7 @@ import { NewGameData, PlayerInput, PlayersLobbyData } from '../types/shared.type
 	async onUserGameInput(@ConnectedSocket() client: Socket,
 	@MessageBody() data: any)
 	{
-		this.lobbyfactory.lobby_game_input(data);
+		this.lobbyfactory.lobby_game_input(client, data);
 	}
 
 

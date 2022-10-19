@@ -4,6 +4,11 @@ export enum PlayerType {
 	Spectator
 }
 
+export enum GameType {
+	Classic,
+	Special_A
+}
+
 export type Player = {
 	name: string,
 	win: number,
@@ -115,8 +120,8 @@ export enum EndResult
 	Player_B_Win
 }
 
-export type InterpolationData =
-{
-	pos: Coordinates,
-	time: Date
-}
+// export type InterpolationData =
+// {
+// 	pos: Coordinates,
+// 	time: Date
+// }

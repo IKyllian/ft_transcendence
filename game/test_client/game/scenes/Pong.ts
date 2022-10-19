@@ -370,11 +370,18 @@ export default class Pong extends Phaser.Scene
 	}
 
 
-	game_end = (winner: PlayerType) =>
+	game_end = (winner: EndResult) =>
 	{
 		this.game.registry.set('winner', winner);
 
-		this.scene.start('MatchResult');
+		this.time.addEvent({
+			delay: 1000,
+			callback: function()
+			{				
+				this.scene.start('MatchResult');
+			},
+			callbackScope: this,
+			loop: true });
 	}
 
 }

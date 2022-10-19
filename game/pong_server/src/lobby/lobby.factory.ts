@@ -24,7 +24,7 @@ export class LobbyFactory
 				player_B_secret: 'oVugmgY4Ck',
 				game_id: 'aKnHwyr8z'
 			}
-			const lobby = new Lobby(ret);
+			const lobby = new Lobby(ret, this);
 			this.lobby_list.set(lobby.game_id, lobby);
 	
 			return ret;
@@ -45,7 +45,7 @@ export class LobbyFactory
 			game_id : game_id
 		};
 
-		const lobby = new Lobby(ret);
+		const lobby = new Lobby(ret, this);
 		this.lobby_list.set(lobby.game_id, lobby);
 
 		return ret;
@@ -88,10 +88,11 @@ export class LobbyFactory
 
 			lobby.lobby_add(client, data.player_secret);
 			this.client_list.set(client['id'], data.game_id);
+			client.emit('lobby_join_response', true);
 		}
 		else
 		{
-			client.emit('join_lobby_fail', 'room not found');
+			client.emit('lobby_join_response', false);
 			console.log("unable to join room, not found: ", data.game_id);
 		}
 	}
@@ -121,9 +122,9 @@ export class LobbyFactory
 		this.lobby_list.get(game_id)?.player_ready(client);
 	}
 
-	lobby_game_input(data: any)
+	lobby_game_input(client: Socket, data: any)
 	{
-		this.lobby_list.get(data[0])?.game_receive_input(data[1]);
+		this.lobby_list.get(data[0])?.game_receive_input(client, data[1]);
 	}
 
 	lobby_game_get_round_setup(client: Socket, game_id: string)

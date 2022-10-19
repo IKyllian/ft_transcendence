@@ -4,7 +4,8 @@ import {
 		PlayerStatus,
 		PlayerType,
 		LobbyStatus, 
-		RoundSetup} from '../types/shared.types';
+		RoundSetup,
+		EndResult} from '../types/shared.types';
 import { io, Socket } from "socket.io-client";
 import ClientSocketManager from '../client.socket.manager';
 
@@ -18,10 +19,18 @@ export default class Lobby extends Phaser.Scene
 
 	socketmanager: ClientSocketManager = new ClientSocketManager();
 	//already_started: boolean = false;
+
 	player_A_avatar: Phaser.GameObjects.Image;
 	player_A_indicator: Phaser.GameObjects.Shape;
+	player_A_name: Phaser.GameObjects.Text;
+	player_A_win: Phaser.GameObjects.Text;
+	player_A_loss: Phaser.GameObjects.Text;
+
 	player_B_avatar: Phaser.GameObjects.Image;
 	player_B_indicator: Phaser.GameObjects.Shape;
+	player_B_name: Phaser.GameObjects.Text;
+	player_B_win: Phaser.GameObjects.Text;
+	player_B_loss: Phaser.GameObjects.Text;
 	ready_button: Phaser.GameObjects.Image;
 	countdown: Phaser.GameObjects.Text;
 	me: PlayerType = PlayerType.Spectator;
@@ -31,7 +40,10 @@ export default class Lobby extends Phaser.Scene
 		player_B: PlayerStatus.Absent
 	}
 	anti_spam_count :number = 0;
-	
+	wait_delay: number = 0;
+	connected: boolean = false;
+
+
 	preload ()
 	{
 		this.load.image(
@@ -43,7 +55,7 @@ export default class Lobby extends Phaser.Scene
 			this.game.registry.get('players_data').player_B.avatar
 			);
 		this.load.image(
-			'ready_button',
+			'button',
 			'assets/button.png'
 			); 
 	}
@@ -56,7 +68,9 @@ export default class Lobby extends Phaser.Scene
         this.socketmanager.set_lobby_triggers({
             ready_to_go: this.ready_to_go.bind(this),
 			update_lobby_status: this.update_lobby_status.bind(this),
-			store_round_setup: this.store_round_setup.bind(this)
+			store_round_setup: this.store_round_setup.bind(this),
+			lobby_join: this.lobby_join.bind(this),
+			game_end: this.game_end.bind(this)
 
         });
 
@@ -76,14 +90,14 @@ export default class Lobby extends Phaser.Scene
 			color: '#000000',
 			fontFamily: 'Arial'
 		}
-		this.add.text(100, 320, "Win:" + this.game.registry.get('players_data').player_A.win, style);
-		this.add.text(100, 360, "Loss:" + this.game.registry.get('players_data').player_A.loss, style);
-		this.add.text(600, 320, "Win:" + this.game.registry.get('players_data').player_B.win, style);
-		this.add.text(600, 360, "Loss:" + this.game.registry.get('players_data').player_B.loss, style);
+		this.player_A_win = this.add.text(100, 320, "Win:" + this.game.registry.get('players_data').player_A.win, style);
+		this.player_A_loss = this.add.text(100, 360, "Loss:" + this.game.registry.get('players_data').player_A.loss, style);
+		this.player_B_win = this.add.text(600, 320, "Win:" + this.game.registry.get('players_data').player_B.win, style);
+		this.player_B_loss = this.add.text(600, 360, "Loss:" + this.game.registry.get('players_data').player_B.loss, style);
 
 		if (this.me !== PlayerType.Spectator)
 		{
-			this.ready_button = this.add.image(400, 400, 'ready_button')
+			this.ready_button = this.add.image(400, 400, 'button')
 									.setOrigin(0.5,0.5).setName('ready')
 									.setDisplaySize(200, 200)
 									.setInteractive();
@@ -112,6 +126,17 @@ export default class Lobby extends Phaser.Scene
 			this.socketmanager.lobby_send_request_status(this.registry.get('players_data').game_id);
 			this.anti_spam_count = 0;
 		}
+
+		if (!this.connected)
+		{
+			this.wait_delay++;
+			if (this.wait_delay >= 200)
+			{
+	
+				this.server_connect_fail();
+			}
+
+		}
 	}
 
 	click_event = (pointer: Phaser.Input.Pointer ,gameobject :Phaser.GameObjects.GameObject) =>
@@ -123,6 +148,11 @@ export default class Lobby extends Phaser.Scene
 		{
 			this.socketmanager.lobby_send_ready(this.registry.get('players_data').game_id);
 			gameobject.destroy();
+		}
+
+		if (gameobject.name === 'exit')
+		{
+			this.game.destroy(true, false);
 		}
 	}
 
@@ -208,4 +238,75 @@ export default class Lobby extends Phaser.Scene
 
 		this.scene.start('Pong');
 	}
+
+	clear_all = () =>
+	{
+		this.player_A_avatar.destroy();
+		this.player_A_indicator.destroy();
+		this.player_A_win.destroy();
+		this.player_A_loss.destroy();
+
+		this.player_B_avatar.destroy();
+		this.player_B_indicator.destroy();
+		this.player_B_win.destroy();
+		this.player_B_loss.destroy();
+
+		// if (this.me !== PlayerType.Spectator)
+		// {
+		// 	this.ready_button.destroy();
+		// }
+	}
+
+
+	server_connect_fail = () =>
+	{
+		this.clear_all();
+		
+		this.ready_button = this.add.image(400, 400, 'button')
+		.setOrigin(0.5,0.5).setName('exit')
+		.setDisplaySize(200, 200)
+		.setInteractive();
+
+		let style: Phaser.Types.GameObjects.Text.TextStyle = 
+		{
+			fontSize: '30px',
+			color: '#000000',
+			fontFamily: 'Arial'
+		}
+
+		this.countdown = this.add.text(400, 100, "Error: Could not connect to server", style);	
+	}
+
+	lobby_join = (response: boolean) =>
+	{
+		this.connected = true;
+		if(!response)
+		{
+			this.clear_all();
+			
+			this.ready_button = this.add.image(400, 400, 'button')
+			.setOrigin(0.5,0.5).setName('exit')
+			.setDisplaySize(200, 200)
+			.setInteractive();
+	
+			let style: Phaser.Types.GameObjects.Text.TextStyle = 
+			{
+				fontSize: '30px',
+				color: '#000000',
+				fontFamily: 'Arial'
+			}
+	
+			this.countdown = this.add.text(400, 100, "Error: Lobby not found", style);
+
+		}
+	}
+
+
+	game_end = (winner: EndResult) =>
+	{
+		this.game.registry.set('winner', winner);
+
+		this.scene.start('MatchResult');
+	}
+
 }

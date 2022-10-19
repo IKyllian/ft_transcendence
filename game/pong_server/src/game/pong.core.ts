@@ -338,6 +338,7 @@ export default class PongCore
 			{
 				//playerA Win
 				this.result = EndResult.Player_A_Win;
+				console.log('player A won');
 				//???
 				return;
 				//end game
@@ -346,6 +347,7 @@ export default class PongCore
 			{
 				//playerB Win
 				this.result = EndResult.Player_B_Win;
+				console.log('player B won');
 				//???
 				return;
 				//end game

@@ -1,6 +1,7 @@
 import { Socket } from "socket.io";
 import { PongGame } from "../game/pong.game";
-import { LobbyStatus, NewGameData, PlayerInput, PlayerStatus, RoundSetup } from "../types/shared.types";
+import { GameState, LobbyStatus, NewGameData, PlayerInput, PlayerStatus, PlayerType, RoundSetup } from "../types/shared.types";
+import { LobbyFactory } from "./lobby.factory";
 
 export class Lobby
 {
@@ -18,12 +19,20 @@ export class Lobby
 	player_B_status: PlayerStatus = PlayerStatus.Absent;
 	
 	already_started: boolean = false;
+//	already_playing: boolean = false;
+	already_finished: boolean = false;
 
 	constructor(
-		public gamedata: NewGameData
+		public gamedata: NewGameData,
+		private readonly factory: LobbyFactory
 		)
 	{
 		this.game_id = gamedata.game_id;
+	}
+
+	game_set_finished()
+	{
+		this.already_finished = true;
 	}
 
 	lobby_add(client: Socket, player_secret: string)
@@ -47,7 +56,8 @@ export class Lobby
 			this.spectators.set(client['id'], client);
 			console.log('room', this.game_id, 'spectator joined, total:', this.spectators.size);
 		}
-		client.emit('join_lobby_ok', this.game_id);
+		//moved to factory to be in same place than join fail
+		// client.emit('lobby_join_response', true);
 	}
 
 	lobby_disconnect(client: Socket)
@@ -95,7 +105,12 @@ export class Lobby
 
 	lobby_send_lobby_status(client: Socket)
 	{
-		if (this.player_A_status === PlayerStatus.Ready
+		if(this.already_finished)
+		{
+			let gamestate: GameState = this.game.core.get_gamestate();
+			client.emit('match_winner', gamestate.result);
+		}
+		else if (this.player_A_status === PlayerStatus.Ready
 			&& this.player_B_status === PlayerStatus.Ready)
 		{
 			client.emit('lobby_all_ready');
@@ -152,12 +167,12 @@ export class Lobby
 		if (this.player_A_status !== PlayerStatus.Absent)
 		{
 			this.player_A.emit(message);
-			console.log('sending to player A', message);
+		//	console.log('sending to player A', message);
 		}
 		if (this.player_B_status !== PlayerStatus.Absent)
 		{
 			this.player_B.emit(message);
-			console.log('sending to player B', message);
+	//		console.log('sending to player B', message);
 		}
 		this.spectators.forEach(function(spectator)
 		{
@@ -190,14 +205,30 @@ export class Lobby
 			console.log("both players ready ", this.game_id);
 			this.lobby_broadcast_message('lobby_all_ready');
 			if (!this.already_started)
+			{
 				this.game.start();
-			this.already_started = true;
+				this.already_started = true;
+			}
+
+			// setTimeout(function(){
+			// 	this.already_playing = true;
+			// }, 3000);
+
 		}
 	}
 
-	game_receive_input(input: PlayerInput)
+	game_receive_input(client: Socket, input: PlayerInput)
 	{
-		this.game.core.append_input(input);
+		if ((client.id === this.player_A_id && input.playertype === PlayerType.Player_A)
+			||(client.id === this.player_B_id && input.playertype === PlayerType.Player_B))
+			{
+				this.game.core.append_input(input);
+			}
+			else
+			{
+//TODO better logging
+				console.log("input incidend");
+			}
 	}
 
 

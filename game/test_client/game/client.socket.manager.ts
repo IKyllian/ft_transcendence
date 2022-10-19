@@ -37,7 +37,7 @@ export default class ClientSocketManager
 		if (this.socket instanceof Socket)
 		{
 			//Lobby
-			this.socket.on('join_lobby_ok', this.onLobbyJoinOk.bind(this));
+			this.socket.on('lobby_join_response', this.onLobbyJoinResponse.bind(this));
 			this.socket.on('lobby_all_ready', this.onLobbyAllReady.bind(this));
 			this.socket.on('lobby_status', this.onLobbyStatus.bind(this));
 			//Game
@@ -76,21 +76,22 @@ export default class ClientSocketManager
 
 	//Lobby Listens
 
-	onLobbyJoinOk = (message: string) =>
+	onLobbyJoinResponse = (response: boolean) =>
 	{
-		console.log('received lobby ok', message);
+		console.log('received lobby ok', response);
+		this.lobby_triggers?.lobby_join(response);
 	}
 
 	onLobbyAllReady = () =>
 	{
-		console.log('received lobby_all_ready');
-		this.lobby_triggers.ready_to_go();
+	//	console.log('received lobby_all_ready');
+		this.lobby_triggers?.ready_to_go();
 	}
 
 	onLobbyStatus = (new_status: LobbyStatus) =>
 	{
-		console.log('received lobby_status');
-		this.lobby_triggers.update_lobby_status(new_status);	
+	//	console.log('received lobby_status');
+		this.lobby_triggers?.update_lobby_status(new_status);	
 	}
 
 	//Game Emits
@@ -127,5 +128,6 @@ export default class ClientSocketManager
 	onGameGetMatchWinner = (result: EndResult) =>
 	{
 		this.pong_triggers?.game_end(result);
+		this.lobby_triggers?.game_end(result);
 	}
 }

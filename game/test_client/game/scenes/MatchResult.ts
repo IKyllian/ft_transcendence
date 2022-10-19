@@ -1,5 +1,5 @@
 import 'phaser';
-import { PlayerType } from '../types/shared.types';
+import { EndResult, PlayerType } from '../types/shared.types';
 
 
 
@@ -10,7 +10,7 @@ export default class MatchResult extends Phaser.Scene
 		super({ key: 'MatchResult' });
 	}
 
-	winner: PlayerType = PlayerType.Spectator;
+	winner: EndResult = EndResult.Undecided;
 	me: PlayerType = PlayerType.Spectator;
 
 	player_A_name: string = "";
@@ -38,7 +38,7 @@ export default class MatchResult extends Phaser.Scene
 			this.game.registry.get('players_data').player_B.avatar
 			);
 		this.load.image(
-			'close_button',
+			'button',
 			'assets/button.png'
 			); 
 	}
@@ -46,6 +46,8 @@ export default class MatchResult extends Phaser.Scene
 	create ()
 	{
 		this.me = this.game.registry.get('players_data').playertype;
+		this.player_A_name = this.game.registry.get('players_data').player_A.name;
+		this.player_B_name = this.game.registry.get('players_data').player_B.name;
 		this.winner = this.game.registry.get('winner');
 		
 		this.player_A_avatar = this.add.image(130, 130, 'player_a_avatar')
@@ -54,9 +56,10 @@ export default class MatchResult extends Phaser.Scene
 		this.player_B_avatar = this.add.image(670, 130, 'player_b_avatar')
 								.setOrigin(0.5,0.5)
 								.setDisplaySize(200, 200);
-		this.close_button = this.add.image(400, 400, 'ready_button')
-								.setOrigin(0.5,0.5).setName('close')
+		this.close_button = this.add.image(400, 400, 'button')
+								.setOrigin(0.5,0.5)
 								.setDisplaySize(200, 200)
+								.setName('close')
 								.setInteractive();
 		let style: Phaser.Types.GameObjects.Text.TextStyle = 
 		{
@@ -68,7 +71,7 @@ export default class MatchResult extends Phaser.Scene
 		let text: string;
 		if(this.me === PlayerType.Spectator)
 		{
-			if (this.winner === PlayerType.Player_A)
+			if (this.winner === EndResult.Player_A_Win)
 			{
 				text = this.player_A_name + " Wins";
 			}
@@ -77,7 +80,8 @@ export default class MatchResult extends Phaser.Scene
 				text = this.player_B_name + " Wins";
 			}
 		}
-		else if (this.me === this.winner)
+		else if ((this.me === PlayerType.Player_A && this.winner === EndResult.Player_A_Win)
+				|| (this.me === PlayerType.Player_B && this.winner === EndResult.Player_B_Win))
 		{
 			text = "You Won";
 		}
@@ -89,7 +93,7 @@ export default class MatchResult extends Phaser.Scene
 		this.result_text = this.add.text(400, 100, text, style);
 
 
-		if (this.winner === PlayerType.Player_A)
+		if (this.winner === EndResult.Player_A_Win)
 		{
 			this.player_A_win = this.game.registry.get('players_data').player_A.win + 1;
 			this.player_A_loss = this.game.registry.get('players_data').player_A.loss;
@@ -122,7 +126,6 @@ export default class MatchResult extends Phaser.Scene
 			gameobject.destroy();
 			//close phaser
 			this.game.destroy(true, false);
-			
 		}
 	}
 
