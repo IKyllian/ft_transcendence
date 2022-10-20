@@ -189,6 +189,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		const updatedChan = await this.channelService.join(user, channel.id, pwdDto);
 		this.server.to(`channel-${channel.id}`).emit('ChannelUsersUpdate', updatedChan);
 		this.server.to(`user-${user.id}`).emit('OnJoin', updatedChan);
+		// const servMsg = await this.channelMsgService.createServer({
+		// 	chanId: updatedChan.id,
+		// 	content: `Welcome ${user.username}, say hi!`,
+		// });
+		// this.server.to(`channel-${channel.id}`).emit('NewChannelMessage', servMsg);
 	}
 
 	@UseGuards(WsJwtGuard)
@@ -200,6 +205,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		const updatedChan = await this.channelService.leave(user, channel.id);
 		this.server.to(`channel-${channel.id}`).emit('ChannelUsersUpdate', updatedChan);
 		this.server.to(`user-${user.id}`).emit('OnLeave', updatedChan);
+		// const servMsg = await this.channelMsgService.createServer({
+		// 		chanId: updatedChan.id,
+		// 		content: `${user.username} just left.`,
+		// });
+		// this.server.to(`channel-${channel.id}`).emit('NewChannelMessage', servMsg);
 	}
 
 	@UseGuards(WsJwtGuard)
@@ -235,6 +245,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			const updatedChan = await this.channelService.banUser(user, dto);
 			this.server.to(`channel-${updatedChan.id}`).emit('ChannelUsersUpdate', updatedChan);
 			this.server.to(`user-${dto.userId}`).emit('OnLeave', updatedChan);
+			// const servMsg = await this.channelMsgService.createServer({
+			// 	chanId: updatedChan.id,
+			// 	content: `${user.username} got banned ${dto.time ? `for ${dto.time} seconds.` : 'permanently.'}`,
+			// });
+			// this.server.to(`channel-${updatedChan.id}`).emit('NewChannelMessage', servMsg);
 	}
 
 	@UseGuards(WsJwtGuard, WsInChannelGuard, ChannelPermissionGuard)
