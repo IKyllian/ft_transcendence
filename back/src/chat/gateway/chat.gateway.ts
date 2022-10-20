@@ -27,6 +27,7 @@ import { WsInChannelGuard } from '../channel/guards/ws-in-channel.guard';
 import { ConversationService } from '../conversation/conversation.service';
 import { doesNotMatch } from 'assert';
 import { MuteUserDto } from '../channel/dto/mute-user.dto';
+import { PromoteDto } from './dto/promote.dto';
 
 @Catch()
 class GatewayExceptionFilter extends BaseWsExceptionFilter {
@@ -70,7 +71,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	async handleConnection(socket: Socket) {
 		let user: User = null;
-		console.log(socket.handshake)
 		if (socket.handshake.headers.authorization) {
 			const token = socket.handshake.headers.authorization.split(' ')[1];
 			user = await this.authService.verify(token);
@@ -251,8 +251,19 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	async unMuteUser(
 		@MessageBody() dto: MuteUserDto,
 	) {
-		const updatedChanUser = await this.channelService.muteUser(dto);
+		const updatedChanUser = await this.channelService.unMuteUser(dto);
 		this.server.to(`channel-${dto.chanId}`).emit('ChannelUserUpdate', updatedChanUser);
 	}
 
+	@UseGuards(WsJwtGuard, WsInChannelGuard, ChannelPermissionGuard)
+	@SubscribeMessage('ChangeRole')
+	async promoteUser(
+		@GetChannelUser() chanUser: ChannelUser,
+		@MessageBody() dto: PromoteDto,
+	){
+		const info = await this.channelService.changeUserRole(chanUser, dto);
+		this.server.to(`channel-${dto.chanId}`).emit('ChannelUserUpdate', info.userChanged);
+		if (info.ownerPassed)
+			this.server.to(`channel-${dto.chanId}`).emit('ChannelUserUpdate', info.chanUser);
+	}
 }

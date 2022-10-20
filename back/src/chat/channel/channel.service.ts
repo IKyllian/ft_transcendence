@@ -13,6 +13,8 @@ import { NotificationService } from 'src/notification/notification.service';
 import { ResponseDto } from '../gateway/dto/response.dto';
 import { SearchToInviteInChanDto } from './dto/search-user-to-invite.dto';
 import { MuteUserDto } from './dto/mute-user.dto';
+import { PromoteDto } from '../gateway/dto/promote.dto';
+import { ChannelInviteDto } from '../gateway/dto/channel-invite.dto';
 
 @Injectable()
 export class ChannelService {
@@ -316,17 +318,17 @@ export class ChannelService {
 		if (dto.time)
 			toMuteChanUser.mutedTime = new Date(new Date().getTime() + dto.time * 1000);
 		toMuteChanUser.is_muted = true;
-		this.channelUserRepo.save(toMuteChanUser);
+		return this.channelUserRepo.save(toMuteChanUser);
 	}
 
 	async unMuteUser(dto: MuteUserDto) {
-		const toMuteChanUser = await this.getChannelUser(dto.chanId, dto.userId);
-		if (!toMuteChanUser)
+		const toUnMuteChanUser = await this.getChannelUser(dto.chanId, dto.userId);
+		if (!toUnMuteChanUser)
 			throw new NotInChannelException();
 		
-		toMuteChanUser.is_muted = false;
-		toMuteChanUser.mutedTime = null;
-		this.channelUserRepo.save(toMuteChanUser);
+		toUnMuteChanUser.is_muted = false;
+		toUnMuteChanUser.mutedTime = null;
+		return this.channelUserRepo.save(toUnMuteChanUser);
 	}
 
 	isMuted(chanUser: ChannelUser) {
@@ -335,8 +337,8 @@ export class ChannelService {
 				const until = ((chanUser.mutedTime.getTime() - Date.now()) / 1000).toFixed(0)
 				throw new ForbiddenException(`You are muted for ${until} seconds`);
 			}
-			// else if (!chanUser.mutedTime)
-			// 	throw new ForbiddenException('You are muted')
+			else if (!chanUser.mutedTime)
+				throw new ForbiddenException('You are muted')
 			else {
 				chanUser.mutedTime = null;
 				chanUser.is_muted = false;
@@ -366,5 +368,38 @@ export class ChannelService {
 				username: Like(`%${dto.str}%`),
 			}
 		});
+	}
+
+	async changeUserRole(chanUser: ChannelUser, dto: PromoteDto) {
+		const userToChange = await this.getChannelUser(dto.chanId, dto.userId);
+		if (!userToChange) { throw new NotInChannelException(); }
+		let ownerPassed = false;
+		switch (dto.role) {
+			case channelRole.MODERATOR:
+				if (chanUser.role === channelRole.OWNER && userToChange.role === channelRole.MEMBER) {
+					userToChange.role = dto.role;
+				}
+				break;
+			case channelRole.MEMBER:
+				if (chanUser.role === channelRole.OWNER && userToChange.role === channelRole.MODERATOR) {
+					userToChange.role = dto.role;
+				}
+				break;
+			case channelRole.OWNER:
+				if (chanUser.role === channelRole.OWNER) {
+					userToChange.role = dto.role;
+					ownerPassed = true;
+					chanUser.role = channelRole.MODERATOR;
+				}
+				break;
+			default:
+				break;
+		}
+		const userChanged = await this.channelUserRepo.save(userToChange);
+		return {
+			userChanged,
+			chanUser: ownerPassed ? await this.channelUserRepo.save(chanUser) : chanUser,
+			ownerPassed
+		}
 	}
 }

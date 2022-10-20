@@ -151,7 +151,6 @@ export class AuthService {
 
 	async verify(token: string) {
 		try {
-			console.log("token", token)
 			const decoded = this.jwt.verify(token, {
 				secret: this.config.get('ACCESS_SECRET')
 			});
