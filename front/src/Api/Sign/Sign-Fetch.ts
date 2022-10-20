@@ -71,6 +71,8 @@ export function fetchSetUsername(username: string, token: string, dispatch: Disp
             user: response.data.user,
             token: response.data.access_token,
         }
+		console.log("response,", response);
+		console.log("response.data.access_token,", response.data.access_token);
         dispatch(loginSuccess(payload));
     })
     .catch(err => {

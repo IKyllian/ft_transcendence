@@ -5,7 +5,6 @@ import { copyChannelsArray, copyPrivateConvArray, addPrivateConv } from "../../R
 import { getSecondUserIdOfPM } from "../../Utils/Utils-Chat";
 import { Dispatch, AnyAction } from "@reduxjs/toolkit";
 import { NavigateFunction } from "react-router-dom";
-import { v4 as uuidv4 } from 'uuid';
 import { UserInterface } from "../../Types/User-Types";
 
 export async function fetchUserChannels(token: string, channelId: number | undefined, dispatch: Dispatch<AnyAction>): Promise<void> {

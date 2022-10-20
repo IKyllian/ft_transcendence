@@ -55,9 +55,8 @@ export class UserController {
 
 	@UseGuards(JwtGuard)
 	@Patch('edit-username')
-	editUser(@GetUser() user: User, @Body() body) {
-		console.log('user to edit', user);
-		return this.userService.editUsername(user, body.username);
+	async editUser(@GetUser() user: User, @Body() body) {
+		return await this.userService.editUsername(user, body.username);
 	}
 
 	@UseGuards(JwtGuard)
