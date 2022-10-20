@@ -14,7 +14,7 @@ export class User {
 
 	@PrimaryGeneratedColumn()
 	id: number;
-	
+
 	@Column({ nullable: true })
 	@Exclude()
 	id42?: number;
@@ -24,10 +24,10 @@ export class User {
 
 	@Column({ default: 'offline' })
 	status: userStatus;
-	
+
 	@Column({ nullable: true })
 	avatar?: string;
-	
+
 	@OneToOne(() => Statistic, (statistic) => statistic.user, {
 		cascade: true,
 	})
@@ -40,9 +40,11 @@ export class User {
 	@JoinTable({ name: 'blocked_users' })
 	blocked: User[];
 
-	
+	@Exclude()
+	@Column({ nullable: true, select: false })
+	hash?: string
 
 	@Exclude()
-	@Column({nullable: true, select: false })
-	hash?: string
+	@Column({ nullable: true, select: false })
+	refresh_hash?: string
 } 

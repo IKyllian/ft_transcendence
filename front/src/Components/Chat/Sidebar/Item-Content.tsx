@@ -29,7 +29,7 @@ function ItemContent(props: Props) {
             }
             {
                 privateConvs && privateConvs.map((elem) => 
-                    <Link className="list-item-container" key={elem.conversation.id} to={`/chat/private-message/${getSecondUserIdOfPM(elem.conversation, currentUser!.id)}`} onClick={() => sidebarStatus.setSidebarStatus()}>
+                    <Link className="list-item-container" key={elem.conversation.id} to={`/chat/private-message/${elem.conversation.id}`} onClick={() => sidebarStatus.setSidebarStatus()}>
                         <li is-target={elem.isActive}>
                             {elem.conversation.user1.id !== currentUser?.id ? elem.conversation.user1.username : elem.conversation.user2.username }
                         </li>

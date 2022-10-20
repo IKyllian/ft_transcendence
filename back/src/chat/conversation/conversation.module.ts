@@ -21,6 +21,6 @@ import { PrivateMessageService } from "./message/private-msg.sevice";
 			provide: APP_INTERCEPTOR,
 			useClass: ClassSerializerInterceptor,
 		}],
-	exports: [ PrivateMessageService ],
+	exports: [ ConversationService, PrivateMessageService ],
 })
 export class ConversationModule {}

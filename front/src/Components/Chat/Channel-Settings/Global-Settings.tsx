@@ -11,7 +11,6 @@ function GlobalSettings(props: {chanDatas: Channel}) {
         e?.preventDefault();
         console.log("data");
     });
-    console.log(errors)
 
     return (
         <div>

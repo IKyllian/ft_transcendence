@@ -23,20 +23,7 @@ function ChannelItem(props: {channelData: Channel, token: string}) {
         else
             body = {};
         socket?.emit("JoinChannel", {id: channelData.id, pwdDto: body});
-        setTimeout(function() {
-            navigate(`/chat/channel/${channelData.id}`);
-		}, 50);
     })
-
-    useEffect(() => {
-        socket!.on('exception', (data: any) => {
-            console.log("exception", data);
-        });
-
-        return () => {
-            socket?.off('exception');
-        }
-    }, [])
 
     return (
         <div className="channels-card-wrapper">
@@ -51,6 +38,7 @@ function ChannelItem(props: {channelData: Channel, token: string}) {
                             channelData.option === 'protected' &&
                             <input type="password" placeholder="password" {...register("password")} />
                         }
+                        
                         <IconPlus onClick={() => handleClick()} />
                     </div>
                 </div>
@@ -61,12 +49,31 @@ function ChannelItem(props: {channelData: Channel, token: string}) {
 
 function ChannelsList() {
     const [channelsList, setChannelsList] = useState<undefined | Channel[]>(undefined);
+    // const [ joinError, setJoinError] = useState<string | undefined>(undefined);
+
     let authDatas = useAppSelector((state) => state.auth);
     const sidebarStatus = useContext(SidebarContext);
+    const {socket} = useContext(SocketContext);
 
     useEffect(() => {
+        // socket!.on('exception', (data: any) => {
+        //     console.log("exception", data);
+        //     console.log(data.message);
+        //     setJoinError(data.message);
+        // });
+
         fetchVisibleChannels(authDatas.token, setChannelsList);
+
+        // return () => {
+        //     socket?.off('exception');
+        // }
     }, [])
+
+    // useEffect(() => {
+       
+
+       
+    // }, [])
 
     return !channelsList ? (
        <div>

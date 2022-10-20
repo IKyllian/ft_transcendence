@@ -24,17 +24,15 @@ function ChatChannel() {
     ) : (
         <div className="message-container">
             <div className="message-container-main">
-                <div className="message-wrapper">
-                    <ChatHeader chatItem={chatDatas} showUsersSidebar={showUsersSidebar} changeSidebarStatus={changeSidebarStatus} />
-                    <ul>
-                        {
-                            chatDatas!.messages.map((elem, index) =>
-                                <MessageItem key={index} isFromChan={true} message={elem} loggedUserIsOwner={loggedUserIsOwner} />
-                            )
-                        }
-                        <div ref={messagesEndRef} /> 
-                    </ul>
-                </div>
+                <ChatHeader chatItem={chatDatas} showUsersSidebar={showUsersSidebar} changeSidebarStatus={changeSidebarStatus} />
+                <ul>
+                    {
+                        chatDatas.messages.map((elem, index) =>
+                            <MessageItem key={index} isFromChan={true} message={elem} loggedUserIsOwner={loggedUserIsOwner} chanId={chatDatas.id} />
+                        )
+                    }
+                    <div ref={messagesEndRef} /> 
+                </ul>
                 <div className="message-input-container">
                     <form onSubmit={handleSubmit}>
                         <input type="text" placeholder="Type Your Message..." value={inputMessage} onChange={(e) => setInputMessage(e.target.value)} />

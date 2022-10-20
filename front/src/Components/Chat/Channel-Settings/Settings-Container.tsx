@@ -3,7 +3,7 @@ import { IconX } from "@tabler/icons";
 
 import SidebarSettings from "./Sidebar-Settings";
 import RenderSettingPage from "./Render-Setting-Page";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Channel } from "../../../Types/Chat-Types"
 import LoadingSpin from "../../Utils/Loading-Spin";
 import { useAppSelector } from "../../../Redux/Hooks";
@@ -16,6 +16,9 @@ function ChannelSettings() {
     const location = useLocation();
     const navigate = useNavigate();
     const authDatas = useAppSelector((state) => state.auth);
+    const params = useParams();
+
+    console.log("setting params", params);
 
     useEffect(() => {
         if (location && location.state) {
@@ -38,7 +41,7 @@ function ChannelSettings() {
                 <SidebarSettings setSidebarItem={setSidebarItem} channelDatas={channelDatas} loggedUserIsOwner={loggedUserIsOwner} />
                 <div className="content-setting-container">
                     <div className="content-wrapper">
-                        <RenderSettingPage item={sidebarItem} channelDatas={channelDatas} loggedUserIsOwner={loggedUserIsOwner} />
+                        <RenderSettingPage item={sidebarItem} channelDatas={channelDatas} loggedUserIsOwner={loggedUserIsOwner} loggedUserToken={authDatas.token} setChannelDatas={setChannelDatas} />
                     </div>
                 </div>
                 <IconX className="leave-icon" onClick={() => navigate(-1)} />

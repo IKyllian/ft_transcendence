@@ -24,7 +24,7 @@ export function useChannelHook() {
     }
 
     const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+        messagesEndRef.current?.scrollIntoView();
     }
 
     useEffect(() => {
@@ -33,30 +33,35 @@ export function useChannelHook() {
 
     useEffect(() => {
         setChatDatas(undefined);
+        setLoggedUserIsOwner(false);
+        setInputMessage('');
         const getDatas = () => {
             socket!.emit("JoinChannelRoom", {
                 id: channelId,
             });
 
-            socket!.on('ChannelUpdate', (data: Channel) => {
+            socket!.on('ChannelUsersUpdate', (data: Channel) => {
                 setChatDatas((prev: any) => {
                     return {...prev, channelUsers: [...data.channelUsers]}
                 });
                 console.log(data);
             });
 
-            socket!.on('exception', (data: any) => {
-                console.log(data);
-            });
+            // socket!.on('exception', (data: any) => {
+            //     console.log(data);
+            // });
 
             socket!.on('roomData', (data: Channel) => {
-                let channel: Channel = data;
-                channel.messages.forEach(elem => elem.send_at = new Date(elem.send_at));
-                setChatDatas(channel);
-                if (!channels?.find(elem => elem.channel.id === channel.id))
-                    dispatch(addChannel({isActive: 'true', channel: data}));
-                if (data.channelUsers.find((elem) => elem.user.id === authDatas.currentUser?.id && (elem.role === "owner" || elem.role === "moderator")))
-                    setLoggedUserIsOwner(true);
+                console.log(data);
+                if (data.id === channelId) {
+                    let channel: Channel = data;
+                    channel.messages.forEach(elem => elem.send_at = new Date(elem.send_at));
+                    setChatDatas(channel);
+                    if (!channels?.find(elem => elem.channel.id === channel.id))
+                        dispatch(addChannel({isActive: 'true', channel: {id: data.id, name: data.name, option: data.option}}));
+                    if (data.channelUsers.find((elem) => elem.user.id === authDatas.currentUser?.id && (elem.role === "owner" || elem.role === "moderator")))
+                        setLoggedUserIsOwner(true);
+                }
             });
         }
         if (channelId) {
@@ -67,9 +72,9 @@ export function useChannelHook() {
             socket!.emit("LeaveChannelRoom", {
                 id: channelId,
             });
-            socket!.off("exception");
+            // socket!.off("exception");
             socket!.off("roomData");
-            socket!.off("ChannelUpdate");
+            socket!.off("ChannelUsersUpdate");
         }
     }, [channelId])
 

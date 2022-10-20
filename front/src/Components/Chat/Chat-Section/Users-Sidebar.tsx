@@ -13,7 +13,7 @@ function UserSidebarItem(props: {user: ChannelUser}) {
                     {/* <div className={`${user.isOnline ? "online" :"offline"}`}> </div> */}
                 </div>
             </div>
-            <Link to="/profile">
+            <Link to={`/profile/${user.user.username}`}>
                 { user.user.username }
             </Link>
         </li>

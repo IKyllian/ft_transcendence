@@ -1,4 +1,4 @@
-import { IsNumber, IsOptional } from "class-validator";
+import { IsNumber, IsOptional, IsPositive } from "class-validator";
 
 export class BanUserDto {
 	@IsNumber()
@@ -8,6 +8,7 @@ export class BanUserDto {
 	chanId: number;
 
 	@IsNumber()
+	@IsPositive()
 	@IsOptional()
 	time?: number;
 }
