@@ -7,7 +7,6 @@ export interface ChannelsInterfaceFront {
 
 export interface ConversationInterfaceFront {
     isActive: string,
-    temporary: boolean,
     conversation: ConversationInfoSidebar,
 }
 

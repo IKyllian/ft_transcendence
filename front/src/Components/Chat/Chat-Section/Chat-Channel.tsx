@@ -28,14 +28,14 @@ function ChatChannel() {
                 <ul>
                     {
                         chatDatas.messages.map((elem, index) =>
-                            <MessageItem key={index} isFromChan={true} message={elem} loggedUserIsOwner={loggedUserIsOwner} chanId={chatDatas.id} />
+                            <MessageItem key={index} isFromChan={true} message={elem} loggedUserIsOwner={loggedUserIsOwner} chanId={chatDatas} />
                         )
                     }
-                    <div ref={messagesEndRef} /> 
+                    <div ref={messagesEndRef} />
                 </ul>
                 <div className="message-input-container">
                     <form onSubmit={handleSubmit}>
-                        <input type="text" placeholder="Type Your Message..." value={inputMessage} onChange={(e) => setInputMessage(e.target.value)} />
+                        <input  type="text" placeholder="Type Your Message..." value={inputMessage} onChange={(e) => setInputMessage(e.target.value)} />
                         <button type="submit"> <IconSend /> </button>
                     </form>
                 </div>

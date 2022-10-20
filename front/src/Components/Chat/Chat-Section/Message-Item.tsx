@@ -5,13 +5,14 @@ import { Link } from "react-router-dom";
 import DropdownContainer from "../../Utils/Dropdown-Container";
 import { useAppSelector } from '../../../Redux/Hooks'
 import BlockButton from "../../Utils/Block-Button";
-import { ChatMessage, PrivateMessage } from "../../../Types/Chat-Types";
+import { Channel, ChatMessage, PrivateMessage } from "../../../Types/Chat-Types";
 import { userIdIsBlocked } from "../../../Utils/Utils-User";
 import BanButton from "../../Utils/Ban-Button";
+import MuteButton from "../../Utils/Mute-Button";
 
 import { getMessageDateString } from "../../../Utils/Utils-Chat";
 
-function MessageItem(props: {isFromChan: boolean, message: ChatMessage | PrivateMessage, loggedUserIsOwner: boolean, chanId?: number}) {
+function MessageItem(props: {isFromChan: boolean, message: ChatMessage | PrivateMessage, loggedUserIsOwner: boolean, chanId?: Channel}) {
     const {isFromChan, message, loggedUserIsOwner, chanId} = props;
     const [showDropdown, setShowDropdown] = useState<boolean>(false);
 
@@ -46,8 +47,8 @@ function MessageItem(props: {isFromChan: boolean, message: ChatMessage | Private
                             {
                                 loggedUserIsOwner &&
                                 <>
-                                    <p> mute </p>
-                                   <BanButton senderId={message.sender.id} chanId={chanId!} />
+                                   <MuteButton senderId={message.sender.id} chan={chanId!} />
+                                   <BanButton senderId={message.sender.id} chanId={chanId!.id} />
                                 </>
                             }
                         </DropdownContainer>

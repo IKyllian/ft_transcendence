@@ -1,10 +1,9 @@
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useAppSelector, useAppDispatch } from "../../Redux/Hooks";
-import { addChannel, changeActiveElement, removeChannel } from "../../Redux/ChatSlice";
+import { changeActiveElement } from "../../Redux/ChatSlice";
 import { useEffect, useState, useCallback, useContext } from "react";
 import { fetchUserChannels, fetchUserConvs, fetchConvAndRedirect } from "../../Api/Chat/Chat-Fetch";
 import { SocketContext } from "../../App";
-import { Channel } from "../../Types/Chat-Types";
 
 export function useLoadChatDatas() {
     //States
@@ -22,7 +21,6 @@ export function useLoadChatDatas() {
     
     const channelId: number | undefined = params.channelId ? parseInt(params.channelId!, 10) : undefined;
     const convId: number | undefined = params.convId ? parseInt(params.convId!, 10) : undefined;
-  
 
     // Functions pour le composant
     const sidebarOnChange = useCallback( () => {
@@ -34,21 +32,12 @@ export function useLoadChatDatas() {
     }, [setShowModal]);
 
     const changeModalStatus = useCallback((index: number) => {
-        setShowModal(index === 0 ? 1 : 0);
+        setShowModal(index);
     }, [setShowModal]);
 
     // Les useEffect pour les call api etc..
     useEffect(() => {
-        if (channelId !== undefined) {
-            // socket?.on("OnLeave", (data: Channel) => {
-            //     console.log("OnLeave");
-            //     if (channelId && channelId === data.id) {
-            //         navigate(`/chat`);
-            //     }
-            //     dispatch(removeChannel(data.id));
-            // });
-        }
-
+        onCloseModal();
         // Permet d'afficher la sidebar si aucun channel ou aucune conv n'est selectionner (en responsive)
         if ((channelId === undefined && convId === undefined) && location.pathname !== "/chat/channels-list") {
             setReponsiveSidebar(true);
@@ -76,10 +65,6 @@ export function useLoadChatDatas() {
                 navigate
             );
         }
-
-        // return () => {
-            // socket?.off("OnLeave");
-        // }
     }, [])
 
     // Return tout ce que j'ai besoin pour le composant

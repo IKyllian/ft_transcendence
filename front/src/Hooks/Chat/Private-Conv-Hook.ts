@@ -1,12 +1,11 @@
 import { useState, useRef, useContext, useEffect } from "react";
 
-import { Conversation, ChatMessage, ConversationInterfaceFront, PrivateMessage } from "../../Types/Chat-Types";
+import { Conversation, ConversationInterfaceFront, PrivateMessage } from "../../Types/Chat-Types";
 import { SocketContext } from "../../App";
 import { useLocation, useParams } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from '../../Redux/Hooks'
 import { getSecondUserIdOfPM } from "../../Utils/Utils-Chat";
 import { fetchPrivateConvDatas } from "../../Api/Chat/Chat-Fetch";
-import { addPrivateConv } from "../../Redux/ChatSlice";
 
 interface ConversationState {
     temporary: boolean,
@@ -58,13 +57,9 @@ export function usePrivateConvHook() {
     useEffect(() => {
         if (convId) {
             setConvDatas(undefined);
-            const searchTemp: ConversationInterfaceFront | undefined = !privateConv ? undefined : privateConv?.find(elem => elem.conversation.id === convId && elem.temporary == true);
             if (location && location.state) {
                 const locationState = location.state as {conv: ConversationInterfaceFront};
-                console.log("locationState", locationState);
                 setConvDatas({temporary: true, conv: {...locationState.conv.conversation, messages: []}});
-            } else if (searchTemp !== undefined) {
-                setConvDatas({temporary: true, conv: {...searchTemp.conversation, messages: []}});
             } else {
                 fetchPrivateConvDatas(convId, authDatas.token, setConvDatas);
             }

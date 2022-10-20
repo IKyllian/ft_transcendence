@@ -1,4 +1,4 @@
-import { Conversation, ConversationInfoSidebar } from "../Types/Chat-Types";
+import { Conversation, ConversationInfoSidebar, ChannelUser } from "../Types/Chat-Types";
 import { UserInterface } from "../Types/User-Types";
 
 export function getSecondUserIdOfPM(conversation: Conversation | ConversationInfoSidebar, userConnectedId: number): number {
@@ -26,4 +26,8 @@ export function getMessageDateString(date: Date): string {
         return (`Hier à ${date.getHours() + 2}:${date.getMinutes() >= 0 && date.getMinutes() <= 9 ? '0' : ''}${date.getMinutes()}`);
     else
         return (`${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`);
+}
+
+export function UserIsMute(channelUsers: ChannelUser[], userId: number): boolean {
+    return channelUsers.find(elem => (elem.user.id === userId && elem.is_muted)) ? true : false;
 }

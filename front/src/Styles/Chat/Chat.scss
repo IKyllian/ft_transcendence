@@ -26,10 +26,6 @@
         .explore-button {
            background-color: $DarkPalette;
            padding: 15px;
-           position: absolute;
-           bottom: 0;
-           left: 0;
-           right: 0;
            text-align: center;
         }
 
@@ -38,7 +34,6 @@
             list-style-type: none;
             margin-right: 30px;
             overflow-y: scroll;
-            
             &-elem {
                 .collapse-button {
                     @include flex-row-alignCenter;
@@ -127,12 +122,21 @@
 
                 &-right-side {
                     margin-right: 20px;
-                    svg {
-                        cursor: pointer;
-                        &:first-child {
-                            margin-right: 28px;
+                    @include flex-row-alignCenter();
+                    .chat-action-icones {
+                        margin-right: 28px;
+                        @include flex-row-alignCenter();
+                        gap: 10px;
+                        a {
+                            @include width-height(23px, 23px);
+                            margin: 0
+                        }
+                        svg {
+                            @include width-height(23px, 23px);
+                            cursor: pointer;
                         }
                     }
+                    
                 }
 
                 .burger-icon-responsive {
@@ -474,11 +478,8 @@
                         padding: 0 $HeaderResponsive800Marge;
                         &-right-side {
                             margin-right: 0px;
-                            svg {
-                                cursor: pointer;
-                                &:first-child {
-                                    margin-right: 0px;
-                                }
+                            .chat-action-icones {
+                                margin-right: 0px;
                             }
                         }
                         .burger-icon-responsive {

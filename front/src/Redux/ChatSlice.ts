@@ -3,15 +3,15 @@ import { ChannelsInterfaceFront, ConversationInterfaceFront, ChannelInfoSidebar 
 import { UserInterface } from '../Types/User-Types';
 
 interface ChannelState {
-    channels?: ChannelsInterfaceFront[],
-    privateConv?: ConversationInterfaceFront[],
+    channels: ChannelsInterfaceFront[],
+    privateConv: ConversationInterfaceFront[],
     loading: boolean,
     error?: string,
 }
 
 const defaultState: ChannelState = {
-    channels: undefined,
-    privateConv: undefined,
+    channels: [],
+    privateConv: [],
     loading: false,
     error: undefined,
 }
@@ -41,20 +41,21 @@ export const chatSlice = createSlice({
                 state.channels = [...state.channels, payload];
             else
                 state.channels = [payload];
+            console.log("state.channels", state.channels);
         },
-        addPrivateConv: (state, {payload}: PayloadAction<{conv: ConversationInterfaceFront, receiverId: number}>) => {
-            const tempConvExist: ConversationInterfaceFront | undefined = !state.privateConv ? undefined : state.privateConv.find(elem => (elem.conversation.user1.id === payload.receiverId || elem.conversation.user2.id === payload.receiverId));
+        addPrivateConv: (state, {payload}: PayloadAction<ConversationInterfaceFront>) => {
+            // const tempConvExist: ConversationInterfaceFront | undefined = !state.privateConv ? undefined : state.privateConv.find(elem => (elem.conversation.user1.id === payload.receiverId || elem.conversation.user2.id === payload.receiverId));
             // console.log("tempConvExist", tempConvExist);
             // console.log("receiverId", payload.receiverId);
             // console.log("Before state.privateConv", state.privateConv);
-            if (tempConvExist)  {
+            // if (tempConvExist)  {
                 // console.log("CONDITION OUI");
-                state.privateConv = state.privateConv?.filter(elem => elem.conversation.id !== tempConvExist.conversation.id);
-            }
+            //     state.privateConv = state.privateConv?.filter(elem => elem.conversation.id !== tempConvExist.conversation.id);
+            // }
             if (state.privateConv)
-                state.privateConv = [...state.privateConv, payload.conv];
+                state.privateConv = [...state.privateConv, payload];
             else
-                state.privateConv = [payload.conv];
+                state.privateConv = [payload];
         },
         removeChannel: (state, {payload}: PayloadAction<number>) => {
             if (state.channels) {

@@ -4,8 +4,8 @@ import { useContext, useState } from "react";
 import { ModalContext } from "./Utils/ModalProvider";
 import UserFindItem from "./User-Find-Item";
 import SearchBarPlayers from "./SearchBarPlayers";
-
 import { friendsDatas } from "../Types/Datas-Examples";
+import { fetchSearchAllUsers } from "../Api/User-Fetch";
 
 function AddFriendModal() {
     const [showFriendList, setShowFriendList] = useState<boolean>(true);
@@ -39,7 +39,7 @@ function AddFriendModal() {
                                 )
                             }
                         </div> :
-                        <SearchBarPlayers functionality="addFriend" />
+                        <SearchBarPlayers functionality="addFriend" fetchUserFunction={fetchSearchAllUsers} />
                     }
                 </div>
             </div>

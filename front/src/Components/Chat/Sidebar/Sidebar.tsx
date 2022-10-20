@@ -31,16 +31,14 @@ function Sidebar(props: {setShowModal: Function, chanDatas: ChannelsInterfaceFro
         <div ref={ref} className={`chat-sidebar ${sidebarStatus.sidebar ? "chat-sidebar-responsive" : ""}`}>
             <ul className="ul-wrapper">
                 <SidebarItem
-                    index={0}
                     title="Channels"
                     chanDatas={chanDatas}
-                    setShowModal={setShowModal}
+                    setShowModal={() => setShowModal(1)}
                 />
                 <SidebarItem
-                    index={1}
                     title="Messages Privées"
                     privateConvs={privateConvs}
-                    setShowModal={setShowModal}
+                    setShowModal={() => setShowModal(2)}
                 />
             </ul>
             <Link className="explore-button" to="/chat/channels-list" onClick={() => sidebarStatus.setSidebarStatus()}>

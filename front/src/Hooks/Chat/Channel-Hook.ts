@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef, useContext } from "react";
 import { useParams } from "react-router-dom";
-import { Channel } from "../../Types/Chat-Types";
+import { Channel, ChannelUser } from "../../Types/Chat-Types";
 import { useAppDispatch, useAppSelector } from '../../Redux/Hooks'
 import { SocketContext } from "../../App";
 import { addChannel } from "../../Redux/ChatSlice";
@@ -18,6 +18,7 @@ export function useChannelHook() {
     const {socket} = useContext(SocketContext);
     const channelId: number | undefined = params.channelId ? parseInt(params.channelId!, 10) : undefined;
     const dispatch = useAppDispatch();
+    console.log(chatDatas);
 
     const changeSidebarStatus = () => {
         setShowUsersSidebar(!showUsersSidebar);
@@ -44,15 +45,21 @@ export function useChannelHook() {
                 setChatDatas((prev: any) => {
                     return {...prev, channelUsers: [...data.channelUsers]}
                 });
-                console.log(data);
+                console.log("ChannelUsersUpdate", data);
             });
 
-            // socket!.on('exception', (data: any) => {
-            //     console.log(data);
-            // });
+            socket!.on("ChannelUserUpdate", (data: ChannelUser) => {
+                setChatDatas((prev: any) => {
+                    return {...prev, channelUsers: [...prev.channelUsers.map((elem: any) => {
+                        if (elem.user.id === data.user.id)
+                            return elem = data;
+                        return elem
+                    })] }
+                });
+            })
 
             socket!.on('roomData', (data: Channel) => {
-                console.log(data);
+                console.log("roomData", data);
                 if (data.id === channelId) {
                     let channel: Channel = data;
                     channel.messages.forEach(elem => elem.send_at = new Date(elem.send_at));
@@ -72,9 +79,9 @@ export function useChannelHook() {
             socket!.emit("LeaveChannelRoom", {
                 id: channelId,
             });
-            // socket!.off("exception");
             socket!.off("roomData");
             socket!.off("ChannelUsersUpdate");
+            socket!.off("ChannelUserUpdate");
         }
     }, [channelId])
 
