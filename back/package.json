@@ -42,6 +42,7 @@
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^7.2.0",
+    "shortid": "^2.2.16",
     "typeorm": "^0.3.10",
     "uuid": "^9.0.0"
   },
@@ -54,6 +55,7 @@
     "@types/multer": "^1.4.7",
     "@types/node": "^16.11.58",
     "@types/passport-jwt": "^3.0.6",
+    "@types/shortid": "0.0.29",
     "@types/socket.io": "^3.0.2",
     "@types/supertest": "^2.0.11",
     "@typescript-eslint/eslint-plugin": "^5.0.0",

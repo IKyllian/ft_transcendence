@@ -46,7 +46,8 @@ class GatewayExceptionFilter extends BaseWsExceptionFilter {
 	cors: {
 		// origin: ['http://localhost:3000'],
 		credential: true,
-	}
+	},
+	namespace: 'hui'
 })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
@@ -70,7 +71,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	async handleConnection(socket: Socket) {
 		let user: User = null;
-		console.log(socket.handshake)
 		if (socket.handshake.headers.authorization) {
 			const token = socket.handshake.headers.authorization.split(' ')[1];
 			user = await this.authService.verify(token);
@@ -92,6 +92,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	}
 
 	async handleDisconnect(socket: Socket) {
+		console.log('disco')
 		if (socket.handshake.headers.authorization) {
 			const payload = this.authService.decodeJwt(socket.handshake.headers.authorization.split(' ')[1]) as JwtPayload;
 			// get usersocket instance instead of call db ?
@@ -102,9 +103,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				socket.emit('statusUpdate', { user, status: 'offline' });
 			}
 			console.log(payload.username, 'disconnected');
-		} else
+			} else
 				console.log(socket.id, 'disconnected');
-	}
+		}
 
 	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('JoinChannelRoom')
