@@ -13,7 +13,7 @@ import { NotificationService } from 'src/notification/notification.service';
 import { ResponseDto } from '../gateway/dto/response.dto';
 import { SearchToInviteInChanDto } from './dto/search-user-to-invite.dto';
 import { MuteUserDto } from './dto/mute-user.dto';
-import { PromoteDto } from '../gateway/dto/promote.dto';
+import { ChangeRoleDto } from '../gateway/dto/change-role.dto';
 import { ChannelInviteDto } from '../gateway/dto/channel-invite.dto';
 
 @Injectable()
@@ -370,7 +370,7 @@ export class ChannelService {
 		});
 	}
 
-	async changeUserRole(chanUser: ChannelUser, dto: PromoteDto) {
+	async changeUserRole(chanUser: ChannelUser, dto: ChangeRoleDto) {
 		const userToChange = await this.getChannelUser(dto.chanId, dto.userId);
 		if (!userToChange) { throw new NotInChannelException(); }
 		let ownerPassed = false;
