@@ -27,7 +27,9 @@ import { WsInChannelGuard } from '../channel/guards/ws-in-channel.guard';
 import { ConversationService } from '../conversation/conversation.service';
 import { doesNotMatch } from 'assert';
 import { MuteUserDto } from '../channel/dto/mute-user.dto';
-import { PromoteDto } from './dto/promote.dto';
+import { ChangeRoleDto } from './dto/change-role.dto';
+import { OnTypingChannelDto } from './dto/on-typing-chan.dto';
+import { OnTypingPrivateDto } from './dto/on-typing-priv.dto';
 
 @Catch()
 class GatewayExceptionFilter extends BaseWsExceptionFilter {
@@ -189,11 +191,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		const updatedChan = await this.channelService.join(user, channel.id, pwdDto);
 		this.server.to(`channel-${channel.id}`).emit('ChannelUsersUpdate', updatedChan);
 		this.server.to(`user-${user.id}`).emit('OnJoin', updatedChan);
-		// const servMsg = await this.channelMsgService.createServer({
-		// 	chanId: updatedChan.id,
-		// 	content: `Welcome ${user.username}, say hi!`,
-		// });
-		// this.server.to(`channel-${channel.id}`).emit('NewChannelMessage', servMsg);
+		const servMsg = await this.channelMsgService.createServer({
+			chanId: updatedChan.id,
+			content: `Welcome ${user.username}, say hi!`,
+		});
+		this.server.to(`channel-${channel.id}`).emit('NewChannelMessage', servMsg);
 	}
 
 	@UseGuards(WsJwtGuard)
@@ -272,13 +274,33 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@UseGuards(WsJwtGuard, WsInChannelGuard, ChannelPermissionGuard)
 	@SubscribeMessage('ChangeRole')
-	async promoteUser(
+	async changeUserRole(
 		@GetChannelUser() chanUser: ChannelUser,
-		@MessageBody() dto: PromoteDto,
+		@MessageBody() dto: ChangeRoleDto,
 	){
 		const info = await this.channelService.changeUserRole(chanUser, dto);
 		this.server.to(`channel-${dto.chanId}`).emit('ChannelUserUpdate', info.userChanged);
 		if (info.ownerPassed)
 			this.server.to(`channel-${dto.chanId}`).emit('ChannelUserUpdate', info.chanUser);
+	}
+
+	@UseGuards(WsJwtGuard, WsInChannelGuard)
+	@SubscribeMessage('OnTypingChannel')
+	async onTypingChannel(
+		@GetUser() user: User,
+		@ConnectedSocket() socket: Socket,
+		@MessageBody() dto: OnTypingChannelDto,
+	) {
+		socket.to(`channel-${dto.chanId}`).emit('OnTypingChannel', { username: user.username, isTyping: dto.isTyping });
+	}
+
+	@UseGuards(WsJwtGuard)
+	@SubscribeMessage('OnTypingPrivate')
+	async onTypingPrivate(
+		@GetUser() user: User,
+		@ConnectedSocket() socket: Socket,
+		@MessageBody() dto: OnTypingPrivateDto,
+	) {
+		socket.to(`user-${dto.userId}`).emit('OnTypingPrivate', { username: user.username, isTyping: dto.isTyping });
 	}
 }

@@ -1,7 +1,7 @@
 import { IsNumber } from "class-validator";
 import { channelRole } from "src/utils/types/types";
 
-export class PromoteDto {
+export class ChangeRoleDto {
 	@IsNumber()
 	userId: number;
 
