@@ -39,15 +39,14 @@ export function useLoadChatDatas() {
     useEffect(() => {
         onCloseModal();
         // Permet d'afficher la sidebar si aucun channel ou aucune conv n'est selectionner (en responsive)
-        if ((channelId === undefined && convId === undefined) && location.pathname !== "/chat/channels-list") {
+        if ((channelId === undefined && convId === undefined) && window.innerWidth <= 855 && location.pathname !== "/chat/channels-list")
             setReponsiveSidebar(true);
-        }
         // Permet de mettre en couleur le channel ou la conv selectionner
         if (channelId)
             dispatch(changeActiveElement({id:channelId, isChannel: true}));
         else if (convId)
             dispatch(changeActiveElement({id:convId, isChannel: false}));
-    }, [channelId, convId, location.pathname])
+    }, [channelId, convId, location.pathname, window.innerWidth])
 
     useEffect(() => {
         fetchUserChannels(authDatas.token, channelId, dispatch); //Recupere les channels d'un user

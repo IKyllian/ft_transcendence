@@ -15,6 +15,7 @@ export interface ChannelUser {
     user: UserInterface,
     mutedTime?: string,
     is_muted: boolean, 
+    channelId: number,
 }
 
 export interface BannedUser {
@@ -26,7 +27,7 @@ export interface BannedUser {
 
 export interface ChatMessage {
     id: number,
-    sender: UserInterface,
+    sender?: UserInterface,
     content: string,
     send_at: Date,
     channel: Channel,

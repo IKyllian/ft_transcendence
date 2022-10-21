@@ -22,7 +22,7 @@ function MessageItem(props: {isFromChan: boolean, message: ChatMessage | Private
         setShowDropdown(!showDropdown);
     }
 
-    return (
+    return message.sender ? (
         <li className={`message-item message-item-${message.sender.id === authDatas.currentUser?.id ? "right" : "left"}`}> 
             { message.sender.id !== authDatas.currentUser?.id && <img src={ProfilPic} alt="profil pic" /> }
             <div className="message-item-info">
@@ -56,6 +56,10 @@ function MessageItem(props: {isFromChan: boolean, message: ChatMessage | Private
                 </div>       
             </div>
         </li>
+    ) : (
+        <div className="message-server">
+            <p> {message.content} </p>
+        </div>
     );
 }
 

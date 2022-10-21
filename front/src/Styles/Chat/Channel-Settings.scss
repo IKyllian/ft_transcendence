@@ -4,8 +4,7 @@
     display: flex;
     flex-direction: row;
     color: $WhitePalette;
-    height: 100vh;
-
+    @include page-wrapper();
     .sidebar-setting {
         background-color: $DarkPalette;
         width: 500px;
@@ -68,6 +67,7 @@
 
         .content-wrapper {
             margin-left: 50px;
+            height: 100%;
 
             .radio-form {
                 display: flex;
@@ -111,45 +111,55 @@
                 display: flex;
                 flex-direction: column;
                 gap: 10px;
+                height: 100%;
+                overflow-y: scroll;
                 h3 {
                     margin: 0;
                     padding: 0;
                     color: rgb(190, 181, 181);
                 }
-                .setting-user-item {
-                    width: 300px;
-                    @include flex-row-alignCenter;
-                    justify-content: space-between;
-                    .profil-container {
+                ul {
+                    margin: 0;
+                    padding: 0;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 5px;
+                    margin-bottom: 15px;
+                    .setting-user-item {
+                        width: 300px;
                         @include flex-row-alignCenter;
-                        gap: 10px;
-                        .profile-avatar {
-                            @include avatar-player(45px);
+                        justify-content: space-between;
+                        .profil-container {
+                            @include flex-row-alignCenter;
+                            gap: 10px;
+                            .profile-avatar {
+                                @include avatar-player(45px);
+                            }
                         }
-                    }
-                    .user-dropdown-container {
-                        position: relative;
-                        svg {
-                            cursor: pointer;
+                        .user-dropdown-container {
+                            position: relative;
+                            svg {
+                                cursor: pointer;
+                            }
                         }
-                    }
-
-                    .unban-button-wrapper {
-                        display: flex;
-                        flex-direction: column;
-                        gap: 2px;
-                        align-items: center;
-                        button {
-                            all: unset;
-                            cursor: pointer;
-                            background-color: $DarkPalette;
-                            padding: 6px;
-                            border-radius: 5px;
-                            font-size: 12px
-                        }
-                        p {
-                            font-size: 8px;
-                            margin: 0;
+    
+                        .unban-button-wrapper {
+                            display: flex;
+                            flex-direction: column;
+                            gap: 2px;
+                            align-items: center;
+                            button {
+                                all: unset;
+                                cursor: pointer;
+                                background-color: $DarkPalette;
+                                padding: 6px;
+                                border-radius: 5px;
+                                font-size: 12px
+                            }
+                            p {
+                                font-size: 8px;
+                                margin: 0;
+                            }
                         }
                     }
                 }

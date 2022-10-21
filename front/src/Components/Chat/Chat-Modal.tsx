@@ -73,57 +73,59 @@ function ChatModal(props: {onCloseModal: Function, showModal: number}) {
         return (
             <div className="chat-modal">
                 <IconX className="modal-exit" onClick={() => onCloseModal() } />
-                <h3> {showModal === 1 ? "Create Channel" : "Inviter des gens"}  </h3>
-                <form onSubmit={formSubmit}>
-                    {   showModal === 1 && 
-                        <>
-                            <div className="checkbox-container">
-                                {
-                                    ["public", "protected" ,"privée"].map((elem, index) => 
-                                        <label key={index}>
-                                            {elem}
-                                            <input
-                                                defaultChecked={index === 0 ? true : false}
-                                                type="radio"
-                                                value={elem}
-                                                {...register("chanMode", {required: "This is required"})}
-                                            />
-                                        </label>
-                                    )
-                                }
-                            </div>
-                            {errors.chanMode && <p className="txt-form-error"> {errors.chanMode.message} </p>}
-                            <label className="labelTextInput">
-                                Channel name:
-                                <input
-                                    type="text"
-                                    placeholder="Channel name..."
-                                    {...register("chanName", {
-                                        required: "Channel name is required",
-                                        minLength: {
-                                            value: 2,
-                                            message: "Min length is 2"
-                                        }
-                                    })}
-                                />
-                                {errors.chanName && <p className="txt-form-error"> {errors.chanName.message} </p>}
-                            </label>
-                            {
-                                channelMode === "protected" && 
+                <div className="form-modal-wrapper">
+                    <h3> {showModal === 1 ? "Create Channel" : "Inviter des gens"}  </h3>
+                    <form onSubmit={formSubmit}>
+                        {   showModal === 1 && 
+                            <>
+                                <div className="checkbox-container">
+                                    {
+                                        ["public", "protected" ,"privée"].map((elem, index) => 
+                                            <label key={index}>
+                                                {elem}
+                                                <input
+                                                    defaultChecked={index === 0 ? true : false}
+                                                    type="radio"
+                                                    value={elem}
+                                                    {...register("chanMode", {required: "This is required"})}
+                                                />
+                                            </label>
+                                        )
+                                    }
+                                </div>
+                                {errors.chanMode && <p className="txt-form-error"> {errors.chanMode.message} </p>}
                                 <label className="labelTextInput">
-                                    Password :
-                                    <input type="password" placeholder="password" {...register("password")} />
+                                    Channel name:
+                                    <input
+                                        type="text"
+                                        placeholder="Channel name..."
+                                        {...register("chanName", {
+                                            required: "Channel name is required",
+                                            minLength: {
+                                                value: 2,
+                                                message: "Min length is 2"
+                                            }
+                                        })}
+                                    />
+                                    {errors.chanName && <p className="txt-form-error"> {errors.chanName.message} </p>}
                                 </label>
-                            }
-                        </>
-                    }
-                    { showModal === 1 && <SearchBarPlayers functionality="chanInviteOnCreate" checkboxOnChange={checkboxOnChange} checkboxArray={usersInvited} fetchUserFunction={fetchSearchAllUsers} />}
-                    { showModal === 3 && <SearchBarPlayers functionality="chanInvite" checkboxOnChange={checkboxOnChange} checkboxArray={usersInvited} fetchUserFunction={fetchSearchUsersToInvite} />}
-                    <div className="chat-modal-buttons">
-                        <button onClick={() => onCloseModal() }> Cancel </button>
-                        <input type="submit" name={showModal === 1 ? "Save" : "Envoyer"} />
-                    </div>
-                </form>
+                                {
+                                    channelMode === "protected" && 
+                                    <label className="labelTextInput">
+                                        Password :
+                                        <input type="password" placeholder="password" {...register("password")} />
+                                    </label>
+                                }
+                            </>
+                        }
+                        { showModal === 1 && <SearchBarPlayers functionality="chanInviteOnCreate" checkboxOnChange={checkboxOnChange} checkboxArray={usersInvited} fetchUserFunction={fetchSearchAllUsers} />}
+                        { showModal === 3 && <SearchBarPlayers functionality="chanInvite" checkboxOnChange={checkboxOnChange} checkboxArray={usersInvited} fetchUserFunction={fetchSearchUsersToInvite} />}
+                        <div className="chat-modal-buttons">
+                            <button onClick={() => onCloseModal() }> Cancel </button>
+                            <input type="submit" name={showModal === 1 ? "Save" : "Envoyer"} />
+                        </div>
+                    </form>
+                </div>
             </div>        
         );
     } else if (showModal === 2) {

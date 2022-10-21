@@ -31,3 +31,15 @@ export function getMessageDateString(date: Date): string {
 export function UserIsMute(channelUsers: ChannelUser[], userId: number): boolean {
     return channelUsers.find(elem => (elem.user.id === userId && elem.is_muted)) ? true : false;
 }
+
+export const debounce = (func: Function) => {
+    let timer: any;
+    return function (...args: any) {
+      const context: any = debounce;
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(() => {
+        timer = null;
+        func.apply(context, args);
+      }, 7000);
+    };
+};

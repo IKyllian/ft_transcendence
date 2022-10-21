@@ -206,11 +206,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		const updatedChan = await this.channelService.leave(user, channel.id);
 		this.server.to(`channel-${channel.id}`).emit('ChannelUsersUpdate', updatedChan);
 		this.server.to(`user-${user.id}`).emit('OnLeave', updatedChan);
-		// const servMsg = await this.channelMsgService.createServer({
-		// 		chanId: updatedChan.id,
-		// 		content: `${user.username} just left.`,
-		// });
-		// this.server.to(`channel-${channel.id}`).emit('NewChannelMessage', servMsg);
+		const servMsg = await this.channelMsgService.createServer({
+				chanId: updatedChan.id,
+				content: `${user.username} just left.`,
+		});
+		this.server.to(`channel-${channel.id}`).emit('NewChannelMessage', servMsg);
 	}
 
 	@UseGuards(WsJwtGuard)

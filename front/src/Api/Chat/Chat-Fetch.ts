@@ -75,15 +75,19 @@ export async function fetchConvAndRedirect(
         console.log(response.data);
         const responseDatas: Conversation | UserInterface = response.data;
         if ((responseDatas as Conversation).messages) {
+            console.log("CONV");
             if (!privateConvs?.find(elem => elem.conversation.id === response.data.id))
                 dispatch(addPrivateConv({isActive: 'false', conversation: {id: response.data.id, user1: response.data.user1, user2: response.data.user2}}));
             let conv: Conversation = response.data;
             conv.messages.forEach(elem => elem.send_at = new Date(elem.send_at));
-            navigate(`/chat/private-message/${conv.id}`, {state: {conv: {isActive: true, conversation: conv}}});
+            console.log("new Conv", conv);
+            navigate(`/chat/private-message/${conv.id}`, {state: {isTemp: false, conv: conv}});
         } else {
+            console.log("User");
+
             //Check pour l'id temporaire
             const tempId: number = Math.floor(Math.random() * 10000);;
-            navigate(`/chat/private-message/${tempId}`, {state: {conv: {isActive: 'true', conversation: {id: tempId, user1: loggedUser, user2: response.data}}}});
+            navigate(`/chat/private-message/${tempId}`, {state: {isTemp: true, conv: {id: tempId, user1: loggedUser, user2: response.data, messages: []}}});
         }
         
     })

@@ -9,7 +9,6 @@ function SidebarSettings(props: {setSidebarItem: Function, channelDatas: Channel
     const {setSidebarItem, channelDatas, loggedUserIsOwner} = props;
 
     const params = useParams();
-    const navigate = useNavigate();
     const dispatch = useAppDispatch();
 
     const {socket} = useContext(SocketContext);
@@ -19,9 +18,6 @@ function SidebarSettings(props: {setSidebarItem: Function, channelDatas: Channel
             const chanId: number = parseInt(params.channelId);
             socket?.emit("LeaveChannel", {id: chanId});
             dispatch(removeChannel(chanId));
-            // setTimeout(function() {
-            //     navigate(`/chat`);
-            // }, 50);
         }
     }
 

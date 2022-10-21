@@ -10,9 +10,6 @@ function MuteButton(props: {senderId: number, chan: Channel}) {
     const {socket} = useContext(SocketContext);
 
     const handleClick = () => {
-        console.log("Handle Click", senderIsMute);
-        console.log("senderId", senderId);
-        console.log("chan.id", chan.id);
         if (!senderIsMute) {
             socket?.emit("Mute", {
                 userId: senderId,
