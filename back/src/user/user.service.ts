@@ -81,7 +81,7 @@ export class UserService {
 			user.username = name;
 			user = await this.userRepo.save(user);
 			return {
-				token: (await this.authService.signTokens(user.id, user.username)).access_token,
+				access_token: ((await this.authService.signTokens(user.id, user.username)).access_token),
 				user: user,
 			}
 		} catch(error) {

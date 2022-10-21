@@ -166,6 +166,7 @@ export class AuthService {
 			});
 		}
 		catch(e) {
+			console.log('hello', e.message)
 			return null;
 		}
 	}
