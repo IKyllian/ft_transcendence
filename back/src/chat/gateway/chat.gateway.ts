@@ -47,7 +47,6 @@ class GatewayExceptionFilter extends BaseWsExceptionFilter {
 @UsePipes(new ValidationPipe())
 @WebSocketGateway({
 	cors: {
-		// origin: ['http://localhost:3000'],
 		credential: true,
 	}
 })
@@ -291,7 +290,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		@ConnectedSocket() socket: Socket,
 		@MessageBody() dto: OnTypingChannelDto,
 	) {
-		socket.to(`channel-${dto.chanId}`).emit('OnTypingChannel', { username: user.username, isTyping: dto.isTyping });
+		socket.to(`channel-${dto.chanId}`).emit('OnTypingChannel', { user, isTyping: dto.isTyping });
 	}
 
 	@UseGuards(WsJwtGuard)
@@ -301,6 +300,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		@ConnectedSocket() socket: Socket,
 		@MessageBody() dto: OnTypingPrivateDto,
 	) {
-		socket.to(`user-${dto.userId}`).emit('OnTypingPrivate', { username: user.username, isTyping: dto.isTyping });
+		socket.to(`user-${dto.userId}`).emit('OnTypingPrivate', { user, isTyping: dto.isTyping, convId: dto.convId });
 	}
 }
