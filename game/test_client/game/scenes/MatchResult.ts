@@ -26,6 +26,7 @@ export default class MatchResult extends Phaser.Scene
 	player_B_avatar?: Phaser.GameObjects.Image;
 	result_text?: Phaser.GameObjects.Text;
 	close_button?: Phaser.GameObjects.Image;
+	// replay_button?: Phaser.GameObjects.Image;
 
 	preload ()
 	{
@@ -61,6 +62,12 @@ export default class MatchResult extends Phaser.Scene
 								.setDisplaySize(200, 200)
 								.setName('close')
 								.setInteractive();
+		// this.replay_button = this.add.image(500, 400, 'button')
+		// 						.setOrigin(0.5,0.5)
+		// 						.setDisplaySize(200, 200)
+		// 						.setName('replay')
+		// 						.setInteractive();
+
 		let style: Phaser.Types.GameObjects.Text.TextStyle = 
 		{
 			fontSize: '32px',
@@ -127,6 +134,13 @@ export default class MatchResult extends Phaser.Scene
 			//close phaser
 			this.game.destroy(true, false);
 		}
+
+		// if (gameobject.name === 'replay')
+		// {
+		// 	gameobject.destroy();
+		// 	//close phaser
+		// 	this.game.destroy(true, false);
+		// }
 	}
 
 }

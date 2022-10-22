@@ -2,13 +2,14 @@ import { Server } from 'socket.io';
 import { generate } from 'shortid'
 import { Lobby } from './lobby';
 import { Socket } from 'socket.io';
-import { PlayersLobbyData,  NewGameData, PlayerInput } from 'src/types/shared.types';
+import { PlayersLobbyData,  NewGameData, PlayerInput, GameState } from 'src/types/shared.types';
 
 export class LobbyFactory
 {
 	server: Server;
 	private lobby_list: Map<Lobby['game_id'], Lobby> = new Map<Lobby['game_id'], Lobby>();
 	private client_list: Map<Socket['id'], Lobby['game_id']> = new Map<Socket['id'], Lobby['game_id']>();
+	replay_list: Map<string, Array<GameState>> = new Map <string, Array<GameState>>();
 
 	lobby_create(data: {player_A: string, player_B: string}): NewGameData
 	{
@@ -56,7 +57,7 @@ export class LobbyFactory
 		let lobby: Lobby | undefined =  this.lobby_list.get(game_id);
 		if (lobby !== undefined)
 		{
-			lobby.lobby_remove_all();
+		//	lobby.lobby_remove_all();
 			this.lobby_list.delete(game_id);
 			console.log("deleted lobby: ", game_id);
 		}
@@ -102,7 +103,7 @@ export class LobbyFactory
 		let game_id: string | undefined = this.locate_client(client);
 		if (game_id !== undefined )
 		{
-			this.lobby_list.get(game_id).lobby_disconnect(client);
+			this.lobby_list.get(game_id)?.lobby_disconnect(client);
 			this.client_list.delete(client['id']);
 		}
 	}
@@ -132,4 +133,76 @@ export class LobbyFactory
 		this.lobby_list.get(game_id)?.game_send_round_setup(client);
 	}
 
+
+	save_replay(game_id: string, save: Array<GameState>)
+	{
+		this.replay_list.set(game_id, save);
+	}
+
+//rework this shit
+	send_replay(client: Socket, game_id: string)
+	{
+		let replay :Array<GameState> | undefined = this.replay_list.get(game_id);
+// this.replay_debug(game_id);		
+		if (replay !== undefined)
+		{
+			console.log('starting replay send', game_id, 'frame count', replay.length);
+		
+			replay.forEach((gamestate, index) => {
+				setTimeout(() => {
+
+					//let cpy: GameState = gamestate;
+
+					gamestate.last_processed_time_A = new Date();;
+	
+					if (!(index % 60))
+					{
+						console.log('sending frame:', index);
+						// console.log('date:', date);
+						console.log('gamestate time:', gamestate.last_processed_time_A );
+						// console.log('cpy time', cpy.last_processed_time_A);
+					}
+					client.emit('replay_state', gamestate);
+			
+				}, index * (1000 / 60));
+			  });
+		}
+		else
+		{
+			//emit au client not found
+			console.log('replay not found:', game_id);
+		}
+	}
+
+	replay_debug(game_id: string)
+	{
+console.log('@@@@@@@@@@@@@@@ replay data in factory @@@@@@@@@@@@@@@@@');
+
+
+		let replay :Array<GameState> | undefined = this.replay_list.get(game_id);
+		if (replay !== undefined)
+		{
+
+			console.log('replay debug', game_id);
+
+
+			replay.forEach((gamestate, index) => {
+
+				// if (!(index % 10))
+				// {
+					console.log('factory frame#', index)
+					console.log(gamestate);
+					console.log('ball position:',gamestate.balldata.position);
+				// }
+
+				// if(index === (replay.length -1))
+				// {
+				// 	console.log('@@@@last one');
+				// 	console.log(gamestate);
+				// 	console.log('ball position:',gamestate.balldata.position);
+				// }
+			});
+
+		}
+	}
 }

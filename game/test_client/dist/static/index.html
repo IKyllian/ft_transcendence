@@ -17,6 +17,7 @@
     <button onclick="runLuigi()">runLuigi</button>
     <button onclick="runSpect()">runSpectator</button>
     <button onclick="runWrongLobbyData()">runWrongLobbyData</button>
+    <button onclick="runReplay()">the secret feature #TOPSECRET</button>
 
 
     <script>
@@ -122,6 +123,11 @@
               player_secret: '',
               game_id: 'ayr8z'
             });
+      }
+
+      function runReplay()
+      {
+        window.libpong.watch_replay('aKnHwyr8z');
       }
     </script>
 

@@ -24,7 +24,7 @@ export class Lobby
 
 	constructor(
 		public gamedata: NewGameData,
-		private readonly factory: LobbyFactory
+		readonly factory: LobbyFactory
 		)
 	{
 		this.game_id = gamedata.game_id;

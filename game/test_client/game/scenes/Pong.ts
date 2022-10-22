@@ -373,7 +373,8 @@ export default class Pong extends Phaser.Scene
 	game_end = (winner: EndResult) =>
 	{
 		this.game.registry.set('winner', winner);
-
+//TODO
+//clear l'interval ?
 		this.time.addEvent({
 			delay: 1000,
 			callback: function()

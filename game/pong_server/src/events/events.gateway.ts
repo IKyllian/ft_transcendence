@@ -186,4 +186,15 @@ import { NewGameData, PlayerInput, PlayersLobbyData } from '../types/shared.type
 		this.lobbyfactory.lobby_game_get_round_setup(client, game_id);
 	}
 
+
+	/* ----- Replay Handling ----- */
+
+
+	@SubscribeMessage('replay_request')
+	async onReplayRequest(@ConnectedSocket() client: Socket,
+	@MessageBody() game_id: string)
+	{
+		this.lobbyfactory.send_replay(client, game_id);
+	}
+
   }
