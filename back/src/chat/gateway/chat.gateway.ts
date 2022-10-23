@@ -1,12 +1,11 @@
-import { ArgumentsHost, BadRequestException, Catch, ClassSerializerInterceptor, ExceptionFilter, HttpException, UseFilters, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
-import { WebSocketGateway, MessageBody, WebSocketServer, ConnectedSocket, OnGatewayConnection, OnGatewayDisconnect, WsException, BaseWsExceptionFilter, SubscribeMessage, OnGatewayInit } from '@nestjs/websockets';
+import { ArgumentsHost, Catch, UseFilters, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import { WebSocketGateway, MessageBody, WebSocketServer, ConnectedSocket, OnGatewayConnection, OnGatewayDisconnect, WsException, BaseWsExceptionFilter, SubscribeMessage } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { AuthService } from 'src/auth/auth.service';
 import { WsJwtGuard } from 'src/auth/guard/ws-jwt.guard';
 import { ChannelMessage, ChannelUser, User } from 'src/typeorm';
 import { ChannelService } from '../channel/channel.service';
 import { ChatSessionManager } from './chat.session';
-import { MessageDto } from '../channel/dto/message.dto';
 import { UserService } from 'src/user/user.service';
 import { JwtPayload } from 'src/utils/types/types';
 import { GetChannelUser, GetUser } from 'src/utils/decorators';
@@ -25,7 +24,6 @@ import { BanUserDto } from '../channel/dto/ban-user.dto';
 import { ChannelPermissionGuard } from '../channel/guards';
 import { WsInChannelGuard } from '../channel/guards/ws-in-channel.guard';
 import { ConversationService } from '../conversation/conversation.service';
-import { doesNotMatch } from 'assert';
 import { MuteUserDto } from '../channel/dto/mute-user.dto';
 import { ChangeRoleDto } from './dto/change-role.dto';
 import { OnTypingChannelDto } from './dto/on-typing-chan.dto';
@@ -159,13 +157,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		@GetUser() user: User,
 		@ConnectedSocket() socket: Socket,
 		@MessageBody() data: PrivateMessageDto,
-		) {
-			console.log(socket.id)
-			const conv = await this.convService.create(user, data.adresseeId, data.content);
-			this.server
-			.to(`user-${user.id}`)
-			.to(`user-${data.adresseeId}`)
-			.emit('NewConversation', { conv, socketId: socket.id });
+	) {
+		console.log(socket.id)
+		const conv = await this.convService.create(user, data.adresseeId, data.content);
+		this.server
+		.to(`user-${user.id}`)
+		.to(`user-${data.adresseeId}`)
+		.emit('NewConversation', { conv, socketId: socket.id });
 	}
 
 	@UseGuards(WsJwtGuard)
@@ -243,14 +241,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		@GetUser() user: User,
 		@MessageBody() dto: BanUserDto,
 	) {
-			const updatedChan = await this.channelService.banUser(user, dto);
-			this.server.to(`channel-${updatedChan.id}`).emit('ChannelUsersUpdate', updatedChan);
-			this.server.to(`user-${dto.userId}`).emit('OnLeave', updatedChan);
-			// const servMsg = await this.channelMsgService.createServer({
-			// 	chanId: updatedChan.id,
-			// 	content: `${user.username} got banned ${dto.time ? `for ${dto.time} seconds.` : 'permanently.'}`,
-			// });
-			// this.server.to(`channel-${updatedChan.id}`).emit('NewChannelMessage', servMsg);
+		const updatedChan = await this.channelService.banUser(user, dto);
+		this.server.to(`channel-${updatedChan.id}`).emit('ChannelUsersUpdate', updatedChan);
+		this.server.to(`user-${dto.userId}`).emit('OnLeave', updatedChan);
+		// const servMsg = await this.channelMsgService.createServer({
+		// 	chanId: updatedChan.id,
+		// 	content: `${user.username} got banned ${dto.time ? `for ${dto.time} seconds.` : 'permanently.'}`,
+		// });
+		// this.server.to(`channel-${updatedChan.id}`).emit('NewChannelMessage', servMsg);
 	}
 
 	@UseGuards(WsJwtGuard, WsInChannelGuard, ChannelPermissionGuard)

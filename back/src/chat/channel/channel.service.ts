@@ -28,6 +28,8 @@ export class ChannelService {
 		private channelUserRepo: Repository<ChannelUser>,
 		@InjectRepository(BannedUser)
 		private bannedRepo: Repository<BannedUser>,
+		@InjectRepository(User)
+		private userRepo: Repository<User>,
 	) {}
 	/**
 	 * TODO C PAS FOU
@@ -35,35 +37,15 @@ export class ChannelService {
 	 * @returns All the channel that the user did not joined and that is visible
 	 */
 	async searchChannel(user: User) {
-		// const userChannel = await this.getMyChannels(user.id);
-		// let userChannelId: number[] = [];
-		// userChannel.forEach((element) => {
-		// 	userChannelId.push(element.id);
-		// });
-
-
-		// return this.channelRepo.find({
-		// 	relations: {
-		// 		channelUsers: {
-		// 			user: true,
-		// 		},
-		// 	},
-		// 	where: {
-		// 		option: In([channelOption.PUBLIC, channelOption.PROTECTED]),
-		// 		id: Not(In(userChannelId))
-		// 	},
-		// });
-
 		const channelsUserHasJoined = this.channelUserRepo
   		.createQueryBuilder("channelUser")
   		.select("channelUser.channel.id")
   		.where("channelUser.user.id = :id", { id: user.id })
 
-
   		return this.channelRepo
   		.createQueryBuilder("channel")
 		.innerJoinAndSelect("channel.channelUsers", "channelUsers")
-  		.where("channel.id NOT IN ("+ channelsUserHasJoined.getQuery() +")")
+  		.where("channel.id NOT IN (" + channelsUserHasJoined.getQuery() + ")")
   		.setParameters(channelsUserHasJoined.getParameters())
   		.getMany()
 	}
@@ -95,9 +77,10 @@ export class ChannelService {
 	}
 
 	async create(user: User, dto: CreateChannelDto) {
-		const channelExist = await this.findOne({
-			where: { name: dto.name }
-		});
+		const channelExist = await this.channelRepo
+		.createQueryBuilder("channel")
+		.where("LOWER(channel.name) = :name", { name: dto.name.toLowerCase() })
+		.getOne()
 		if (channelExist)
 			throw new ChannelExistException();
 
@@ -215,7 +198,6 @@ export class ChannelService {
 		const userInChannel = await this.channelUserRepo.findOne({
 			relations: {
 				user: true,
-				// channel: true,
 			},
 			where: {
 				channel: {
@@ -347,27 +329,19 @@ export class ChannelService {
 		}
 	}
 
-	//TODO what if banned?
 	async getUsersToInvite(dto: SearchToInviteInChanDto) {
-		const channel = await this.channelRepo.findOne({
-			relations: {
-				channelUsers: { user: true },
-			},
-			where: { id: dto.chanId },
-		});
-		if (!channel)
-			throw new ChannelNotFoundException();
+		const usersJoined = this.userRepo
+		.createQueryBuilder("user")
+		.select("user.id")
+		.innerJoin("user.channelUser", "channelUser", "channelUser.channel.id = :chanId",
+		{ chanId: dto.chanId })
 
-		const usersId: number[] = [];
-		channel.channelUsers.forEach((chanUser) => {
-			usersId.push(chanUser.user.id);
-		})
-		return this.userService.find({
-			where: {
-				id: Not(In(usersId)),
-				username: Like(`%${dto.str}%`),
-			}
-		});
+		return this.userRepo.createQueryBuilder("user")
+		.where("user.id NOT IN (" + usersJoined.getQuery() + ")")
+		.setParameters(usersJoined.getParameters())
+		.andWhere("LOWER(user.username) LIKE :name", { name: `%${dto.str.toLowerCase()}%` })
+		.take(10)
+		.getMany()
 	}
 
 	async changeUserRole(chanUser: ChannelUser, dto: ChangeRoleDto) {

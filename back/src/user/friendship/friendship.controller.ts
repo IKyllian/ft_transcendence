@@ -1,7 +1,8 @@
-import { Controller, Get, Param, ParseIntPipe, Post, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, Param, ParseIntPipe, Post, UseGuards } from "@nestjs/common";
 import { JwtGuard } from "src/auth/guard/jwt.guard";
 import { User } from "src/typeorm";
 import { GetUser } from "src/utils/decorators";
+import { SearchDto } from "../dto/search.dto";
 import { FriendshipService } from "./friendship.service";
 
 @Controller('friend')
@@ -17,8 +18,11 @@ export class friendshipController {
 
 	@UseGuards(JwtGuard)
 	@Get('search')
-	async searchUserToAdd(@GetUser() user: User) {
-		return await this.friendshipService.searchUsersToAdd(user);
+	async searchUserToAdd(
+	@GetUser() user: User,
+	@Body() dto: SearchDto,
+	) {
+		return await this.friendshipService.searchUsersToAdd(user, dto);
 	}
 
 	//TODO delete

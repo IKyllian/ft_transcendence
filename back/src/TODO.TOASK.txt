@@ -24,4 +24,7 @@
 	- recuperer conv prive avec msg avec l id de la conv
 	- use update instead of save ?
 	- debounce on search input
-	- on typing?
+	- test envoyer un msg prive quand on est bloque sur discord
+
+//ISSUE ?
+	- mute is canceled if user quit and rejoin channel
