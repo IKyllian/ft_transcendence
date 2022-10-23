@@ -6,14 +6,16 @@ import { SocketContext } from "../../App";
 import { addChannel } from "../../Redux/ChatSlice";
 import { UserInterface } from "../../Types/User-Types";
 import { debounce } from "../../Utils/Utils-Chat";
+import { useForm } from "react-hook-form";
 
 export function useChannelHook() {
     const [chatDatas, setChatDatas] = useState<Channel | undefined>(undefined);
     const [showUsersSidebar, setShowUsersSidebar] = useState<boolean>(true);
-    const [inputMessage, setInputMessage] = useState<string>('');
     const [loggedUserIsOwner, setLoggedUserIsOwner] = useState<boolean>(false);
     const [hasSendTypingEvent, setHasTypingEvent] = useState<boolean>(false);
     const [usersTyping, setUsersTyping] = useState<UserInterface[]>([]);
+
+    const { register, handleSubmit, reset, formState: {errors} } = useForm<{inputMessage: string}>();
 
     const messagesEndRef = useRef<null | HTMLDivElement>(null);
     let authDatas = useAppSelector((state) => state.auth);
@@ -23,19 +25,18 @@ export function useChannelHook() {
     const channelId: number | undefined = params.channelId ? parseInt(params.channelId!, 10) : undefined;
     const dispatch = useAppDispatch();
 
-    useEffect(() => {
-        console.log("useEffect hasSendTypingEvent", hasSendTypingEvent);
-    }, [hasSendTypingEvent])
+    console.log("Channel page render");
 
-    const changeSidebarStatus = () => {
+    const changeSidebarStatus = useCallback(() => {
+        console.log("changeSidebarStatus");
         setShowUsersSidebar(!showUsersSidebar);
-    }
+    }, [setShowUsersSidebar]);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView();
     }
 
-    const handleInputChange = (value: string) => {
+    const handleInputChange = () => {
         if (!hasSendTypingEvent) {
             console.log("Send Emit is Typing True");
             socket?.emit("OnTypingChannel", {
@@ -44,7 +45,6 @@ export function useChannelHook() {
             })
             setHasTypingEvent(true);
         }
-        setInputMessage(value);
     }
 
     const endOfTyping = () => {
@@ -63,28 +63,31 @@ export function useChannelHook() {
     }, [chatDatas?.messages]);
 
     useEffect(() => {
+        console.log("UseEffect ChannelId");
         setChatDatas(undefined);
         setLoggedUserIsOwner(false);
         setUsersTyping([]);
-        setInputMessage('');
         const getDatas = () => {
             socket!.emit("JoinChannelRoom", {
                 id: channelId,
             });
 
             socket?.on("OnTypingChannel", (data: {user: UserInterface, isTyping: boolean}) => {
+                console.log("OnTypingChannel");
                 setUsersTyping(prev => [...prev.filter(elem => elem.id !== data.user.id)]);
                 if (data.isTyping)
                     setUsersTyping(prev => [...prev, data.user]);
             });
 
             socket!.on('ChannelUsersUpdate', (data: Channel) => {
+                console.log("ChannelUsersUpdate");
                 setChatDatas((prev: any) => {
                     return {...prev, channelUsers: [...data.channelUsers]}
                 });
             });
 
             socket!.on("ChannelUserUpdate", (data: ChannelUser) => {
+                console.log("ChannelUserUpdate");
                 setChatDatas((prev: any) => {
                     return {...prev, channelUsers: [...prev.channelUsers.map((elem: any) => {
                         if (elem.user.id === data.user.id)
@@ -95,7 +98,7 @@ export function useChannelHook() {
             })
 
             socket!.on('roomData', (data: Channel) => {
-                console.log("roomData", data);
+                console.log("Getting datas roomData", data);
                 if (data.id === channelId) {
                     let channel: Channel = data;
                     channel.messages.forEach(elem => elem.send_at = new Date(elem.send_at));
@@ -122,6 +125,7 @@ export function useChannelHook() {
     }, [channelId])
 
     useEffect(() => {
+        console.log("EseEffect no dependance");
         const listener = (data: any) => {
             setChatDatas((prev: any) => {
                 return {...prev, messages: [...prev!.messages, {...data, send_at: new Date(data.send_at)}]}
@@ -134,11 +138,11 @@ export function useChannelHook() {
         }
     }, [])
 
-    const handleSubmit = (e: any) => {
+    const handleSubmitMessage = handleSubmit((data, e: any) => {
         e.preventDefault();
-        const submitMessage = () => {
+        if (data.inputMessage.length > 0) {
             socket!.emit("ChannelMessage", {
-                content: inputMessage,
+                content: data.inputMessage,
                 chanId: channelId,
             });
             socket?.emit("OnTypingChannel", {
@@ -146,24 +150,20 @@ export function useChannelHook() {
                 isTyping: false,
             })
             setHasTypingEvent(false);
-            setInputMessage('');
+            reset();
         }
-        if (inputMessage.length > 0) {
-            submitMessage();
-        }
-    }
+    })
 
     return {
         loggedUserIsOwner: loggedUserIsOwner,
         changeSidebarStatus: changeSidebarStatus,
-        handleSubmit: handleSubmit,
+        handleSubmit: handleSubmitMessage,
         messagesEndRef: messagesEndRef,
-        inputMessage: inputMessage,
-        setInputMessage: setInputMessage,
         showUsersSidebar: showUsersSidebar,
         chatDatas: chatDatas,
         optimizedFn: optimizedFn,
         handleInputChange: handleInputChange,
         usersTyping: usersTyping,
+        register: register,
     };
 }

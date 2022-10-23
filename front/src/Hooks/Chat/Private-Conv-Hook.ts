@@ -3,11 +3,12 @@ import { useState, useRef, useContext, useEffect, useCallback } from "react";
 import { Conversation, PrivateMessage } from "../../Types/Chat-Types";
 import { SocketContext } from "../../App";
 import { useLocation, useParams } from "react-router-dom";
-import { useAppDispatch, useAppSelector } from '../../Redux/Hooks'
+import { useAppSelector } from '../../Redux/Hooks'
 import { getSecondUserIdOfPM } from "../../Utils/Utils-Chat";
 import { fetchPrivateConvDatas } from "../../Api/Chat/Chat-Fetch";
 import { UserInterface } from "../../Types/User-Types";
 import { debounce } from "../../Utils/Utils-Chat";
+import { useForm } from "react-hook-form";
 
 interface ConversationState {
     temporary: boolean,
@@ -15,26 +16,24 @@ interface ConversationState {
 }
 
 export function usePrivateConvHook() {
-    const [inputMessage, setInputMessage] = useState<string>('');
     const [convDatas, setConvDatas] = useState<ConversationState | undefined>(undefined);
     const [userTyping, setUserTyping] = useState<UserInterface | undefined>(undefined);
     const [hasSendTypingEvent, setHasTypingEvent] = useState<boolean>(false);
+    const { register, handleSubmit, reset, formState: {errors} } = useForm<{inputMessage: string}>();
 
     const authDatas = useAppSelector((state) => state.auth);
-    const {privateConv} = useAppSelector((state) => state.chat);
     const messagesEndRef = useRef<null | HTMLDivElement>(null);
     const location = useLocation();
     const params = useParams();
     const convId: number | undefined = params.convId ? parseInt(params.convId!) : undefined;
     const { socket } = useContext(SocketContext);
-    const dispatch = useAppDispatch();
 
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }
 
-    const handleInputChange = (value: string) => {
+    const handleInputChange = () => {
         if (!hasSendTypingEvent) {
             socket?.emit("OnTypingPrivate", {
                 userId: getSecondUserIdOfPM(convDatas?.conv!, authDatas.currentUser!.id),
@@ -43,7 +42,6 @@ export function usePrivateConvHook() {
             })
             setHasTypingEvent(true);
         }
-        setInputMessage(value);
     }
 
     const endOfTyping = () => {
@@ -59,19 +57,19 @@ export function usePrivateConvHook() {
 
     const optimizedFn = useCallback(debounce(endOfTyping), [hasSendTypingEvent, convDatas, authDatas]);
 
-    const handleSubmit = (e: any) => {
+    const handleSubmitMessage = handleSubmit((data, e: any) => {
         e.preventDefault();
         const submitMessage = () => {
             const secondUserId: number = getSecondUserIdOfPM(convDatas?.conv!, authDatas.currentUser!.id);
             console.log();
             if (convDatas?.temporary) {
                 socket!.emit("CreateConversation", {
-                    content: inputMessage,
+                    content: data.inputMessage,
                     adresseeId: secondUserId,
                 });
             } else {
                 socket!.emit("PrivateMessage", {
-                    content: inputMessage,
+                    content: data.inputMessage,
                     adresseeId: secondUserId,
                 });
             }
@@ -80,12 +78,12 @@ export function usePrivateConvHook() {
                 isTyping: false,
             })
             setHasTypingEvent(false);
-            setInputMessage('');
         }
-        if (inputMessage.length > 0) {
+        if (data.inputMessage.length > 0) {
             submitMessage();
+            reset();
         }
-    } 
+    })
 
     useEffect(() => {
         scrollToBottom();
@@ -137,13 +135,12 @@ export function usePrivateConvHook() {
 
     return {
         convDatas: convDatas,
-        inputMessage: inputMessage,
-        setInputMessage: setInputMessage,
-        handleSubmit: handleSubmit,
+        handleSubmit: handleSubmitMessage,
         messagesEndRef: messagesEndRef,
         loggedUser: authDatas.currentUser,
         optimizedFn: optimizedFn,
         handleInputChange: handleInputChange,
         userTyping: userTyping,
+        register: register,
     };
 }

@@ -23,6 +23,10 @@ export const chatSlice = createSlice({
         loadingDatas: (state) => {
             state.loading = true;
         },
+        copyChannelsAndConvs: (state, {payload} : PayloadAction<{channels: ChannelsInterfaceFront[], convs: ConversationInterfaceFront[]}>) => {
+            state.channels = [...payload.channels];
+            state.privateConv = [...payload.convs];
+        },
         copyChannelsArray: (state, {payload}: PayloadAction<ChannelsInterfaceFront[]>) => {
             state.channels = [...payload];
         },
@@ -105,6 +109,7 @@ export const chatSlice = createSlice({
 
 export const {
     loadingDatas,
+    copyChannelsAndConvs,
     copyChannelsArray,
     copyPrivateConvArray,
     updateChannel,

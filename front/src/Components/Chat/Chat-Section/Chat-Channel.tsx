@@ -12,13 +12,12 @@ function ChatChannel() {
         changeSidebarStatus,
         handleSubmit,
         messagesEndRef,
-        inputMessage,
-        setInputMessage,
         showUsersSidebar,
         chatDatas,
         optimizedFn,
         handleInputChange,
         usersTyping,
+        register,
     } = useChannelHook();
 
     return (chatDatas === undefined) ? (
@@ -31,8 +30,14 @@ function ChatChannel() {
                 <ChatHeader chatItem={chatDatas} showUsersSidebar={showUsersSidebar} changeSidebarStatus={changeSidebarStatus} />
                 <ul>
                     {
-                        chatDatas.messages.map((elem, index) =>
-                            <MessageItem key={index} isFromChan={true} message={elem} loggedUserIsOwner={loggedUserIsOwner} chanId={chatDatas} />
+                        chatDatas.messages.map((elem, index) => {
+                            if (index === 0)
+                                console.log("Messages Render");
+                            if (index === 0 || !elem.sender || chatDatas.messages[index - 1].sender?.id !== elem.sender?.id || (elem.send_at.getDate() !== chatDatas.messages[index - 1].send_at.getDate()))
+                                return <MessageItem key={index} isFromChan={true} message={elem} loggedUserIsOwner={loggedUserIsOwner} chanId={chatDatas} isNewSender={true} index={index} />
+                            else
+                                return <MessageItem key={index} isFromChan={true} message={elem} loggedUserIsOwner={loggedUserIsOwner} chanId={chatDatas} isNewSender={false} index={index} />
+                        }
                         )
                     }
                     <div ref={messagesEndRef} />
@@ -50,7 +55,7 @@ function ChatChannel() {
                 }
                 <div className="message-input-container">
                     <form onSubmit={handleSubmit}>
-                        <input type="text" placeholder="Type Your Message..." value={inputMessage} onChange={(e) => {handleInputChange(e.target.value); optimizedFn(e.target.value)}} />
+                        <input type="text" placeholder="Type Your Message..." {...register('inputMessage', {minLength: 1, onChange: (e) => {optimizedFn(e.target.value); handleInputChange()}})} />
                         <button type="submit"> <IconSend /> </button>
                     </form>
                     

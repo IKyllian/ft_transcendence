@@ -28,6 +28,10 @@ export function getMessageDateString(date: Date): string {
         return (`${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`);
 }
 
+export function getMessageHour(date: Date): string {
+    return (`${date.getHours() + 2}:${date.getMinutes() >= 0 && date.getMinutes() <= 9 ? '0' : ''}${date.getMinutes()}`)
+}
+
 export function UserIsMute(channelUsers: ChannelUser[], userId: number): boolean {
     return channelUsers.find(elem => (elem.user.id === userId && elem.is_muted)) ? true : false;
 }

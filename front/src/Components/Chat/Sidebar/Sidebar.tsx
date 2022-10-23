@@ -12,6 +12,9 @@ function Sidebar(props: {setShowModal: Function, chanDatas: ChannelsInterfaceFro
     const ref = useRef<HTMLHeadingElement>(null);
     const params = useParams();
 
+    const channelId: number | undefined = params.channelId ? parseInt(params.channelId!, 10) : undefined;
+    const convId: number | undefined = params.convId ? parseInt(params.convId!, 10) : undefined;
+
     useEffect(() => {
         const handleClickOutside = (event: any) => {
             if (ref.current && !ref.current.contains(event.target)) {
@@ -24,8 +27,7 @@ function Sidebar(props: {setShowModal: Function, chanDatas: ChannelsInterfaceFro
         return () => {
             document.removeEventListener('click', handleClickOutside, true);
         };
-    }, [sidebarStatus, sidebarStatus.setSidebarStatus, params.channelId, params.convId]);
-
+    }, [sidebarStatus, sidebarStatus.setSidebarStatus, channelId, convId]);
  
     return (
         <div ref={ref} className={`chat-sidebar ${sidebarStatus.sidebar ? "chat-sidebar-responsive" : ""}`}>

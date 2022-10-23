@@ -6,7 +6,8 @@ import { Dispatch, AnyAction } from "@reduxjs/toolkit";
 import { NavigateFunction } from "react-router-dom";
 import { UserInterface } from "../../Types/User-Types";
 
-export async function fetchUserChannels(token: string, channelId: number | undefined, dispatch: Dispatch<AnyAction>): Promise<void> {
+export async function fetchUserChannels(token: string, channelId: number | undefined, dispatch: Dispatch<AnyAction>): Promise<ChannelsInterfaceFront[]> {
+    let datasArray: ChannelsInterfaceFront[] = [];
     await axios.get(`${baseUrl}/channel/my_channels`, {
         headers: {
             "Authorization": `Bearer ${token}`,
@@ -14,7 +15,6 @@ export async function fetchUserChannels(token: string, channelId: number | undef
     })
     .then((response) => {
         const channelArray: Channel[] = response.data;
-        let datasArray: ChannelsInterfaceFront[] = [];
 
         channelArray.forEach((elem: Channel) => {
             datasArray.push({
@@ -29,13 +29,14 @@ export async function fetchUserChannels(token: string, channelId: number | undef
                     elem.isActive = "true";
             })
         }
-        dispatch(copyChannelsArray(datasArray));
     }).catch(err => {
         console.log(err);
     })
+    return datasArray;
 }
 
-export async function fetchUserConvs(token: string, dispatch: Dispatch<AnyAction>): Promise<void> {
+export async function fetchUserConvs(token: string, dispatch: Dispatch<AnyAction>): Promise<ConversationInterfaceFront[]> {
+    let datasArray: ConversationInterfaceFront[] = [];
    await axios.get(`${baseUrl}/conversation`, {
         headers: {
             "Authorization": `Bearer ${token}`,
@@ -43,7 +44,6 @@ export async function fetchUserConvs(token: string, dispatch: Dispatch<AnyAction
     })
     .then((response) => {
         const convArray: Conversation[] = response.data;
-        let datasArray: ConversationInterfaceFront[] = [];
         
         convArray.forEach(elem => {
             datasArray.push({
@@ -51,10 +51,10 @@ export async function fetchUserConvs(token: string, dispatch: Dispatch<AnyAction
                 isActive: "false",
             });
         })
-        dispatch(copyPrivateConvArray(datasArray));
     }).catch(err => {
         console.log(err);
     })
+    return datasArray;
 }
 
 export async function fetchConvAndRedirect(

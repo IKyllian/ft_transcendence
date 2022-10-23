@@ -10,10 +10,10 @@ import { userIdIsBlocked } from "../../../Utils/Utils-User";
 import BanButton from "../../Utils/Ban-Button";
 import MuteButton from "../../Utils/Mute-Button";
 
-import { getMessageDateString } from "../../../Utils/Utils-Chat";
+import { getMessageDateString, getMessageHour } from "../../../Utils/Utils-Chat";
 
-function MessageItem(props: {isFromChan: boolean, message: ChatMessage | PrivateMessage, loggedUserIsOwner: boolean, chanId?: Channel}) {
-    const {isFromChan, message, loggedUserIsOwner, chanId} = props;
+function MessageItem(props: {isFromChan: boolean, message: ChatMessage | PrivateMessage, loggedUserIsOwner: boolean, chanId?: Channel, isNewSender?: boolean, index?: number}) {
+    const {isFromChan, message, loggedUserIsOwner, chanId, isNewSender, index} = props;
     const [showDropdown, setShowDropdown] = useState<boolean>(false);
 
     let authDatas = useAppSelector((state) => state.auth);
@@ -21,22 +21,20 @@ function MessageItem(props: {isFromChan: boolean, message: ChatMessage | Private
     const handleClick = () => {
         setShowDropdown(!showDropdown);
     }
-
+    
     return message.sender ? (
-        <li className={`message-item message-item-${message.sender.id === authDatas.currentUser?.id ? "right" : "left"}`}> 
-            { message.sender.id !== authDatas.currentUser?.id && <img src={ProfilPic} alt="profil pic" /> }
-            <div className="message-item-info">
-                {
-                    userIdIsBlocked(authDatas.currentUser!, message.sender.id) ?
-                    <p> Sender is block </p> :
-                    <p className="message-text"> { message.content } </p>
-                }
-                <div className="message-sender">
-                    {   
-                        message.sender.id !== authDatas.currentUser?.id && isFromChan &&
-                        <span className="sender-txt" onClick={() => handleClick()}> {message.sender.username} </span>
-                    }
-                    <span> {getMessageDateString(message.send_at)} </span>
+        <>
+            {
+                isNewSender &&
+                <li style={isNewSender && index && index > 0 ? {marginTop: '20px'}: {}} className="message-item-container">
+                    <img src={ProfilPic} alt="profil pic" />
+                    <div className="message-content-wrapper">
+                        <div className="message-info-wrapper">
+                            <span className="sender-txt" onClick={() => handleClick()}> {message.sender.username} </span>
+                            <span> {getMessageDateString(message.send_at)} </span>
+                        </div>
+                        <p className="message-text"> { message.content } </p>
+                    </div>
                     {
                         isFromChan && message.sender.id !== authDatas.currentUser?.id &&
                         <DropdownContainer show={showDropdown} onClickOutside={handleClick}>
@@ -47,15 +45,24 @@ function MessageItem(props: {isFromChan: boolean, message: ChatMessage | Private
                             {
                                 loggedUserIsOwner &&
                                 <>
-                                   <MuteButton senderId={message.sender.id} chan={chanId!} />
-                                   <BanButton senderId={message.sender.id} chanId={chanId!.id} />
+                                    <MuteButton senderId={message.sender.id} chan={chanId!} />
+                                    <BanButton senderId={message.sender.id} chanId={chanId!.id} />
                                 </>
                             }
                         </DropdownContainer>
                     }
-                </div>       
-            </div>
-        </li>
+                </li>
+            }
+            {
+                !isNewSender &&
+                <li className="message-item-container-2">
+                    <span className="date-message">  {getMessageHour(message.send_at)} </span>
+                    <span> { message.content } </span>
+                </li>
+                
+            }
+           
+        </>
     ) : (
         <div className="message-server">
             <p> {message.content} </p>

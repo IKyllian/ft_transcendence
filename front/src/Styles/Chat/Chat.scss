@@ -60,7 +60,9 @@
 
                     .list-item-container {
                         text-decoration: none;
-                        li {
+                        display: flex;
+                        a {
+                            width: 100%;
                             padding: 8px;
                             border-radius: 5px;
                             &:hover {
@@ -68,7 +70,7 @@
                             }
                         }
     
-                        li[is-target="true"] {
+                        a[is-target="true"] {
                             background-color: $DarkPalette;
                         }
 
@@ -123,6 +125,10 @@
                 &-right-side {
                     margin-right: 20px;
                     @include flex-row-alignCenter();
+                    svg {
+                        @include width-height(23px, 23px);
+                        cursor: pointer;
+                    }
                     .chat-action-icones {
                         margin-right: 28px;
                         @include flex-row-alignCenter();
@@ -130,10 +136,6 @@
                         a {
                             @include width-height(23px, 23px);
                             margin: 0
-                        }
-                        svg {
-                            @include width-height(23px, 23px);
-                            cursor: pointer;
                         }
                     }
                     
@@ -168,10 +170,6 @@
                     p {
                         cursor: pointer;
                     }
-                    // .profile-avatar {
-                    //     @include avatar-player(10em);
-                    // }
-        
                     .player-status {
                         @include player-status;
                     }
@@ -181,7 +179,7 @@
             ul {
                 overflow-y: scroll;
                 margin: 0;
-                padding: 20px;
+                padding: 20px 0;
                 height: 90%;
                 display: flex;
                 flex-direction: column;
@@ -189,72 +187,61 @@
                     margin: 0 auto;
                 }
 
-                .message-item {
-                    @include flex-row-alignCenter;
+                .message-item-container {
+                    @include flex-row-alignCenter();
                     gap: 15px;
-
-                    &:not(&:first-child) {
-                        margin-top: 15px;
+                    padding: 3px 0 3px 20px;
+                    width: 100%;
+                    position: relative;
+                    &:hover {
+                        background-color: $DarkPalette;
                     }
-        
                     img {
-                        @include avatar-player(50px);
+                        @include avatar-player(45px);
                     }
-
-                    &-info {
-                        p {
-                            margin: 0;
-                        }
-                        .message-text {
-                            padding: 10px 15px;
-                            background-color: $LightBluePalette;
-                            margin: 0;
-                        }
-
-                        .message-sender {
-                            font-size: 10px;
-                            color: #a5abb0;
-                            margin-top: 5px;
-                            text-decoration: none;
-                            position: relative;
-                            .sender-txt {
-                                cursor: pointer;
-                                margin-right: 5px;
-                            }
+                    .message-content-wrapper {
+                        .message-info-wrapper {
+                            @include flex-row-alignCenter();
+                            gap: 10px;
                             span {
+                                &:first-child {
+                                    color: orange;
+                                    cursor: pointer;
+                                }
                                 &:last-child {
-                                    font-size: 9px;
-                                    letter-spacing: 0.5px;
-                                }   
-                            }
-                        }
-                    }
-        
-                    &-left {
-                        float: left;
-                        width: 100%;
-                        .message-text {
-                            border-top-right-radius: 30px;
-                            border-bottom-right-radius: 30px;
-                            border-top-left-radius: 30px;
-                        }
-                    }
-        
-                    &-right {
-                        flex-direction: row-reverse;
-                        .message-text {
-                            background-color: rgb(173, 113, 22);
-                            border-top-right-radius: 30px;
-                            border-bottom-left-radius: 30px;
-                            border-top-left-radius: 30px;
-                        }
-
-                        .message-item-info {
-                            .message-sender {
-                                span {
-                                    float: right;
+                                    margin-top: 2.5px;
+                                    font-size: 10px;
                                 }
                             }
+                        }
+                        .message-text {
+                            margin: 0;
+                            font-size: 13px;
+                            margin-top: 5px;
+                        }
+                    }
+                    
+                }
+
+                .message-item-container-2 {
+                    display: flex;
+                    align-items: center;
+                    padding: 4px 0 4px 80px;
+                    width: 100%;
+                    margin: 0;
+                    font-size: 13px;
+                    .date-message {
+                        width: 45px;
+                        text-align: center;
+                        display: none;
+                        font-size: 10px;
+                    }
+                    &:hover {
+                        background-color: $DarkPalette;
+                        padding-left: 20px;
+                        .date-message {
+                            display: block;
+                            margin-right: 15px;
                         }
                     }
                 }
