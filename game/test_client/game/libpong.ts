@@ -1,20 +1,19 @@
 import 'phaser';
 import Pong from './scenes/Pong';
 import Lobby from './scenes/Lobby';
-import { PlayersGameData } from './types/shared.types';
+import { LobbyRequest, PlayersGameData } from './types/shared.types';
 import { io, Socket } from 'socket.io-client';
 import MatchResult from './scenes/MatchResult';
 import ReplayPlayer from './scenes/ReplayPlayer';
 
 
-export function admin_new_game(player_A: string, player_B: string): void
+export function admin_new_game(request: LobbyRequest): void
 {
 	const sock: Socket = io('http://localhost:6161');
 
 	sock.emit('admin_authenticate', 'praclarushtaonas');
 
-	console.log('requesting new game for', player_A, player_B);
-	sock.emit('admin_newgame', {player_A: player_A, player_B: player_B});
+	sock.emit('admin_newgame', request);
 
 }
 
@@ -36,6 +35,7 @@ export function launch_game(players_data: PlayersGameData): void
 		callbacks: {
 			preBoot: function (game) {
 				game.registry.set('players_data', players_data);
+				game.registry.set('is_replay', false);
 			}
 		  },
 		scene: [ Lobby, Pong, MatchResult ]
@@ -61,9 +61,10 @@ export function watch_replay(game_id: string): void
 		callbacks: {
 			preBoot: function (game) {
 				game.registry.set('game_id', game_id);
+				game.registry.set('is_replay', true);
 			}
 		  },
-		scene: [ ReplayPlayer ]
+		scene: [ ReplayPlayer, MatchResult ]
 	};
 	const game = new Phaser.Game(config);
 }

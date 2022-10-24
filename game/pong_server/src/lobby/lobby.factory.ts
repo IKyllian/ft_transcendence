@@ -2,7 +2,7 @@ import { Server } from 'socket.io';
 import { generate } from 'shortid'
 import { Lobby } from './lobby';
 import { Socket } from 'socket.io';
-import { PlayersLobbyData,  NewGameData, PlayerInput, GameState, LobbyRequest, GameType } from 'src/types/shared.types';
+import { PlayersLobbyData,  NewGameData, PlayerInput, GameState, LobbyRequest, GameType } from '../types/shared.types';
 
 
 //TODO

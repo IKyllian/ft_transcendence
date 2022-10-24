@@ -5,7 +5,8 @@ import {
 		PlayerType,
 		LobbyStatus, 
 		RoundSetup,
-		EndResult} from '../types/shared.types';
+		EndResult,
+		GameType} from '../types/shared.types';
 import { io, Socket } from "socket.io-client";
 import ClientSocketManager from '../client.socket.manager';
 
@@ -18,27 +19,46 @@ export default class Lobby extends Phaser.Scene
 	}
 
 	socketmanager: ClientSocketManager = new ClientSocketManager();
-	//already_started: boolean = false;
 
-	player_A_avatar: Phaser.GameObjects.Image;
-	player_A_indicator: Phaser.GameObjects.Shape;
-	player_A_name: Phaser.GameObjects.Text;
-	player_A_win: Phaser.GameObjects.Text;
-	player_A_loss: Phaser.GameObjects.Text;
+	Player_A_Back_avatar?: Phaser.GameObjects.Image;
+	Player_A_Back_indicator?: Phaser.GameObjects.Shape;
+	Player_A_Back_name?: Phaser.GameObjects.Text;
+	Player_A_Back_win?: Phaser.GameObjects.Text;
+	Player_A_Back_loss?: Phaser.GameObjects.Text;
+	
+	Player_A_Front_avatar?: Phaser.GameObjects.Image;
+	Player_A_Front_indicator?: Phaser.GameObjects.Shape;
+	Player_A_Front_name?: Phaser.GameObjects.Text;
+	Player_A_Front_win?: Phaser.GameObjects.Text;
+	Player_A_Front_loss?: Phaser.GameObjects.Text;
 
-	player_B_avatar: Phaser.GameObjects.Image;
-	player_B_indicator: Phaser.GameObjects.Shape;
-	player_B_name: Phaser.GameObjects.Text;
-	player_B_win: Phaser.GameObjects.Text;
-	player_B_loss: Phaser.GameObjects.Text;
-	ready_button: Phaser.GameObjects.Image;
-	countdown: Phaser.GameObjects.Text;
+	Player_B_Front_avatar?: Phaser.GameObjects.Image;
+	Player_B_Front_indicator?: Phaser.GameObjects.Shape;
+	Player_B_Front_name?: Phaser.GameObjects.Text;
+	Player_B_Front_win?: Phaser.GameObjects.Text;
+	Player_B_Front_loss?: Phaser.GameObjects.Text;
+
+	Player_B_Back_avatar?: Phaser.GameObjects.Image;
+	Player_B_Back_indicator?: Phaser.GameObjects.Shape;
+	Player_B_Back_name?: Phaser.GameObjects.Text;
+	Player_B_Back_win?: Phaser.GameObjects.Text;
+	Player_B_Back_loss?: Phaser.GameObjects.Text;
+	
+
+	ready_button?: Phaser.GameObjects.Image;
+	countdown?: Phaser.GameObjects.Text;
+
+
+	game_type: GameType;
 	me: PlayerType = PlayerType.Spectator;
 	lobbystatus: LobbyStatus = 
 	{
-		player_A: PlayerStatus.Absent,
-		player_B: PlayerStatus.Absent
+		Player_A_Back: PlayerStatus.Absent,
+		Player_A_Front: PlayerStatus.Absent,
+		Player_B_Front: PlayerStatus.Absent,
+		Player_B_Back: PlayerStatus.Absent,
 	}
+
 	anti_spam_count :number = 0;
 	wait_delay: number = 0;
 	connected: boolean = false;
@@ -47,22 +67,38 @@ export default class Lobby extends Phaser.Scene
 	preload ()
 	{
 		this.load.image(
-			'player_a_avatar',
-			this.game.registry.get('players_data').player_A.avatar
+			'player_a_back_avatar',
+			this.game.registry.get('players_data').Player_A_Back.avatar
 			);
 		this.load.image(
-			'player_b_avatar',
-			this.game.registry.get('players_data').player_B.avatar
+			'player_b_back_avatar',
+			this.game.registry.get('players_data').Player_B_Back.avatar
 			);
 		this.load.image(
 			'button',
 			'assets/button.png'
-			); 
+			);
+
+		this.game_type = this.game.registry.get('players_data').game_settings.game_type;
+
+		if (this.game_type === GameType.Doubles)
+		{
+			this.load.image(
+				'player_a_front_avatar',
+				this.game.registry.get('players_data').Player_A_Front.avatar
+				);
+			this.load.image(
+				'player_b_front_avatar',
+				this.game.registry.get('players_data').Player_B_Front.avatar
+				);
+
+
+		}
 	}
 
 	create ()
 	{
-		this.me = this.game.registry.get('players_data').playertype;
+		this.me = this.game.registry.get('players_data').player_type;
 		this.game.registry.set('socketmanager', this.socketmanager);
 
         this.socketmanager.set_lobby_triggers({
@@ -74,15 +110,15 @@ export default class Lobby extends Phaser.Scene
 
         });
 
-		this.player_A_avatar = this.add.image(130, 130, 'player_a_avatar')
+		this.Player_A_Back_avatar = this.add.image(130, 130, 'player_a_back_avatar')
 								.setOrigin(0.5,0.5)
-								.setDisplaySize(200, 200);
-		this.player_B_avatar = this.add.image(670, 130, 'player_b_avatar')
+								.setDisplaySize(150, 150);
+		this.Player_B_Back_avatar = this.add.image(670, 130, 'player_b_back_avatar')
 								.setOrigin(0.5,0.5)
-								.setDisplaySize(200, 200);
+								.setDisplaySize(150, 150);
 
-		this.player_A_indicator = this.add.circle(200, 240, 50, 0x000000);
-		this.player_B_indicator = this.add.circle(600, 240, 50, 0x000000);
+		this.Player_A_Back_indicator = this.add.circle(150, 240, 50, 0x000000);
+		this.Player_B_Back_indicator = this.add.circle(650, 240, 50, 0x000000);
 
 		let style: Phaser.Types.GameObjects.Text.TextStyle = 
 		{
@@ -90,10 +126,30 @@ export default class Lobby extends Phaser.Scene
 			color: '#000000',
 			fontFamily: 'Arial'
 		}
-		this.player_A_win = this.add.text(100, 320, "Win:" + this.game.registry.get('players_data').player_A.win, style);
-		this.player_A_loss = this.add.text(100, 360, "Loss:" + this.game.registry.get('players_data').player_A.loss, style);
-		this.player_B_win = this.add.text(600, 320, "Win:" + this.game.registry.get('players_data').player_B.win, style);
-		this.player_B_loss = this.add.text(600, 360, "Loss:" + this.game.registry.get('players_data').player_B.loss, style);
+		this.Player_A_Back_win = this.add.text(100, 320, "Win:" + this.game.registry.get('players_data').Player_A_Back.win, style);
+		this.Player_A_Back_loss = this.add.text(100, 360, "Loss:" + this.game.registry.get('players_data').Player_A_Back.loss, style);
+		this.Player_B_Back_win = this.add.text(700, 320, "Win:" + this.game.registry.get('players_data').Player_B_Back.win, style);
+		this.Player_B_Back_loss = this.add.text(700, 360, "Loss:" + this.game.registry.get('players_data').Player_B_Back.loss, style);
+
+
+		if (this.game_type === GameType.Doubles)
+		{
+			this.Player_A_Front_avatar = this.add.image(260, 130, 'player_a_front_avatar')
+								.setOrigin(0.5,0.5)
+								.setDisplaySize(150, 150);
+			this.Player_B_Front_avatar = this.add.image(670, 130, 'player_b_front_avatar')
+								.setOrigin(0.5,0.5)
+								.setDisplaySize(150, 150);
+
+			this.Player_A_Front_indicator = this.add.circle(300, 240, 50, 0x000000);
+			this.Player_B_Front_indicator = this.add.circle(500, 240, 50, 0x000000);
+
+			this.Player_A_Front_win = this.add.text(300, 320, "Win:" + this.game.registry.get('players_data').Player_A_Front.win, style);
+			this.Player_A_Front_loss = this.add.text(300, 360, "Loss:" + this.game.registry.get('players_data').Player_A_Front.loss, style);
+			this.Player_B_Front_win = this.add.text(500, 320, "Win:" + this.game.registry.get('players_data').Player_B_Front.win, style);
+			this.Player_B_Front_loss = this.add.text(500, 360, "Loss:" + this.game.registry.get('players_data').Player_B_Front.loss, style);
+		
+		}
 
 		if (this.me !== PlayerType.Spectator)
 		{
@@ -118,7 +174,7 @@ export default class Lobby extends Phaser.Scene
 		this.socketmanager.lobby_send_request_status(this.registry.get('players_data').game_id);
 	}
 
-	update(/*time: number, delta: number*/): void
+	update(): void
 	{
 		this.anti_spam_count++;
 		if (this.anti_spam_count >= 5)
@@ -160,31 +216,62 @@ export default class Lobby extends Phaser.Scene
 	{
 		this.lobbystatus = new_status;
 
-		if (this.lobbystatus.player_A === PlayerStatus.Present)
+		if (this.lobbystatus.Player_A_Back === PlayerStatus.Present)
 		{
-			this.player_A_indicator.setFillStyle(0xf2fc23);
+			this.Player_A_Back_indicator?.setFillStyle(0xf2fc23);
 		}
-		else if (this.lobbystatus.player_A === PlayerStatus.Ready)
+		else if (this.lobbystatus.Player_A_Back === PlayerStatus.Ready)
 		{
-			this.player_A_indicator.setFillStyle(0x43f33b);
+			this.Player_A_Back_indicator?.setFillStyle(0x43f33b);
 		}
 		else
 		{
-			this.player_A_indicator.setFillStyle(0xff0000);
+			this.Player_A_Back_indicator?.setFillStyle(0xff0000);
 		}
 
-		if (this.lobbystatus.player_B === PlayerStatus.Present)
+		if (this.lobbystatus.Player_B_Back === PlayerStatus.Present)
 		{
-			this.player_B_indicator.setFillStyle(0xf2fc23);
+			this.Player_B_Back_indicator?.setFillStyle(0xf2fc23);
 		}
-		else if (this.lobbystatus.player_B === PlayerStatus.Ready)
+		else if (this.lobbystatus.Player_B_Back === PlayerStatus.Ready)
 		{
-			this.player_B_indicator.setFillStyle(0x43f33b);
+			this.Player_B_Back_indicator?.setFillStyle(0x43f33b);
 		}
 		else
 		{
-			this.player_B_indicator.setFillStyle(0xff0000);
+			this.Player_B_Back_indicator?.setFillStyle(0xff0000);
 		}
+
+
+		if (this.game_type === GameType.Doubles)
+		{
+			if (this.lobbystatus.Player_A_Front === PlayerStatus.Present)
+			{
+				this.Player_A_Front_indicator?.setFillStyle(0xf2fc23);
+			}
+			else if (this.lobbystatus.Player_A_Front === PlayerStatus.Ready)
+			{
+				this.Player_A_Front_indicator?.setFillStyle(0x43f33b);
+			}
+			else
+			{
+				this.Player_A_Front_indicator?.setFillStyle(0xff0000);
+			}
+	
+			if (this.lobbystatus.Player_B_Front === PlayerStatus.Present)
+			{
+				this.Player_B_Front_indicator?.setFillStyle(0xf2fc23);
+			}
+			else if (this.lobbystatus.Player_B_Front === PlayerStatus.Ready)
+			{
+				this.Player_B_Front_indicator?.setFillStyle(0x43f33b);
+			}
+			else
+			{
+				this.Player_B_Front_indicator?.setFillStyle(0xff0000);
+			}	
+		}
+
 	}
 
 	ready_to_go = () =>
@@ -193,8 +280,10 @@ export default class Lobby extends Phaser.Scene
 
 		this.update_lobby_status(
 			{
-				player_A: PlayerStatus.Ready,
-				player_B: PlayerStatus.Ready
+				Player_A_Back: PlayerStatus.Ready,
+				Player_A_Front: PlayerStatus.Ready,
+				Player_B_Front: PlayerStatus.Ready,
+				Player_B_Back: PlayerStatus.Ready,
 			});
 
 		let timer: number = 1;
@@ -241,20 +330,33 @@ export default class Lobby extends Phaser.Scene
 
 	clear_all = () =>
 	{
-		this.player_A_avatar.destroy();
-		this.player_A_indicator.destroy();
-		this.player_A_win.destroy();
-		this.player_A_loss.destroy();
+		this.Player_A_Back_avatar?.destroy();
+		this.Player_A_Back_indicator?.destroy();
+		this.Player_A_Back_name?.destroy();
+		this.Player_A_Back_win?.destroy();
+		this.Player_A_Back_loss?.destroy();
 
-		this.player_B_avatar.destroy();
-		this.player_B_indicator.destroy();
-		this.player_B_win.destroy();
-		this.player_B_loss.destroy();
+		this.Player_B_Back_avatar?.destroy();
+		this.Player_B_Back_indicator?.destroy();
+		this.Player_B_Back_name?.destroy();
+		this.Player_B_Back_win?.destroy();
+		this.Player_B_Back_loss?.destroy();
 
-		// if (this.me !== PlayerType.Spectator)
-		// {
-		// 	this.ready_button.destroy();
-		// }
+		if (this.game_type === GameType.Doubles)
+		{
+			this.Player_A_Front_avatar?.destroy();
+			this.Player_A_Front_indicator?.destroy();
+			this.Player_A_Front_name?.destroy();
+			this.Player_A_Front_win?.destroy();
+			this.Player_A_Front_loss?.destroy();
+		
+			this.Player_B_Front_avatar?.destroy();
+			this.Player_B_Front_indicator?.destroy();
+			this.Player_B_Front_name?.destroy();
+			this.Player_B_Front_win?.destroy();
+			this.Player_B_Front_loss?.destroy();
+		}
+
 	}
 
 
@@ -300,7 +402,6 @@ export default class Lobby extends Phaser.Scene
 
 		}
 	}
-
 
 	game_end = (winner: EndResult) =>
 	{

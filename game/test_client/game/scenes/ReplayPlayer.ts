@@ -6,11 +6,12 @@ import { GameState, Goal, Movement, Player, PlayerInput, PlayerType, BallData, E
 
 export default class ReplayPlayer extends Phaser.Scene
 {
+
 	constructor ()
 	{
 		super({ key: 'ReplayPlayer' });
 	}
-
+/*
 	//me: PlayerType = PlayerType.Spectator;
 	socketmanager: ClientSocketManager = new ClientSocketManager();
 	//core: PongCore = new PongCore();
@@ -246,5 +247,5 @@ export default class ReplayPlayer extends Phaser.Scene
 			callbackScope: this,
 			loop: true });
 	}
-
+*/
 }
