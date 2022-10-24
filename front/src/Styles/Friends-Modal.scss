@@ -71,6 +71,25 @@
             background-color: $LightDarkPalette;
         }
 
+        .friendship-action-wrapper {
+            @include flex-row-alignCenter();
+            gap: 10px;
+            svg {
+                cursor: pointer;
+                border-radius: 50%;
+                @include width-height(25px, 25px);
+                padding: 2px;
+                &:first-child {
+                    color: green;
+                    border: 1px solid green;
+                }
+                &:last-child {
+                    color: red;
+                    border: 1px solid red;
+                }
+            }
+        }
+
         .icons-player-item {
             @include flex-row-alignCenter;
             gap: 5px;

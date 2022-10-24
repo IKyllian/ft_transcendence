@@ -36,7 +36,7 @@ export function UserIsMute(channelUsers: ChannelUser[], userId: number): boolean
     return channelUsers.find(elem => (elem.user.id === userId && elem.is_muted)) ? true : false;
 }
 
-export const debounce = (func: Function) => {
+export const debounce = (func: Function, debouneTime: number) => {
     let timer: any;
     return function (...args: any) {
       const context: any = debounce;
@@ -44,6 +44,6 @@ export const debounce = (func: Function) => {
       timer = setTimeout(() => {
         timer = null;
         func.apply(context, args);
-      }, 7000);
+      }, debouneTime);
     };
 };

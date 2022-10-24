@@ -14,7 +14,9 @@ function NotifItem(props: {notification: NotificationInterface}){
     const handleClick = (response: string) => {
         if (notification.type === "channel_invite")
             socket?.emit("ChannelInviteResponse", {id: notification.id, chanId: notification.channel?.id, response: response});
-        dispatch(deleteNotification(notification.id));
+        else
+            socket?.emit("FriendRequestResponse", {id: notification.requester.id, response: response})
+        // dispatch(deleteNotification(notification.id));
     }
 
     return (

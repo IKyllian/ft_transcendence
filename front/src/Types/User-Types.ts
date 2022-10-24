@@ -18,6 +18,7 @@ export interface AuthState {
     loading: boolean,
     token: string,
     setUsersame: boolean,
+    friendList: UserInterface[];
 }
 
 export interface LoginPayload {
@@ -42,4 +43,6 @@ interface Statistic {
 export interface ProfileState {
     isLoggedUser: boolean,
     user: UserInterface,
+    friendList: UserInterface[],
+    relationStatus?: string,
 }

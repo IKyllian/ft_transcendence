@@ -22,18 +22,15 @@ export function useLoadChatDatas() {
     const dispatch = useAppDispatch();
     const {socket} = useContext(SocketContext);
     const modalStatus = useContext(ModalContext);
-
-    console.log("params", params);
     
     const channelId: number | undefined = params.channelId ? parseInt(params.channelId!, 10) : undefined;
     const convId: number | undefined = params.convId ? parseInt(params.convId!, 10) : undefined;
 
     console.log("Chat render");
 
-    // Functions pour le composant
-    const sidebarOnChange = useCallback( () => {
+    const sidebarOnChange = () => {
         setReponsiveSidebar(!responsiveSidebar);
-    }, [channelId]);
+    };
 
     const onCloseModal = useCallback(() => {
         setShowModal(0);

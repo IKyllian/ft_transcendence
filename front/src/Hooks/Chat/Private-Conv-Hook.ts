@@ -55,7 +55,7 @@ export function usePrivateConvHook() {
         setHasTypingEvent(false);
     }
 
-    const optimizedFn = useCallback(debounce(endOfTyping), [hasSendTypingEvent, convDatas, authDatas]);
+    const optimizedFn = useCallback(debounce(endOfTyping, 6000), [hasSendTypingEvent, convDatas, authDatas]);
 
     const handleSubmitMessage = handleSubmit((data, e: any) => {
         e.preventDefault();

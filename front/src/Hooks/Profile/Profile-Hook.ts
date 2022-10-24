@@ -21,7 +21,7 @@ export function useProfileHook() {
     
     const params = useParams();
     const modalStatus = useContext(ModalContext);
-    let {currentUser, token} = useAppSelector(state => state.auth);
+    let {currentUser, token, friendList} = useAppSelector(state => state.auth);
     
     const handleClick = (index: number) => {
         let newArray = [...attributes];
@@ -39,6 +39,7 @@ export function useProfileHook() {
             setUserState({
                 isLoggedUser: true,
                 user: currentUser!,
+                friendList: friendList,
             });
         }
         else if (params.username) {

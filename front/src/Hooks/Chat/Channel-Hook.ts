@@ -27,10 +27,10 @@ export function useChannelHook() {
 
     console.log("Channel page render");
 
-    const changeSidebarStatus = useCallback(() => {
+    const changeSidebarStatus = () => {
         console.log("changeSidebarStatus");
         setShowUsersSidebar(!showUsersSidebar);
-    }, [setShowUsersSidebar]);
+    };
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView();
@@ -56,7 +56,7 @@ export function useChannelHook() {
         setHasTypingEvent(false);
     }
 
-    const optimizedFn = useCallback(debounce(endOfTyping), [hasSendTypingEvent, channelId]);
+    const optimizedFn = useCallback(debounce(endOfTyping, 6000), [hasSendTypingEvent, channelId]);
 
     useEffect(() => {
         scrollToBottom();
