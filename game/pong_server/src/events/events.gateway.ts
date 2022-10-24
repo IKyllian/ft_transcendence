@@ -9,30 +9,9 @@ import {
   } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
 import { LobbyFactory } from '../lobby/lobby.factory';
-import { NewGameData, PlayerInput, PlayersLobbyData } from '../types/shared.types';
-
-// @WebSocketGateway(/*{ cors: true }*/ 6161, {cors: true})
-
-//   cors: {
-	//     origin: "https://example.com",
-//     methods: ["GET", "POST"]
-//   }
+import { LobbyRequest, NewGameData, PlayerInput, PlayersLobbyData } from '../types/shared.types';
 
 
-//   @WebSocketGateway( 6161,  {cors: {
-	//     origin: '*',
-	//     methods: ["GET", "POST"]
-	//   }})
-	
-	
-	
-	
-	// @WebSocketGateway({
-	// 	cors: {
-	// 		origin: ['http://192.168.1.22:6161/'],
-	// 		credential: true,
-	// 	}
-	// })
 	@WebSocketGateway({cors: true})
   export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect
   {
@@ -54,9 +33,6 @@ import { NewGameData, PlayerInput, PlayersLobbyData } from '../types/shared.type
 	{
 	  this.lobbyfactory.server = server;
 	}
-
-
-
 
 
 	/* ----- Connect/Disconnect ----- */
@@ -99,7 +75,7 @@ import { NewGameData, PlayerInput, PlayersLobbyData } from '../types/shared.type
 
 	@SubscribeMessage('admin_newgame')
 	async onAdminNewGame(@ConnectedSocket() client: Socket,
-	@MessageBody() data: {player_A: string, player_B: string})
+	@MessageBody() data: LobbyRequest)
 	{
 		if (client['id'] == this.admin['id'])
 		{

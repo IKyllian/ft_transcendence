@@ -1,13 +1,13 @@
 import 'phaser';
 import Pong from './scenes/Pong';
 import Lobby from './scenes/Lobby';
-import { NewGameData, PlayersGameData } from './types/shared.types';
+import { PlayersGameData } from './types/shared.types';
 import { io, Socket } from 'socket.io-client';
 import MatchResult from './scenes/MatchResult';
 import ReplayPlayer from './scenes/ReplayPlayer';
 
 
-export function admin_new_game(player_A: string, player_B: string): NewGameData | void
+export function admin_new_game(player_A: string, player_B: string): void
 {
 	const sock: Socket = io('http://localhost:6161');
 
@@ -22,6 +22,13 @@ export function launch_game(players_data: PlayersGameData): void
 {
 	const config = {
 		type: Phaser.AUTO,
+		scale: {
+			mode: Phaser.Scale.FIT,
+			autoCenter: Phaser.Scale.CENTER_BOTH,
+			parent: 'game_anchor',
+			width: 800,
+			height: 600
+		},
 		parent: 'game_anchor',
 		backgroundColor: '#FFFFFF',
 		width: 800,

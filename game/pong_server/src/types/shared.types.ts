@@ -1,12 +1,14 @@
 export enum PlayerType {
-	Player_A,
-	Player_B,
+	Player_A_Back,
+	Player_A_Front,
+	Player_B_Front,
+	Player_B_Back,
 	Spectator
 }
 
 export enum GameType {
-	Classic,
-	Special_A
+	Singles,
+	Doubles
 }
 
 export type Player = {
@@ -16,27 +18,49 @@ export type Player = {
 	avatar: string
 }
 
+//data sent to each player before the game
 export type PlayersGameData = {
-	player_A: Player,
-	player_B: Player,
-	playertype: PlayerType,
+	Player_A_Back: Player,
+	Player_A_Front: Player,
+	Player_B_Front: Player,
+	Player_B_Back: Player,
+	player_type: PlayerType,
 	player_secret: string,
-	game_id: string
+	game_id: string,
+	game_settings: GameSettings
 }
 
+//data sent from player to join lobby
 export type PlayersLobbyData = 
 {
 	player_secret: string,
 	game_id: string
 }
 
+//data sent to lobby factory to request a new lobby
+export type LobbyRequest =
+{
+	Player_A_Back: string,
+	Player_A_Front: string,
+	Player_B_Front: string,
+	Player_B_Back: string,
+	game_settings: GameSettings
+}
+
+
+//data sent from back to front with data for the players
 export type NewGameData =
 {
-	player_A: string,
-	player_A_secret: string,
-	player_B: string,
-	player_B_secret: string,
-	game_id: string
+	Player_A_Back: string,
+	Player_A_Back_secret: string,
+	Player_A_Front: string,
+	Player_A_Front_secret: string,
+	Player_B_Front: string,
+	Player_B_Front_secret: string,
+	Player_B_Back: string,
+	Player_B_Back_secret: string,
+	game_id: string,
+	game_settings: GameSettings
 }
 
 export enum PlayerStatus
@@ -48,14 +72,16 @@ export enum PlayerStatus
 
 export type LobbyStatus =
 {
-	player_A: PlayerStatus,
-	player_B: PlayerStatus
+	Player_A_Back: PlayerStatus,
+	Player_A_Front: PlayerStatus,
+	Player_B_Front: PlayerStatus,
+	Player_B_Back: PlayerStatus,
 }
 
 export type ScoreBoard = 
 {
-	player_A: number,
-	player_B: number
+	Team_A: number,
+	Team_B: number
 }
 
 export type Coordinates = 
@@ -81,32 +107,41 @@ export enum Movement
 export enum Goal
 {
 	None,
-	Player_A,
-	Player_B
+	Team_A,
+	Team_B
 }
 
 export type PlayerInput =
 {
-	playertype: PlayerType,
+	player_type: PlayerType,
 	number: number,
 	time: Date,
 	movement: Movement
 }
 
+//detailed data about the gamestate
+//produced by server core
+//applied by client core
 export type GameState =
 {
+	game_type: GameType,	
 	result: EndResult,
 	goal: Goal,
 	score: ScoreBoard,
 	balldata: BallData,
-	player_A: Coordinates,
-	last_processed_id_A: number,
-	last_processed_time_A: Date,
-	player_B: Coordinates,
-	last_processed_id_B: number,
-	last_processed_time_B: Date
+	Player_A_Back: Coordinates,
+	Player_A_Front: Coordinates,
+	Player_B_Front: Coordinates,
+	Player_B_Back: Coordinates,
+	last_processed_id_A_Back: number,
+	last_processed_id_A_Front: number,
+	last_processed_id_B_Front: number,
+	last_processed_id_B_Back: number,
+	send_date: Date
 }
 
+
+//data for next round to ensure sync
 export type RoundSetup =
 {
 	start_time: Date,
@@ -116,12 +151,20 @@ export type RoundSetup =
 export enum EndResult
 {
 	Undecided,
-	Player_A_Win,
-	Player_B_Win
+	Team_A_Win,
+	Team_B_Win
 }
 
-// export type InterpolationData =
-// {
-// 	pos: Coordinates,
-// 	time: Date
-// }
+//game settings for the core
+export type GameSettings =
+{
+	game_type: GameType,
+	up_down_border: number,
+	player_back_advance: number,
+	player_front_advance: number,
+	paddle_size_h: number,
+	paddle_speed: number,
+	ball_start_speed: number,
+	ball_acceleration: number,
+	point_for_victory: number
+}

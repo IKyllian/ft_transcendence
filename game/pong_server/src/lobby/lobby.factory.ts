@@ -2,7 +2,11 @@ import { Server } from 'socket.io';
 import { generate } from 'shortid'
 import { Lobby } from './lobby';
 import { Socket } from 'socket.io';
-import { PlayersLobbyData,  NewGameData, PlayerInput, GameState } from 'src/types/shared.types';
+import { PlayersLobbyData,  NewGameData, PlayerInput, GameState, LobbyRequest, GameType } from 'src/types/shared.types';
+
+
+//TODO
+//rework client handling
 
 export class LobbyFactory
 {
@@ -11,21 +15,51 @@ export class LobbyFactory
 	private client_list: Map<Socket['id'], Lobby['game_id']> = new Map<Socket['id'], Lobby['game_id']>();
 	replay_list: Map<string, Array<GameState>> = new Map <string, Array<GameState>>();
 
-	lobby_create(data: {player_A: string, player_B: string}): NewGameData
+	lobby_create(lobby_request: LobbyRequest): NewGameData
 	{
 
 
-		if (data.player_A === 'Mario' && data.player_B === 'Luigi')
+		if (lobby_request.Player_A_Back === 'Mario' && lobby_request.Player_B_Back === 'Trent'
+		&& lobby_request.Player_A_Front === 'Luigi' && lobby_request.Player_B_Front === 'Daria')
 		{
 			let ret:NewGameData =
 			{
-				player_A: 'Mario',
-				player_A_secret: '9rzx9PAs0r',
-				player_B: 'Luigi',
-				player_B_secret: 'oVugmgY4Ck',
-				game_id: 'aKnHwyr8z'
+				Player_A_Back: 'Mario',
+				Player_A_Back_secret: '9rzx9PAs0r',
+				Player_A_Front: 'Luigi',
+				Player_A_Front_secret: 'oVugmgY4Ck',
+				
+				Player_B_Back: 'Trent',
+				Player_B_Back_secret: 'spiralmystic',
+				Player_B_Front: 'Daria',
+				Player_B_Front_secret: 'tristemondetragique',
+
+				game_id: '4p_lobby',
+				game_settings: lobby_request.game_settings
 			}
-			const lobby = new Lobby(ret, this);
+			const lobby = new Lobby(ret, lobby_request.game_settings, this);
+			this.lobby_list.set(lobby.game_id, lobby);
+	
+			return ret;
+		}
+		else if (lobby_request.Player_A_Back === 'Mario' && lobby_request.Player_B_Back === 'Luigi')
+		{
+			let ret:NewGameData =
+			{
+				Player_A_Back: 'Mario',
+				Player_A_Back_secret: '9rzx9PAs0r',
+				Player_B_Back: 'Luigi',
+				Player_B_Back_secret: 'oVugmgY4Ck',
+				
+				Player_A_Front: '',
+				Player_A_Front_secret: '',
+				Player_B_Front: '',
+				Player_B_Front_secret: '',
+				
+				game_id: 'aKnHwyr8z',
+				game_settings: lobby_request.game_settings
+			}
+			const lobby = new Lobby(ret, lobby_request.game_settings, this);
 			this.lobby_list.set(lobby.game_id, lobby);
 	
 			return ret;
@@ -34,19 +68,49 @@ export class LobbyFactory
 
 
 		const game_id: string = generate();
-		const player_A_secret: string = generate();
-		const player_B_secret: string = generate();
+		let ret:NewGameData;
+		const player_A_Back_secret: string = generate();
+		const player_B_Back_secret: string = generate();
 
-		let ret:NewGameData =
+		if (lobby_request.game_settings.game_type === GameType.Doubles)
 		{
-			player_A : data.player_A,
-			player_A_secret : player_A_secret,
-			player_B : data.player_B,
-			player_B_secret : player_B_secret,
-			game_id : game_id
-		};
+			const player_A_Front_secret: string = generate();
+			const player_B_Front_secret: string = generate();
+			ret =
+			{
+				Player_A_Back : lobby_request.Player_A_Back,
+				Player_A_Back_secret : player_A_Back_secret,
+				Player_B_Back : lobby_request.Player_B_Back,
+				Player_B_Back_secret : player_B_Back_secret,
+				Player_A_Front: lobby_request.Player_A_Front,
+				Player_A_Front_secret: player_A_Front_secret,
+				Player_B_Front: lobby_request.Player_B_Front,
+				Player_B_Front_secret: player_B_Front_secret,
 
-		const lobby = new Lobby(ret, this);
+				game_id : game_id,
+				game_settings: lobby_request.game_settings
+			};
+		}
+		else
+		{
+			
+			ret =
+			{
+				Player_A_Back : lobby_request.Player_A_Back,
+				Player_A_Back_secret : player_A_Back_secret,
+				Player_B_Back : lobby_request.Player_B_Back,
+				Player_B_Back_secret : player_B_Back_secret,
+				Player_A_Front: '',
+				Player_A_Front_secret: '',
+				Player_B_Front: '',
+				Player_B_Front_secret: '',
+				game_id : game_id,
+				game_settings: lobby_request.game_settings
+			};
+
+		}
+
+		const lobby = new Lobby(ret, lobby_request.game_settings,  this);
 		this.lobby_list.set(lobby.game_id, lobby);
 
 		return ret;
@@ -139,11 +203,11 @@ export class LobbyFactory
 		this.replay_list.set(game_id, save);
 	}
 
-//rework this shit
+
 	send_replay(client: Socket, game_id: string)
 	{
 		let replay :Array<GameState> | undefined = this.replay_list.get(game_id);
-// this.replay_debug(game_id);		
+	
 		if (replay !== undefined)
 		{
 			console.log('starting replay send', game_id, 'frame count', replay.length);
@@ -151,17 +215,8 @@ export class LobbyFactory
 			replay.forEach((gamestate, index) => {
 				setTimeout(() => {
 
-					//let cpy: GameState = gamestate;
-
-					gamestate.last_processed_time_A = new Date();;
-	
-					if (!(index % 60))
-					{
-						console.log('sending frame:', index);
-						// console.log('date:', date);
-						console.log('gamestate time:', gamestate.last_processed_time_A );
-						// console.log('cpy time', cpy.last_processed_time_A);
-					}
+					//TODO investigate date stuff
+					//gamestate.last_processed_time_A = new Date();;
 					client.emit('replay_state', gamestate);
 			
 				}, index * (1000 / 60));
@@ -176,7 +231,7 @@ export class LobbyFactory
 
 	replay_debug(game_id: string)
 	{
-console.log('@@@@@@@@@@@@@@@ replay data in factory @@@@@@@@@@@@@@@@@');
+		console.log('@@@@@@@@@@@@@@@ replay data in factory @@@@@@@@@@@@@@@@@');
 
 
 		let replay :Array<GameState> | undefined = this.replay_list.get(game_id);
@@ -199,8 +254,8 @@ console.log('@@@@@@@@@@@@@@@ replay data in factory @@@@@@@@@@@@@@@@@');
 				// {
 				// 	console.log('@@@@last one');
 				// 	console.log(gamestate);
-				// 	console.log('ball position:',gamestate.balldata.position);
-				// }
+				// 	
+				//}
 			});
 
 		}
