@@ -35,3 +35,10 @@ export enum ResponseType {
 	ACCEPTED = 'accepted',
 	DECLINED = 'declined'
 };
+
+export enum RelationStatus {
+	REQUESTED = 'requested',
+	PENDIND = 'pending',
+	FRIEND = 'friend',
+	NONE = 'none'
+}

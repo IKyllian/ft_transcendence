@@ -17,24 +17,25 @@ export class friendshipController {
 	}
 
 	@UseGuards(JwtGuard)
-	@Get('search')
+	@Post('search')
 	async searchUserToAdd(
 	@GetUser() user: User,
 	@Body() dto: SearchDto,
 	) {
+		console.log('search user to add', dto)
 		return await this.friendshipService.searchUsersToAdd(user, dto);
 	}
 
 	//TODO delete
-	@UseGuards(JwtGuard)
-	@Post(':id/add')
-	async sendFriendRequest(
-		@GetUser() user: User,
-		@Param('id', ParseIntPipe) userId: number,
-	) {
-		// Not returning anything i think
-		return await this.friendshipService.sendFriendRequest(user, userId);
-	}
+	// @UseGuards(JwtGuard)
+	// @Post(':id/add')
+	// async sendFriendRequest(
+	// 	@GetUser() user: User,
+	// 	@Param('id', ParseIntPipe) userId: number,
+	// ) {
+	// 	// Not returning anything i think
+	// 	return await this.friendshipService.sendFriendRequest(user, userId);
+	// }
 
 	@UseGuards(JwtGuard)
 	@Get()

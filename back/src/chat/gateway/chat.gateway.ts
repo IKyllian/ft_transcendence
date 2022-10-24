@@ -1,4 +1,4 @@
-import { ArgumentsHost, Catch, UseFilters, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import { ArgumentsHost, Catch, NotFoundException, UseFilters, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { WebSocketGateway, MessageBody, WebSocketServer, ConnectedSocket, OnGatewayConnection, OnGatewayDisconnect, WsException, BaseWsExceptionFilter, SubscribeMessage } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { AuthService } from 'src/auth/auth.service';
@@ -173,9 +173,39 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		@ConnectedSocket() socket: Socket,
 		@MessageBody() dto: UserIdDto,
 	) {
-		const friendRequest = await this.friendshipService.sendFriendRequest(user, dto.id);
-		const notif = await this.notificationService.createFriendRequestNotif(friendRequest);
-		socket.to(`user-${dto.id}`).emit('NewNotication', notif);
+		const addressee = await this.userService.findOneBy({ id: dto.id });
+		if (!addressee)
+			throw new NotFoundException('User not found');
+		await this.friendshipService.sendFriendRequest(user, addressee);
+		const notif = await this.notificationService.createFriendRequestNotif(addressee, user);
+		socket.to(`user-${dto.id}`).emit('NewNotification', notif);
+	}
+
+	@UseGuards(WsJwtGuard)
+	@SubscribeMessage('FriendRequestResponse')
+	async friendRequestResponse(
+		@GetUser() user: User,
+		@ConnectedSocket() socket: Socket,
+		@MessageBody() dto: ResponseDto,
+	) {
+		const requester = await this.userService.findOneBy({ id: dto.id });
+		if (!requester)
+			throw new NotFoundException('User not found');
+		const friendship = await this.friendshipService.friendRequestResponse(user, requester, dto);
+		const notif = await this.notificationService.findOne({
+			where: {
+				requester: { id: requester.id },
+				addressee: { id: user.id },
+			}
+		});
+		if (notif) {
+			this.notificationService.delete(notif.id);
+			this.server.to(`user-${user.id}`).emit('DeleteNotification', notif.id);
+		}
+		if (friendship.status === 'accepted') {
+			this.server.to(`user-${user.id}`).emit('FriendListUpdate', await this.friendshipService.getFriendlist(user));
+			this.server.to(`user-${requester.id}`).emit('FriendListUpdate', await this.friendshipService.getFriendlist(requester));
+		}
 	}
 
 	@UseGuards(WsJwtGuard)

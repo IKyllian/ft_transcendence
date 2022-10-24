@@ -8,6 +8,7 @@ import { userStatus } from "src/typeorm/entities/user";
 import { EditUserDto } from "./dto/editUser.dto";
 import * as argon from 'argon2';
 import { SearchDto } from "./dto/search.dto";
+import { FriendshipService } from "./friendship/friendship.service";
 
 @Injectable()
 export class UserService {
@@ -18,6 +19,7 @@ export class UserService {
 		private userRepo: Repository<User>,
 		@InjectRepository(Statistic)
 		private statisticRepo: Repository<Statistic>,
+		private friendshipService: FriendshipService,
 	) {}
 
 	create(dto: CreateUserDto) {
@@ -129,7 +131,6 @@ export class UserService {
 		const toBlock = await this.findOneBy({ id });
 		if (!toBlock)
 			throw new NotFoundException('User not found');
-		console.log("REturn", this.isBlocked(user, id));
 		if (this.isBlocked(user, id))
 			throw new BadRequestException('User already blocked');
 		user.blocked = [...user.blocked, toBlock];
@@ -138,7 +139,6 @@ export class UserService {
 
 	async deblockUser(user: User, id: number) {
 		user.blocked = user.blocked.filter((blocked) => blocked.id !== id);
-		console.log(user.blocked)
 		return this.userRepo.save(user);
 	}
 
@@ -146,5 +146,12 @@ export class UserService {
 		const isblocked = user.blocked.find((blocked) => blocked.id === id);
 		console.log(isblocked);
 		return isblocked ? true : false;
+	}
+
+	async getUserInfo(user: User, user2: User) {
+		const friendList: User[] = await this.friendshipService.getFriendlist(user2);
+		const relation = await this.friendshipService.getRelation(user, user2);
+		const relationStatus = this.friendshipService.getRelationStatus(user2, relation);
+		return { user: user2, friendList, relationStatus };
 	}
 }
