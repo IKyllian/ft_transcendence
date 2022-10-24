@@ -62,10 +62,10 @@ export default class Pong extends Phaser.Scene
 			velocity: 0,
 			vector: { x: 0, y: 0  }
 		},
-		Player_A_Back: { x: 0, y: 0 },
-		Player_A_Front: { x: 0, y: 0 },
-		Player_B_Front: { x: 0, y: 0 },
-		Player_B_Back: { x: 0, y: 0 },
+		Player_A_Back: { x: 0, y: 300 },
+		Player_A_Front: { x: 0, y: 300 },
+		Player_B_Front: { x: 0, y: 300 },
+		Player_B_Back: { x: 0, y: 300 },
 		last_processed_id_A_Back: 0,
 		last_processed_id_A_Front: 0,
 		last_processed_id_B_Front: 0,
@@ -96,6 +96,11 @@ export default class Pong extends Phaser.Scene
 		this.core = new PongCore(this.game_settings);
 
 		this.game_state.game_type = this.game.registry.get('players_data').game_settings.game_type;
+		this.game_state.Player_A_Back.x = this.game_settings.player_back_advance;
+		this.game_state.Player_A_Front.x = this.game_settings.player_front_advance;
+		this.game_state.Player_B_Back.x = 800 - this.game_settings.player_back_advance;
+		this.game_state.Player_B_Front.x = 800 - this.game_settings.player_front_advance;
+
 		this.me = this.game.registry.get('players_data').player_type;
 
 		if (this.socketmanager !== undefined)
@@ -113,16 +118,16 @@ export default class Pong extends Phaser.Scene
 		this.asset_lag_icon = this.add.image(400, 300, 'lag_icon');
 		this.asset_lag_icon.setAlpha(1);
 
-		this.upper_limit = this.add.rectangle(0, 0, 800, this.game_settings.up_down_border , 0x000000);
-		this.lower_limit = this.add.rectangle(0, (600 - (this.game_settings.up_down_border)), 800, this.game_settings.up_down_border, 0x000000);
+		this.upper_limit = this.add.rectangle(0, 0, 800, this.game_settings.up_down_border , 0x000000).setOrigin(0,0);
+		this.lower_limit = this.add.rectangle(0, (600 - (this.game_settings.up_down_border)), 800, this.game_settings.up_down_border, 0x000000).setOrigin(0,0);
 
-		this.asset_Player_A_Back = this.add.rectangle(this.game_settings.player_back_advance, 300, 10, this.game_settings.paddle_size_h, 0x000000);
-		this.asset_Player_B_Back = this.add.rectangle((600 - this.game_settings.player_back_advance), 300, 10, this.game_settings.paddle_size_h, 0x000000);
+		this.asset_Player_A_Back = this.add.rectangle(this.game_settings.player_back_advance, 300, 10, this.game_settings.paddle_size_h, 0x000000).setOrigin(1,0.5);
+		this.asset_Player_B_Back = this.add.rectangle((600 - this.game_settings.player_back_advance), 300, 10, this.game_settings.paddle_size_h, 0x000000).setOrigin(0,0.5);
 
 		if (this.game_type === GameType.Doubles)
 		{
-			this.asset_Player_A_Front = this.add.rectangle(this.game_settings.player_front_advance, 300, 10, this.game_settings.paddle_size_h, 0x000000);
-			this.asset_Player_B_Front = this.add.rectangle((600 - this.game_settings.player_front_advance), 300, 10, this.game_settings.paddle_size_h, 0x000000);
+			this.asset_Player_A_Front = this.add.rectangle(this.game_settings.player_front_advance, 300, 10, this.game_settings.paddle_size_h, 0x000000).setOrigin(1,0.5);
+			this.asset_Player_B_Front = this.add.rectangle((600 - this.game_settings.player_front_advance), 300, 10, this.game_settings.paddle_size_h, 0x000000).setOrigin(0,0.5);
 		
 		}
 
@@ -293,6 +298,7 @@ export default class Pong extends Phaser.Scene
 			text = this.game_state.score.Team_A.toString() + " - " + this.game_state.score.Team_B.toString();
 			this.asset_scoreboard?.setText(text);
 		}
+
 		this.lag_check();
 	}
 
@@ -307,14 +313,14 @@ export default class Pong extends Phaser.Scene
 		this.server_stock.push(gamestate);
 	}
 
-	display_score = () =>
-	{
-		let text: string;
-		text = this.game_state.score.Team_A.toString() + " - " + this.game_state.score.Team_B.toString();
+	// display_score = () =>
+	// {
+	// 	let text: string;
+	// 	text = this.game_state.score.Team_A.toString() + " - " + this.game_state.score.Team_B.toString();
 
 
-		this.asset_scoreboard?.setText(text);
-	}
+	// 	this.asset_scoreboard?.setText(text);
+	// }
 
 	acknowledge_server_authority = (gamestate: GameState) =>
 	{
@@ -323,7 +329,7 @@ export default class Pong extends Phaser.Scene
 
 	lag_check = () =>
 	{
-		if (this.is_lagging)
+		if (this.is_lagging && this.game_state.result === EndResult.Undecided)
 			this.asset_lag_icon!.setAlpha(1);
 		else
 			this.asset_lag_icon!.setAlpha(0);
@@ -335,19 +341,24 @@ export default class Pong extends Phaser.Scene
 		this.game.registry.set('winner', winner);
 //TODO
 //clear l'interval ?
-		setTimeout(() => { 
+		// setTimeout(() => { 
 			clearInterval(this.update_interval);
-		}, 150);
+		// }, 100);
+
+		setTimeout(() => { 
+			this.scene.start('MatchResult');
+		//	this.scene.remove('Pong');
+		}, 500);
 
 
-		this.time.addEvent({
-			delay: 500,
-			callback: function()
-			{				
-				this.scene.start('MatchResult');
-			},
-			callbackScope: this,
-			loop: true });
+		// this.time.addEvent({
+		// 	delay: 500,
+		// 	callback: function()
+		// 	{				
+		// 		this.scene.start('MatchResult');
+		// 	},
+		// 	callbackScope: this,
+		// 	loop: false });
 	}
 
 

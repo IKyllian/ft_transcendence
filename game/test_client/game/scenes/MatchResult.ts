@@ -60,6 +60,8 @@ export default class MatchResult extends Phaser.Scene
 
 
 		}
+
+		this.scene.remove('Pong');
 	}
 
 	create ()
