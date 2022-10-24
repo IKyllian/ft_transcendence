@@ -13,9 +13,12 @@ export default class Pong extends Phaser.Scene
 
 	me: PlayerType = PlayerType.Spectator;
 	socketmanager?: ClientSocketManager;
-	game_settings: GameSettings = this.game.registry.get('players_data').game_settings;
-	game_type: GameType = this.game.registry.get('players_data').game_settings.game_type;
-	core: PongCore = new PongCore(this.game_settings);
+
+	game_settings: GameSettings;
+	game_type: GameType;
+
+
+	core: PongCore;
 	game_id?: string;
 
 	//Displayed elements
@@ -86,6 +89,12 @@ export default class Pong extends Phaser.Scene
 		this.socketmanager = this.registry.get('socketmanager');
 		this.next_round_setup = this.registry.get('round_setup');
 		this.game_id = this.registry.get('players_data').game_id;
+
+		this.game_settings = this.game.registry.get('players_data').game_settings;
+		this.game_type = this.game.registry.get('players_data').game_settings.game_type;
+	
+		this.core = new PongCore(this.game_settings);
+
 		this.game_state.game_type = this.game.registry.get('players_data').game_settings.game_type;
 		this.me = this.game.registry.get('players_data').player_type;
 
@@ -104,8 +113,8 @@ export default class Pong extends Phaser.Scene
 		this.asset_lag_icon = this.add.image(400, 300, 'lag_icon');
 		this.asset_lag_icon.setAlpha(1);
 
-		this.upper_limit = this.add.rectangle(400, (this.game_settings.up_down_border / 2), 800, (this.game_settings.up_down_border / 2), 0x000000);
-		this.lower_limit = this.add.rectangle(400, (600 - (this.game_settings.up_down_border / 2)), 800, (this.game_settings.up_down_border / 2), 0x000000);
+		this.upper_limit = this.add.rectangle(0, 0, 800, this.game_settings.up_down_border , 0x000000);
+		this.lower_limit = this.add.rectangle(0, (600 - (this.game_settings.up_down_border)), 800, this.game_settings.up_down_border, 0x000000);
 
 		this.asset_Player_A_Back = this.add.rectangle(this.game_settings.player_back_advance, 300, 10, this.game_settings.paddle_size_h, 0x000000);
 		this.asset_Player_B_Back = this.add.rectangle((600 - this.game_settings.player_back_advance), 300, 10, this.game_settings.paddle_size_h, 0x000000);
@@ -136,6 +145,7 @@ export default class Pong extends Phaser.Scene
 		}
 
 		this.socketmanager?.game_get_round_setup(this.game_id!);
+
 
 
 		clearInterval(this.update_interval);
@@ -189,6 +199,7 @@ export default class Pong extends Phaser.Scene
 				time: new Date(),
 				movement: current_move
 			};
+
 			this.input_number++;
 			this.input_stock.push(player_input);
 			this.socketmanager?.game_send_input(this.registry.get('players_data').game_id, player_input);

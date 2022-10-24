@@ -25,16 +25,16 @@ export class LobbyFactory
 			let ret:NewGameData =
 			{
 				Player_A_Back: 'Mario',
-				Player_A_Back_secret: '9rzx9PAs0r',
+				Player_A_Back_secret: 'itsmemario',
 				Player_A_Front: 'Luigi',
-				Player_A_Front_secret: 'oVugmgY4Ck',
+				Player_A_Front_secret: 'ogdgdggY4Ck',
 				
+				Player_B_Front: 'Daria',
+				Player_B_Front_secret: 'lalala-la-la',
 				Player_B_Back: 'Trent',
 				Player_B_Back_secret: 'spiralmystic',
-				Player_B_Front: 'Daria',
-				Player_B_Front_secret: 'tristemondetragique',
 
-				game_id: '4p_lobby',
+				game_id: '4p_lobbyggfdgdadf',
 				game_settings: lobby_request.game_settings
 			}
 			const lobby = new Lobby(ret, lobby_request.game_settings, this);

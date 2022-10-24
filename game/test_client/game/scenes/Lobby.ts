@@ -134,10 +134,10 @@ export default class Lobby extends Phaser.Scene
 
 		if (this.game_type === GameType.Doubles)
 		{
-			this.Player_A_Front_avatar = this.add.image(260, 130, 'player_a_front_avatar')
+			this.Player_A_Front_avatar = this.add.image(280, 130, 'player_a_front_avatar')
 								.setOrigin(0.5,0.5)
 								.setDisplaySize(150, 150);
-			this.Player_B_Front_avatar = this.add.image(670, 130, 'player_b_front_avatar')
+			this.Player_B_Front_avatar = this.add.image(520, 130, 'player_b_front_avatar')
 								.setOrigin(0.5,0.5)
 								.setDisplaySize(150, 150);
 

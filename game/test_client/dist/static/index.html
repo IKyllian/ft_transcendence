@@ -12,122 +12,480 @@
 
     <script src="libpong.js"></script>
 
-    <button onclick="buildlobby()">new lobby(check console)</button> 
+    <button onclick="buildlobby()">new lobby 2P</button> 
     <button onclick="runMario()">runMario</button> 
     <button onclick="runLuigi()">runLuigi</button>
     <button onclick="runSpect()">runSpectator</button>
-    <button onclick="runWrongLobbyData()">runWrongLobbyData</button>
-    <button onclick="runReplay()">the secret feature #TOPSECRET</button>
+    <!-- <button onclick="runReplay()">the secret feature #TOPSECRET</button> -->
+    <div></div>
+
+    <button onclick="buildlobby4P()">new lobby 4P</button> 
+    <button onclick="runMario4P()">runMario 4P</button> 
+    <button onclick="runLuigi4P()">runLuigi 4P</button>
+    <button onclick="runDaria4P()">runDaria 4P</button> 
+    <button onclick="runTrent4P()">runTrent 4P</button>
+    <button onclick="runSpect4P()">runSpectator</button>
+
+    <!-- <button onclick="runReplay4P()">the secret feature #TOPSECRET 4P</button> -->
 
 
     <script>
 
       function buildlobby()
       {
-        var data = window.libpong.admin_new_game('Mario', 'Luigi');
-        console.log("data from the html", data);
+          window.libpong.admin_new_game(
+          {
+
+              Player_A_Back: 'Mario',
+              Player_A_Front: '',
+              Player_B_Front: '',
+              Player_B_Back: 'Luigi',
+              game_settings: 
+              {
+                  game_type: 0,
+                  up_down_border: 20,
+                  player_back_advance: 20,
+                  player_front_advance: 60,
+                  paddle_size_h: 150,
+                  paddle_speed: 13,
+                  ball_start_speed: 5,
+                  ball_acceleration: 1,
+                  point_for_victory: 3
+              }           
+           });
       }
 
       function runMario()
       {
           window.libpong.launch_game(
             {
-              player_A:
+             Player_A_Back:
               {
                   name: 'Mario',
                   win: 0,
                   loss: 0,
                   avatar: 'avatars/mario.png'
               },
-              player_B:
+              Player_A_Front:
+              {
+                  name: '',
+                  win: 0,
+                  loss: 0,
+                  avatar: ''
+              },
+              Player_B_Front:
+              {
+                  name: '',
+                  win: 0,
+                  loss: 0,
+                  avatar: ''
+              },
+              Player_B_Back:
               {
                   name: 'Luigi',
                   win: 0,
                   loss: 0,
                   avatar: 'avatars/luigi.jpeg'
               },
-              playertype: 0,
+              player_type: 0,
               player_secret: '9rzx9PAs0r',
-              game_id: 'aKnHwyr8z'
+              game_id: 'aKnHwyr8z',
+              game_settings: 
+              {
+                  game_type: 0,
+                  up_down_border: 20,
+                  player_back_advance: 20,
+                  player_front_advance: 60,
+                  paddle_size_h: 150,
+                  paddle_speed: 13,
+                  ball_start_speed: 5,
+                  ball_acceleration: 1,
+                  point_for_victory: 3
+              }               
             });
       }
 
       function runLuigi()
       {
-          window.libpong.launch_game(
+        window.libpong.launch_game(
             {
-              player_A:
+             Player_A_Back:
               {
                   name: 'Mario',
                   win: 0,
                   loss: 0,
                   avatar: 'avatars/mario.png'
               },
-              player_B:
+              Player_A_Front:
+              {
+                  name: '',
+                  win: 0,
+                  loss: 0,
+                  avatar: ''
+              },
+              Player_B_Front:
+              {
+                  name: '',
+                  win: 0,
+                  loss: 0,
+                  avatar: ''
+              },
+              Player_B_Back:
               {
                   name: 'Luigi',
                   win: 0,
                   loss: 0,
                   avatar: 'avatars/luigi.jpeg'
               },
-              playertype: 1,
+              player_type: 3,
               player_secret: 'oVugmgY4Ck',
-              game_id: 'aKnHwyr8z'
+              game_id: 'aKnHwyr8z',
+              game_settings: 
+              {
+                  game_type: 0,
+                  up_down_border: 20,
+                  player_back_advance: 20,
+                  player_front_advance: 60,
+                  paddle_size_h: 150,
+                  paddle_speed: 13,
+                  ball_start_speed: 5,
+                  ball_acceleration: 1,
+                  point_for_victory: 3
+              }               
             });
       }
 
       function runSpect()
       {
-          window.libpong.launch_game(
+        window.libpong.launch_game(
             {
-              player_A:
+             Player_A_Back:
               {
                   name: 'Mario',
                   win: 0,
                   loss: 0,
                   avatar: 'avatars/mario.png'
               },
-              player_B:
+              Player_A_Front:
+              {
+                  name: '',
+                  win: 0,
+                  loss: 0,
+                  avatar: ''
+              },
+              Player_B_Front:
+              {
+                  name: '',
+                  win: 0,
+                  loss: 0,
+                  avatar: ''
+              },
+              Player_B_Back:
               {
                   name: 'Luigi',
                   win: 0,
                   loss: 0,
                   avatar: 'avatars/luigi.jpeg'
               },
-              playertype: 2,
+              player_type: 4,
               player_secret: '',
-              game_id: 'aKnHwyr8z'
+              game_id: 'aKnHwyr8z',
+              game_settings: 
+              {
+                  game_type: 0,
+                  up_down_border: 20,
+                  player_back_advance: 20,
+                  player_front_advance: 60,
+                  paddle_size_h: 150,
+                  paddle_speed: 13,
+                  ball_start_speed: 5,
+                  ball_acceleration: 1,
+                  point_for_victory: 3
+              }               
             });
       }
 
+      // function runReplay()
+      // {
+      //   window.libpong.watch_replay('aKnHwyr8z');
+      // }
 
-      function runWrongLobbyData()
+
+
+      function buildlobby4P()
+      {
+          window.libpong.admin_new_game(
+          {
+
+              Player_A_Back: 'Mario',
+              Player_A_Front: 'Luigi',
+              Player_B_Front: 'Daria',
+              Player_B_Back: 'Trent',
+              game_settings: 
+              {
+                  game_type: 1,
+                  up_down_border: 20,
+                  player_back_advance: 20,
+                  player_front_advance: 60,
+                  paddle_size_h: 100,
+                  paddle_speed: 13,
+                  ball_start_speed: 5,
+                  ball_acceleration: 1,
+                  point_for_victory: 3
+              }           
+           });
+      }
+
+
+      function runMario4P()
       {
           window.libpong.launch_game(
             {
-              player_A:
+             Player_A_Back:
               {
                   name: 'Mario',
                   win: 0,
                   loss: 0,
                   avatar: 'avatars/mario.png'
               },
-              player_B:
+              Player_A_Front:
               {
                   name: 'Luigi',
                   win: 0,
                   loss: 0,
                   avatar: 'avatars/luigi.jpeg'
               },
-              playertype: 0,
-              player_secret: '',
-              game_id: 'ayr8z'
+              Player_B_Front:
+              {
+                  name: 'Daria',
+                  win: 0,
+                  loss: 0,
+                  avatar: 'avatars/daria.png'
+              },
+              Player_B_Back:
+              {
+                  name: 'Trent',
+                  win: 0,
+                  loss: 0,
+                  avatar: 'avatars/trent.png'
+              },
+              player_type: 0,
+              player_secret: 'itsmemario',
+              game_id: '4p_lobbyggfdgdadf',
+              game_settings: 
+              {
+                  game_type: 1,
+                  up_down_border: 20,
+                  player_back_advance: 20,
+                  player_front_advance: 60,
+                  paddle_size_h: 100,
+                  paddle_speed: 13,
+                  ball_start_speed: 5,
+                  ball_acceleration: 1,
+                  point_for_victory: 3
+              }               
             });
       }
 
-      function runReplay()
+      function runLuigi4P()
       {
-        window.libpong.watch_replay('aKnHwyr8z');
+          window.libpong.launch_game(
+            {
+             Player_A_Back:
+              {
+                  name: 'Mario',
+                  win: 0,
+                  loss: 0,
+                  avatar: 'avatars/mario.png'
+              },
+              Player_A_Front:
+              {
+                  name: 'Luigi',
+                  win: 0,
+                  loss: 0,
+                  avatar: 'avatars/luigi.jpeg'
+              },
+              Player_B_Front:
+              {
+                  name: 'Daria',
+                  win: 0,
+                  loss: 0,
+                  avatar: 'avatars/daria.png'
+              },
+              Player_B_Back:
+              {
+                  name: 'Trent',
+                  win: 0,
+                  loss: 0,
+                  avatar: 'avatars/trent.png'
+              },
+              player_type: 1,
+              player_secret: 'ogdgdggY4Ck',
+              game_id: '4p_lobbyggfdgdadf',
+              game_settings: 
+              {
+                  game_type: 1,
+                  up_down_border: 20,
+                  player_back_advance: 20,
+                  player_front_advance: 60,
+                  paddle_size_h: 100,
+                  paddle_speed: 13,
+                  ball_start_speed: 5,
+                  ball_acceleration: 1,
+                  point_for_victory: 3
+              }               
+            });
+      }
+   
+      
+      function runDaria4P()
+      {
+          window.libpong.launch_game(
+            {
+             Player_A_Back:
+              {
+                  name: 'Mario',
+                  win: 0,
+                  loss: 0,
+                  avatar: 'avatars/mario.png'
+              },
+              Player_A_Front:
+              {
+                  name: 'Luigi',
+                  win: 0,
+                  loss: 0,
+                  avatar: 'avatars/luigi.jpeg'
+              },
+              Player_B_Front:
+              {
+                  name: 'Daria',
+                  win: 0,
+                  loss: 0,
+                  avatar: 'avatars/daria.png'
+              },
+              Player_B_Back:
+              {
+                  name: 'Trent',
+                  win: 0,
+                  loss: 0,
+                  avatar: 'avatars/trent.png' 
+              },
+              player_type: 2,
+              player_secret: 'lalala-la-la',
+              game_id: '4p_lobbyggfdgdadf',
+              game_settings: 
+              {
+                  game_type: 1,
+                  up_down_border: 20,
+                  player_back_advance: 20,
+                  player_front_advance: 60,
+                  paddle_size_h: 100,
+                  paddle_speed: 13,
+                  ball_start_speed: 5,
+                  ball_acceleration: 1,
+                  point_for_victory: 3
+              }               
+            });
+      }
+
+      function runTrent4P()
+      {
+          window.libpong.launch_game(
+            {
+             Player_A_Back:
+              {
+                  name: 'Mario',
+                  win: 0,
+                  loss: 0,
+                  avatar: 'avatars/mario.png'
+              },
+              Player_A_Front:
+              {
+                  name: 'Luigi',
+                  win: 0,
+                  loss: 0,
+                  avatar: 'avatars/luigi.jpeg'
+              },
+              Player_B_Front:
+              {
+                  name: 'Daria',
+                  win: 0,
+                  loss: 0,
+                  avatar: 'avatars/daria.png'
+              },
+              Player_B_Back:
+              {
+                  name: 'Trent',
+                  win: 0,
+                  loss: 0,
+                  avatar: 'avatars/trent.png'
+              },
+              player_type: 3,
+              player_secret: 'spiralmystic',
+              game_id: '4p_lobbyggfdgdadf',
+              game_settings: 
+              {
+                  game_type: 1,
+                  up_down_border: 20,
+                  player_back_advance: 20,
+                  player_front_advance: 60,
+                  paddle_size_h: 100,
+                  paddle_speed: 13,
+                  ball_start_speed: 5,
+                  ball_acceleration: 1,
+                  point_for_victory: 3
+              }               
+            });
+      }
+
+      function runSpect4P()
+      {
+          window.libpong.launch_game(
+            {
+             Player_A_Back:
+              {
+                  name: 'Mario',
+                  win: 0,
+                  loss: 0,
+                  avatar: 'avatars/mario.png'
+              },
+              Player_A_Front:
+              {
+                  name: 'Luigi',
+                  win: 0,
+                  loss: 0,
+                  avatar: 'avatars/luigi.jpeg'
+              },
+              Player_B_Front:
+              {
+                  name: 'Daria',
+                  win: 0,
+                  loss: 0,
+                  avatar: 'avatars/daria.png'
+              },
+              Player_B_Back:
+              {
+                  name: 'Trent',
+                  win: 0,
+                  loss: 0,
+                  avatar: 'avatars/trent.png'
+              },
+              player_type: 4,
+              player_secret: '',
+              game_id: '4p_lobbyggfdgdadf',
+              game_settings: 
+              {
+                  game_type: 1,
+                  up_down_border: 20,
+                  player_back_advance: 20,
+                  player_front_advance: 60,
+                  paddle_size_h: 100,
+                  paddle_speed: 13,
+                  ball_start_speed: 5,
+                  ball_acceleration: 1,
+                  point_for_victory: 3
+              }               
+            });
       }
     </script>
 

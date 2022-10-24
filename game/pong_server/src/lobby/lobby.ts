@@ -351,7 +351,11 @@ export class Lobby
 			else
 			{
 //TODO better logging
-				console.log("input incidend");
+				console.log("input incidend", input);
+				console.log("player_type", input.player_type);
+				console.log("client.id", client.id);
+				console.log("this.Player_A_Back_id", this.Player_A_Back_id);
+				console.log("this.Player_B_Back_id", this.Player_B_Back_id);
 			}
 	}
 

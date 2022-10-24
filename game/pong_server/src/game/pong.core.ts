@@ -51,14 +51,14 @@ export default class PongCore
 	
 	Player_A_Front_pos: Coordinates =
 	{ 
-		x: ( this.field_width - this.player_back_advance ),
+		x: this.player_front_advance,
 		y: ( this.field_height / 2 )
 	};
 	last_processed_id_A_Front: number = 0;
 
 	Player_B_Front_pos: Coordinates =
 	{ 
-		x: ( this.field_width - this.player_back_advance ),
+		x: ( this.field_width - this.player_front_advance ),
 		y: ( this.field_height / 2 )
 	};
 	last_processed_id_B_Front: number = 0;
@@ -103,31 +103,38 @@ export default class PongCore
 			vector: { x: 0, y: 0 }
 		}
 
-		this.Player_A_Back_pos =
-		{
-			x: this.player_back_advance,
-			y: ( this.field_height / 2 )
-		};
+		// this.Player_A_Back_pos =
+		// {
+		// 	x: this.player_back_advance,
+		// 	y: ( this.field_height / 2 )
+		// };
 
-		this.Player_B_Back_pos =
-		{ 
-			x: ( this.field_width - this.player_back_advance ),
-			y: ( this.field_height / 2 )
-		};
+		// this.Player_B_Back_pos =
+		// { 
+		// 	x: ( this.field_width - this.player_back_advance ),
+		// 	y: ( this.field_height / 2 )
+		// };
+
+		this.Player_A_Back_pos.y = ( this.field_height / 2 );
+		this.Player_B_Back_pos.y = ( this.field_height / 2 );
+		
 
 		if (this.game_type === GameType.Doubles)
 		{
-			this.Player_A_Front_pos =
-			{ 
-				x: ( this.field_width - this.player_back_advance ),
-				y: ( this.field_height / 2 )
-			};
+			this.Player_A_Front_pos.y = ( this.field_height / 2 );
+			this.Player_B_Front_pos.y = ( this.field_height / 2 );
+
+			// this.Player_A_Front_pos =
+			// { 
+			// 	x: ( this.field_width - this.player_back_advance ),
+			// 	y: ( this.field_height / 2 )
+			// };
 	
-			this.Player_B_Front_pos =
-			{ 
-				x: ( this.field_width - this.player_back_advance ),
-				y: ( this.field_height / 2 )
-			};	
+			// this.Player_B_Front_pos =
+			// { 
+			// 	x: ( this.field_width - this.player_back_advance ),
+			// 	y: ( this.field_height / 2 )
+			// };	
 		}
 
 		this.playing = false;
@@ -273,7 +280,11 @@ export default class PongCore
 
 	move_ball = () =>
 	{
-		this.previous_ball_pos = this.ball_data.position;
+		// this.previous_ball_pos = this.ball_data.position;
+		this.previous_ball_pos = JSON.parse(JSON.stringify(this.ball_data.position));
+
+
+
 		this.ball_data.position.x += this.ball_data.vector.x * this.ball_data.velocity;
 		this.ball_data.position.y += this.ball_data.vector.y * this.ball_data.velocity;
 
@@ -296,21 +307,15 @@ export default class PongCore
 		if (this.ball_data.position.x <= this.player_back_advance 
 			&& this.previous_ball_pos.x > this.player_back_advance)
 		{
-
 			if (this.ball_data.position.y < (this.Player_A_Back_pos.y + (this.paddle_size_h / 2))
 			&& this.ball_data.position.y > (this.Player_A_Back_pos.y - (this.paddle_size_h / 2)))
 			{
-
 				this.ball_data.position.x = this.player_back_advance;
 				this.ball_data.vector.x *= -1;	
 //TODO
 //do something cool with vectors for bounce
 				this.ball_data.velocity += this.ball_acceleration;
-
-
 			}
-
-
 		}
 
 		//check paddle B_back ( I I   I [I] )
@@ -320,7 +325,7 @@ export default class PongCore
 			if (this.ball_data.position.y < (this.Player_B_Back_pos.y + (this.paddle_size_h / 2))
 			&& this.ball_data.position.y > (this.Player_B_Back_pos.y - (this.paddle_size_h / 2)))
 			{
-				this.ball_data.position.x = this.player_back_advance;
+				this.ball_data.position.x = (this.field_width - this.player_back_advance);
 				this.ball_data.vector.x *= -1;	
 //TODO
 //do something cool with vectors for bounce
@@ -353,7 +358,7 @@ export default class PongCore
 				if (this.ball_data.position.y < (this.Player_B_Front_pos.y + (this.paddle_size_h / 2))
 				&& this.ball_data.position.y > (this.Player_B_Front_pos.y - (this.paddle_size_h / 2)))
 				{
-					this.ball_data.position.x = this.player_front_advance;
+					this.ball_data.position.x = (this.field_width - this.player_front_advance);
 					this.ball_data.vector.x *= -1;	
 	//TODO
 	//do something cool with vectors for bounce
