@@ -55,6 +55,7 @@ export class UserController {
 
 	@UseGuards(JwtGuard)
 	@Patch('edit-username')
+	//TODO validation body
 	async editUser(@GetUser() user: User, @Body() body) {
 		return await this.userService.editUsername(user, body.username);
 	}

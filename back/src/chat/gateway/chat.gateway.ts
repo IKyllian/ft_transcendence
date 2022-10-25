@@ -28,7 +28,6 @@ import { MuteUserDto } from '../channel/dto/mute-user.dto';
 import { ChangeRoleDto } from './dto/change-role.dto';
 import { OnTypingChannelDto } from './dto/on-typing-chan.dto';
 import { OnTypingPrivateDto } from './dto/on-typing-priv.dto';
-import { domainToASCII } from 'url';
 
 @Catch()
 class GatewayExceptionFilter extends BaseWsExceptionFilter {
@@ -159,7 +158,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		@ConnectedSocket() socket: Socket,
 		@MessageBody() data: PrivateMessageDto,
 	) {
-		console.log(socket.id)
 		const conv = await this.convService.create(user, data.adresseeId, data.content);
 		this.server
 		.to(`user-${user.id}`)
@@ -178,7 +176,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		if (!addressee)
 			throw new NotFoundException('User not found');
 		await this.friendshipService.sendFriendRequest(user, addressee);
-		this.server.to(`user-${user.id}`).emit("FriendRequestSent");
+		this.server.to(`user-${user.id}`).emit("RequestValidation");
 		const notif = await this.notificationService.createFriendRequestNotif(addressee, user);
 		socket.to(`user-${dto.id}`).emit('NewNotification', notif);
 	}
@@ -200,6 +198,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				type: notificationType.FRIEND_REQUEST,
 			}
 		});
+		this.server.to(`user-${user.id}`).emit("RequestValidation");
 		if (notif) {
 			await this.notificationService.delete(notif.id);
 			this.server.to(`user-${user.id}`).emit('DeleteNotification', notif.id);

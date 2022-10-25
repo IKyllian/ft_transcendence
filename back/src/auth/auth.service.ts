@@ -8,6 +8,7 @@ import { lastValueFrom } from "rxjs";
 import { UserService } from "src/user/user.service";
 import { Auth42Dto } from "./dto/auth42.dto";
 import { User } from "src/typeorm";
+import { SignupDto } from "./dto/signup.dto";
 
 @Injectable()
 export class AuthService {
@@ -19,7 +20,7 @@ export class AuthService {
 		private readonly httpService: HttpService,
 	) {}
 
-	async signup(dto: AuthDto) {
+	async signup(dto: SignupDto) {
 		if (await this.userService.nameTaken(dto.username))
 			throw new ForbiddenException('Username taken');
 		const hash = await argon.hash(dto.password);

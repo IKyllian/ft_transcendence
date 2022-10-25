@@ -27,7 +27,7 @@ export class PrivateMessageService {
 			where: { id: dto.adresseeId }
 		});
 		if (this.userService.isBlocked(user2, user.id))
-			throw new BadRequestException("You are send blocked by this user");
+			throw new BadRequestException("You are blocked by this user");
 		const msg = this.privateMsgRepo.create({
 			sender: user,
 			content: dto.content,
