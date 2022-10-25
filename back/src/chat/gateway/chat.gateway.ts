@@ -178,7 +178,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		if (!addressee)
 			throw new NotFoundException('User not found');
 		await this.friendshipService.sendFriendRequest(user, addressee);
-		this.server.to(`user-${user.id}`).emit("FriendRequestSent");
+		this.server.to(`user-${user.id}`).emit("RequestValidation");
 		const notif = await this.notificationService.createFriendRequestNotif(addressee, user);
 		socket.to(`user-${dto.id}`).emit('NewNotification', notif);
 	}
@@ -200,6 +200,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				type: notificationType.FRIEND_REQUEST,
 			}
 		});
+		this.server.to(`user-${user.id}`).emit("RequestValidation");
 		if (notif) {
 			await this.notificationService.delete(notif.id);
 			this.server.to(`user-${user.id}`).emit('DeleteNotification', notif.id);

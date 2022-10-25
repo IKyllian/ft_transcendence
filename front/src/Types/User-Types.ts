@@ -46,3 +46,8 @@ export interface ProfileState {
     friendList: UserInterface[],
     relationStatus?: string,
 }
+
+export interface UsersListInterface {
+    user: UserInterface,
+    relationStatus?: string,
+}

@@ -55,7 +55,8 @@
         justify-content: space-between;
         margin: 0 auto;
         .item-player-info {
-            display: inline-flex;
+            display: flex;
+            align-items: center;
             .modal-picture {
                 @include avatar-player(50px);
                 margin-right: 10px;

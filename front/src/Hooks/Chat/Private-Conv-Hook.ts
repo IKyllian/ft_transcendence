@@ -28,9 +28,8 @@ export function usePrivateConvHook() {
     const convId: number | undefined = params.convId ? parseInt(params.convId!) : undefined;
     const { socket } = useContext(SocketContext);
 
-
     const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+        messagesEndRef.current?.scrollIntoView();
     }
 
     const handleInputChange = () => {

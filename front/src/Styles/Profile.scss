@@ -80,8 +80,8 @@ $FontSizeTextResponsive: 15px;
                 @include flex-row-alignCenter();
                 gap: 10px;
                 button {
-                    cursor: pointer;
                     all: unset;
+                    cursor: pointer;
                     width: 80px;
                     text-align: center;
                     font-size: 10px;

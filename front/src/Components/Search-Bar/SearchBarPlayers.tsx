@@ -1,7 +1,7 @@
 import { ReactNode, useEffect, useState, useCallback, useContext } from "react";
 import { IconSearch, IconCheck, IconX } from "@tabler/icons";
 import UserFindItem from "./User-Find-Item";
-import { UserInterface } from "../../Types/User-Types";
+import { UserInterface, UsersListInterface } from "../../Types/User-Types";
 import { useAppDispatch, useAppSelector } from "../../Redux/Hooks";
 import Avatar from "../../Images-Icons/pp.jpg"
 import { fetchConvAndRedirect } from "../../Api/Chat/Chat-Fetch";
@@ -9,6 +9,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { debounce } from "../../Utils/Utils-Chat";
 import { SocketContext } from "../../App";
+import { useFriendHook } from "../../Hooks/Friend-Hook";
 
 interface SearchBarButtonsProps {
     functionality: string,
@@ -17,35 +18,26 @@ interface SearchBarButtonsProps {
     checkboxArray?: UserInterface[],
     handleSendMessage?: Function,
     userFromList?: UsersListInterface,
-    // setRequestIsSend?: Function,
-}
-
-interface UsersListInterface {
-    user: UserInterface,
-    relationStatus?: string,
 }
 
 function SearchBarButtons(props: SearchBarButtonsProps) {
     const { functionality, user, checkboxOnChange, checkboxArray, handleSendMessage, userFromList} = props;
 
-    const {socket} = useContext(SocketContext);
-    const handleAddFriend = () => {
-        socket?.emit("FriendRequest", {
-            id: userFromList?.user.id,
-        });
-        // setRequestIsSend!((prev:any) => {return !prev});
-    }
+    const {
+        handleAddFriend,
+        replieFriendRequest,
+    } = useFriendHook();
    
     if (functionality === "addFriend") {
         if (userFromList?.relationStatus === "none") {
-            return (<button onClick={() => handleAddFriend()}> Add friend </button>);
+            return (<button onClick={() => handleAddFriend(userFromList!.user.id)}> Add friend </button>);
         } else if (userFromList?.relationStatus === "pending") {
             return (<p> pending </p>);
         } else {
             return (
                 <div className="friendship-action-wrapper">
-                    <IconCheck />
-                    <IconX />
+                    <IconCheck onClick={() => replieFriendRequest(userFromList!.user.id, "accepted")} />
+                    <IconX onClick={() => replieFriendRequest(userFromList!.user.id, "declined")} />
                 </div>
             )
         }
@@ -69,16 +61,26 @@ function SearchBarPlayers(props: {functionality: string, checkboxOnChange?: Func
     const {functionality, checkboxOnChange, checkboxArray, fetchUserFunction} = props;
     const { register, reset, formState: {errors}, getValues } = useForm<{textInput: string}>();
     const [usersList, setUsersList] = useState<UsersListInterface[] | undefined>(undefined);
-    // const [requestIsSend, setRequestIsSend] = useState<boolean>(false);
-    const {token, currentUser} = useAppSelector(state => state.auth);
+    const {token, currentUser, friendList} = useAppSelector(state => state.auth);
     const {privateConv} = useAppSelector(state => state.chat);
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const params = useParams();
+    const {socket} = useContext(SocketContext);
  
     const handleSendMessage = (userIdToSend: number) => {
         fetchConvAndRedirect(currentUser!, userIdToSend, token, privateConv, dispatch, navigate);
     }
+
+    useEffect(() => {
+        socket?.on("RequestValidation", () => {
+            fetchUserFunction(getValues('textInput'), token, setUsersList);
+        });
+
+        return () => {
+            socket?.off("RequestValidation");
+        }
+    })
 
     const endOfTyping = () => {
         if (getValues('textInput') && getValues('textInput').length > 0) {
@@ -93,7 +95,7 @@ function SearchBarPlayers(props: {functionality: string, checkboxOnChange?: Func
         }
     }
 
-    const optimizedFn = useCallback(debounce(endOfTyping, 700), []);
+    const optimizedFn = useCallback(debounce(endOfTyping, 700), [friendList]);
 
     const renderSearchBarButton = (parameters: SearchBarButtonsProps): ReactNode => {
         const { functionality, user, checkboxOnChange, checkboxArray, handleSendMessage, userFromList } = parameters;

@@ -68,6 +68,7 @@ export function useAppHook() {
 			});
 
 			socket.on("FriendListUpdate", (data: UserInterface[]) => {
+				console.log("FriendListUpdate", data);
 				dispatch(copyFriendListArray(data));
 			})
 
@@ -99,6 +100,7 @@ export function useAppHook() {
 		return () => {
 			socket?.off("NewNotification");
 			socket?.off("NewConversation");
+			socket?.off("FriendListUpdate");
 			socket?.off("DeleteNotification");
 			socket?.off("exception");
 			socket?.off("OnJoin");
