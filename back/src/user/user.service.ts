@@ -144,7 +144,6 @@ export class UserService {
 
 	isBlocked(user: User, id: number): boolean {
 		const isblocked = user.blocked.find((blocked) => blocked.id === id);
-		console.log(isblocked);
 		return isblocked ? true : false;
 	}
 
