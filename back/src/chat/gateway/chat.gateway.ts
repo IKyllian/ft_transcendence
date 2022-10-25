@@ -275,6 +275,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			this.server.to(`channel-${updatedChan.id}`).emit('ChannelUsersUpdate', updatedChan);
 			this.server.to(`user-${user.id}`).emit('OnJoin', updatedChan);
 		}
+		this.server.to(`user-${user.id}`).emit('DeleteNotification', dto.id);
 	}
 
 	@UseGuards(WsJwtGuard, WsInChannelGuard, ChannelPermissionGuard)
