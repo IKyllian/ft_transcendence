@@ -48,22 +48,5 @@ async function bootstrap() {
   // const channelRepo = await app.get<any, Repository<Channel>>(getRepositoryToken(Channel));
   // const user = { id: 18 }
 
-
-// Trouver tous les channels dont l'user ne fait pas parti
-
-  // const channelsUserHasJoined = await channelUserRepo
-  // .createQueryBuilder("channelUser")
-  // .select("channelUser.channel.id")
-  // .where("channelUser.user.id = :id", { id: user.id })
-
-  
-  // const channelList = await channelRepo
-  // .createQueryBuilder("channel")
-  // .where("channel.id NOT IN ("+ channelsUserHasJoined.getQuery() +")")
-  // .setParameters(channelsUserHasJoined.getParameters())
-  // .getMany()
-
-
-  // console.log(channelList)
 }
 bootstrap();

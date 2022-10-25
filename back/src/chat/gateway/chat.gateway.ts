@@ -1,12 +1,11 @@
-import { ArgumentsHost, BadRequestException, Catch, ClassSerializerInterceptor, ExceptionFilter, HttpException, UseFilters, UseGuards, UseInterceptors, UsePipes, ValidationPipe } from '@nestjs/common';
-import { WebSocketGateway, MessageBody, WebSocketServer, ConnectedSocket, OnGatewayConnection, OnGatewayDisconnect, WsException, BaseWsExceptionFilter, SubscribeMessage, OnGatewayInit } from '@nestjs/websockets';
+import { ArgumentsHost, Catch, NotFoundException, UseFilters, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import { WebSocketGateway, MessageBody, WebSocketServer, ConnectedSocket, OnGatewayConnection, OnGatewayDisconnect, WsException, BaseWsExceptionFilter, SubscribeMessage } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { AuthService } from 'src/auth/auth.service';
 import { WsJwtGuard } from 'src/auth/guard/ws-jwt.guard';
 import { ChannelMessage, ChannelUser, User } from 'src/typeorm';
 import { ChannelService } from '../channel/channel.service';
 import { ChatSessionManager } from './chat.session';
-import { MessageDto } from '../channel/dto/message.dto';
 import { UserService } from 'src/user/user.service';
 import { JwtPayload } from 'src/utils/types/types';
 import { GetChannelUser, GetUser } from 'src/utils/decorators';
@@ -25,7 +24,6 @@ import { BanUserDto } from '../channel/dto/ban-user.dto';
 import { ChannelPermissionGuard } from '../channel/guards';
 import { WsInChannelGuard } from '../channel/guards/ws-in-channel.guard';
 import { ConversationService } from '../conversation/conversation.service';
-import { doesNotMatch } from 'assert';
 import { MuteUserDto } from '../channel/dto/mute-user.dto';
 import { ChangeRoleDto } from './dto/change-role.dto';
 import { OnTypingChannelDto } from './dto/on-typing-chan.dto';
@@ -159,13 +157,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		@GetUser() user: User,
 		@ConnectedSocket() socket: Socket,
 		@MessageBody() data: PrivateMessageDto,
-		) {
-			console.log(socket.id)
-			const conv = await this.convService.create(user, data.adresseeId, data.content);
-			this.server
-			.to(`user-${user.id}`)
-			.to(`user-${data.adresseeId}`)
-			.emit('NewConversation', { conv, socketId: socket.id });
+	) {
+		console.log(socket.id)
+		const conv = await this.convService.create(user, data.adresseeId, data.content);
+		this.server
+		.to(`user-${user.id}`)
+		.to(`user-${data.adresseeId}`)
+		.emit('NewConversation', { conv, socketId: socket.id });
 	}
 
 	@UseGuards(WsJwtGuard)
@@ -175,9 +173,39 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		@ConnectedSocket() socket: Socket,
 		@MessageBody() dto: UserIdDto,
 	) {
-		const friendRequest = await this.friendshipService.sendFriendRequest(user, dto.id);
-		const notif = await this.notificationService.createFriendRequestNotif(friendRequest);
-		socket.to(`user-${dto.id}`).emit('NewNotication', notif);
+		const addressee = await this.userService.findOneBy({ id: dto.id });
+		if (!addressee)
+			throw new NotFoundException('User not found');
+		await this.friendshipService.sendFriendRequest(user, addressee);
+		const notif = await this.notificationService.createFriendRequestNotif(addressee, user);
+		socket.to(`user-${dto.id}`).emit('NewNotification', notif);
+	}
+
+	@UseGuards(WsJwtGuard)
+	@SubscribeMessage('FriendRequestResponse')
+	async friendRequestResponse(
+		@GetUser() user: User,
+		@ConnectedSocket() socket: Socket,
+		@MessageBody() dto: ResponseDto,
+	) {
+		const requester = await this.userService.findOneBy({ id: dto.id });
+		if (!requester)
+			throw new NotFoundException('User not found');
+		const friendship = await this.friendshipService.friendRequestResponse(user, requester, dto);
+		const notif = await this.notificationService.findOne({
+			where: {
+				requester: { id: requester.id },
+				addressee: { id: user.id },
+			}
+		});
+		if (notif) {
+			this.notificationService.delete(notif.id);
+			this.server.to(`user-${user.id}`).emit('DeleteNotification', notif.id);
+		}
+		if (friendship.status === 'accepted') {
+			this.server.to(`user-${user.id}`).emit('FriendListUpdate', await this.friendshipService.getFriendlist(user));
+			this.server.to(`user-${requester.id}`).emit('FriendListUpdate', await this.friendshipService.getFriendlist(requester));
+		}
 	}
 
 	@UseGuards(WsJwtGuard)
@@ -243,14 +271,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		@GetUser() user: User,
 		@MessageBody() dto: BanUserDto,
 	) {
-			const updatedChan = await this.channelService.banUser(user, dto);
-			this.server.to(`channel-${updatedChan.id}`).emit('ChannelUsersUpdate', updatedChan);
-			this.server.to(`user-${dto.userId}`).emit('OnLeave', updatedChan);
-			// const servMsg = await this.channelMsgService.createServer({
-			// 	chanId: updatedChan.id,
-			// 	content: `${user.username} got banned ${dto.time ? `for ${dto.time} seconds.` : 'permanently.'}`,
-			// });
-			// this.server.to(`channel-${updatedChan.id}`).emit('NewChannelMessage', servMsg);
+		const updatedChan = await this.channelService.banUser(user, dto);
+		this.server.to(`channel-${updatedChan.id}`).emit('ChannelUsersUpdate', updatedChan);
+		this.server.to(`user-${dto.userId}`).emit('OnLeave', updatedChan);
+		// const servMsg = await this.channelMsgService.createServer({
+		// 	chanId: updatedChan.id,
+		// 	content: `${user.username} got banned ${dto.time ? `for ${dto.time} seconds.` : 'permanently.'}`,
+		// });
+		// this.server.to(`channel-${updatedChan.id}`).emit('NewChannelMessage', servMsg);
 	}
 
 	@UseGuards(WsJwtGuard, WsInChannelGuard, ChannelPermissionGuard)

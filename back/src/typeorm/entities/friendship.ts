@@ -1,7 +1,7 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "./user";
 
-export type friendShipStatus = 'requested' | 'accepted' | 'declined';
+export type friendshipStatus = 'requested' | 'accepted' | 'declined';
 
 @Entity()
 export class Friendship {
@@ -16,7 +16,7 @@ export class Friendship {
 	addressee: User;
 
 	@Column({ nullable: true })
-	status: friendShipStatus;
+	status: friendshipStatus;
 
 	@CreateDateColumn()
 	created_at: Date;

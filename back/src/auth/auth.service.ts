@@ -20,10 +20,8 @@ export class AuthService {
 	) {}
 
 	async signup(dto: AuthDto) {
-		const userExist = await this.userService.findOneBy({ username: dto.username });
-		if (userExist)
+		if (await this.userService.nameTaken(dto.username))
 			throw new ForbiddenException('Username taken');
-
 		const hash = await argon.hash(dto.password);
 		const params = {
 			username: dto.username,
@@ -166,7 +164,6 @@ export class AuthService {
 			});
 		}
 		catch(e) {
-			console.log('hello', e.message)
 			return null;
 		}
 	}

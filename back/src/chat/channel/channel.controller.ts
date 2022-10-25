@@ -29,7 +29,7 @@ export class ChannelController {
 	async searchChannel(@GetUser() user: User) {
 		console.log('searching channel')
 		const chan =  await this.channelService.searchChannel(user);
-		console.log(chan)
+		// console.log(chan)
 		return chan
 	}
 
