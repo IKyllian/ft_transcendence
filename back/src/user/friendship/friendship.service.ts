@@ -1,6 +1,7 @@
 import { BadRequestException, forwardRef, Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { ResponseDto } from "src/chat/gateway/dto/response.dto";
+import { UserIdDto } from "src/chat/gateway/dto/user-id.dto";
 import { Friendship, User } from "src/typeorm";
 import { RelationStatus } from "src/utils/types/types";
 import { In, Not, Repository } from "typeorm";
@@ -191,6 +192,17 @@ export class FriendshipService {
 		}
 		friendship.status = status.response;
 		return this.friendshipRepo.save(friendship);
+	}
+
+	async unFriend(user: User, dto: UserIdDto) {
+		const user2 = await this.userService.findOneBy({ id: dto.id });
+		if (!user2)
+			throw new NotFoundException('User not found');
+		const friendship = await this.getRelation(user, user2);
+		if (!friendship || friendship.status !== 'accepted')
+			throw new BadRequestException('You are not friend with this user');
+		this.friendshipRepo.delete(friendship.id);
+		return user2;
 	}
 }
 

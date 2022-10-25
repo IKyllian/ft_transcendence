@@ -28,6 +28,7 @@ import { MuteUserDto } from '../channel/dto/mute-user.dto';
 import { ChangeRoleDto } from './dto/change-role.dto';
 import { OnTypingChannelDto } from './dto/on-typing-chan.dto';
 import { OnTypingPrivateDto } from './dto/on-typing-priv.dto';
+import { domainToASCII } from 'url';
 
 @Catch()
 class GatewayExceptionFilter extends BaseWsExceptionFilter {
@@ -206,6 +207,17 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			this.server.to(`user-${user.id}`).emit('FriendListUpdate', await this.friendshipService.getFriendlist(user));
 			this.server.to(`user-${requester.id}`).emit('FriendListUpdate', await this.friendshipService.getFriendlist(requester));
 		}
+	}
+
+	@UseGuards(WsJwtGuard)
+	@SubscribeMessage('UnFriend')
+	async unFriend(
+		@GetUser() user: User,
+		@MessageBody() dto: UserIdDto,
+	) {
+		const user2 = await this.friendshipService.unFriend(user, dto);
+		this.server.to(`user-${user.id}`).emit('FriendListUpdate', await this.friendshipService.getFriendlist(user));
+		this.server.to(`user-${user2.id}`).emit('FriendListUpdate', await this.friendshipService.getFriendlist(user2));
 	}
 
 	@UseGuards(WsJwtGuard)
