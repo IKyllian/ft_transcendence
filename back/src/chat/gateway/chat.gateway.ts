@@ -7,7 +7,7 @@ import { ChannelMessage, ChannelUser, User } from 'src/typeorm';
 import { ChannelService } from '../channel/channel.service';
 import { ChatSessionManager } from './chat.session';
 import { UserService } from 'src/user/user.service';
-import { JwtPayload } from 'src/utils/types/types';
+import { JwtPayload, notificationType } from 'src/utils/types/types';
 import { GetChannelUser, GetUser } from 'src/utils/decorators';
 import { ChannelMessageService } from '../channel/message/ChannelMessage.service';
 import { ChannelMessageDto } from '../channel/message/dto/channelMessage.dto';
@@ -178,6 +178,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		if (!addressee)
 			throw new NotFoundException('User not found');
 		await this.friendshipService.sendFriendRequest(user, addressee);
+		this.server.to(`user-${user.id}`).emit("FriendRequestSent");
 		const notif = await this.notificationService.createFriendRequestNotif(addressee, user);
 		socket.to(`user-${dto.id}`).emit('NewNotification', notif);
 	}
@@ -186,7 +187,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@SubscribeMessage('FriendRequestResponse')
 	async friendRequestResponse(
 		@GetUser() user: User,
-		@ConnectedSocket() socket: Socket,
 		@MessageBody() dto: ResponseDto,
 	) {
 		const requester = await this.userService.findOneBy({ id: dto.id });
@@ -197,10 +197,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			where: {
 				requester: { id: requester.id },
 				addressee: { id: user.id },
+				type: notificationType.FRIEND_REQUEST,
 			}
 		});
 		if (notif) {
-			this.notificationService.delete(notif.id);
+			await this.notificationService.delete(notif.id);
 			this.server.to(`user-${user.id}`).emit('DeleteNotification', notif.id);
 		}
 		if (friendship.status === 'accepted') {
@@ -263,7 +264,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		this.server.to(`user-${dto.userId}`).emit('NewNotification', notif);
 	}
 
-	//TODO change response dto
 	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('ChannelInviteResponse')
 	async respondToChannelInvite(

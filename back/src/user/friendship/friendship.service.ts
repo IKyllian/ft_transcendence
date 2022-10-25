@@ -102,6 +102,7 @@ export class FriendshipService {
 		const userList = await this.userRepo
 			.createQueryBuilder("user")
 			.where("LOWER(user.username) LIKE :name", { name: `%${dto.str.toLowerCase()}%` })
+			.andWhere("user.id != :userId", { userId: user.id })
 			.take(10)
 			.getMany()
 
@@ -201,7 +202,7 @@ export class FriendshipService {
 		const friendship = await this.getRelation(user, user2);
 		if (!friendship || friendship.status !== 'accepted')
 			throw new BadRequestException('You are not friend with this user');
-		this.friendshipRepo.delete(friendship.id);
+		await this.friendshipRepo.delete(friendship.id);
 		return user2;
 	}
 }
