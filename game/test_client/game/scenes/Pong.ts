@@ -18,6 +18,15 @@ export default class Pong extends Phaser.Scene
 	game_type: GameType;
 
 
+
+
+	sound_a;
+	sound_b;
+	sound_c;
+	sound_clapping;
+
+
+
 	core: PongCore;
 	game_id?: string;
 
@@ -82,6 +91,11 @@ export default class Pong extends Phaser.Scene
 	{
 		this.load.image('ball', 'assets/black_dot.png');
 		this.load.image('lag_icon', 'assets/lag_icon.png');
+
+		this.load.audio('sound_a', 'assets/sound/8bit_effect_a.ogg');
+		this.load.audio('sound_b', 'assets/sound/8bit_effect_b.ogg');
+		this.load.audio('sound_c', 'assets/sound/8bit_effect_c.ogg');
+		this.load.audio('clapping', 'assets/sound/clapping.ogg');
 	}
 
 	create ()
@@ -91,6 +105,7 @@ export default class Pong extends Phaser.Scene
 		this.game_id = this.registry.get('players_data').game_id;
 
 		this.game_settings = this.game.registry.get('players_data').game_settings;
+console.log("setings: ", this.game_settings);
 		this.game_type = this.game.registry.get('players_data').game_settings.game_type;
 	
 		this.core = new PongCore(this.game_settings);
@@ -103,6 +118,14 @@ export default class Pong extends Phaser.Scene
 
 		this.me = this.game.registry.get('players_data').player_type;
 
+
+		this.sound_a = this.sound.add('sound_a');
+		this.sound_b = this.sound.add('sound_b');
+		this.sound_c = this.sound.add('sound_c');
+		this.sound_clapping = this.sound.add('clapping');
+	
+
+
 		if (this.socketmanager !== undefined)
 		{
 			this.socketmanager.set_pong_triggers({
@@ -114,10 +137,29 @@ export default class Pong extends Phaser.Scene
 
 		}
 
+
+		if (this.core !== undefined)
+		{
+//console.log('setting triggers for core')
+			this.core.set_pong_triggers({
+
+				play_sound_a: this.play_sound_a.bind(this),
+				play_sound_b: this.play_sound_b.bind(this),
+				play_sound_c: this.play_sound_c.bind(this),
+				play_sound_clapping: this.play_sound_clapping.bind(this)
+
+				// play_sound_a: this.sound_a.play.bind(this),
+				// play_sound_b: this.sound_b.play.bind(this),
+				// play_sound_c: this.sound_c.play.bind(this),
+				// clapping: this.sound_clapping.play.bind(this)
+
+			});
+		}
+
 		this.asset_ball = this.add.image(400, 300, 'ball');
 		this.asset_lag_icon = this.add.image(400, 300, 'lag_icon');
 		this.asset_lag_icon.setAlpha(1);
-
+// console.log("paddle h", this.game_settings.paddle_size_h);
 		this.upper_limit = this.add.rectangle(0, 0, 800, this.game_settings.up_down_border , 0x000000).setOrigin(0,0);
 		this.lower_limit = this.add.rectangle(0, (600 - (this.game_settings.up_down_border)), 800, this.game_settings.up_down_border, 0x000000).setOrigin(0,0);
 
@@ -214,6 +256,13 @@ export default class Pong extends Phaser.Scene
 		//check received data from server
 		if (this.server_stock.length !== 0)
 		{
+			if (this.me !== PlayerType.Spectator)
+				this.core.apply_input(this.input_stock[(this.input_stock.length - 1)]);
+
+
+			this.core.move_ball();
+			this.core.client_check_goal();
+
 			this.is_lagging = false;
 			this.lag_count = 0;
 			this.server_stock.forEach(function(elem: GameState)
@@ -345,22 +394,26 @@ export default class Pong extends Phaser.Scene
 			clearInterval(this.update_interval);
 		// }, 100);
 
-		setTimeout(() => { 
-			this.scene.start('MatchResult');
-		//	this.scene.remove('Pong');
-		}, 500);
+		// setTimeout(() => { 
+		// 	this.scene.start('MatchResult');
+		// //	this.scene.remove('Pong');
+		// }, 500);
 
 
-		// this.time.addEvent({
-		// 	delay: 500,
-		// 	callback: function()
-		// 	{				
-		// 		this.scene.start('MatchResult');
-		// 	},
-		// 	callbackScope: this,
-		// 	loop: false });
+		this.time.addEvent({
+			delay: 500,
+			callback: function()
+			{				
+				this.launch_match_result();
+			},
+			callbackScope: this,
+			loop: false });
 	}
 
+	launch_match_result = () =>
+	{
+		this.scene.start('MatchResult');
+	}
 
 	display_singles = () =>
 	{
@@ -533,6 +586,30 @@ export default class Pong extends Phaser.Scene
 		}
 
 
+	}
+
+	play_sound_a = () =>
+	{
+		this.sound.stopAll();
+		this.sound_a.play();
+	}
+
+	play_sound_b = () =>
+	{
+		this.sound.stopAll();
+		this.sound_b.play();
+	}
+
+	play_sound_c = () =>
+	{
+		this.sound.stopAll();
+		this.sound_c.play();
+	}
+
+	play_sound_clapping = () =>
+	{
+		this.sound.stopAll();
+		this.sound_clapping.play();
 	}
 
 }

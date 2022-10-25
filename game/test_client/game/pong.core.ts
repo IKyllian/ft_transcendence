@@ -8,6 +8,9 @@ import { BallData, Coordinates, EndResult, GameSettings, GameState, GameType, Go
 
 export default class PongCore
 {
+	//for client only
+	private pong_triggers: any;
+
 	//Modifiable Game Settings
 	game_type: GameType = GameType.Singles; //(enum)Singles or Doubles
 	up_down_border: number = 20; //pixels
@@ -96,6 +99,13 @@ export default class PongCore
 		this.Player_B_Front_pos.x = ( this.field_width - this.player_front_advance );
 		this.Player_B_Back_pos.x = ( this.field_width - this.player_back_advance );
     }
+
+
+    set_pong_triggers(data: any): void
+	{
+        this.pong_triggers = data;
+    }
+
 
 	get_round_setup = (): RoundSetup =>
 	{
@@ -285,6 +295,7 @@ export default class PongCore
 
 		this.move_ball();
 		//this.check_goal();
+		//this.client_check_goal();
 	}
 
 	move_ball = () =>
@@ -303,6 +314,8 @@ export default class PongCore
 			this.ball_data.position.y = this.up_down_border;
 			this.ball_data.vector.y *= -1;
 	//		this.ball_data.velocity += this.ball_acceleration;
+
+			this.pong_triggers?.play_sound_a();
 		}
 		//check down wall
 		if (this.ball_data.position.y >= (this.field_height - this.up_down_border))
@@ -310,6 +323,8 @@ export default class PongCore
 			this.ball_data.position.y = (this.field_height - this.up_down_border);
 			this.ball_data.vector.y *= -1;
 	//		this.ball_data.velocity += this.ball_acceleration;
+	
+			this.pong_triggers?.play_sound_a();
 		}
 
 		//check paddle A_back ( [I] I   I I )
@@ -324,6 +339,8 @@ export default class PongCore
 //TODO
 //do something cool with vectors for bounce
 				this.ball_data.velocity += this.ball_acceleration;
+				
+				this.pong_triggers?.play_sound_b();
 			}
 		}
 
@@ -339,6 +356,8 @@ export default class PongCore
 //TODO
 //do something cool with vectors for bounce
 				this.ball_data.velocity += this.ball_acceleration;
+				
+				this.pong_triggers?.play_sound_b();
 			}
 		}	
 
@@ -357,6 +376,8 @@ export default class PongCore
 	//TODO
 	//do something cool with vectors for bounce
 					this.ball_data.velocity += this.ball_acceleration;
+					
+					this.pong_triggers?.play_sound_b();
 				}
 			}
 	
@@ -372,6 +393,8 @@ export default class PongCore
 	//TODO
 	//do something cool with vectors for bounce
 					this.ball_data.velocity += this.ball_acceleration;
+					
+					this.pong_triggers?.play_sound_b();
 				}
 			}
 		}
@@ -508,5 +531,17 @@ export default class PongCore
 				this.do_round_setup();
 			}
 		}
+	}
+
+
+	client_check_goal = () =>
+	{
+console.log("client check goal");
+		if (this.ball_data.position.x < 0
+			|| this.ball_data.position.x > this.field_width )
+		{
+			this.pong_triggers?.play_sound_clapping();
+		}
+
 	}
 }
