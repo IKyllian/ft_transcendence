@@ -3,7 +3,8 @@ import { UserInterface } from "./User-Types";
 
 enum notificationType {
 	FRIEND_REQUEST = 'friend_request',
-	CHANNEL_INVITE = 'channel_invite'
+	CHANNEL_INVITE = 'channel_invite',
+	GAME_INVITE = 'game_invite',
 };
 
 export interface NotificationInterface {

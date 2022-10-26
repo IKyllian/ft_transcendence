@@ -4,9 +4,17 @@ import { ProfileState } from '../../Types/User-Types';
 import ProfilePic from "../../Images-Icons/pp.jpg"
 import { Link } from "react-router-dom";
 import FriendButton from '../Buttons/Friend-Button';
+import { useContext } from 'react';
+import { SocketContext } from '../../App';
 
 function CardInfo(props: {userState: ProfileState}) {
     const { userState } = props;
+
+    const {socket} = useContext(SocketContext);
+
+    const invitePlayer = () => {
+        socket?.emit("GameInvite", {id: userState.user.id});
+    }
     
     return (
         <div className="card-info">
@@ -20,14 +28,10 @@ function CardInfo(props: {userState: ProfileState}) {
                     <Link className="send-message-icon" to="/chat" state={{userIdToSend: userState.user.id}}>
                         <IconMessage />
                     </Link>
-                    <Link className="fight-button" to="/profile">
+                    <Link onClick={() => invitePlayer()} className="fight-button" to="/lobby">
                         Play
                         <IconBrandAppleArcade />
                     </Link>
-                     {/* <Link className="fight-button" to="/profile">
-                        Watch Game */}
-                        {/* <IconEye /> */}
-                    {/* </Link> */}
                 </>
             }
         </div>

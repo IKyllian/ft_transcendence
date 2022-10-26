@@ -1,9 +1,18 @@
+import { useContext } from "react";
 import Avatar from "../Images-Icons/pp.jpg";
+import { SocketContext } from "../App";
+import { NotificationInterface } from "../Types/Notification-Types";
+import { useNavigate } from "react-router-dom";
 
-function NotifGameInvite(props: {notifOnLeave: Function}) {
-    const {notifOnLeave} = props;
+function NotifGameInvite(props: {notif: NotificationInterface ,notifOnLeave: Function}) {
+    const {notif, notifOnLeave} = props;
+    const {socket} = useContext(SocketContext);
+    const navigate = useNavigate();
+    
     const handleAccept = () => {
+        socket!.emit("AcceptGameInvite", { id: notif.requester.id });
         notifOnLeave();
+        navigate(`/lobby`, {state: notif.requester});
     }
 
     const handleDecline = () => {
@@ -15,7 +24,7 @@ function NotifGameInvite(props: {notifOnLeave: Function}) {
             <div className="notif-top">
                 <img className='profile-avatar' src={Avatar} alt="profil pic" />
                 <div className="notif-text">
-                    <p> Jojo </p>
+                    <p> {notif.requester.username} </p>
                     <p> Invited you to play a game </p>
                 </div>
             </div>

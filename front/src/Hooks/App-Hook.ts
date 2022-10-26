@@ -13,7 +13,7 @@ import { copyFriendListArray } from "../Redux/AuthSlice";
 
 export function useAppHook() {
     const [socket, setSocket] = useState<Socket | undefined>(undefined);
-	const [gameInvite, setGameInvite] = useState<boolean>(false);
+	const [gameInvite, setGameInvite] = useState<NotificationInterface | undefined>(undefined);
     const {token, isAuthenticated, currentUser} = useAppSelector((state) => state.auth);
 	const [eventError, setEventError] = useState<string | undefined>(undefined);
 
@@ -33,7 +33,7 @@ export function useAppHook() {
 	}
 
 	const gameNotificationLeave = () => {
-		setGameInvite(false);
+		setGameInvite(undefined);
 	}
 
 	useEffect(() => {
@@ -57,6 +57,11 @@ export function useAppHook() {
 				console.log("NewNotification", data);
 				dispatch(addNotification(data));
 			});
+
+			socket.on("NewGameInvite", (data: NotificationInterface) => {
+				console.log("NewGameInvite", data);
+				setGameInvite(data);
+			})
 
 			socket.on("DeleteNotification", (data: number) => {
 				dispatch(deleteNotification(data));
@@ -100,6 +105,7 @@ export function useAppHook() {
 		return () => {
 			socket?.off("NewNotification");
 			socket?.off("NewConversation");
+			socket?.off("NewGameInvite");
 			socket?.off("FriendListUpdate");
 			socket?.off("DeleteNotification");
 			socket?.off("exception");
