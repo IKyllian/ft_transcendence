@@ -1,10 +1,12 @@
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useAppSelector, useAppDispatch } from "../../Redux/Hooks";
-import { addChannel, changeActiveElement, removeChannel } from "../../Redux/ChatSlice";
+import { changeActiveElement } from "../../Redux/ChatSlice";
 import { useEffect, useState, useCallback, useContext } from "react";
 import { fetchUserChannels, fetchUserConvs, fetchConvAndRedirect } from "../../Api/Chat/Chat-Fetch";
 import { SocketContext } from "../../App";
-import { Channel } from "../../Types/Chat-Types";
+import { ModalContext } from "../../Components/Utils/ModalProvider";
+import { ConversationInterfaceFront, ChannelsInterfaceFront } from "../../Types/Chat-Types";
+import { copyChannelsAndConvs } from "../../Redux/ChatSlice";
 
 export function useLoadChatDatas() {
     //States
@@ -19,10 +21,14 @@ export function useLoadChatDatas() {
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
     const {socket} = useContext(SocketContext);
+    const modalStatus = useContext(ModalContext);
+
+    console.log("params", params);
     
     const channelId: number | undefined = params.channelId ? parseInt(params.channelId!, 10) : undefined;
     const convId: number | undefined = params.convId ? parseInt(params.convId!, 10) : undefined;
-  
+
+    console.log("Chat render");
 
     // Functions pour le composant
     const sidebarOnChange = useCallback( () => {
@@ -34,35 +40,36 @@ export function useLoadChatDatas() {
     }, [setShowModal]);
 
     const changeModalStatus = useCallback((index: number) => {
-        setShowModal(index === 0 ? 1 : 0);
+        setShowModal(index);
     }, [setShowModal]);
 
     // Les useEffect pour les call api etc..
     useEffect(() => {
-        if (channelId !== undefined) {
-            // socket?.on("OnLeave", (data: Channel) => {
-            //     console.log("OnLeave");
-            //     if (channelId && channelId === data.id) {
-            //         navigate(`/chat`);
-            //     }
-            //     dispatch(removeChannel(data.id));
-            // });
-        }
-
+        if (showModal !== 0)
+            onCloseModal();
         // Permet d'afficher la sidebar si aucun channel ou aucune conv n'est selectionner (en responsive)
-        if ((channelId === undefined && convId === undefined) && location.pathname !== "/chat/channels-list") {
+        if ((channelId === undefined && convId === undefined) && window.innerWidth <= 855 && location.pathname !== "/chat/channels-list")
             setReponsiveSidebar(true);
-        }
         // Permet de mettre en couleur le channel ou la conv selectionner
-        if (channelId)
+        if (channelId) {
+            console.log("changeActiveElement");
             dispatch(changeActiveElement({id:channelId, isChannel: true}));
-        else if (convId)
+        } else if (convId)
             dispatch(changeActiveElement({id:convId, isChannel: false}));
-    }, [channelId, convId, location.pathname])
+    }, [channelId, convId, location.pathname, window.innerWidth])
 
     useEffect(() => {
-        fetchUserChannels(authDatas.token, channelId, dispatch); //Recupere les channels d'un user
-        fetchUserConvs(authDatas.token, dispatch); //Recupere les convs d'un user
+
+        const resolvePromises =  async (channelsUser: Promise<ChannelsInterfaceFront[]>, convsUser: Promise<ConversationInterfaceFront[]>) => {
+            const channelResolve: ChannelsInterfaceFront[] = await channelsUser.then(result => { return result });
+            const convResolve: ConversationInterfaceFront[] = await convsUser.then(result => { return result });
+            dispatch(copyChannelsAndConvs({channels: channelResolve, convs: convResolve}));
+        }
+        console.log("UseEffect Fetch");
+        const channelsUser = fetchUserChannels(authDatas.token, channelId, dispatch); //Recupere les channels d'un user
+        const convsUser = fetchUserConvs(authDatas.token, dispatch); //Recupere les convs d'un user
+        resolvePromises(channelsUser, convsUser);
+
 
         //Permet de redirect sur une conv (et de la créer si besoin) dans le cas où un user click quelque part pour dm quelqu'un
         if (location && location.state) {
@@ -76,10 +83,6 @@ export function useLoadChatDatas() {
                 navigate
             );
         }
-
-        // return () => {
-            // socket?.off("OnLeave");
-        // }
     }, [])
 
     // Return tout ce que j'ai besoin pour le composant
@@ -93,5 +96,6 @@ export function useLoadChatDatas() {
         changeModalStatus: changeModalStatus,
         paramsChannelId: channelId,
         locationPathname: location.pathname,
+        modalStatus: modalStatus,
     }    
 }

@@ -55,6 +55,7 @@ export class UserController {
 
 	@UseGuards(JwtGuard)
 	@Patch('edit-username')
+	//TODO validation body
 	async editUser(@GetUser() user: User, @Body() body) {
 		return await this.userService.editUsername(user, body.username);
 	}
@@ -80,14 +81,17 @@ export class UserController {
 
 	@UseGuards(JwtGuard)
 	@Get('name/:username')
-	async getUserbyName(@Param('username') username: string) {
-		console.log('find by username')
-		return await this.userService.findOne({
+	async getUserbyName(
+		@Param('username') username: string,
+		@GetUser() user: User,
+	) {
+		const user2 = await this.userService.findOne({
 			relations: {
 				statistic: true,
 			},
 			where: { username },
 		});
+		return await this.userService.getUserInfo(user, user2);
 	}
 
 	//probably going to be socked sided

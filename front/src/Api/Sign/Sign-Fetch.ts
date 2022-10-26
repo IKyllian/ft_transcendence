@@ -31,7 +31,7 @@ export function fetchSignUp({username, password, dispatch}: SignParameter) {
         console.log('JWT =>', response.data);
         const payload: LoginPayload = {
             token: response.data.access_token,
-            user: response.data.user,
+            user: {...response.data.user, blocked: [], channelUser: []},
         }
         dispatch(loginSuccess(payload));
     }).catch(err => {

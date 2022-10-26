@@ -28,6 +28,17 @@ export class ChannelMessageService {
 		return this.messagesRepo.save(message);
 	}
 
+	async createServer(messageDto: ChannelMessageDto) {
+		const channel = await this.channelService.findOneBy({ id: messageDto.chanId });
+		if (!channel)
+			throw new ChannelNotFoundException();
+		const message = this.messagesRepo.create({
+			content: messageDto.content,
+			channel,
+		});
+		return this.messagesRepo.save(message);
+	}
+
 	async getMessages(chanId: number) {
 		const channel = await this.channelService.findOneBy({ id: chanId });
 		if (!channel)

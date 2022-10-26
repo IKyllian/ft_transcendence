@@ -30,7 +30,7 @@ export interface UserInterface {
     username: string,
     avatar: string,
     statistic: Statistic,
-    channels?: Channel[],
+    channelUser: Channel[],
     blocked: UserInterface[];
 }
 

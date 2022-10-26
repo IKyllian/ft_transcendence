@@ -2,20 +2,27 @@ import { ReactNode, useEffect, useState } from "react";
 import { IconSearch } from "@tabler/icons";
 import UserFindItem from "./User-Find-Item";
 import { UserInterface } from "../Types/User-Types";
-import axios from "axios";
-import { baseUrl } from "../env";
-import { useAppSelector } from "../Redux/Hooks";
+import { useAppDispatch, useAppSelector } from "../Redux/Hooks";
 import Avatar from "../Images-Icons/pp.jpg"
-import { fetchSearchAllUsers } from "../Api/User-Fetch";
+import { fetchConvAndRedirect } from "../Api/Chat/Chat-Fetch";
+import { useNavigate, useParams } from "react-router-dom";
 
-function SearchBarButtons(props: {functionality: string, user?: UserInterface, checkboxOnChange?: Function, checkboxArray?: UserInterface[]}) {
-    const { functionality, user, checkboxOnChange, checkboxArray } = props;
+interface SearchBarButtonsProps {
+    functionality: string,
+    user?: UserInterface,
+    checkboxOnChange?: Function,
+    checkboxArray?: UserInterface[],
+    handleSendMessage?: Function,
+}
+
+function SearchBarButtons(props: SearchBarButtonsProps) {
+    const { functionality, user, checkboxOnChange, checkboxArray, handleSendMessage } = props;
    
     if (functionality === "addFriend") {
         return (
             <button> Add friend </button>
         );
-    } else if (functionality === "chanInvite") {
+    } else if (functionality === "chanInviteOnCreate" || functionality === "chanInvite") {
         return (
             <input
                 type="checkbox"
@@ -26,25 +33,49 @@ function SearchBarButtons(props: {functionality: string, user?: UserInterface, c
         );
     } else {
         return (
-            <button> Send message </button>
+            <button onClick={() => handleSendMessage!()}> Send message </button>
         );
     }
 }
 
-function SearchBarPlayers(props: {functionality: string, checkboxOnChange?: Function, checkboxArray?: UserInterface[]}) {
+function SearchBarPlayers(props: {functionality: string, checkboxOnChange?: Function, checkboxArray?: UserInterface[], fetchUserFunction: Function}) {
+    const {functionality, checkboxOnChange, checkboxArray, fetchUserFunction} = props;
     const [inputText, setInputText] = useState<string>("");
     const [usersList, setUsersList] = useState<UserInterface[] | undefined>(undefined);
-    const {functionality, checkboxOnChange, checkboxArray} = props;
-    const {token} = useAppSelector(state => state.auth);
+    const {token, currentUser} = useAppSelector(state => state.auth);
+    const {privateConv} = useAppSelector(state => state.chat);
+    const dispatch = useAppDispatch();
+    const navigate = useNavigate();
+    const params = useParams();
 
     const handleChange = (e: any) => {
         setInputText(e.target.value);
     }
 
+    const handleSendMessage = (userIdToSend: number) => {
+        fetchConvAndRedirect(currentUser!, userIdToSend, token, privateConv, dispatch, navigate);
+    }
+
     useEffect(() => {
-        if (inputText.length > 0)
-            fetchSearchAllUsers(inputText, token, setUsersList);
+        if (inputText.length > 0) {
+            if (functionality !== "chanInvite")
+                fetchUserFunction(inputText, token, setUsersList);
+            else {
+                if (params.channelId)
+                    fetchUserFunction(inputText, token, setUsersList, parseInt(params.channelId));
+            }
+        }
     }, [inputText])
+
+    const renderSearchBarButton = (parameters: SearchBarButtonsProps): ReactNode => {
+        const { functionality, user, checkboxOnChange, checkboxArray, handleSendMessage } = parameters;
+        if (functionality === "chanInviteOnCreate" || functionality === "chanInvite")
+            return <SearchBarButtons functionality={functionality} user={user} checkboxOnChange={checkboxOnChange} checkboxArray={checkboxArray} />
+        else if (functionality === "addFriend")
+            return <SearchBarButtons functionality={functionality}  />
+        else
+            return <SearchBarButtons functionality={functionality} handleSendMessage={() => handleSendMessage!(user?.id)} />
+    }
 
     return (
         <div className='search-player-container'>
@@ -57,11 +88,7 @@ function SearchBarPlayers(props: {functionality: string, checkboxOnChange?: Func
                     inputText.length > 0 && usersList && usersList.length > 0 &&
                     usersList.map((elem, index) =>
                         <UserFindItem key={index} avatar={Avatar} name={elem.username} >
-                            {
-                                functionality === "chanInvite"
-                                ? <SearchBarButtons functionality={functionality} user={elem} checkboxOnChange={checkboxOnChange} checkboxArray={checkboxArray} />
-                                : <SearchBarButtons functionality={functionality} />
-                            }
+                            { renderSearchBarButton({functionality: functionality, user: elem, checkboxOnChange: checkboxOnChange, checkboxArray: checkboxArray, handleSendMessage: handleSendMessage}) }
                         </UserFindItem>
                     )
                 }
@@ -69,11 +96,7 @@ function SearchBarPlayers(props: {functionality: string, checkboxOnChange?: Func
                     inputText.length === 0 && checkboxArray && checkboxArray.length > 0 &&
                     checkboxArray.map((elem, index) =>
                         <UserFindItem key={index} avatar={Avatar} name={elem.username} >
-                            {
-                                functionality === "chanInvite"
-                                ? <SearchBarButtons functionality={functionality} user={elem} checkboxOnChange={checkboxOnChange} checkboxArray={checkboxArray} />
-                                : <SearchBarButtons functionality={functionality} />
-                            }
+                            { renderSearchBarButton({functionality: functionality, user: elem, checkboxOnChange: checkboxOnChange, checkboxArray: checkboxArray, handleSendMessage: handleSendMessage}) }
                         </UserFindItem>
                     )
                 }

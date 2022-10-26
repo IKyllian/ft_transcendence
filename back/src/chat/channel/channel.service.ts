@@ -13,6 +13,8 @@ import { NotificationService } from 'src/notification/notification.service';
 import { ResponseDto } from '../gateway/dto/response.dto';
 import { SearchToInviteInChanDto } from './dto/search-user-to-invite.dto';
 import { MuteUserDto } from './dto/mute-user.dto';
+import { ChangeRoleDto } from '../gateway/dto/change-role.dto';
+import { ChannelInviteDto } from '../gateway/dto/channel-invite.dto';
 
 @Injectable()
 export class ChannelService {
@@ -26,6 +28,8 @@ export class ChannelService {
 		private channelUserRepo: Repository<ChannelUser>,
 		@InjectRepository(BannedUser)
 		private bannedRepo: Repository<BannedUser>,
+		@InjectRepository(User)
+		private userRepo: Repository<User>,
 	) {}
 	/**
 	 * TODO C PAS FOU
@@ -33,35 +37,15 @@ export class ChannelService {
 	 * @returns All the channel that the user did not joined and that is visible
 	 */
 	async searchChannel(user: User) {
-		// const userChannel = await this.getMyChannels(user.id);
-		// let userChannelId: number[] = [];
-		// userChannel.forEach((element) => {
-		// 	userChannelId.push(element.id);
-		// });
-
-
-		// return this.channelRepo.find({
-		// 	relations: {
-		// 		channelUsers: {
-		// 			user: true,
-		// 		},
-		// 	},
-		// 	where: {
-		// 		option: In([channelOption.PUBLIC, channelOption.PROTECTED]),
-		// 		id: Not(In(userChannelId))
-		// 	},
-		// });
-
 		const channelsUserHasJoined = this.channelUserRepo
   		.createQueryBuilder("channelUser")
   		.select("channelUser.channel.id")
   		.where("channelUser.user.id = :id", { id: user.id })
 
-
   		return this.channelRepo
   		.createQueryBuilder("channel")
 		.innerJoinAndSelect("channel.channelUsers", "channelUsers")
-  		.where("channel.id NOT IN ("+ channelsUserHasJoined.getQuery() +")")
+  		.where("channel.id NOT IN (" + channelsUserHasJoined.getQuery() + ")")
   		.setParameters(channelsUserHasJoined.getParameters())
   		.getMany()
 	}
@@ -93,9 +77,10 @@ export class ChannelService {
 	}
 
 	async create(user: User, dto: CreateChannelDto) {
-		const channelExist = await this.findOne({
-			where: { name: dto.name }
-		});
+		const channelExist = await this.channelRepo
+		.createQueryBuilder("channel")
+		.where("LOWER(channel.name) = :name", { name: dto.name.toLowerCase() })
+		.getOne()
 		if (channelExist)
 			throw new ChannelExistException();
 
@@ -213,7 +198,6 @@ export class ChannelService {
 		const userInChannel = await this.channelUserRepo.findOne({
 			relations: {
 				user: true,
-				// channel: true,
 			},
 			where: {
 				channel: {
@@ -316,17 +300,17 @@ export class ChannelService {
 		if (dto.time)
 			toMuteChanUser.mutedTime = new Date(new Date().getTime() + dto.time * 1000);
 		toMuteChanUser.is_muted = true;
-		this.channelUserRepo.save(toMuteChanUser);
+		return this.channelUserRepo.save(toMuteChanUser);
 	}
 
 	async unMuteUser(dto: MuteUserDto) {
-		const toMuteChanUser = await this.getChannelUser(dto.chanId, dto.userId);
-		if (!toMuteChanUser)
+		const toUnMuteChanUser = await this.getChannelUser(dto.chanId, dto.userId);
+		if (!toUnMuteChanUser)
 			throw new NotInChannelException();
 		
-		toMuteChanUser.is_muted = false;
-		toMuteChanUser.mutedTime = null;
-		this.channelUserRepo.save(toMuteChanUser);
+		toUnMuteChanUser.is_muted = false;
+		toUnMuteChanUser.mutedTime = null;
+		return this.channelUserRepo.save(toUnMuteChanUser);
 	}
 
 	isMuted(chanUser: ChannelUser) {
@@ -335,8 +319,8 @@ export class ChannelService {
 				const until = ((chanUser.mutedTime.getTime() - Date.now()) / 1000).toFixed(0)
 				throw new ForbiddenException(`You are muted for ${until} seconds`);
 			}
-			// else if (!chanUser.mutedTime)
-			// 	throw new ForbiddenException('You are muted')
+			else if (!chanUser.mutedTime)
+				throw new ForbiddenException('You are muted')
 			else {
 				chanUser.mutedTime = null;
 				chanUser.is_muted = false;
@@ -345,26 +329,51 @@ export class ChannelService {
 		}
 	}
 
-	//TODO what if banned?
 	async getUsersToInvite(dto: SearchToInviteInChanDto) {
-		const channel = await this.channelRepo.findOne({
-			relations: {
-				channelUsers: { user: true },
-			},
-			where: { id: dto.chanId },
-		});
-		if (!channel)
-			throw new ChannelNotFoundException();
+		const usersJoined = this.userRepo
+		.createQueryBuilder("user")
+		.select("user.id")
+		.innerJoin("user.channelUser", "channelUser", "channelUser.channel.id = :chanId",
+		{ chanId: dto.chanId })
 
-		const usersId: number[] = [];
-		channel.channelUsers.forEach((chanUser) => {
-			usersId.push(chanUser.user.id);
-		})
-		return this.userService.find({
-			where: {
-				id: Not(In(usersId)),
-				username: Like(`%${dto.str}%`),
-			}
-		});
+		return this.userRepo.createQueryBuilder("user")
+		.where("user.id NOT IN (" + usersJoined.getQuery() + ")")
+		.setParameters(usersJoined.getParameters())
+		.andWhere("LOWER(user.username) LIKE :name", { name: `%${dto.str.toLowerCase()}%` })
+		.take(10)
+		.getMany()
+	}
+
+	async changeUserRole(chanUser: ChannelUser, dto: ChangeRoleDto) {
+		const userToChange = await this.getChannelUser(dto.chanId, dto.userId);
+		if (!userToChange) { throw new NotInChannelException(); }
+		let ownerPassed = false;
+		switch (dto.role) {
+			case channelRole.MODERATOR:
+				if (chanUser.role === channelRole.OWNER && userToChange.role === channelRole.MEMBER) {
+					userToChange.role = dto.role;
+				}
+				break;
+			case channelRole.MEMBER:
+				if (chanUser.role === channelRole.OWNER && userToChange.role === channelRole.MODERATOR) {
+					userToChange.role = dto.role;
+				}
+				break;
+			case channelRole.OWNER:
+				if (chanUser.role === channelRole.OWNER) {
+					userToChange.role = dto.role;
+					ownerPassed = true;
+					chanUser.role = channelRole.MODERATOR;
+				}
+				break;
+			default:
+				break;
+		}
+		const userChanged = await this.channelUserRepo.save(userToChange);
+		return {
+			userChanged,
+			chanUser: ownerPassed ? await this.channelUserRepo.save(chanUser) : chanUser,
+			ownerPassed
+		}
 	}
 }

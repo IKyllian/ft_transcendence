@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { io, Socket } from "socket.io-client";
 import { useAppDispatch, useAppSelector } from '../Redux/Hooks'
@@ -62,7 +62,7 @@ export function useAppHook() {
 
 			socket.on("NewConversation", (data : {conv: Conversation, socketId: string}) => {
 				console.log("NewConversation", data);
-				dispatch(addPrivateConv({conv: {isActive: 'false', temporary: false, conversation: {id: data.conv.id, user1: data.conv.user1, user2: data.conv.user2}}, receiverId: data.conv.user2.id}));
+				dispatch(addPrivateConv({isActive: 'false', conversation: {id: data.conv.id, user1: data.conv.user1, user2: data.conv.user2}}));
 				if (data.socketId === socket.id)
 					navigate(`/chat/private-message/${data.conv.id}`);
 			});
@@ -75,6 +75,7 @@ export function useAppHook() {
 
             socket?.on("OnLeave", (data: Channel) => {
                 console.log("OnLeave");
+				
                 // Sert à ne pas redirect si le user est sur une autre page que le channel leave (pour le multitab)
                 // Si on veut faire ca il faut que j'envoie l'url ou juste le params du channel à l'event LeaveChannel et que Jojo me le revoie sur cet event
                 // if (params.channelId && parseInt(params.channelId) === data.id) {
@@ -86,7 +87,7 @@ export function useAppHook() {
 
 		return () => {
 			socket?.off("NewNotification");
-			// socket?.off("NewConversation");
+			socket?.off("NewConversation");
 			socket?.off("exception");
 			socket?.off("OnJoin");
 			socket?.off("OnLeave");

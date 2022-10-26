@@ -58,7 +58,7 @@ function Header() {
                 <div className='icons-header'>
                     <NotifIcon handleNotifDropdownClick={handleNotifDropdownClick} />
                     <IconUserPlus onClick={() => modalStatus.setStatus()} />
-                    <Link to="/chat">
+                    <Link to="/chat" aria-label="Link to the chat">
                         <IconMessages />
                     </Link>
                 </div>

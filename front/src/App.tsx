@@ -62,13 +62,15 @@ const routes: RouteProps[] = [
 			<PrivateRoute>
 				<Leaderboard />
 			</PrivateRoute>,
-	}, {
+	},
+	{
 		path: '/chat/channel/:channelId/settings',
 		element:
 			<PrivateRoute>
 				<ChannelSettings />
 			</PrivateRoute>,
-	}, {
+	},
+	{
 		path: '*',
 		element:
 			<PrivateRoute>

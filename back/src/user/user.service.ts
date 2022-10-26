@@ -8,6 +8,7 @@ import { userStatus } from "src/typeorm/entities/user";
 import { EditUserDto } from "./dto/editUser.dto";
 import * as argon from 'argon2';
 import { SearchDto } from "./dto/search.dto";
+import { FriendshipService } from "./friendship/friendship.service";
 
 @Injectable()
 export class UserService {
@@ -18,6 +19,7 @@ export class UserService {
 		private userRepo: Repository<User>,
 		@InjectRepository(Statistic)
 		private statisticRepo: Repository<Statistic>,
+		private friendshipService: FriendshipService,
 	) {}
 
 	create(dto: CreateUserDto) {
@@ -49,20 +51,27 @@ export class UserService {
 	}
 
 	search(user: User, dto: SearchDto) {
-		return this.userRepo.find({
-			where: {
-				id: Not(user.id),
-				username: Like(`%${dto.str}%`),
-			}
-		});
+		return this.userRepo
+		.createQueryBuilder("user")
+		.where("user.id != :id", { id: user.id })
+		.andWhere("LOWER(user.username) LIKE :name", { name: `%${dto.str.toLowerCase()}%`})
+		.take(10)
+		.getMany()
+	}
+
+	async nameTaken(name: string) {
+		const nameTaken = await this.userRepo
+			.createQueryBuilder("user")
+			.where("LOWER(user.username) = :name", { name: name.toLowerCase() })
+			.getOne();
+		return nameTaken ? true : false;
 	}
 
 	// TODO ask if usefull
 	async editUser(user: User, dto: EditUserDto) {
 		switch (dto) {
 			case dto.username:
-				const nameTaken = await this.findOneBy({ username: dto.username });
-				if (nameTaken)
+				if (await this.nameTaken(dto.username))
 					throw new ForbiddenException('Username taken');
 				user.username = dto.username;
 			case dto.password:
@@ -77,16 +86,13 @@ export class UserService {
 	}
 
 	async editUsername(user: User, name: string) {
-		try {
-			user.username = name;
-			user = await this.userRepo.save(user);
-			return {
-				access_token: ((await this.authService.signTokens(user.id, user.username)).access_token),
-				user: user,
-			}
-		} catch(error) {
-			console.log(error.message);
+		if (await this.nameTaken(name))
 			throw new ForbiddenException('Username taken');
+		user.username = name;
+		user = await this.userRepo.save(user);
+		return {
+			access_token: ((await this.authService.signTokens(user.id, user.username)).access_token),
+			user: user,
 		}
 	}
 
@@ -125,7 +131,6 @@ export class UserService {
 		const toBlock = await this.findOneBy({ id });
 		if (!toBlock)
 			throw new NotFoundException('User not found');
-		console.log("REturn", this.isBlocked(user, id));
 		if (this.isBlocked(user, id))
 			throw new BadRequestException('User already blocked');
 		user.blocked = [...user.blocked, toBlock];
@@ -134,13 +139,18 @@ export class UserService {
 
 	async deblockUser(user: User, id: number) {
 		user.blocked = user.blocked.filter((blocked) => blocked.id !== id);
-		console.log(user.blocked)
 		return this.userRepo.save(user);
 	}
 
 	isBlocked(user: User, id: number): boolean {
 		const isblocked = user.blocked.find((blocked) => blocked.id === id);
-		console.log(isblocked);
 		return isblocked ? true : false;
+	}
+
+	async getUserInfo(user: User, user2: User) {
+		const friendList: User[] = await this.friendshipService.getFriendlist(user2);
+		const relation = await this.friendshipService.getRelation(user, user2);
+		const relationStatus = this.friendshipService.getRelationStatus(user2, relation);
+		return { user: user2, friendList, relationStatus };
 	}
 }

@@ -1,12 +1,14 @@
-import { useState, useRef, useContext, useEffect } from "react";
+import { useState, useRef, useContext, useEffect, useCallback } from "react";
 
-import { Conversation, ChatMessage, ConversationInterfaceFront, PrivateMessage } from "../../Types/Chat-Types";
+import { Conversation, PrivateMessage } from "../../Types/Chat-Types";
 import { SocketContext } from "../../App";
 import { useLocation, useParams } from "react-router-dom";
-import { useAppDispatch, useAppSelector } from '../../Redux/Hooks'
+import { useAppSelector } from '../../Redux/Hooks'
 import { getSecondUserIdOfPM } from "../../Utils/Utils-Chat";
 import { fetchPrivateConvDatas } from "../../Api/Chat/Chat-Fetch";
-import { addPrivateConv } from "../../Redux/ChatSlice";
+import { UserInterface } from "../../Types/User-Types";
+import { debounce } from "../../Utils/Utils-Chat";
+import { useForm } from "react-hook-form";
 
 interface ConversationState {
     temporary: boolean,
@@ -14,42 +16,74 @@ interface ConversationState {
 }
 
 export function usePrivateConvHook() {
-    const [inputMessage, setInputMessage] = useState<string>('');
     const [convDatas, setConvDatas] = useState<ConversationState | undefined>(undefined);
+    const [userTyping, setUserTyping] = useState<UserInterface | undefined>(undefined);
+    const [hasSendTypingEvent, setHasTypingEvent] = useState<boolean>(false);
+    const { register, handleSubmit, reset, formState: {errors} } = useForm<{inputMessage: string}>();
 
     const authDatas = useAppSelector((state) => state.auth);
-    const {privateConv} = useAppSelector((state) => state.chat);
     const messagesEndRef = useRef<null | HTMLDivElement>(null);
     const location = useLocation();
     const params = useParams();
     const convId: number | undefined = params.convId ? parseInt(params.convId!) : undefined;
     const { socket } = useContext(SocketContext);
-    const dispatch = useAppDispatch();
+
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }
 
-    const handleSubmit = (e: any) => {
+    const handleInputChange = () => {
+        if (!hasSendTypingEvent) {
+            socket?.emit("OnTypingPrivate", {
+                userId: getSecondUserIdOfPM(convDatas?.conv!, authDatas.currentUser!.id),
+                isTyping: true,
+                convId: convId,
+            })
+            setHasTypingEvent(true);
+        }
+    }
+
+    const endOfTyping = () => {
+        console.log("OnTypingPrivate", getSecondUserIdOfPM(convDatas?.conv!, authDatas.currentUser!.id));
+        console.log("convId", convId);
+        socket?.emit("OnTypingPrivate", {
+            userId: getSecondUserIdOfPM(convDatas?.conv!, authDatas.currentUser!.id),
+            isTyping: false,
+            convId: convId,
+        })
+        setHasTypingEvent(false);
+    }
+
+    const optimizedFn = useCallback(debounce(endOfTyping), [hasSendTypingEvent, convDatas, authDatas]);
+
+    const handleSubmitMessage = handleSubmit((data, e: any) => {
         e.preventDefault();
         const submitMessage = () => {
+            const secondUserId: number = getSecondUserIdOfPM(convDatas?.conv!, authDatas.currentUser!.id);
+            console.log();
             if (convDatas?.temporary) {
                 socket!.emit("CreateConversation", {
-                    content: inputMessage,
-                    adresseeId: getSecondUserIdOfPM(convDatas?.conv!, authDatas.currentUser!.id),
+                    content: data.inputMessage,
+                    adresseeId: secondUserId,
                 });
             } else {
                 socket!.emit("PrivateMessage", {
-                    content: inputMessage,
-                    adresseeId: getSecondUserIdOfPM(convDatas?.conv!, authDatas.currentUser!.id),
+                    content: data.inputMessage,
+                    adresseeId: secondUserId,
                 });
             }
-            setInputMessage('');
+            socket?.emit("OnTypingPrivate", {
+                userId: secondUserId,
+                isTyping: false,
+            })
+            setHasTypingEvent(false);
         }
-        if (inputMessage.length > 0) {
+        if (data.inputMessage.length > 0) {
             submitMessage();
+            reset();
         }
-    } 
+    })
 
     useEffect(() => {
         scrollToBottom();
@@ -58,16 +92,31 @@ export function usePrivateConvHook() {
     useEffect(() => {
         if (convId) {
             setConvDatas(undefined);
-            const searchTemp: ConversationInterfaceFront | undefined = !privateConv ? undefined : privateConv?.find(elem => elem.conversation.id === convId && elem.temporary == true);
+            setUserTyping(undefined);
+            socket?.on("OnTypingPrivate", (data: {user: UserInterface, isTyping: boolean, convId: number}) => {
+                console.log("data", data);
+                console.log("convId", convId);
+                if (data.convId === convId) {
+                    if (data.isTyping)
+                        setUserTyping(data.user);
+                    else
+                        setUserTyping(undefined);
+                }
+            });
+
             if (location && location.state) {
-                const locationState = location.state as {conv: ConversationInterfaceFront};
-                console.log("locationState", locationState);
-                setConvDatas({temporary: true, conv: {...locationState.conv.conversation, messages: []}});
-            } else if (searchTemp !== undefined) {
-                setConvDatas({temporary: true, conv: {...searchTemp.conversation, messages: []}});
+                const locationState = location.state as {isTemp: boolean, conv: Conversation};
+                if (locationState.isTemp)
+                    setConvDatas({temporary: true, conv: {...locationState.conv}});
+                else
+                    setConvDatas({temporary: true, conv: {...locationState.conv}});
             } else {
                 fetchPrivateConvDatas(convId, authDatas.token, setConvDatas);
             }
+        }
+
+        return () => {
+            socket?.off("OnTypingPrivate");
         }
     }, [convId])
 
@@ -86,10 +135,12 @@ export function usePrivateConvHook() {
 
     return {
         convDatas: convDatas,
-        inputMessage: inputMessage,
-        setInputMessage: setInputMessage,
-        handleSubmit: handleSubmit,
+        handleSubmit: handleSubmitMessage,
         messagesEndRef: messagesEndRef,
         loggedUser: authDatas.currentUser,
+        optimizedFn: optimizedFn,
+        handleInputChange: handleInputChange,
+        userTyping: userTyping,
+        register: register,
     };
 }

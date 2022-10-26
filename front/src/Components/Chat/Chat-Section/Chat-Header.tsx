@@ -1,12 +1,12 @@
 import { useContext, useState } from "react";
 import { Link } from "react-router-dom";
-import { IconSettings, IconMenu2, IconChevronLeft, IconChevronRight } from "@tabler/icons";
-
+import { IconSettings, IconMenu2, IconChevronLeft, IconChevronRight, IconUserPlus } from "@tabler/icons";
 import { SidebarContext } from "../Chat";
 import { UserInterface } from "../../../Types/User-Types";
 import { Channel } from "../../../Types/Chat-Types"
 import DropdownContainer from "../../Utils/Dropdown-Container";
 import BlockButton from "../../Utils/Block-Button";
+import { SetModalContext } from "../Chat";
 
 interface Props {
     chatItem?: Channel | undefined,
@@ -24,6 +24,7 @@ function ChatHeader(props: Props) {
     }
 
     const sidebarStatus = useContext(SidebarContext);
+    const modalStatus = useContext(SetModalContext);
 
     return (chatItem && changeSidebarStatus) ? (
         <div className="message-header">
@@ -33,9 +34,12 @@ function ChatHeader(props: Props) {
             />
             <p className="chan-name"> # {chatItem?.name} </p>
             <div className="message-header-right-side">
-                <Link to={`/chat/channel/${chatItem?.id}/settings`} state={chatItem} >
-                    <IconSettings />
-                </Link>
+                <div className="chat-action-icones">
+                    <IconUserPlus onClick={() => modalStatus.setModalStatus(3)} />
+                    <Link to={`/chat/channel/${chatItem?.id}/settings`} state={chatItem} >
+                        <IconSettings />
+                    </Link> 
+                </div>
                 {showUsersSidebar === false && <IconChevronLeft onClick={() => changeSidebarStatus()} />}
                 {showUsersSidebar && <IconChevronRight onClick={() => changeSidebarStatus()} />}
             </div>
