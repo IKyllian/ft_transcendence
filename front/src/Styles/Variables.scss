@@ -59,7 +59,6 @@ $OfflineColor: rgb(194, 29, 29);
     margin: auto;
     border-radius: 10px;
     background-color: $bgColor;
-
     .modal-exit {
         position: absolute;
         right: 0;
@@ -85,14 +84,17 @@ $OfflineColor: rgb(194, 29, 29);
 @font-face {
     font-family: Montserrat;
     src: url("../../public/Font/Montserrat/static/Montserrat-Regular.ttf");
+    font-display: swap;
 }
 
 @font-face {
     font-family: Silkscreen;
     src: url("../../public/Font/Silkscreen/Silkscreen-Regular.ttf");
+    font-display: swap;
 }
 
 @font-face {
     font-family: OpenSans;
     src: url("../../public/Font/Open_Sans/static/OpenSans/OpenSans-Light.ttf");
+    font-display: swap;
 }

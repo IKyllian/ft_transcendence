@@ -8,6 +8,7 @@ import { v4 as uuidv4 } from "uuid";
 import * as path from 'path';
 import { UserService } from "./user.service";
 import { GetUser } from "src/utils/decorators";
+import { SearchDto } from "./dto/search.dto";
 
 export const avatarStorage = {
 	storage: diskStorage({
@@ -54,9 +55,8 @@ export class UserController {
 
 	@UseGuards(JwtGuard)
 	@Patch('edit-username')
-	editUser(@GetUser() user: User, @Body() body) {
-		console.log('user to edit', user);
-		return this.userService.editUsername(user, body.username);
+	async editUser(@GetUser() user: User, @Body() body) {
+		return await this.userService.editUsername(user, body.username);
 	}
 
 	@UseGuards(JwtGuard)
@@ -80,14 +80,17 @@ export class UserController {
 
 	@UseGuards(JwtGuard)
 	@Get('name/:username')
-	async getUserbyName(@Param('username') username: string) {
-		console.log('find by username')
-		return await this.userService.findOne({
+	async getUserbyName(
+		@Param('username') username: string,
+		@GetUser() user: User,
+	) {
+		const user2 = await this.userService.findOne({
 			relations: {
 				statistic: true,
 			},
 			where: { username },
 		});
+		return await this.userService.getUserInfo(user, user2);
 	}
 
 	//probably going to be socked sided
@@ -107,6 +110,15 @@ export class UserController {
 		@GetUser() user: User,
 	) {
 		return await this.userService.deblockUser(user, id);
+	}
+
+	@Post('search')
+	@UseGuards(JwtGuard)
+	async searchUser(
+		@GetUser() user: User,
+		@Body() searchDto: SearchDto,
+	) {
+		return await this.userService.search(user, searchDto);
 	}
 
 	//test

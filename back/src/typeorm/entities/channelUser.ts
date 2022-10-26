@@ -9,6 +9,12 @@ export class ChannelUser  {
 	@PrimaryGeneratedColumn()
 	id: number;
 
+	@RelationId("user")
+	userId: number
+
+	@RelationId("channel")
+	channelId: number
+
 	@ManyToOne(() => User, (user) => user.channelUser, {
 		nullable: false,
 		onDelete: 'CASCADE',

@@ -20,10 +20,8 @@ export class AuthService {
 	) {}
 
 	async signup(dto: AuthDto) {
-		const userExist = await this.userService.findOneBy({ username: dto.username });
-		if (userExist)
+		if (await this.userService.nameTaken(dto.username))
 			throw new ForbiddenException('Username taken');
-
 		const hash = await argon.hash(dto.password);
 		const params = {
 			username: dto.username,
@@ -152,7 +150,7 @@ export class AuthService {
 	async verify(token: string) {
 		try {
 			const decoded = this.jwt.verify(token, {
-				secret: this.config.get('JWT_SECRET')
+				secret: this.config.get('ACCESS_SECRET')
 			});
 			return await this.userService.findOne({
 				relations: {

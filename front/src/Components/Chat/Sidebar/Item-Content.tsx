@@ -20,20 +20,20 @@ function ItemContent(props: Props) {
         <ul className="ul-collapse">
             {
                 chanDatas && chanDatas.map((elem) => 
-                    <Link className="list-item-container" key={elem.channel.id} to={`/chat/channel/${elem.channel.id}`} onClick={() => sidebarStatus.setSidebarStatus()}>
-                        <li is-target={elem.isActive}>
-                            # {elem.channel.name}
-                        </li>
+                 <li key={elem.channel.id} className="list-item-container" >
+                    <Link  is-target={elem.isActive} to={`/chat/channel/${elem.channel.id}`} onClick={() => sidebarStatus.setSidebarStatus()}>
+                        # {elem.channel.name}
                     </Link>
+                </li>
                 )
             }
             {
                 privateConvs && privateConvs.map((elem) => 
-                    <Link className="list-item-container" key={elem.conversation.id} to={`/chat/private-message/${getSecondUserIdOfPM(elem.conversation, currentUser!.id)}`} onClick={() => sidebarStatus.setSidebarStatus()}>
-                        <li is-target={elem.isActive}>
+                    <li key={elem.conversation.id} className="list-item-container">
+                        <Link is-target={elem.isActive} to={`/chat/private-message/${elem.conversation.id}`} onClick={() => sidebarStatus.setSidebarStatus()}>
                             {elem.conversation.user1.id !== currentUser?.id ? elem.conversation.user1.username : elem.conversation.user2.username }
-                        </li>
-                    </Link>
+                        </Link>
+                    </li>
                 )
             }
         </ul>

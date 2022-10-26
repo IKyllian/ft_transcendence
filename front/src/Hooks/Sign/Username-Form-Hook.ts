@@ -19,6 +19,8 @@ export function useUsernameFormHook() {
 
     const locationState = location.state as CustomState;
 
+	console.log("locationState", locationState);
+
     const onSubmit = handleSubmit(async (data, e) => {
         e?.preventDefault();
         fetchSetUsername(data.username, locationState.token, dispatch);
@@ -32,7 +34,7 @@ export function useUsernameFormHook() {
     }, [location])
 
     return {
-        register: register,
-        onSubmit: onSubmit,
+        register,
+        onSubmit,
     }
 }

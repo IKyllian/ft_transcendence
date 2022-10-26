@@ -18,9 +18,9 @@ export class BannedUser {
 	})
 	channel: Channel;
 
-	@CreateDateColumn()
-	created_at: Date;
+	// @CreateDateColumn()
+	// created_at: Date;
 
 	@Column({ nullable: true })
-	time?: number;
+	until?: Date;
 }

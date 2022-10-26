@@ -12,7 +12,7 @@ import { RefreshGuard } from "./guard/refresh.guard";
 export class AuthController {
 	constructor(private authService: AuthService) {}
 
-	@HttpCode(HttpStatus.OK)
+	@HttpCode(HttpStatus.CREATED)
 	@Post('signup')
 	signup(@Body() dto: AuthDto) {
 		return this.authService.signup(dto);

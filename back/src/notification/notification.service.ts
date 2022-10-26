@@ -5,7 +5,7 @@ import { Channel, Friendship, Notification, User } from 'src/typeorm';
 import { UserService } from 'src/user/user.service';
 import { ChannelService } from 'src/chat/channel/channel.service';
 import { notificationType } from 'src/utils/types/types';
-import { Repository } from 'typeorm';
+import { FindOneOptions, Repository } from 'typeorm';
 import { ChannelNotFoundException } from 'src/utils/exceptions';
 
 @Injectable()
@@ -21,10 +21,10 @@ export class NotificationService {
 		private channelRepo: Repository<Channel>,
 	) {}
 
-	createFriendRequestNotif(friendRequest: Friendship) {
+	createFriendRequestNotif(addressee: User, requester: User) {
 		const notif = this.notifRepo.create({
-			addressee: friendRequest.addressee,
-			requester: friendRequest.requester,
+			addressee,
+			requester,
 			type: notificationType.FRIEND_REQUEST,
 		});
 		return this.notifRepo.save(notif);
@@ -59,6 +59,10 @@ export class NotificationService {
 		return this.notifRepo.save(notif);
 	}
 
+	findOne(options: FindOneOptions<Notification>): Promise<Notification | null> {
+		return this.notifRepo.findOne(options);
+	}
+
 	getNotification(user: User) {
 		return this.notifRepo.find({
 			relations: {
@@ -71,11 +75,11 @@ export class NotificationService {
 		});
 	}
 
-	getChannelInvite(user: User, chanId: number) {
+	getChannelInvite(user: User, id: number) {
 		return this.notifRepo.findOne({
 			where: {
-				addressee: { id: user.id},
-				channel: { id: chanId },
+				addressee: { id: user.id },
+				id,
 			}
 		});
 	}

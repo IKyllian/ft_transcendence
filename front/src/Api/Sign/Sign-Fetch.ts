@@ -16,7 +16,7 @@ export function fetchSignIn({username, password, dispatch}: SignParameter) {
     .then((response) => {
         console.log('JWT =>', response.data);
         const payload: LoginPayload = {
-            token: response.data.token,
+            token: response.data.access_token,
             user: response.data.user,
         }
         dispatch(loginSuccess(payload));
@@ -30,8 +30,8 @@ export function fetchSignUp({username, password, dispatch}: SignParameter) {
     .then((response) => {
         console.log('JWT =>', response.data);
         const payload: LoginPayload = {
-            token: response.data.token,
-            user: response.data.user,
+            token: response.data.access_token,
+            user: {...response.data.user, blocked: [], channelUser: []},
         }
         dispatch(loginSuccess(payload));
     }).catch(err => {
@@ -45,16 +45,17 @@ export function fetchLogin42(authorizationCode: string, dispatch: Dispatch<AnyAc
         console.log('JWT =>', response.data);
         if (response.data.usernameSet) {
             const payload: LoginPayload = {
-                token: response.data.token,
+                token: response.data.access_token,
                 user: response.data.user,
             }
             dispatch(loginSuccess(payload));
         } else {
             dispatch(setUsername());
-            navigate("/set-username", {state:{token: response.data.token}});
+            navigate("/set-username", {state:{token: response.data.access_token}});
         }
     })
     .catch(err => {
+        console.log(err);
         dispatch(loginError("Error while login with 42"));
     });
 }
@@ -68,8 +69,10 @@ export function fetchSetUsername(username: string, token: string, dispatch: Disp
     .then((response) => {
         const payload: LoginPayload = {
             user: response.data.user,
-            token: response.data.token,
+            token: response.data.access_token,
         }
+		console.log("response,", response);
+		console.log("response.data.access_token,", response.data.access_token);
         dispatch(loginSuccess(payload));
     })
     .catch(err => {

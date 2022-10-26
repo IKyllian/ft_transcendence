@@ -9,9 +9,7 @@ function SidebarSettings(props: {setSidebarItem: Function, channelDatas: Channel
     const {setSidebarItem, channelDatas, loggedUserIsOwner} = props;
 
     const params = useParams();
-    const navigate = useNavigate();
     const dispatch = useAppDispatch();
-    let authDatas = useAppSelector((state) => state.auth);
 
     const {socket} = useContext(SocketContext);
 
@@ -20,9 +18,6 @@ function SidebarSettings(props: {setSidebarItem: Function, channelDatas: Channel
             const chanId: number = parseInt(params.channelId);
             socket?.emit("LeaveChannel", {id: chanId});
             dispatch(removeChannel(chanId));
-            setTimeout(function() {
-                navigate(`/chat`);
-            }, 50);
         }
     }
 
@@ -33,7 +28,7 @@ function SidebarSettings(props: {setSidebarItem: Function, channelDatas: Channel
                 <ul>
                     {loggedUserIsOwner && <li onClick={() => setSidebarItem("Settings")}> Settings </li>}
                     <li onClick={() => setSidebarItem("Users")}> Users ({channelDatas.channelUsers.length}) </li>
-                    {loggedUserIsOwner && <li onClick={() => setSidebarItem("Invitations")}> Invitations </li>}
+                    {loggedUserIsOwner && <li onClick={() => setSidebarItem("Invitations")}> Banned User </li>}
                 </ul>
                 <div className="separate-line"> </div>
                 <button onClick={() => leaveChannel()}> Leave Channel </button>

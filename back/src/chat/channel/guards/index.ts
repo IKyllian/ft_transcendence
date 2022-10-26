@@ -1,5 +1,5 @@
 import { ChannelPermissionGuard } from "./channel-permission.guard";
-import { InChannelGuard } from "./inChannel.guard";
+import { InChannelGuard } from "./in-channel.guard";
 
 export {
 	InChannelGuard,

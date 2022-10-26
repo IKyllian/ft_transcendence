@@ -5,6 +5,7 @@ import { UserInterface } from '../Types/User-Types';
 
 const defaultState: AuthState = {
     currentUser: undefined,
+    friendList: [],
     isAuthenticated: false,
     error: undefined,
     loading: false,
@@ -20,11 +21,12 @@ export const authSlice = createSlice({
             state.loading = true;
         },
         loginSuccess: (state, {payload}: PayloadAction<LoginPayload>) => {
+			console.log("payload", payload);
             state.currentUser = payload.user;
             state.token = payload.token;
             state.isAuthenticated = true;
             state.loading = false;
-            console.log(state.currentUser);
+            console.log("state", state);
         },
         loginError: (state, {payload}: PayloadAction<string>) => {
             state.error = payload;
@@ -41,6 +43,7 @@ export const authSlice = createSlice({
         logoutSuccess: (state) => {
             state = {
                 currentUser: undefined,
+                friendList: [],
                 isAuthenticated: false,
                 error: undefined,
                 loading: false,
@@ -50,8 +53,11 @@ export const authSlice = createSlice({
         },
         replaceUserObject: (state, {payload}: PayloadAction<UserInterface>) => {
             state.currentUser = {...payload};
+        },
+        copyFriendListArray: (state, {payload}: PayloadAction<UserInterface[]>) => {
+            state.friendList = [...payload];
         }
     }
 });
 
-export const { loginPending, loginSuccess, loginError, setUsername, logoutPending, logoutSuccess, replaceUserObject } = authSlice.actions;
+export const { loginPending, loginSuccess, loginError, setUsername, logoutPending, logoutSuccess, replaceUserObject, copyFriendListArray } = authSlice.actions;

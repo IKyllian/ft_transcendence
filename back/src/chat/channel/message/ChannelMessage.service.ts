@@ -1,7 +1,7 @@
-import { ClassSerializerInterceptor, Injectable, UseInterceptors } from "@nestjs/common";
+import { ClassSerializerInterceptor, ForbiddenException, Injectable, UseInterceptors } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Channel, ChannelMessage, User } from "src/typeorm";
-import { ChannelNotFoundException, NotInChannelException, IsMutedException } from "src/utils/exceptions";
+import { ChannelMessage, ChannelUser } from "src/typeorm";
+import { ChannelNotFoundException } from "src/utils/exceptions";
 import { Repository } from "typeorm";
 import { ChannelService } from "../channel.service";
 import { ChannelMessageDto } from "./dto/channelMessage.dto";
@@ -15,27 +15,34 @@ export class ChannelMessageService {
 		private messagesRepo: Repository<ChannelMessage>,
 	) {}
 
-	async create(user: User, messageDto: ChannelMessageDto) {
-		const channel = await this.channelService.findOne({ id: messageDto.chanId });
+	async create(chanUser: ChannelUser, messageDto: ChannelMessageDto) {
+		const channel = await this.channelService.findOneBy({ id: messageDto.chanId });
 		if (!channel)
 			throw new ChannelNotFoundException();
-		const channelUser = await this.channelService.getChannelUser(channel.id, user.id);
-		if (!channelUser) { throw new NotInChannelException() } 
-		if (channelUser.is_muted) { throw new IsMutedException() }
+		this.channelService.isMuted(chanUser);
 		const message = this.messagesRepo.create({
 			content: messageDto.content,
 			channel,
-			sender: user,
+			sender: chanUser.user,
 		});
 		return this.messagesRepo.save(message);
 	}
 
-	async getMessages(chanId: number, user: User) {
-		const channel = await this.channelService.findOne({ id: chanId });
+	async createServer(messageDto: ChannelMessageDto) {
+		const channel = await this.channelService.findOneBy({ id: messageDto.chanId });
 		if (!channel)
 			throw new ChannelNotFoundException();
-		const channelUser = await this.channelService.getChannelUser(channel.id, user.id);
-		if (!channelUser) { throw new NotInChannelException() }
+		const message = this.messagesRepo.create({
+			content: messageDto.content,
+			channel,
+		});
+		return this.messagesRepo.save(message);
+	}
+
+	async getMessages(chanId: number) {
+		const channel = await this.channelService.findOneBy({ id: chanId });
+		if (!channel)
+			throw new ChannelNotFoundException();
 
 		return await this.messagesRepo.find({
 			relations: ['sender'],

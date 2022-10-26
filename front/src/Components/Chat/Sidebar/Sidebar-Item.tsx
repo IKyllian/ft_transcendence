@@ -5,7 +5,6 @@ import ItemHeader from "./Item-Header";
 import ItemContent from "./Item-Content";
 
 interface SidebarItemProps {
-    index: number,
     title: string,
     chanDatas?: ChannelsInterfaceFront[],
     privateConvs?: ConversationInterfaceFront[],
@@ -14,7 +13,7 @@ interface SidebarItemProps {
 
 function SidebarItem(props: SidebarItemProps) {
     const [sidebarOpen, setSidebarOpen] = useState<boolean>(true);
-    const {index, title, chanDatas, setShowModal, privateConvs} = props;
+    const {title, chanDatas, setShowModal, privateConvs} = props;
 
     const handleClick = () => {
         setSidebarOpen(!sidebarOpen);
@@ -22,7 +21,7 @@ function SidebarItem(props: SidebarItemProps) {
 
     return (
         <li className="ul-wrapper-elem">
-            <ItemHeader title={title} sidebarOpen={sidebarOpen} handleClick={handleClick} modalStatus={() => setShowModal!(index)} />           
+            <ItemHeader title={title} sidebarOpen={sidebarOpen} handleClick={handleClick} modalStatus={setShowModal} />           
             {
                chanDatas !== undefined && sidebarOpen && 
                <ItemContent chanDatas={chanDatas} />

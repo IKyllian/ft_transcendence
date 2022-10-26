@@ -12,6 +12,9 @@ function Sidebar(props: {setShowModal: Function, chanDatas: ChannelsInterfaceFro
     const ref = useRef<HTMLHeadingElement>(null);
     const params = useParams();
 
+    const channelId: number | undefined = params.channelId ? parseInt(params.channelId!, 10) : undefined;
+    const convId: number | undefined = params.convId ? parseInt(params.convId!, 10) : undefined;
+
     useEffect(() => {
         const handleClickOutside = (event: any) => {
             if (ref.current && !ref.current.contains(event.target)) {
@@ -24,23 +27,20 @@ function Sidebar(props: {setShowModal: Function, chanDatas: ChannelsInterfaceFro
         return () => {
             document.removeEventListener('click', handleClickOutside, true);
         };
-    }, [sidebarStatus, sidebarStatus.setSidebarStatus, params.channelId, params.convId]);
-
+    }, [sidebarStatus, sidebarStatus.setSidebarStatus, channelId, convId]);
  
     return (
         <div ref={ref} className={`chat-sidebar ${sidebarStatus.sidebar ? "chat-sidebar-responsive" : ""}`}>
             <ul className="ul-wrapper">
                 <SidebarItem
-                    index={0}
                     title="Channels"
                     chanDatas={chanDatas}
-                    setShowModal={setShowModal}
+                    setShowModal={() => setShowModal(1)}
                 />
                 <SidebarItem
-                    index={1}
                     title="Messages Privées"
                     privateConvs={privateConvs}
-                    setShowModal={setShowModal}
+                    setShowModal={() => setShowModal(2)}
                 />
             </ul>
             <Link className="explore-button" to="/chat/channels-list" onClick={() => sidebarStatus.setSidebarStatus()}>

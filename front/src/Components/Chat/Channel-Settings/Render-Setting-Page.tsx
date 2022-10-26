@@ -1,14 +1,22 @@
-import ChannelInvitations from "./Channel-Invitations";
 import ChannelUsers from "./Channel-Users";
 import GlobalSettings from "./Global-Settings";
 import { Channel } from "../../../Types/Chat-Types";
+import ChannelBanUser from "./Channel-Ban-User";
 
-function RenderSettingPage(props: {item: string, channelDatas: Channel, loggedUserIsOwner: boolean}) {
-    const { item, channelDatas, loggedUserIsOwner } = props;
+interface State {
+    item: string,
+    channelDatas: Channel,
+    loggedUserIsOwner: boolean,
+    loggedUserToken: string,
+    setChannelDatas: Function,
+}
+
+function RenderSettingPage(props: State) {
+    const { item, channelDatas, loggedUserIsOwner, loggedUserToken, setChannelDatas } = props;
 
     if (item === "Invitations") {
         return (
-            <ChannelInvitations />
+            <ChannelBanUser chanId={channelDatas.id} usersBan={channelDatas.bannedUsers} loggedUserToken={loggedUserToken} setChannelDatas={setChannelDatas} />
         );
     } else if (item === "Settings") {
         return (

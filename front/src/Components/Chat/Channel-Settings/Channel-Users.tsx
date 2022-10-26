@@ -4,9 +4,10 @@ import { IconDotsVertical } from '@tabler/icons';
 import { useState } from "react";
 import DropdownContainer from "../../Utils/Dropdown-Container";
 import { Link } from "react-router-dom";
-import BlockButton from "../../Utils/Block-Button";
+import BlockButton from "../../Buttons/Block-Button";
+import RoleButton from "../../Buttons/Role-Button";
 
-function ChannelUserItem(props: {userDatas: ChannelUser, loggedUserIsOwner: boolean}) {
+export function ChannelUserItem(props: {userDatas: ChannelUser, loggedUserIsOwner: boolean}) {
     const { userDatas, loggedUserIsOwner } = props;
     const [showDropdown, setShowDropdown] = useState<boolean>(false);
 
@@ -15,7 +16,7 @@ function ChannelUserItem(props: {userDatas: ChannelUser, loggedUserIsOwner: bool
     }
 
     return (
-        <div className="setting-user-item">
+        <li className="setting-user-item">
             <div className="profil-container">
                 <img className='profile-avatar' src={ProfilePic} alt="profil pic" />
                 <p> {userDatas.user.username } </p>
@@ -29,8 +30,9 @@ function ChannelUserItem(props: {userDatas: ChannelUser, loggedUserIsOwner: bool
                     <BlockButton
                         senderId={userDatas.user.id}
                     />
+                    <RoleButton sender={userDatas} />
                     {
-                        loggedUserIsOwner && 
+                        loggedUserIsOwner &&
                         <> 
                             <p> mute </p>
                             <p> kick </p>
@@ -38,7 +40,7 @@ function ChannelUserItem(props: {userDatas: ChannelUser, loggedUserIsOwner: bool
                     }
                 </DropdownContainer>
             </div>
-        </div>
+        </li>
     );
 }
 
@@ -48,26 +50,32 @@ function ChannelUsers(props: {users: ChannelUser[], loggedUserIsOwner: boolean})
     return (
         <div className="user-list-container">
             <h3> Owner </h3>
-            {
-                users.filter((elem) => elem.role === "owner")
-                .map((elem) =>
-                    <ChannelUserItem key={elem.user.id} userDatas={elem} loggedUserIsOwner={loggedUserIsOwner} />
-                )
-            }
+            <ul>
+                {
+                    users.filter((elem) => elem.role === "owner")
+                    .map((elem) =>
+                        <ChannelUserItem key={elem.user.id} userDatas={elem} loggedUserIsOwner={loggedUserIsOwner} />
+                    )
+                }
+            </ul>
             <h3> Admins </h3>
-            {
-                users.filter((elem) => elem.role === "moderator")
-                .map((elem) =>
-                    <ChannelUserItem key={elem.user.id} userDatas={elem} loggedUserIsOwner={loggedUserIsOwner} />
-                )
-            }
+            <ul>
+                {
+                    users.filter((elem) => elem.role === "moderator")
+                    .map((elem) =>
+                        <ChannelUserItem key={elem.user.id} userDatas={elem} loggedUserIsOwner={loggedUserIsOwner} />
+                    )
+                }
+            </ul>
             <h3> Users </h3>
-            {
-                users.filter((elem) => elem.role === "clampin")
-                .map((elem) =>
-                    <ChannelUserItem key={elem.user.id} userDatas={elem} loggedUserIsOwner={loggedUserIsOwner} />
-                )
-            }
+            <ul>
+                {
+                    users.filter((elem) => elem.role === "clampin")
+                    .map((elem) =>
+                        <ChannelUserItem key={elem.user.id} userDatas={elem} loggedUserIsOwner={loggedUserIsOwner} />
+                    )
+                }
+            </ul>
         </div>
     );
 }

@@ -11,7 +11,9 @@ export function fetchProfile(username: string, token: string, setUserState: Func
         console.log(response);
         setUserState({
             isLoggedUser: false,
-            user: response.data,
+            user: response.data.user,
+            frindList: response.data.friendList,
+            relationStatus: response.data.relationStatus,
         });
     })
     .catch(err => {
