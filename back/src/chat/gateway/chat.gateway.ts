@@ -320,7 +320,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	async changeUserRole(
 		@GetChannelUser() chanUser: ChannelUser,
 		@MessageBody() dto: ChangeRoleDto,
-	){
+	) {
 		const info = await this.channelService.changeUserRole(chanUser, dto);
 		this.server.to(`channel-${dto.chanId}`).emit('ChannelUserUpdate', info.userChanged);
 		if (info.ownerPassed)
@@ -347,21 +347,37 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		socket.to(`user-${dto.userId}`).emit('OnTypingPrivate', { user, isTyping: dto.isTyping, convId: dto.convId });
 	}
 
-	@UseGuards(JwtGuard)
+	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('GameInvite')
 	async sendGameInvite(
 		@GetUser() user: User,
 		@ConnectedSocket() socket: Socket,
 		@MessageBody() dto: UserIdDto,
 	) {
-		const addressee = await this.userService.findOneBy({ id: dto.id });
-		if (!addressee)
-			throw new NotFoundException('User not found');
-		let notif: Notification;
-		notif.requester = user;
-		notif.addressee = addressee;
-		notif.type = notificationType.GAME_INVITE;
+		// const addressee = await this.userService.findOneBy({ id: dto.id });
+		// if (!addressee) {
+		// 	throw new NotFoundException('User not found');
+		// }
+		const notif: any = {
+			requester: user,
+			type: notificationType.GAME_INVITE
+		}
 
-		socket.to(`user-${addressee.id}`).emit('NewGameInvite', notif);
+
+		socket.to(`user-${dto.id}`).emit('NewGameInvite', notif);
+	}
+
+	@UseGuards(WsJwtGuard)
+	@SubscribeMessage('AcceptGameInvite')
+	async acceptGameInvite(
+		@ConnectedSocket() socket: Socket,
+		@GetUser() user: User,
+		@MessageBody() dto: UserIdDto,
+	) {
+		// const addressee = await this.userService.findOneBy({ id: dto.id });
+		// if (!addressee)
+		// 	throw new NotFoundException('User not found');
+
+		socket.to(`user-${dto.id}`).emit('JoinLobby', user);
 	}
 }
