@@ -86,13 +86,13 @@ export function useLoadChatDatas() {
     return {
         channels: chatDatas.channels,
         privateConvs: chatDatas.privateConv,
-        showModal: showModal,
-        responsiveSidebar: responsiveSidebar,
-        sidebarOnChange: sidebarOnChange,
-        onCloseModal: onCloseModal,
-        changeModalStatus: changeModalStatus,
+        showModal,
+        responsiveSidebar,
+        sidebarOnChange,
+        onCloseModal,
+        changeModalStatus,
         paramsChannelId: channelId,
         locationPathname: location.pathname,
-        modalStatus: modalStatus,
+        modalStatus,
     }    
 }

@@ -155,15 +155,15 @@ export function useChannelHook() {
     })
 
     return {
-        loggedUserIsOwner: loggedUserIsOwner,
-        changeSidebarStatus: changeSidebarStatus,
+        loggedUserIsOwner,
+        changeSidebarStatus,
         handleSubmit: handleSubmitMessage,
-        messagesEndRef: messagesEndRef,
-        showUsersSidebar: showUsersSidebar,
-        chatDatas: chatDatas,
-        optimizedFn: optimizedFn,
-        handleInputChange: handleInputChange,
-        usersTyping: usersTyping,
-        register: register,
+        messagesEndRef,
+        showUsersSidebar,
+        chatDatas,
+        optimizedFn,
+        handleInputChange,
+        usersTyping,
+        register,
     };
 }

@@ -64,9 +64,9 @@ export function useProfileHook() {
     })
 
     return {
-        userState: userState,
-        handleClick: handleClick,
-        modalStatus: modalStatus,
-        attributes: attributes
+        userState,
+        handleClick,
+        modalStatus,
+        attributes,
     }
 }

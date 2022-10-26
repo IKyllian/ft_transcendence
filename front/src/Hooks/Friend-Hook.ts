@@ -21,8 +21,8 @@ export function useFriendHook() {
     }
 
     return {
-        handleAddFriend: handleAddFriend,
-        handleRemoveFriend: handleRemoveFriend,
-        replieFriendRequest: replieFriendRequest,
+        handleAddFriend,
+        handleRemoveFriend,
+        replieFriendRequest,
     };
 }

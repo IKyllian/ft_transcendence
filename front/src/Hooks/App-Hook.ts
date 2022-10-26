@@ -109,10 +109,10 @@ export function useAppHook() {
 	}, [socket])
 
     return {
-        socket: socket,
-        eventError: eventError,
-        closeEventError: closeEventError,
-        gameInvite: gameInvite,
-        gameNotificationLeave: gameNotificationLeave
+        socket,
+        eventError,
+        closeEventError,
+        gameInvite,
+        gameNotificationLeave
     };
 }

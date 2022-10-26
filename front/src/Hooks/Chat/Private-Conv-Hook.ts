@@ -133,13 +133,13 @@ export function usePrivateConvHook() {
     }, [])
 
     return {
-        convDatas: convDatas,
+        convDatas,
         handleSubmit: handleSubmitMessage,
-        messagesEndRef: messagesEndRef,
+        messagesEndRef,
         loggedUser: authDatas.currentUser,
-        optimizedFn: optimizedFn,
-        handleInputChange: handleInputChange,
-        userTyping: userTyping,
-        register: register,
+        optimizedFn,
+        handleInputChange,
+        userTyping,
+        register,
     };
 }
