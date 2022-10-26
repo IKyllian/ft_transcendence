@@ -3,7 +3,7 @@ import { WebSocketGateway, MessageBody, WebSocketServer, ConnectedSocket, OnGate
 import { Server, Socket } from 'socket.io';
 import { AuthService } from 'src/auth/auth.service';
 import { WsJwtGuard } from 'src/auth/guard/ws-jwt.guard';
-import { ChannelMessage, ChannelUser, User } from 'src/typeorm';
+import { ChannelMessage, ChannelUser, Notification, User } from 'src/typeorm';
 import { ChannelService } from '../channel/channel.service';
 import { ChatSessionManager } from './chat.session';
 import { UserService } from 'src/user/user.service';
@@ -28,6 +28,8 @@ import { MuteUserDto } from '../channel/dto/mute-user.dto';
 import { ChangeRoleDto } from './dto/change-role.dto';
 import { OnTypingChannelDto } from './dto/on-typing-chan.dto';
 import { OnTypingPrivateDto } from './dto/on-typing-priv.dto';
+import { JwtGuard } from 'src/auth/guard/jwt.guard';
+import { NotificationModule } from 'src/notification/notification.module';
 
 @Catch()
 class GatewayExceptionFilter extends BaseWsExceptionFilter {
@@ -341,5 +343,23 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		@MessageBody() dto: OnTypingPrivateDto,
 	) {
 		socket.to(`user-${dto.userId}`).emit('OnTypingPrivate', { user, isTyping: dto.isTyping, convId: dto.convId });
+	}
+
+	@UseGuards(JwtGuard)
+	@SubscribeMessage('GameInvite')
+	async sendGameInvite(
+		@GetUser() user: User,
+		@ConnectedSocket() socket: Socket,
+		@MessageBody() dto: UserIdDto,
+	) {
+		const addressee = await this.userService.findOneBy({ id: dto.id });
+		if (!addressee)
+			throw new NotFoundException('User not found');
+		let notif: Notification;
+		notif.requester = user;
+		notif.addressee = addressee;
+		notif.type = notificationType.GAME_INVITE;
+
+		socket.to(`user-${addressee.id}`).emit('NewGameInvite', notif);
 	}
 }
