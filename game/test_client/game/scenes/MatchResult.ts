@@ -1,5 +1,5 @@
 import 'phaser';
-import { EndResult, PlayerType } from '../types/shared.types';
+import { EndResult, GameType, PlayerType } from '../types/shared.types';
 
 
 
@@ -12,55 +12,95 @@ export default class MatchResult extends Phaser.Scene
 
 	winner: EndResult = EndResult.Undecided;
 	me: PlayerType = PlayerType.Spectator;
+	game_type: GameType;
 
-	player_A_name: string = "";
-	player_A_win: number = 0;
-	player_A_loss: number = 0;
+	Player_A_Back_name: string = "";
+	Player_A_Front_name: string = "";
+	Player_B_Front_name: string = "";
+	Player_B_Back_name: string = "";
 
-	player_B_name: string = "";
-	player_B_win: number = 0;
-	player_B_loss: number = 0;
 
 	//Displayed elements
-	player_A_avatar?: Phaser.GameObjects.Image;
-	player_B_avatar?: Phaser.GameObjects.Image;
+	Player_A_Back_avatar?: Phaser.GameObjects.Image;
+	Player_A_Front_avatar?: Phaser.GameObjects.Image;
+	Player_B_Front_avatar?: Phaser.GameObjects.Image;
+	Player_B_Back_avatar?: Phaser.GameObjects.Image;
+
 	result_text?: Phaser.GameObjects.Text;
 	close_button?: Phaser.GameObjects.Image;
+	//replay_button?: Phaser.GameObjects.Image;
 
 	preload ()
 	{
 		this.load.image(
-			'player_a_avatar',
-			this.game.registry.get('players_data').player_A.avatar
+			'player_a_back_avatar',
+			this.game.registry.get('players_data').Player_A_Back.avatar
 			);
 		this.load.image(
-			'player_b_avatar',
-			this.game.registry.get('players_data').player_B.avatar
+			'player_b_back_avatar',
+			this.game.registry.get('players_data').Player_B_Back.avatar
 			);
 		this.load.image(
 			'button',
 			'assets/button.png'
-			); 
+			);
+
+		this.game_type = this.game.registry.get('players_data').game_settings.game_type;
+
+		if (this.game_type === GameType.Doubles)
+		{
+			this.load.image(
+				'player_a_front_avatar',
+				this.game.registry.get('players_data').Player_A_Front.avatar
+				);
+			this.load.image(
+				'player_b_front_avatar',
+				this.game.registry.get('players_data').Player_B_Front.avatar
+				);
+
+
+		}
+
+		this.scene.remove('Pong');
 	}
 
 	create ()
 	{
-		this.me = this.game.registry.get('players_data').playertype;
-		this.player_A_name = this.game.registry.get('players_data').player_A.name;
-		this.player_B_name = this.game.registry.get('players_data').player_B.name;
+		this.me = this.game.registry.get('players_data').player_type;
+
+		this.Player_A_Back_name = this.game.registry.get('players_data').Player_A_Back.name;
+		this.Player_B_Back_name = this.game.registry.get('players_data').Player_B_Back.name;
 		this.winner = this.game.registry.get('winner');
 		
-		this.player_A_avatar = this.add.image(130, 130, 'player_a_avatar')
+		this.Player_A_Back_avatar = this.add.image(130, 130, 'player_a_back_avatar')
 								.setOrigin(0.5,0.5)
-								.setDisplaySize(200, 200);
-		this.player_B_avatar = this.add.image(670, 130, 'player_b_avatar')
+								.setDisplaySize(150, 150);
+		this.Player_B_Back_avatar = this.add.image(670, 130, 'player_b_back_avatar')
 								.setOrigin(0.5,0.5)
-								.setDisplaySize(200, 200);
+								.setDisplaySize(150, 150);
+		if (this.game_type === GameType.Doubles)
+		{
+			this.Player_A_Front_name = this.game.registry.get('players_data').Player_A_Front.name;
+			this.Player_B_Front_name = this.game.registry.get('players_data').Player_B_Front.name;
+			this.Player_A_Front_avatar = this.add.image(260, 130, 'player_a_front_avatar')
+								.setOrigin(0.5,0.5)
+								.setDisplaySize(150, 150);
+			this.Player_B_Front_avatar = this.add.image(670, 130, 'player_b_front_avatar')
+								.setOrigin(0.5,0.5)
+								.setDisplaySize(150, 150);
+		}
+
 		this.close_button = this.add.image(400, 400, 'button')
 								.setOrigin(0.5,0.5)
 								.setDisplaySize(200, 200)
 								.setName('close')
 								.setInteractive();
+		// this.replay_button = this.add.image(500, 400, 'button')
+		// 						.setOrigin(0.5,0.5)
+		// 						.setDisplaySize(200, 200)
+		// 						.setName('replay')
+		// 						.setInteractive();
+
 		let style: Phaser.Types.GameObjects.Text.TextStyle = 
 		{
 			fontSize: '32px',
@@ -69,50 +109,60 @@ export default class MatchResult extends Phaser.Scene
 		}
 
 		let text: string;
-		if(this.me === PlayerType.Spectator)
+
+
+		if(this.game_type === GameType.Singles)
 		{
-			if (this.winner === EndResult.Player_A_Win)
+			if(this.me === PlayerType.Spectator)
 			{
-				text = this.player_A_name + " Wins";
+				if (this.winner === EndResult.Team_A_Win)
+				{
+					text = this.Player_A_Back_name + " Wins";
+				}
+				else
+				{
+					text = this.Player_B_Back_name + " Wins";
+				}
+			}
+			else if ((this.me === PlayerType.Player_A_Back && this.winner === EndResult.Team_A_Win)
+					|| (this.me === PlayerType.Player_B_Back && this.winner === EndResult.Team_B_Win))
+			{
+				text = "You Won";
 			}
 			else
 			{
-				text = this.player_B_name + " Wins";
+				text = "You Lost";
 			}
 		}
-		else if ((this.me === PlayerType.Player_A && this.winner === EndResult.Player_A_Win)
-				|| (this.me === PlayerType.Player_B && this.winner === EndResult.Player_B_Win))
-		{
-			text = "You Won";
-		}
 		else
 		{
-			text = "You Lost";
+			if(this.me === PlayerType.Spectator)
+			{
+				if (this.winner === EndResult.Team_A_Win)
+				{
+					text = "Team" + this.Player_A_Back_name + " and " + this.Player_A_Front_name + " Wins";
+				}
+				else
+				{
+					text = "Team" + this.Player_B_Back_name + " and " + this.Player_B_Front_name + " Wins";
+				}
+			}
+			else if (((this.me === PlayerType.Player_A_Back || this.me === PlayerType.Player_A_Front)
+					&& this.winner === EndResult.Team_A_Win)
+					||
+					((this.me === PlayerType.Player_B_Back || this.me === PlayerType.Player_B_Front)
+					&& this.winner === EndResult.Team_B_Win))
+			{
+				text = "Your Team Won";
+			}
+			else
+			{
+				text = "Your Team Lost";
+			}		
 		}
+
 
 		this.result_text = this.add.text(400, 100, text, style);
-
-
-		if (this.winner === EndResult.Player_A_Win)
-		{
-			this.player_A_win = this.game.registry.get('players_data').player_A.win + 1;
-			this.player_A_loss = this.game.registry.get('players_data').player_A.loss;
-			this.player_B_win = this.game.registry.get('players_data').player_B.win;
-			this.player_B_loss = this.game.registry.get('players_data').player_B.loss + 1;
-		}
-		else
-		{
-			this.player_A_win = this.game.registry.get('players_data').player_A.win;
-			this.player_A_loss = this.game.registry.get('players_data').player_A.loss + 1;
-			this.player_B_win = this.game.registry.get('players_data').player_B.win + 1;
-			this.player_B_loss = this.game.registry.get('players_data').player_B.loss;
-		}
-
-		this.add.text(100, 320, "Win:" + this.player_A_win, style);
-		this.add.text(100, 360, "Loss:" + this.player_A_loss, style);
-		this.add.text(600, 320, "Win:" + this.player_B_win, style);
-		this.add.text(600, 360, "Loss:" + this.player_B_loss, style);
-
 		this.input.on('gameobjectdown',this.click_event);
 	}
 
@@ -127,6 +177,13 @@ export default class MatchResult extends Phaser.Scene
 			//close phaser
 			this.game.destroy(true, false);
 		}
+
+		// if (gameobject.name === 'replay')
+		// {
+		// 	gameobject.destroy();
+		// 	//close phaser
+		// 	this.game.destroy(true, false);
+		// }
 	}
 
 }

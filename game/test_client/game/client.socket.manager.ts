@@ -6,6 +6,7 @@ export default class ClientSocketManager
 	private socket?: Socket;
 	private lobby_triggers: any;
 	private pong_triggers: any;
+	private replay_triggers: any;
 
 	constructor()
 	{
@@ -21,6 +22,11 @@ export default class ClientSocketManager
     set_pong_triggers(data: any): void
 	{
         this.pong_triggers = data;
+    }
+
+    set_replay_triggers(data: any): void
+	{
+        this.replay_triggers = data;
     }
 
 	private attempt_connection()
@@ -44,7 +50,8 @@ export default class ClientSocketManager
 			this.socket.on('game_state', this.onGameGetState.bind(this));
 			this.socket.on('round_setup', this.onGameGetRoundSetup.bind(this));
 			this.socket.on('match_winner', this.onGameGetMatchWinner.bind(this));
-
+			//Replay
+			this.socket.on('replay_state', this.onReplayState.bind(this));
 		}
 	}
 
@@ -117,6 +124,7 @@ export default class ClientSocketManager
 	onGameGetState = (gamestate: GameState) =>
 	{
 		this.pong_triggers?.append_server_gamestate(gamestate);
+	//	this.replay_triggers?.append_server_gamestate(gamestate);
 	}
 
 	onGameGetRoundSetup = (round_setup: RoundSetup) =>
@@ -130,4 +138,23 @@ export default class ClientSocketManager
 		this.pong_triggers?.game_end(result);
 		this.lobby_triggers?.game_end(result);
 	}
+
+	//Replay Emits
+
+	request_replay = (game_id: string) =>
+	{
+		if (this.socket instanceof Socket)
+		{
+			this.socket.emit('replay_request', game_id);
+		}
+	}
+
+	//Replay Listens
+
+	onReplayState = (gamestate: GameState) =>
+	{
+		// this.pong_triggers?.append_server_gamestate(gamestate);
+		this.replay_triggers?.append_server_gamestate(gamestate);
+	}
+
 }
