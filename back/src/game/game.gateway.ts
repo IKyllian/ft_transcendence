@@ -8,34 +8,13 @@ import {
 	MessageBody
   } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
-import { NewGameData, PlayersLobbyData } from 'src/utils/types/game.types';
+import { NewGameData, PlayersLobbyData, LobbyRequest } from 'src/utils/types/game.types';
 import { LobbyFactory } from './lobby/lobby.factory';
 
-// @WebSocketGateway(/*{ cors: true }*/ 6161, {cors: true})
 
-//   cors: {
-	//     origin: "https://example.com",
-//     methods: ["GET", "POST"]
-//   }
-
-
-//   @WebSocketGateway( 6161,  {cors: {
-	//     origin: '*',
-	//     methods: ["GET", "POST"]
-	//   }})
-	
-	
-	
-	
-	// @WebSocketGateway({
-	// 	cors: {
-	// 		origin: ['http://192.168.1.22:6161/'],
-	// 		credential: true,
-	// 	}
-	// })
-	@WebSocketGateway({cors: true})
-	export class GameGateway implements OnGatewayConnection
-	{
+@WebSocketGateway()
+export class GameGateway
+{
 
 	/* ----- Initialisation ----- */
 
@@ -46,15 +25,22 @@ import { LobbyFactory } from './lobby/lobby.factory';
 
 	constructor(
 		private readonly lobbyfactory: LobbyFactory,
-	  ) {}
+	  )
+	  {
+	  }
+
+	afterInit(server: Server): any
+	{
+	  this.lobbyfactory.server = server;
+	}
 
 
 	/* ----- Connect/Disconnect ----- */
 
-	async handleConnection(client: Socket)
-	{
-		console.log("someone connected", client['id']);
-	}
+	// async handleConnection(client: Socket)
+	// {
+	// 	console.log("someone connected", client['id']);
+	// }
   
 	// async handleDisconnect(client: Socket)
 	// {
@@ -89,7 +75,7 @@ import { LobbyFactory } from './lobby/lobby.factory';
 
 	@SubscribeMessage('admin_newgame')
 	async onAdminNewGame(@ConnectedSocket() client: Socket,
-	@MessageBody() data: {player_A: string, player_B: string})
+	@MessageBody() data: LobbyRequest)
 	{
 		if (client['id'] == this.admin['id'])
 		{
@@ -174,6 +160,17 @@ import { LobbyFactory } from './lobby/lobby.factory';
 	{
 		//this.lobbyfactory.lobby_game_input(data);
 		this.lobbyfactory.lobby_game_get_round_setup(client, game_id);
+	}
+
+
+	/* ----- Replay Handling ----- */
+
+
+	@SubscribeMessage('replay_request')
+	async onReplayRequest(@ConnectedSocket() client: Socket,
+	@MessageBody() game_id: string)
+	{
+		this.lobbyfactory.send_replay(client, game_id);
 	}
 
   }
