@@ -49,7 +49,7 @@ class GatewayExceptionFilter extends BaseWsExceptionFilter {
 	cors: {
 		credential: true,
 	},
-	namespace: 'hui'
+	// namespace: 'hui'
 })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
@@ -74,6 +74,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	async handleConnection(socket: Socket) {
 		let user: User = null;
 		if (socket.handshake.headers.authorization) {
+			// console.log(socket.handshake.headers)
 			const token = socket.handshake.headers.authorization.split(' ')[1];
 			user = await this.authService.verify(token);
 		}
@@ -99,12 +100,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			const payload = this.authService.decodeJwt(socket.handshake.headers.authorization.split(' ')[1]) as JwtPayload;
 			// get usersocket instance instead of call db ?
 			this.session.removeUserSocket(socket.id);
-			const user = await this.userService.findOneBy({ id: payload.sub });
+			const user = await this.userService.findOneBy({ id: payload?.sub });
 			if (user) {
 				this.userService.setStatus(user, 'offline');
 				socket.emit('statusUpdate', { user, status: 'offline' });
 			}
-			console.log(payload.username, 'disconnected');
+			console.log(payload?.username, 'disconnected');
 			} else
 				console.log(socket.id, 'disconnected');
 		}

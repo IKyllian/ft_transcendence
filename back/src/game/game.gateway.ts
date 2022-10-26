@@ -77,16 +77,22 @@ export class GameGateway
 	async onAdminNewGame(@ConnectedSocket() client: Socket,
 	@MessageBody() data: LobbyRequest)
 	{
-		if (client['id'] == this.admin['id'])
-		{
+		// if (client['id'] == this.admin['id'])
+		// {
 			const gamedata: NewGameData = this.lobbyfactory.lobby_create(data);
 			console.log(gamedata);
+
+//TODO
+//preparer les PlayersGameData de chaque joueur avec le NewGameData
+//envoyer les PlayersGameData au joeuurs concerne
+//-->NEED identification des sockets
+
 			client.emit('newgame_data', gamedata);
-		}
-		else
-		{
-			//log the event somewhere
-		}	
+		// }
+		// else
+		// {
+		// 	//log the event somewhere
+		// }	
 	}
 
 	@SubscribeMessage('admin_lobby_quantity')

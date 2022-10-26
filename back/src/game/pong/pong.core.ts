@@ -78,7 +78,8 @@ export default class PongCore
 
 	constructor(public game_settings: GameSettings)
 	{
-		this.game_type = game_settings.game_type;
+		// this.game_type = game_settings.game_type;
+		this.game_type = GameType.Singles;
 		this.up_down_border = game_settings.up_down_border;
 		this.player_back_advance = game_settings.player_back_advance;
 		this.player_front_advance = game_settings.player_front_advance;
