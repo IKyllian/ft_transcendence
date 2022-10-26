@@ -2,13 +2,17 @@ import { IconX, IconUser, IconMessage, IconBrandAppleArcade } from "@tabler/icon
 import { useContext, useState } from "react";
 
 import { ModalContext } from "./Utils/ModalProvider";
-import UserFindItem from "./User-Find-Item";
-import SearchBarPlayers from "./SearchBarPlayers";
+import UserFindItem from "./Search-Bar/User-Find-Item";
+import SearchBarPlayers from "./Search-Bar/SearchBarPlayers";
 import { friendsDatas } from "../Types/Datas-Examples";
-import { fetchSearchAllUsers } from "../Api/User-Fetch";
+import { fetchSearchUsersToAdd } from "../Api/User-Fetch";
+import { useAppSelector } from "../Redux/Hooks";
+import Avatar from "../Images-Icons/pp.jpg";
 
 function AddFriendModal() {
     const [showFriendList, setShowFriendList] = useState<boolean>(true);
+
+    const {friendList} = useAppSelector((state) => state.auth);
     const modalStatus = useContext(ModalContext);
 
     return modalStatus.modal.isOpen ? (
@@ -28,8 +32,8 @@ function AddFriendModal() {
                         showFriendList ?
                         <div className="modal-player-list modal-friend-list">
                             {
-                                friendsDatas.map((elem, index) =>                    
-                                    <UserFindItem key={index} avatar={elem.profilPic} name={elem.username}>
+                                friendList.map((elem, index) =>                    
+                                    <UserFindItem key={index} avatar={Avatar} name={elem.username}>
                                         <div className="icons-player-item">
                                             <IconUser />
                                             <IconMessage />
@@ -39,7 +43,7 @@ function AddFriendModal() {
                                 )
                             }
                         </div> :
-                        <SearchBarPlayers functionality="addFriend" fetchUserFunction={fetchSearchAllUsers} />
+                        <SearchBarPlayers functionality="addFriend" fetchUserFunction={fetchSearchUsersToAdd} />
                     }
                 </div>
             </div>

@@ -42,7 +42,7 @@ export function fetchSignUp({username, password, dispatch}: SignParameter) {
 export function fetchLogin42(authorizationCode: string, dispatch: Dispatch<AnyAction>, navigate: NavigateFunction) {
     axios.post(`${baseUrl}/auth/login42`, { authorizationCode })
     .then((response) => {
-        console.log('JWT =>', response.data.access_token);
+        console.log('JWT =>', response.data);
         if (response.data.usernameSet) {
             const payload: LoginPayload = {
                 token: response.data.access_token,

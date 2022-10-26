@@ -1,22 +1,13 @@
-import { IconEdit, IconUserPlus, IconMessage, IconBrandAppleArcade } from '@tabler/icons';
+import { IconEdit, IconMessage, IconBrandAppleArcade } from '@tabler/icons';
 import { ProfileState } from '../../Types/User-Types';
 
 import ProfilePic from "../../Images-Icons/pp.jpg"
 import { Link } from "react-router-dom";
-import { SocketContext } from "../../App";
-import { useContext } from 'react';
+import FriendButton from '../Buttons/Friend-Button';
 
 function CardInfo(props: {userState: ProfileState}) {
     const { userState } = props;
-
-    const {socket} = useContext(SocketContext);
-    const inviteTest = (id: number) => {
-        socket?.emit("ChannelInvite", {
-            chanId: 4,
-            userId: id,
-        });
-    }
-
+    
     return (
         <div className="card-info">
             <img className='profile-avatar' src={ProfilePic} alt="profil pic" />
@@ -25,7 +16,7 @@ function CardInfo(props: {userState: ProfileState}) {
             {
                 userState.isLoggedUser ? <IconEdit /> : 
                 <>
-                    <IconUserPlus onClick={() => inviteTest(userState.user.id)} className="friend-icone friend-icone-add" />
+                    <FriendButton secondUserId={userState.user.id} relationStatus={userState.relationStatus!} />
                     <Link className="send-message-icon" to="/chat" state={{userIdToSend: userState.user.id}}>
                         <IconMessage />
                     </Link>

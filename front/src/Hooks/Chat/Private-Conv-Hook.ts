@@ -28,9 +28,8 @@ export function usePrivateConvHook() {
     const convId: number | undefined = params.convId ? parseInt(params.convId!) : undefined;
     const { socket } = useContext(SocketContext);
 
-
     const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+        messagesEndRef.current?.scrollIntoView();
     }
 
     const handleInputChange = () => {
@@ -55,7 +54,7 @@ export function usePrivateConvHook() {
         setHasTypingEvent(false);
     }
 
-    const optimizedFn = useCallback(debounce(endOfTyping), [hasSendTypingEvent, convDatas, authDatas]);
+    const optimizedFn = useCallback(debounce(endOfTyping, 6000), [hasSendTypingEvent, convDatas, authDatas]);
 
     const handleSubmitMessage = handleSubmit((data, e: any) => {
         e.preventDefault();
@@ -134,13 +133,13 @@ export function usePrivateConvHook() {
     }, [])
 
     return {
-        convDatas: convDatas,
+        convDatas,
         handleSubmit: handleSubmitMessage,
-        messagesEndRef: messagesEndRef,
+        messagesEndRef,
         loggedUser: authDatas.currentUser,
-        optimizedFn: optimizedFn,
-        handleInputChange: handleInputChange,
-        userTyping: userTyping,
-        register: register,
+        optimizedFn,
+        handleInputChange,
+        userTyping,
+        register,
     };
 }

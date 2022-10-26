@@ -5,7 +5,7 @@ import { SidebarContext } from "../Chat";
 import { UserInterface } from "../../../Types/User-Types";
 import { Channel } from "../../../Types/Chat-Types"
 import DropdownContainer from "../../Utils/Dropdown-Container";
-import BlockButton from "../../Utils/Block-Button";
+import BlockButton from "../../Buttons/Block-Button";
 import { SetModalContext } from "../Chat";
 
 interface Props {

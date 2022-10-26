@@ -5,6 +5,7 @@ import { UserInterface } from '../Types/User-Types';
 
 const defaultState: AuthState = {
     currentUser: undefined,
+    friendList: [],
     isAuthenticated: false,
     error: undefined,
     loading: false,
@@ -42,6 +43,7 @@ export const authSlice = createSlice({
         logoutSuccess: (state) => {
             state = {
                 currentUser: undefined,
+                friendList: [],
                 isAuthenticated: false,
                 error: undefined,
                 loading: false,
@@ -51,8 +53,11 @@ export const authSlice = createSlice({
         },
         replaceUserObject: (state, {payload}: PayloadAction<UserInterface>) => {
             state.currentUser = {...payload};
+        },
+        copyFriendListArray: (state, {payload}: PayloadAction<UserInterface[]>) => {
+            state.friendList = [...payload];
         }
     }
 });
 
-export const { loginPending, loginSuccess, loginError, setUsername, logoutPending, logoutSuccess, replaceUserObject } = authSlice.actions;
+export const { loginPending, loginSuccess, loginError, setUsername, logoutPending, logoutSuccess, replaceUserObject, copyFriendListArray } = authSlice.actions;

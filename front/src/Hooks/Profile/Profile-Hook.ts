@@ -4,6 +4,7 @@ import { ProfileState } from "../../Types/User-Types";
 import { useAppSelector } from '../../Redux/Hooks';
 import { useParams } from "react-router-dom";
 
+import { SocketContext } from "../../App";
 import { fetchProfile } from "../../Api/Profile/Profile-Fetch";
 
 interface ProfileMenuButtons {
@@ -18,11 +19,14 @@ export function useProfileHook() {
         { title: "Friends", isActive: "false" }
     ]);
     const [userState, setUserState] = useState<ProfileState | undefined>(undefined);
-    
+    const [friendRequestSent, setFriendRequestSent] = useState<number>(0);
+
     const params = useParams();
     const modalStatus = useContext(ModalContext);
-    let {currentUser, token} = useAppSelector(state => state.auth);
-    
+    let {currentUser, token, friendList} = useAppSelector(state => state.auth);
+    let {notifications} = useAppSelector(state => state.notification);
+    const {socket} = useContext(SocketContext);
+
     const handleClick = (index: number) => {
         let newArray = [...attributes];
 
@@ -39,17 +43,30 @@ export function useProfileHook() {
             setUserState({
                 isLoggedUser: true,
                 user: currentUser!,
+                friendList: friendList,
             });
         }
         else if (params.username) {
             fetchProfile(params.username, token, setUserState);
         }
-    }, [params])
+
+        
+    }, [params, friendList, notifications, friendRequestSent])
+
+    useEffect(() => {
+        socket?.on("RequestValidation", (() => {
+            setFriendRequestSent(prev => {return prev + 1});
+        }))
+
+        return () => {
+            socket?.off("RequestValidation");
+        }
+    })
 
     return {
-        userState: userState,
-        handleClick: handleClick,
-        modalStatus: modalStatus,
-        attributes: attributes
+        userState,
+        handleClick,
+        modalStatus,
+        attributes,
     }
 }

@@ -55,7 +55,8 @@
         justify-content: space-between;
         margin: 0 auto;
         .item-player-info {
-            display: inline-flex;
+            display: flex;
+            align-items: center;
             .modal-picture {
                 @include avatar-player(50px);
                 margin-right: 10px;
@@ -69,6 +70,25 @@
             font-size: 15px;
             border-radius: 4px;
             background-color: $LightDarkPalette;
+        }
+
+        .friendship-action-wrapper {
+            @include flex-row-alignCenter();
+            gap: 10px;
+            svg {
+                cursor: pointer;
+                border-radius: 50%;
+                @include width-height(25px, 25px);
+                padding: 2px;
+                &:first-child {
+                    color: green;
+                    border: 1px solid green;
+                }
+                &:last-child {
+                    color: red;
+                    border: 1px solid red;
+                }
+            }
         }
 
         .icons-player-item {

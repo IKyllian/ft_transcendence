@@ -34,7 +34,7 @@ export function useUsernameFormHook() {
     }, [location])
 
     return {
-        register: register,
-        onSubmit: onSubmit,
+        register,
+        onSubmit,
     }
 }
