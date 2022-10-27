@@ -6,6 +6,11 @@ import { Dispatch, AnyAction } from "@reduxjs/toolkit";
 import { NavigateFunction } from "react-router-dom";
 import { UserInterface } from "../../Types/User-Types";
 
+interface UsersListInterface {
+    user: UserInterface,
+    relationStatus?: string,
+}
+
 export async function fetchUserChannels(token: string, channelId: number | undefined, dispatch: Dispatch<AnyAction>): Promise<ChannelsInterfaceFront[]> {
     let datasArray: ChannelsInterfaceFront[] = [];
     await axios.get(`${baseUrl}/channel/my_channels`, {
@@ -136,7 +141,8 @@ export function fetchSearchUsersToInvite(inputText: string, token :string, setUs
         }
     })
     .then((response) => {
-        setUsersList(response.data);   
+        const newArray: UsersListInterface[] = response.data.map((elem: UserInterface) => { return {user: elem}});
+        setUsersList(newArray);   
     })
     .catch((err) => {
         console.log(err);

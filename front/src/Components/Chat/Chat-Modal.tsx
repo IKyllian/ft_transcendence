@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import SearchBarPlayers from "../SearchBarPlayers";
+import SearchBarPlayers from "../Search-Bar/SearchBarPlayers";
 import { useForm } from 'react-hook-form';
 import { useAppSelector, useAppDispatch } from '../../Redux/Hooks'
 import { IconX } from '@tabler/icons';
@@ -72,7 +72,7 @@ function ChatModal(props: {onCloseModal: Function, showModal: number}) {
     if (showModal === 1 || showModal === 3) {
         return (
             <div className="chat-modal">
-                <IconX className="modal-exit" onClick={() => onCloseModal() } />
+                <IconX className="modal-exit" onClick={() => {onCloseModal(); setUsersInvited([])} } />
                 <div className="form-modal-wrapper">
                     <h3> {showModal === 1 ? "Create Channel" : "Inviter des gens"}  </h3>
                     <form onSubmit={formSubmit}>

@@ -11,120 +11,176 @@
 @use "./Loading-Spin.scss";
 @use "./Notif-Game-Invite.scss";
 @use "./Notif-Error.scss";
+@use "./Lobby.scss";
 @use "./Variables.scss" as *;
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+	'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+	sans-serif;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
 }
 
 * {
-  box-sizing: border-box;
+	box-sizing: border-box;
 }
 
 html, body, #root{
-  margin: 0;
-  padding: 0;
-  border: 0;
-  max-height: 100%;
-  min-height: 100%;
-  display: flex;
-  flex-direction: column;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	max-height: 100%;
+	min-height: 100%;
+	display: flex;
+	flex-direction: column;
 }
 
 body {
-  font-family: Montserrat;
-  text-decoration: none;
-  color: $WhitePalette;
-  flex-grow: 1;
+	font-family: Montserrat;
+	text-decoration: none;
+	color: $WhitePalette;
+	flex-grow: 1;
 }
 
 #root {
-  flex-grow: 1;
+	flex-grow: 1;
 }
 
 .app-container {
-  inset: 0;
-  display: flex;
-  position: absolute;
+	inset: 0;
+	display: flex;
+	position: absolute;
 }
 
 .page-container {
-  top: $headerHeight;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  position: absolute;
-  flex-flow: column;
-  min-height: 0;
-  background-size: cover;
+	top: $headerHeight;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	display: flex;
+	position: absolute;
+	flex-flow: column;
+	min-height: 0;
+	background-size: cover;
 }
 
 a, button{
-  color: $WhitePalette;
-  text-decoration: none;
+	color: $WhitePalette;
+	text-decoration: none;
 }
 
 button {
-  cursor: pointer;
+	cursor: pointer;
 }
 
 .blur-background {
-  filter: blur(5px);
+	filter: blur(5px);
 }
 
 .dropdown-container {
-  background-color: white;
-  position: absolute;
-  left: 20px;
-  top: 30px;
-  width: 200px;
-  border-radius: 5px;
-  background-color: $DarkPalette;
-  z-index: 100;
+	background-color: white;
+	position: absolute;
+	left: 20px;
+	top: 30px;
+	width: 200px;
+	border-radius: 5px;
+	background-color: $DarkPalette;
+	z-index: 100;
 
-  .dropdown-wrapper {
-    margin: 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
+	.dropdown-wrapper {
+		margin: 10px;
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
 
-    .red-item {
-      color: red;
-    }
-    a {
-      color: #a5abb0;
-    }
-    p {
-      margin: 0;
-      font-size: 13px;
-      letter-spacing: 1.5px;
-      padding: 5px;
-      border-radius: 5px;
-      cursor: pointer;
-      color: #a5abb0;
+		.red-item {
+			color: red;
+		}
+		a {
+			color: #a5abb0;
+		}
 
-      &:hover {
-        background-color: $LightDarkPalette;
-      }
-    }
-  }
+		.dropdown-button {
+			position: relative;
+			display: flex;
+			&:hover {
+				.right-menu-dropdown {
+					display: flex;
+				}
+			}
+			span {
+				width: 100%;
+			}
+			.right-menu-dropdown {
+				position: absolute;
+				right: -150px;
+				bottom: -20px;
+				background-color: $DarkPalette;
+				padding: 5px;
+				width: 150px;
+				display: none;
+				flex-direction: column;
+				gap: 3px;
+				&:hover {
+					display: flex;
+				}
+				&-separator {
+					text-align: center;
+					font-size: 10px;
+				}
+				p {
+					text-align: center;
+				}
+				.input-dropdown-wrapper {
+					width: 100%;
+					@include flex-row-alignCenter();
+					justify-content: space-between;
+					padding: 5px;
+					margin: 0 auto;
+					&:hover {
+						background-color: $LightDarkPalette;
+						}
+					input {
+						all: unset;
+						width: 80%;
+					}
+					button {
+						all: unset;
+						display: flex;
+						svg {
+							@include width-height(15px, 15px);
+						}
+					}
+				}
+			}
+		}
+
+		p, .dropdown-button {
+			margin: 0;
+			font-size: 13px;
+			letter-spacing: 1.5px;
+			padding: 5px;
+			border-radius: 5px;
+			cursor: pointer;
+			color: #a5abb0;
+
+			&:hover {
+			background-color: $LightDarkPalette;
+			}
+		}
+	}
 }
 
 .err-no-datas {
-  color: $WhitePalette;
-  text-align: center;
-  font-size: 25px;
+	color: $WhitePalette;
+	text-align: center;
+	font-size: 25px;
 }
 
 .txt-form-error {
-  color: red;
-  // margin: 0 0 1em 0;
-  margin: 0;
-  font-size: 14px;
-  letter-spacing: 1px;
+	color: red;
+	margin: 0;
+	font-size: 14px;
+	letter-spacing: 1px;
 }

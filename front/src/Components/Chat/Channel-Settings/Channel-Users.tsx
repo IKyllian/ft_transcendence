@@ -4,8 +4,8 @@ import { IconDotsVertical } from '@tabler/icons';
 import { useState } from "react";
 import DropdownContainer from "../../Utils/Dropdown-Container";
 import { Link } from "react-router-dom";
-import BlockButton from "../../Utils/Block-Button";
-import RoleButton from "../../Utils/Role-Button";
+import BlockButton from "../../Buttons/Block-Button";
+import RoleButton from "../../Buttons/Role-Button";
 
 export function ChannelUserItem(props: {userDatas: ChannelUser, loggedUserIsOwner: boolean}) {
     const { userDatas, loggedUserIsOwner } = props;

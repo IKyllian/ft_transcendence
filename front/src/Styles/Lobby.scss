@@ -1,0 +1,10 @@
+@use "./Variables.scss" as *;
+
+.lobby-container {
+    background-color: $LightDarkPalette;
+    @include page-wrapper();
+
+    button {
+        color: black;
+    }
+}

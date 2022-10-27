@@ -3,15 +3,17 @@ import { useNavigate, useParams } from "react-router-dom";
 import { io, Socket } from "socket.io-client";
 import { useAppDispatch, useAppSelector } from '../Redux/Hooks'
 import { socketUrl } from "../env";
-import { fetchNotifications } from "../Api/User-Fetch";
+import { fetchNotifications, fetchFriendList } from "../Api/User-Fetch";
 import { NotificationInterface } from "../Types/Notification-Types";
-import { addNotification } from "../Redux/NotificationSlice";
-import { addChannel, addPrivateConv, removeChannel } from "../Redux/ChatSlice";
+import { addNotification, deleteNotification } from "../Redux/NotificationSlice";
+import { addChannel, addPrivateConv, removeChannel, } from "../Redux/ChatSlice";
 import { Channel, Conversation } from "../Types/Chat-Types";
+import { UserInterface } from "../Types/User-Types";
+import { copyFriendListArray } from "../Redux/AuthSlice";
 
 export function useAppHook() {
     const [socket, setSocket] = useState<Socket | undefined>(undefined);
-	const [gameInvite, setGameInvite] = useState<boolean>(false);
+	const [gameInvite, setGameInvite] = useState<NotificationInterface | undefined>(undefined);
     const {token, isAuthenticated, currentUser} = useAppSelector((state) => state.auth);
 	const [eventError, setEventError] = useState<string | undefined>(undefined);
 
@@ -31,13 +33,14 @@ export function useAppHook() {
 	}
 
 	const gameNotificationLeave = () => {
-		setGameInvite(false);
+		setGameInvite(undefined);
 	}
 
 	useEffect(() => {
 		if (isAuthenticated && socket === undefined) {
 			connectSocket();
 			fetchNotifications(token, dispatch);
+			fetchFriendList(token, dispatch);
 			// setTimeout(function() {
 			// 	setGameInvite(true);
 			// 	setTimeout(function() {
@@ -55,10 +58,24 @@ export function useAppHook() {
 				dispatch(addNotification(data));
 			});
 
+			socket.on("NewGameInvite", (data: NotificationInterface) => {
+				console.log("NewGameInvite", data);
+				setGameInvite(data);
+			})
+
+			socket.on("DeleteNotification", (data: number) => {
+				dispatch(deleteNotification(data));
+			});
+
 			socket.on("exception", (data) => {
 				console.log(data);
 				setEventError(data.message);
 			});
+
+			socket.on("FriendListUpdate", (data: UserInterface[]) => {
+				console.log("FriendListUpdate", data);
+				dispatch(copyFriendListArray(data));
+			})
 
 			socket.on("NewConversation", (data : {conv: Conversation, socketId: string}) => {
 				console.log("NewConversation", data);
@@ -88,6 +105,9 @@ export function useAppHook() {
 		return () => {
 			socket?.off("NewNotification");
 			socket?.off("NewConversation");
+			socket?.off("NewGameInvite");
+			socket?.off("FriendListUpdate");
+			socket?.off("DeleteNotification");
 			socket?.off("exception");
 			socket?.off("OnJoin");
 			socket?.off("OnLeave");
@@ -95,10 +115,10 @@ export function useAppHook() {
 	}, [socket])
 
     return {
-        socket: socket,
-        eventError: eventError,
-        closeEventError: closeEventError,
-        gameInvite: gameInvite,
-        gameNotificationLeave: gameNotificationLeave
+        socket,
+        eventError,
+        closeEventError,
+        gameInvite,
+        gameNotificationLeave
     };
 }

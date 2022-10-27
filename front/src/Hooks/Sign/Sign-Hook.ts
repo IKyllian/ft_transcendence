@@ -60,11 +60,11 @@ export function useSignHook() {
             register: register,
             errors: errors,
         },
-        authDatas: authDatas,
-        isSignIn: isSignIn,
-        changeForm: changeForm,
-        onSignIn: onSignIn,
-        onSignUp: onSignUp,
-        sign42: sign42,
+        authDatas,
+        isSignIn,
+        changeForm,
+        onSignIn,
+        onSignUp,
+        sign42,
     }
 }

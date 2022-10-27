@@ -27,10 +27,10 @@ export function useChannelHook() {
 
     console.log("Channel page render");
 
-    const changeSidebarStatus = useCallback(() => {
+    const changeSidebarStatus = () => {
         console.log("changeSidebarStatus");
         setShowUsersSidebar(!showUsersSidebar);
-    }, [setShowUsersSidebar]);
+    };
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView();
@@ -56,7 +56,7 @@ export function useChannelHook() {
         setHasTypingEvent(false);
     }
 
-    const optimizedFn = useCallback(debounce(endOfTyping), [hasSendTypingEvent, channelId]);
+    const optimizedFn = useCallback(debounce(endOfTyping, 6000), [hasSendTypingEvent, channelId]);
 
     useEffect(() => {
         scrollToBottom();
@@ -155,15 +155,15 @@ export function useChannelHook() {
     })
 
     return {
-        loggedUserIsOwner: loggedUserIsOwner,
-        changeSidebarStatus: changeSidebarStatus,
+        loggedUserIsOwner,
+        changeSidebarStatus,
         handleSubmit: handleSubmitMessage,
-        messagesEndRef: messagesEndRef,
-        showUsersSidebar: showUsersSidebar,
-        chatDatas: chatDatas,
-        optimizedFn: optimizedFn,
-        handleInputChange: handleInputChange,
-        usersTyping: usersTyping,
-        register: register,
+        messagesEndRef,
+        showUsersSidebar,
+        chatDatas,
+        optimizedFn,
+        handleInputChange,
+        usersTyping,
+        register,
     };
 }

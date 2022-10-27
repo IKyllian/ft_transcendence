@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import { Link } from "react-router-dom";
 
 interface Props {
     children?: ReactNode;
@@ -12,7 +13,9 @@ function UserFindItem(props: Props) {
         <div className="modal-player-list-item">
             <div className="item-player-info">
                 <img className='modal-picture' src={avatar} alt="profil pic" />
-                <p> {name} </p>
+                <Link to={`/profile/${name}`}>
+                    {name}
+                </Link>
             </div>
             {children}
         </div>

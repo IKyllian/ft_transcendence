@@ -3,7 +3,7 @@ import { useAppDispatch, useAppSelector } from "../../Redux/Hooks";
 import { NotificationInterface } from "../../Types/Notification-Types";
 import { SocketContext } from "../../App";
 import { useContext } from "react";
-import { deleteNotification } from "../../Redux/NotificationSlice";
+import { Link } from "react-router-dom";
 
 function NotifItem(props: {notification: NotificationInterface}){
     const { notification } = props;
@@ -14,14 +14,15 @@ function NotifItem(props: {notification: NotificationInterface}){
     const handleClick = (response: string) => {
         if (notification.type === "channel_invite")
             socket?.emit("ChannelInviteResponse", {id: notification.id, chanId: notification.channel?.id, response: response});
-        dispatch(deleteNotification(notification.id));
+        else
+            socket?.emit("FriendRequestResponse", {id: notification.requester.id, response: response})
     }
 
     return (
         <div className="notif-dropdown-item">
             <img className='profile-avatar' src={Avatar} alt="profil pic" />
             <div className="notif-content">
-                <p> {notification.requester.username} </p>
+                <Link to={`/profile/${notification.requester.username}`}> {notification.requester.username} </Link>
                 <p>
                     {   notification.type === "channel_invite"
                         ?`Invited you to ${notification.channel?.name}`
@@ -43,9 +44,10 @@ function DropdownNotification() {
     return notifications && notifications.length > 0 ? (
         <div className="notif-dropdown-wrapper">
             {
-                notifications.map((elem) => 
-                    <NotifItem key={elem.id} notification={elem}  />
-                )
+                notifications.map((elem) => {
+                    if (elem.type !== "game_invite")
+                        return <NotifItem key={elem.id} notification={elem} />
+                })
             }
         </div>
     ) : (
