@@ -347,38 +347,4 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	) {
 		socket.to(`user-${dto.userId}`).emit('OnTypingPrivate', { user, isTyping: dto.isTyping, convId: dto.convId });
 	}
-
-	@UseGuards(WsJwtGuard)
-	@SubscribeMessage('GameInvite')
-	async sendGameInvite(
-		@GetUser() user: User,
-		@ConnectedSocket() socket: Socket,
-		@MessageBody() dto: UserIdDto,
-	) {
-		// const addressee = await this.userService.findOneBy({ id: dto.id });
-		// if (!addressee) {
-		// 	throw new NotFoundException('User not found');
-		// }
-		const notif: any = {
-			requester: user,
-			type: notificationType.GAME_INVITE
-		}
-
-
-		socket.to(`user-${dto.id}`).emit('NewGameInvite', notif);
-	}
-
-	@UseGuards(WsJwtGuard)
-	@SubscribeMessage('AcceptGameInvite')
-	async acceptGameInvite(
-		@ConnectedSocket() socket: Socket,
-		@GetUser() user: User,
-		@MessageBody() dto: UserIdDto,
-	) {
-		// const addressee = await this.userService.findOneBy({ id: dto.id });
-		// if (!addressee)
-		// 	throw new NotFoundException('User not found');
-
-		socket.to(`user-${dto.id}`).emit('JoinLobby', user);
-	}
 }
