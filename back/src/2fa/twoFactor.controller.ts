@@ -33,7 +33,7 @@ export class TwoFactorController {
 
 		const realuser = await this.userService.findOne({ // TEMPORAIRE jusqu'a ce que j'ai trouvé pq y'a pas le two_factor_secret dans le user
 			where: {
-				username: user.username,
+				id: user.id,
 			}
 		}, true);
 
