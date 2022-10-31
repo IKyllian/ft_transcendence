@@ -32,13 +32,6 @@ export class TwoFactorController {
 			throw new UnauthorizedException('2FA already enabled for this user');
 
 		const realuser = await this.userService.findOne({ // TEMPORAIRE jusqu'a ce que j'ai trouvé pq y'a pas le two_factor_secret dans le user
-			relations: {
-				channelUser: {
-					channel: true,
-				},
-				statistic: true,
-				blocked: true,
-			},
 			where: {
 				username: user.username,
 			}
