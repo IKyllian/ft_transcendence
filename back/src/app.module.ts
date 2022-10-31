@@ -8,12 +8,14 @@ import { UserModule } from './user/user.module';
 import { ChatModule } from './chat/chat.module';
 import { NotificationModule } from './notification/notification.module';
 import entities from './typeorm';
+import { TwoFactorModule } from './2fa/twoFactor.module';
 
 @Module({
   imports: [
     AuthModule,
     UserModule,
     ChatModule,
+	TwoFactorModule,
     ConfigModule.forRoot({ envFilePath: '.env', isGlobal: true }),
     NotificationModule,
     TypeOrmModule.forRoot({

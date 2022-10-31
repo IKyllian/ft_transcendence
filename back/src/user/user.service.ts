@@ -153,4 +153,9 @@ export class UserService {
 		const relationStatus = this.friendshipService.getRelationStatus(user2, relation);
 		return { user: user2, friendList, relationStatus };
 	}
+
+	async setTwoFactorSecret(user: User, secret: string) {
+		user.two_factor_secret = secret;
+		this.userRepo.save(user);
+	}
 }

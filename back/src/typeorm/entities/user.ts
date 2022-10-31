@@ -47,4 +47,8 @@ export class User {
 	@Exclude()
 	@Column({ nullable: true, select: false })
 	refresh_hash?: string
+
+	@Exclude()
+	@Column({ nullable: true, select: false })
+	two_factor_secret?: string
 } 
