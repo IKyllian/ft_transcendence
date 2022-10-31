@@ -52,5 +52,5 @@ export class User {
 	two_factor_secret?: string
 
 	@Column({ default: false })
-	two_factor_enabled: boolean = false;
+	two_factor_enabled: boolean;
 } 
