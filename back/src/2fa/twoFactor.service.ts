@@ -26,4 +26,14 @@ export class TwoFactorService {
 	public async pipeQrCodeStream(stream: Response, optUrl: string) {
 		return toFileStream(stream, optUrl)
 	}
+
+	public verify(code: string, user: User) {
+		console.log('received code: ', code);
+		console.log('secret: ', user.two_factor_secret);
+		
+		return authenticator.verify({
+			token: code,
+			secret: user.two_factor_secret
+		});
+	}
 }
