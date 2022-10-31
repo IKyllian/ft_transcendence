@@ -26,12 +26,32 @@ export class TwoFactorController {
 	@Post('enable')
 	@UseGuards(JwtGuard)
 	async enableTwoFactor(@GetUser() user: User, @Body() body: EnableTwoFactorDto) {
-		console.log(user); // y'a pas le field two_factor_secret dans le User jsp pourquoi ca m'enerve
+		console.log(user.two_factor_enabled);
 		
-		const isValid = this.twoFactorService.verify(body.code, user);
+		if (user.two_factor_enabled)
+			throw new UnauthorizedException('2FA already enabled for this user');
+
+		const realuser = await this.userService.findOne({ // TEMPORAIRE jusqu'a ce que j'ai trouvé pq y'a pas le two_factor_secret dans le user
+			relations: {
+				channelUser: {
+					channel: true,
+				},
+				statistic: true,
+				blocked: true,
+			},
+			where: {
+				username: user.username,
+			}
+		}, true);
+
+		console.log(realuser.two_factor_enabled);
+		
+		
+		const isValid = this.twoFactorService.verify(body.code, realuser);
 
 		if (!isValid)
 			throw new UnauthorizedException('Invalid 2FA code');
 		await this.userService.setTwoFactorEnabled(user, true);
+		return {success: true}
 	}
 }

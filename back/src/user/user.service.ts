@@ -37,6 +37,8 @@ export class UserService {
 				'username',
 				'status',
 				'hash',
+				'refresh_hash',
+				'two_factor_secret'
 			];
 		}
 		return this.userRepo.findOne(options);
