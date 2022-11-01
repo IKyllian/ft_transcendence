@@ -1,3 +1,5 @@
+import { GameUser } from "src/game/game-user"
+
 export enum PlayerType {
 	Player_A_Back,
 	Player_A_Front,
@@ -45,6 +47,15 @@ export type LobbyRequest =
 	Player_B_Front: string,
 	Player_B_Back: string,
 	game_settings: GameSettings
+}
+
+//data sent to lobby factory to request a new lobby
+export type MatchmakingLobby =
+{
+	Player_A_Back: GameUser,
+	Player_A_Front?: GameUser,
+	Player_B_Back: GameUser,
+	Player_B_Front?: GameUser,
 }
 
 
@@ -167,4 +178,10 @@ export type GameSettings =
 	ball_start_speed: number,
 	ball_acceleration: number,
 	point_for_victory: number
+}
+
+export enum GameMode {
+	OneVsOne,
+	TwoVsTwo,
+	Custom
 }

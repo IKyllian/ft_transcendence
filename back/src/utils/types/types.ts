@@ -3,6 +3,11 @@ export type JwtPayload = {
 	username: string,
 };
 
+export type UserPayload = {
+	id: number,
+	username: string,
+};
+
 export type FindUserParams = Partial<{
 	id: number;
 	id42: number;

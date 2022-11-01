@@ -28,20 +28,7 @@ import { MuteUserDto } from '../channel/dto/mute-user.dto';
 import { ChangeRoleDto } from './dto/change-role.dto';
 import { OnTypingChannelDto } from './dto/on-typing-chan.dto';
 import { OnTypingPrivateDto } from './dto/on-typing-priv.dto';
-import { JwtGuard } from 'src/auth/guard/jwt.guard';
-import { NotificationModule } from 'src/notification/notification.module';
-
-@Catch()
-class GatewayExceptionFilter extends BaseWsExceptionFilter {
-	catch(exception: any, host: ArgumentsHost) {
-		if (exception instanceof WsException)
-				super.catch(exception, host);
-		else {
-			const properException = new WsException(exception.getResponse());
-			super.catch(properException, host);
-		}
-	}
-}
+import { GatewayExceptionFilter } from 'src/utils/exceptions/filter/Gateway.filter';
 
 @UseFilters(GatewayExceptionFilter)
 @UsePipes(new ValidationPipe())
@@ -49,7 +36,6 @@ class GatewayExceptionFilter extends BaseWsExceptionFilter {
 	cors: {
 		credential: true,
 	},
-	// namespace: 'hui'
 })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
@@ -70,6 +56,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	// afterInit(serverr: Server) {
 	// 		// console.log(this.server)
 	// }
+
+	//test
+	@SubscribeMessage('hello') 
+	hello(@ConnectedSocket() socket: Socket) {
+		console.log('test')
+		// socket.emit('hello', 'hello');
+		this.server.emit('hello', "cccc")
+	}
 
 	async handleConnection(socket: Socket) {
 		let user: User = null;
@@ -108,7 +102,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			console.log(payload?.username, 'disconnected');
 			} else
 				console.log(socket.id, 'disconnected');
-		}
+	}
 
 	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('JoinChannelRoom')

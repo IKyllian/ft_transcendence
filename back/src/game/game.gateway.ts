@@ -1,4 +1,4 @@
-import { UseGuards } from '@nestjs/common';
+import { UnauthorizedException, UseFilters, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import {
 	WebSocketGateway,
 	WebSocketServer,
@@ -9,20 +9,33 @@ import {
 	MessageBody
   } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
+import { AuthService } from 'src/auth/auth.service';
 import { WsJwtGuard } from 'src/auth/guard/ws-jwt.guard';
 import { UserIdDto } from 'src/chat/gateway/dto/user-id.dto';
 import { User } from 'src/typeorm';
+import { UserService } from 'src/user/user.service';
 import { GetUser } from 'src/utils/decorators';
-import { NewGameData, PlayersLobbyData, LobbyRequest } from 'src/utils/types/game.types';
-import { notificationType } from 'src/utils/types/types';
-import { GameUser } from './game-user.interface';
-import { GameUserSessionManager } from './game-user.session';
+import { NewGameData, PlayersLobbyData, LobbyRequest, GameMode } from 'src/utils/types/game.types';
+import { JwtPayload, notificationType, UserPayload } from 'src/utils/types/types';
+import { UserSessionManager } from './user.session';
 import { LobbyFactory } from './lobby/lobby.factory';
-import { WaitingRoom } from './waiting-room/waiting-room';
+import { Party } from './matchmaking/party/party';
+import { GameUser } from './game-user';
+import { PartyService } from './matchmaking/party/party.service';
+import { SocketReservedEventsMap } from 'socket.io/dist/socket';
+import { RoomDto } from 'src/chat/gateway/dto/room.dto';
+import { threadId } from 'worker_threads';
+import { BlobOptions } from 'buffer';
+import { JwtGameGuard } from 'src/auth/guard/jwt-game.guard';
+import { AuthenticatedSocket } from './auth-socket';
+import { QueueService } from './matchmaking/queue/queue.service';
+import { GatewayExceptionFilter } from 'src/utils/exceptions/filter/Gateway.filter';
 
 
-@WebSocketGateway()
-export class GameGateway implements OnGatewayDisconnect
+@UseFilters(GatewayExceptionFilter)
+@UsePipes(new ValidationPipe())
+@WebSocketGateway({ namespace: 'game' })
+export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
 {
 
 	/* ----- Initialisation ----- */
@@ -31,13 +44,12 @@ export class GameGateway implements OnGatewayDisconnect
 	admin?: Socket;
 //get admin secret from envs
 	admin_secret: string = 'praclarushtaonas';
-
 	constructor(
 		private readonly lobbyfactory: LobbyFactory,
-		private readonly gameUserSession: GameUserSessionManager
-	  )
-	  {
-	  }
+		private readonly userSession: UserSessionManager,
+		private readonly authService: AuthService,
+		private readonly userService: UserService,
+	  ) {}
 
 	afterInit(server: Server): any
 	{
@@ -47,16 +59,39 @@ export class GameGateway implements OnGatewayDisconnect
 
 	/* ----- Connect/Disconnect ----- */
 
-	// async handleConnection(client: Socket)
-	// {
-	// 	console.log("someone connected", client['id']);
-	// }
-  
-	async handleDisconnect(client: Socket)
+	async handleConnection(client: Socket)
 	{
-
-		console.log("someone disconnected ", client['id']);
-		this.lobbyfactory.lobby_quit(client);
+		console.log("someone connected", client['id']);
+		let user: User = null;
+		if (client.handshake.headers.authorization) {
+			const token = client.handshake.headers.authorization.split(' ')[1];
+			user = await this.authService.verify(token);
+		}
+		if (!user) {
+			// Found something to do in this case
+			console.log(user, 'invalid credential')
+			return client.disconnect();
+		} else if (this.userSession.getUser(user.id)) {
+			client.disconnect();
+			throw new UnauthorizedException("You can't play in multi tab!");
+		}
+		this.userSession.setUser(user.id, user);
+	}
+  
+	async handleDisconnect(socket: Socket)
+	{
+		// TODO handle different type of disconnect; Ex: multitab error, lost connection
+		if (socket.handshake.headers.authorization) {
+			const payload = this.authService.decodeJwt(socket.handshake.headers.authorization.split(' ')[1]) as JwtPayload;
+			// get usersocket instance instead of call db ?
+			const user = await this.userService.findOneBy({ id: payload?.sub });
+			if (user) {
+				this.userSession.removeUser(user.id)
+			}
+			console.log(payload?.username, 'disconnected');
+		} else
+			console.log(socket.id, 'disconnected');
+		this.lobbyfactory.lobby_quit(socket);
 	}
 
 	@SubscribeMessage('ping')
@@ -163,8 +198,10 @@ export class GameGateway implements OnGatewayDisconnect
 	/* ----- Users Game Management ----- */
 
 
+	@UseGuards(JwtGameGuard)
 	@SubscribeMessage('user_game_input')
-	async onUserGameInput(@ConnectedSocket() client: Socket,
+	async onUserGameInput(
+	@ConnectedSocket() client: AuthenticatedSocket,
 	@MessageBody() data: any)
 	{
 		this.lobbyfactory.lobby_game_input(client, data);
@@ -192,51 +229,122 @@ export class GameGateway implements OnGatewayDisconnect
 
 	/* ----- Invite ----- */
 
-	@UseGuards(WsJwtGuard)
-	@SubscribeMessage('GameInvite')
-	async sendGameInvite(
-		@GetUser() user: User,
-		@ConnectedSocket() socket: Socket,
-		@MessageBody() dto: UserIdDto,
-	) {
-		const GameUser = this.gameUserSession.getGameUser(user.id);
-		if (!GameUser) {
-			delete user.channelUser;
-			delete user.blocked;
-			const waitingRoom = new WaitingRoom(user);
-			const gameUser: GameUser = {
-				user: user,
-				socket: socket,
-				waitingRoom: waitingRoom,
-				isReady: false,
-			};
-			this.gameUserSession.setGameUser(user.id, gameUser);
-			console.log(this.gameUserSession.getGameUser(user.id));
-		}
+	// @UseGuards(WsJwtGuard)
+	// @SubscribeMessage('GameInvite')
+	// async sendGameInvite(
+	// 	@GetUser() user: User,
+	// 	@ConnectedSocket() socket: Socket,
+	// 	@MessageBody() dto: UserIdDto,
+	// ) {
+	// 	delete user.channelUser;
+	// 	delete user.blocked;
 
+	// 	let lobby = this.partyService.partyJoined.getParty(user.id);
+	// 	if (!lobby) {
+	// 		lobby = this.partyService.createParty(user);
+	// 		socket.emit("LobbyCreated", lobby);
+	// 	}
 
+	// 	const notif: any = {
+	// 		requester: user,
+	// 		type: notificationType.GAME_INVITE
+	// 	}
+	// 	socket.to(`user-${dto.id}`).emit('NewGameInvite', notif);
+	// }
 
+	// // @UseGuards(WsJwtGuard)
+	// // @SubscribeMessage('AcceptGameInvite')
+	// // async acceptGameInvite(
+	// // 	@ConnectedSocket() socket: Socket,
+	// // 	@GetUser() user: User,
+	// // 	@MessageBody() dto: UserIdDto,
+	// // ) {
+	// // 	// const addressee = await this.userService.findOneBy({ id: dto.id });
+	// // 	// if (!addressee)
+	// // 	// 	throw new NotFoundException('User not found');
 
+	// // 	socket.to(`user-${dto.id}`).emit('JoinLobby', user);
+	// // }
 
-		const notif: any = {
-			requester: user,
-			type: notificationType.GAME_INVITE
-		}
-		socket.to(`user-${dto.id}`).emit('NewGameInvite', notif);
-	}
+	// @UseGuards(WsJwtGuard)
+	// @SubscribeMessage('JoinLobbyPage')
+	// getLobbyPage(
+	// 	@ConnectedSocket() socket: Socket,
+	// 	@GetUser() user: User,
+	// ) {
+	// 	let gameUser = this.userSession.getUser(user.id);
+	// 	if (gameUser)
+	// 		throw new UnauthorizedException("You can't play in multi tab!");
+	// 	this.userSession.setUser(user.id, user);
+	// 	const lobbyJoined = this.partyService.partyJoined.getParty(user.id);
+	// 	console.log(lobbyJoined)
+	// }
 
-	@UseGuards(WsJwtGuard)
-	@SubscribeMessage('AcceptGameInvite')
-	async acceptGameInvite(
-		@ConnectedSocket() socket: Socket,
-		@GetUser() user: User,
-		@MessageBody() dto: UserIdDto,
-	) {
-		// const addressee = await this.userService.findOneBy({ id: dto.id });
-		// if (!addressee)
-		// 	throw new NotFoundException('User not found');
+	// @UseGuards(WsJwtGuard)
+	// @SubscribeMessage('LeaveLobbyPage')
+	// leaveLobbyPage(
+	// 	@GetUser() user: User,
+	// 	@ConnectedSocket() socket: Socket,
+	// ) {
+	// 	// Not sure about that..
+	// 	let lobby = this.partyService.partyJoined.getParty(user.id);
+	// 	if (lobby) {
+	// 		this.partyService.getGameUserInParty(user.id, lobby.players).isReady = false;
+	// 		socket.to(`lobby-${lobby.id}`).emit('lobbyUpdate', lobby);
+	// 	}
 
-		socket.to(`user-${dto.id}`).emit('JoinLobby', user);
-	}
+	// 	this.userSession.removeUser(user.id);
+	// }
 
+	// @UseGuards(WsJwtGuard)
+	// @SubscribeMessage('CreateLobby')
+	// createLobby(
+	// 	@GetUser() user: User,
+	// 	@ConnectedSocket() socket: Socket,
+	// ) {
+	// 	if (!this.partyService.partyJoined.getParty(user.id)) {
+	// 		const lobby = this.partyService.createParty(user);
+	// 		socket.emit("LobbyCreated", lobby);
+	// 	}
+	// }
+
+	// @UseGuards(WsJwtGuard)
+	// @SubscribeMessage('JoinLobby')
+	// joinLobby(
+	// 	@GetUser() user: User,
+	// 	@ConnectedSocket() socket: Socket,
+	// 	@MessageBody() requester: any // TODO dto
+	// ) {
+	// 	this.partyService.joinParty(user, socket, requester.id);
+	// }
+
+	// @UseGuards(WsJwtGuard)
+	// @SubscribeMessage('LeaveLobby')
+	// leaveLobby(
+	// 	@GetUser() user: User,
+	// 	@ConnectedSocket() socket: Socket,
+	// ) {
+	// 	this.partyService.leaveParty(user, socket);
+	// }
+
+	// @UseGuards(WsJwtGuard)
+	// @SubscribeMessage('SetReadyState')
+	// setReadyState(
+	// 	@GetUser() user: User,
+	// 	@ConnectedSocket() socket: Socket,
+	// 	@MessageBody() data: { isReady: boolean } //TODO dto
+	// ) {
+	// 	this.partyService.setReadyState(user, socket, data.isReady);
+	// }
+
+	// @UseGuards(WsJwtGuard)
+	// @SubscribeMessage('StartQueue')
+	// startQueue(
+	// 	@GetUser() user: User,
+	// 	@MessageBody() data: { gameMode: GameMode}
+	// ) {
+	// 	if (data.gameMode === GameMode.OneVsOne) {
+	// 		this.queueService.join1v1Queue(user);
+	// 	}
+	// }
   }

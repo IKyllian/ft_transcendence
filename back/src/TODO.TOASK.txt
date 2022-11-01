@@ -28,3 +28,4 @@
 
 //ISSUE ?
 	- mute is canceled if user quit and rejoin channel
+	- can create username with \n

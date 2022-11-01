@@ -1,12 +1,14 @@
 import { Socket } from "socket.io";
 import { User } from "src/typeorm";
 import { PlayerType } from "src/utils/types/game.types";
-import { WaitingRoom } from "./waiting-room/waiting-room";
+import { Party } from "./matchmaking/party/party";
 
-export interface GameUser {
-	user: User;
-	socket: Socket;
+export class GameUser {
+	constructor(
+		public user: User,
+	) {
+		this.isReady = false;
+	}
 	isReady: boolean;
-	waitingRoom: WaitingRoom;
 	pos?: PlayerType;
 }

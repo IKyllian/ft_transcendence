@@ -1,7 +1,7 @@
 import { ForbiddenException, Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { AuthDto } from "./dto/auth.dto";
 import * as argon from 'argon2';
-import { JwtService } from "@nestjs/jwt";
+import { JwtService, JwtVerifyOptions } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
 import { HttpService } from "@nestjs/axios";
 import { lastValueFrom } from "rxjs";
@@ -146,6 +146,11 @@ export class AuthService {
 		const tokens = await this.signTokens(user.id, user.username);
 		this.updateRefreshHash(user, tokens.refresh_token);
 		return tokens;
+	}
+
+	verifyToken(token: string, options?: JwtVerifyOptions) {
+		options.secret = this.config.get('ACCESS_SECRET')
+		return this.jwt.verify(token, options);
 	}
 
 	async verify(token: string) {
