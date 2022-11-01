@@ -1,16 +1,18 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
-import { Socket } from "socket.io";
+import { Server, Socket } from "socket.io";
 import { User } from "src/typeorm";
 import { GameUser } from "../../game-user";
 import { PartyJoinedSessionManager } from "./party.session";
 import { Party } from "./party";
-import { NotFoundError } from "rxjs";
+import { MatchmakingGateway } from "../matchmaking.gateway";
 
 @Injectable()
 export class PartyService {
 	constructor(
 		public partyJoined: PartyJoinedSessionManager,
 	) {}
+
+	server: Server;
 
 	getGameUserInParty(id: number, gameUser: GameUser[]) {
 		return gameUser.find((e) => e.user.id === id);
@@ -31,20 +33,19 @@ export class PartyService {
 		if (!party) { throw new NotFoundException('party not found'); }
 		party.join(user);
 		this.partyJoined.setParty(user.id, party);
-		socket.join(`Party-${party.id}`);
-		socket.emit('PartyUpdate', party);
-		socket.to(`Party-${party.id}`).emit('PartyUpdate', party);
+		socket.join(`party-${party.id}`);
+		this.server.to(`party-${party.id}`).emit('PartyUpdate', party);
 	}
 
 	leaveParty(user: User, socket: Socket) {
 		const party = this.partyJoined.getParty(user.id);
 		if (party) {
 			party.leave(user);
+			socket.leave(`party-${party.id}`);
 			if (party.leader.id === user.id && party.players.length > 0) {
 				party.leader = party.players[0].user;
 				party.players.forEach((player) => player.isReady = false);
-				socket.emit('PartyUpdate', party);
-				socket.to(`Party-${party.id}`).emit('PartyUpdate', party);
+				socket.to(`party-${party.id}`).emit('PartyUpdate', party);
 			}
 			this.partyJoined.removeParty(user.id);
 		}
@@ -57,7 +58,7 @@ export class PartyService {
 			if (gameUser) {
 				gameUser.isReady = isReady;
 				socket.emit('PartyUpdate', party);
-				socket.to(`Party-${party.id}`).emit('PartyUpdate', party);
+				socket.to(`party-${party.id}`).emit('PartyUpdate', party);
 			}
 		}
 	}

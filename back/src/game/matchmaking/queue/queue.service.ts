@@ -11,9 +11,9 @@ export class QueueService {
 		private partyService: PartyService,
 		) {}
 		
-	private queue1v1 = new Array<Party>;
-	private queue2v2 = new Array<Party>;
-	private waitingList = new Array<Party>;
+	private queue1v1 = new Array<Party>();
+	private queue2v2 = new Array<Party>();
+	private waitingList = new Array<Party>();
 
 	join1v1Queue(user: User) {
 		let party = this.partyService.partyJoined.getParty(user.id);

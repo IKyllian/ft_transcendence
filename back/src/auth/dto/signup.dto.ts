@@ -1,15 +1,17 @@
 import {
+	IsAlphanumeric,
 	IsNotEmpty,
 	IsString,
-	Max,
-	Min,
+	MaxLength,
+	MinLength,
 } from 'class-validator'
 
 export class SignupDto {
 	@IsString()
 	@IsNotEmpty()
-	@Min(1)
-	@Max(15)
+	@MinLength(3)
+	@MaxLength(15)
+	@IsAlphanumeric()
 	username: string;
 
 	@IsString()

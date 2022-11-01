@@ -1,20 +1,23 @@
 import { UnauthorizedException, UseFilters, UseGuards, UsePipes, ValidationPipe } from "@nestjs/common";
 import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
-import { Socket } from "socket.io";
+import { Server, Socket } from "socket.io";
+import { JwtGameGuard } from "src/auth/guard/jwt-game.guard";
 import { WsJwtGuard } from "src/auth/guard/ws-jwt.guard";
 import { UserIdDto } from "src/chat/gateway/dto/user-id.dto";
 import { User } from "src/typeorm";
 import { GetUser } from "src/utils/decorators";
 import { GatewayExceptionFilter } from "src/utils/exceptions/filter/Gateway.filter";
+import { AuthenticatedSocket } from "src/utils/types/auth-socket";
 import { GameMode } from "src/utils/types/game.types";
 import { notificationType } from "src/utils/types/types";
-import { Server } from "typeorm";
 import { UserSessionManager } from "../user.session";
+import { IsReadyDto } from "./dto/boolean.dto";
+import { IdDto } from "./dto/id.dto";
 import { PartyService } from "./party/party.service";
 import { QueueService } from "./queue/queue.service";
 
-@UseFilters(GatewayExceptionFilter)
-@UsePipes(new ValidationPipe())
+// @UseFilters(GatewayExceptionFilter)
+// @UsePipes(new ValidationPipe())
 @WebSocketGateway()
 export class MatchmakingGateway {
 	@WebSocketServer() server: Server;
@@ -25,6 +28,13 @@ export class MatchmakingGateway {
 		private queueService: QueueService,
 	) {}
 
+
+	afterInit(server: Server)
+	{
+	  this.partyService.server = server;
+	}
+
+
 	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('PartyInvite')
 	async sendGameInvite(
@@ -32,10 +42,10 @@ export class MatchmakingGateway {
 		@ConnectedSocket() socket: Socket,
 		@MessageBody() dto: UserIdDto,
 	) {
-		let lobby = this.partyService.partyJoined.getParty(user.id);
-		if (!lobby) {
-			lobby = this.partyService.createParty(user);
-			socket.emit("LobbyCreated", lobby);
+		if (!this.partyService.partyJoined.getParty(user.id)) {
+			const party = this.partyService.createParty(user);
+			socket.emit("PartyCreated", party);
+			socket.join(`party-${party.id}`)
 		}
 
 		const notif: any = {
@@ -76,29 +86,31 @@ export class MatchmakingGateway {
 	// }
 
 	@UseGuards(WsJwtGuard)
-	@SubscribeMessage('CreateLobby')
+	@SubscribeMessage('CreateParty')
 	createLobby(
 		@GetUser() user: User,
 		@ConnectedSocket() socket: Socket,
 	) {
 		if (!this.partyService.partyJoined.getParty(user.id)) {
-			const lobby = this.partyService.createParty(user);
-			socket.emit("LobbyCreated", lobby);
+			const party = this.partyService.createParty(user);
+			socket.emit("PartyCreated", party);
+			socket.join(`party-${party.id}`)
 		}
 	}
 
 	@UseGuards(WsJwtGuard)
-	@SubscribeMessage('JoinLobby')
+	@SubscribeMessage('JoinParty')
 	joinLobby(
 		@GetUser() user: User,
 		@ConnectedSocket() socket: Socket,
-		@MessageBody() requester: any // TODO dto
+		@MessageBody() requester: IdDto
 	) {
+		//Todo: get confirmation that user is invited
 		this.partyService.joinParty(user, socket, requester.id);
 	}
 
 	@UseGuards(WsJwtGuard)
-	@SubscribeMessage('LeaveLobby')
+	@SubscribeMessage('LeaveParty')
 	leaveLobby(
 		@GetUser() user: User,
 		@ConnectedSocket() socket: Socket,
@@ -111,7 +123,7 @@ export class MatchmakingGateway {
 	setReadyState(
 		@GetUser() user: User,
 		@ConnectedSocket() socket: Socket,
-		@MessageBody() data: { isReady: boolean } //TODO dto
+		@MessageBody() data: IsReadyDto,
 	) {
 		this.partyService.setReadyState(user, socket, data.isReady);
 	}
@@ -122,8 +134,20 @@ export class MatchmakingGateway {
 		@GetUser() user: User,
 		@MessageBody() data: { gameMode: GameMode}
 	) {
-		if (data.gameMode === GameMode.OneVsOne) {
+		if (data.gameMode === GameMode.OneVsOne)
 			this.queueService.join1v1Queue(user);
+	}
+
+	@UseGuards(WsJwtGuard)
+	@SubscribeMessage('test')
+	test(@ConnectedSocket() socket: Socket, @GetUser() user: User) {
+		if (!this.partyService.partyJoined.getParty(user.id)) {
+			const party = this.partyService.createParty(user);
+			socket.emit("PartyCreated", party);
+			socket.join(`party-${party.id}`)
 		}
+		const party = this.partyService.partyJoined.getParty(user.id);
+		console.log(party)
+		party.gameSetting.ball_acceleration++;
 	}
 }
