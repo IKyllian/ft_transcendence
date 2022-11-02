@@ -19,12 +19,13 @@ export class QueueService {
 		let party = this.partyService.partyJoined.getParty(user.id);
 		if (!party)
 			party = this.partyService.createParty(user);
+		const gameUser = this.partyService.getGameUserInParty(user.id, party.players)
 		if (this.queue1v1.find((e) => e.id === party.id)) {
 			throw new BadRequestException("Already in queue");
 		} else if (party.players.length > 1) {
 			throw new BadRequestException("Too many players for this mod");
 		}
-		if (user.id !== party.leader.id) {
+		if (!gameUser.isLeader) {
 			throw new UnauthorizedException("You are not the leader of this party");
 		} else {
 			party.players[0].isReady = true;
@@ -45,13 +46,14 @@ export class QueueService {
 		let party = this.partyService.partyJoined.getParty(user.id);
 		if (!party)
 			party = this.partyService.createParty(user);
+		const gameUser = this.partyService.getGameUserInParty(user.id, party.players)
 		//check if ready
 		if (this.queue2v2.find((e) => e.id === party.id)) {
 			throw new BadRequestException("Already in queue");
 		} else if (party.players.length > 2) {
 			throw new BadRequestException("Too many players for this mod");
 		}
-		if (user.id !== party.leader.id) {
+		if (!gameUser.isLeader) {
 			throw new UnauthorizedException("You are not the leader of this party");
 		} else {
 			party.players[0].isReady = true;

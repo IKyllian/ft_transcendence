@@ -29,6 +29,7 @@ import { ChangeRoleDto } from './dto/change-role.dto';
 import { OnTypingChannelDto } from './dto/on-typing-chan.dto';
 import { OnTypingPrivateDto } from './dto/on-typing-priv.dto';
 import { GatewayExceptionFilter } from 'src/utils/exceptions/filter/Gateway.filter';
+import { PartyService } from 'src/game/matchmaking/party/party.service';
 
 @UseFilters(GatewayExceptionFilter)
 @UsePipes(new ValidationPipe())
@@ -51,6 +52,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		private friendshipService: FriendshipService,
 		private notificationService: NotificationService,
 		private convService: ConversationService,
+		private partyService: PartyService,
 		) {}
 
 	// afterInit(serverr: Server) {
@@ -85,7 +87,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		if (user.status === 'offline') {
 			this.userService.setStatus(user, 'online');
 		}
-		this.session.setUserSocket(socket.id, { user, socket });
+		// this.session.setUserSocket(socket.id, { user, socket });
+		socket.emit('Connection', {
+			friendList: await this.friendshipService.getFriendlist(user),
+			notification: await this.notificationService.getNotification(user),
+			party: this.partyService.partyJoined.getParty(user.id),
+		});
 	}
 
 	async handleDisconnect(socket: Socket) {
@@ -93,7 +100,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		if (socket.handshake.headers.authorization) {
 			const payload = this.authService.decodeJwt(socket.handshake.headers.authorization.split(' ')[1]) as JwtPayload;
 			// get usersocket instance instead of call db ?
-			this.session.removeUserSocket(socket.id);
+			// this.session.removeUserSocket(socket.id);
 			const user = await this.userService.findOneBy({ id: payload?.sub });
 			if (user) {
 				this.userService.setStatus(user, 'offline');

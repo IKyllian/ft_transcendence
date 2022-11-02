@@ -9,10 +9,11 @@ import { GameUser } from "../../game-user";
 export class Party {
 
 	// ownerId: number;
-	constructor(public leader: User)
+	constructor(leader: User)
 	{
 		this.id = generate();
 		this.players.push(new GameUser(leader));
+		this.players[0].isLeader = true;
 	}
 
 	id: string;

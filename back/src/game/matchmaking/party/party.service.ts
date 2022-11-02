@@ -18,6 +18,12 @@ export class PartyService {
 		return gameUser.find((e) => e.user.id === id);
 	}
 
+	emitUpdateParty(party: Party) {
+		party.players.forEach((player) => {
+			this.server.to(`user-${player.user.id}`).emit('PartyUpdate', party);
+		})
+	}
+
 	createParty(user: User) {
 		delete user.blocked;
 		delete user.channelUser;
@@ -25,29 +31,36 @@ export class PartyService {
 		return this.partyJoined.getParty(user.id);
 	}
 
-	joinParty(user: User, socket: Socket, requesterId: number) {
+	joinParty(user: User, requesterId: number) {
 		delete user.blocked;
 		delete user.channelUser;
-		this.leaveParty(user, socket);
+		this.leaveParty(user);
 		const party = this.partyJoined.getParty(requesterId);
 		if (!party) { throw new NotFoundException('party not found'); }
 		party.join(user);
 		this.partyJoined.setParty(user.id, party);
-		socket.join(`party-${party.id}`);
-		this.server.to(`party-${party.id}`).emit('PartyUpdate', party);
+		this.emitUpdateParty(party);
 	}
 
-	leaveParty(user: User, socket: Socket) {
+	leaveParty(user: User) {
 		const party = this.partyJoined.getParty(user.id);
 		if (party) {
-			party.leave(user);
-			socket.leave(`party-${party.id}`);
-			if (party.leader.id === user.id && party.players.length > 0) {
-				party.leader = party.players[0].user;
+			const gameUser = this.getGameUserInParty(user.id, party.players);
+			if (gameUser && gameUser.isLeader && party.players.length > 1) {
+				party.players[1].isLeader = true;
 				party.players.forEach((player) => player.isReady = false);
-				socket.to(`party-${party.id}`).emit('PartyUpdate', party);
 			}
+			party.leave(user);
 			this.partyJoined.removeParty(user.id);
+			this.emitUpdateParty(party);
+			this.server.to(`user-${user.id}`).emit('PartyLeave');
+		}
+	}
+
+	kickFromParty(user: User, id: number) {
+		const party = this.partyJoined.getParty(user.id);
+		if (party && this.getGameUserInParty(user.id, party.players).isLeader) {
+			this.leaveParty(this.getGameUserInParty(id, party.players).user);
 		}
 	}
 

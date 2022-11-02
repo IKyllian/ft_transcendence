@@ -42,6 +42,7 @@ export class MatchmakingGateway {
 		@ConnectedSocket() socket: Socket,
 		@MessageBody() dto: UserIdDto,
 	) {
+		console.log(" party invite")
 		if (!this.partyService.partyJoined.getParty(user.id)) {
 			const party = this.partyService.createParty(user);
 			socket.emit("PartyCreated", party);
@@ -93,7 +94,7 @@ export class MatchmakingGateway {
 	) {
 		if (!this.partyService.partyJoined.getParty(user.id)) {
 			const party = this.partyService.createParty(user);
-			socket.emit("PartyCreated", party);
+			socket.emit("PartyUpdate", party);
 			socket.join(`party-${party.id}`)
 		}
 	}
@@ -102,20 +103,27 @@ export class MatchmakingGateway {
 	@SubscribeMessage('JoinParty')
 	joinLobby(
 		@GetUser() user: User,
-		@ConnectedSocket() socket: Socket,
-		@MessageBody() requester: IdDto
+		@MessageBody() requester: UserIdDto,
 	) {
 		//Todo: get confirmation that user is invited
-		this.partyService.joinParty(user, socket, requester.id);
+		this.partyService.joinParty(user, requester.id);
 	}
 
 	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('LeaveParty')
 	leaveLobby(
 		@GetUser() user: User,
-		@ConnectedSocket() socket: Socket,
 	) {
-		this.partyService.leaveParty(user, socket);
+		this.partyService.leaveParty(user);
+	}
+
+	@UseGuards(WsJwtGuard)
+	@SubscribeMessage('KickParty')
+	kickFromLobby(
+		@GetUser() user: User,
+		@MessageBody() data: UserIdDto,
+	) {
+		this.partyService.kickFromParty(user, data.id);
 	}
 
 	@UseGuards(WsJwtGuard)
@@ -125,6 +133,7 @@ export class MatchmakingGateway {
 		@ConnectedSocket() socket: Socket,
 		@MessageBody() data: IsReadyDto,
 	) {
+		console.log('set Ready', data)
 		this.partyService.setReadyState(user, socket, data.isReady);
 	}
 
