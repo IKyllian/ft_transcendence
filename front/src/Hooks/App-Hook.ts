@@ -10,6 +10,9 @@ import { addChannel, addPrivateConv, removeChannel, } from "../Redux/ChatSlice";
 import { Channel, Conversation } from "../Types/Chat-Types";
 import { UserInterface } from "../Types/User-Types";
 import { copyFriendListArray } from "../Redux/AuthSlice";
+import { PartyInterface } from "../Types/Lobby-Types";
+import { copyNotificationArray } from "../Redux/NotificationSlice";
+import { addParty, leaveParty } from "../Redux/PartySlice";
 
 export function useAppHook() {
     const [socket, setSocket] = useState<Socket | undefined>(undefined);
@@ -41,6 +44,7 @@ export function useAppHook() {
 			connectSocket();
 			fetchNotifications(token, dispatch);
 			fetchFriendList(token, dispatch);
+
 			// setTimeout(function() {
 			// 	setGameInvite(true);
 			// 	setTimeout(function() {
@@ -53,15 +57,33 @@ export function useAppHook() {
 	useEffect(() => {
 		if (socket !== undefined) {
 			console.log("SOCKET CONDITION");
+			
+			socket.on("Connection", (data: {friendList: UserInterface[], notification: NotificationInterface[], party: PartyInterface}) => {
+				console.log("data connection", data);
+				dispatch(copyNotificationArray(data.notification));
+				dispatch(copyFriendListArray(data.friendList));
+				if (data.party)
+					dispatch(addParty(data.party));
+			});
+
+			socket.on("PartyUpdate", (data: PartyInterface) => {
+				console.log("PartyUpdate", data);
+				dispatch(addParty(data));
+			});
+
+			socket.on("PartyLeave", () => {
+				dispatch(leaveParty());
+			});
+
 			socket.on("NewNotification", (data: NotificationInterface) => {
 				console.log("NewNotification", data);
 				dispatch(addNotification(data));
 			});
 
-			socket.on("NewGameInvite", (data: NotificationInterface) => {
-				console.log("NewGameInvite", data);
+			socket.on("NewPartyInvite", (data: NotificationInterface) => {
+				console.log("NewPartyInvite", data);
 				setGameInvite(data);
-			})
+			});
 
 			socket.on("DeleteNotification", (data: number) => {
 				dispatch(deleteNotification(data));
@@ -75,7 +97,7 @@ export function useAppHook() {
 			socket.on("FriendListUpdate", (data: UserInterface[]) => {
 				console.log("FriendListUpdate", data);
 				dispatch(copyFriendListArray(data));
-			})
+			});
 
 			socket.on("NewConversation", (data : {conv: Conversation, socketId: string}) => {
 				console.log("NewConversation", data);
@@ -103,9 +125,12 @@ export function useAppHook() {
 		}
 
 		return () => {
+			socket?.off("Connection");
 			socket?.off("NewNotification");
 			socket?.off("NewConversation");
-			socket?.off("NewGameInvite");
+			socket?.off("PartyUpdate");
+			socket?.off("PartyLeave");
+			socket?.off("NewPartyInvite");
 			socket?.off("FriendListUpdate");
 			socket?.off("DeleteNotification");
 			socket?.off("exception");

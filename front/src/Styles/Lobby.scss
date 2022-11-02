@@ -1,10 +1,194 @@
 @use "./Variables.scss" as *;
 
+$GreyLobby: rgb(163, 158, 158);
+
+#root {
+    $paddleHeight: 150px;
+}
+
 .lobby-container {
     background-color: $LightDarkPalette;
     @include page-wrapper();
 
-    button {
-        color: black;
-    }
+    .lobby-wrapper {
+        height: 100%;
+        padding: 10px 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        .lobby-player-list {
+            @include flex-row-alignCenter();
+            justify-content: center;
+            gap: 10px;
+            list-style-type: none;
+            .empty-item {
+                justify-content: center;
+
+                svg {
+                    @include width-height(30px, 30px);
+                    cursor: pointer;
+                }
+            }
+
+            li {
+                @include width-height(200px, 200px);
+                padding: 30px 10px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                background-color: #131d30;
+                border-radius: 15px;
+                position: relative;
+    
+                .lobby-invited {
+                    opacity: 0.5;
+                }
+    
+                .player-avatar {
+                    @include avatar-player(80px);
+                }
+    
+                p {
+                    margin: 10px 0;
+                    font-size: 15px;
+                    font-weight: bold;
+                }
+    
+                span {
+                    @include flex-row-alignCenter();
+                    gap: 5px;
+                    font-size: 12px;
+                    color: $GreyLobby;
+                    svg {
+                        @include width-height(12px, 12px);
+                        border: 1px solid $GreyLobby;
+                        border-radius: 50%;
+                    }
+                }
+            }
+        }
+
+        .lobby-settings {
+            @include flex-row-alignCenter();
+            gap: 20px;
+            .setting-wrapper {
+                background-color: $DarkPalette;
+                border-radius: 10px;
+            }
+
+            .game-settings {
+                @include width-height(350px, 350px);
+                padding: 10px;
+    
+                p {
+                    text-align: center;
+                    margin: 10px 0;
+                }
+    
+                form {
+                    height: 85%;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: space-between;
+                    gap: 10px;
+                    label {
+                        @include flex-row-alignCenter();
+                        justify-content: space-between;
+                    }
+
+                    .setting-submit {
+                        all: unset;
+                        cursor: pointer;
+                        margin: 0 auto;
+                        border: 1px solid white;
+                        padding: 8px;
+                        border-radius: 7px;
+                    }
+                }
+            }
+
+            .board-game-wrapper {
+                @include width-height(500px, 350px);
+                padding: 0 10px;
+
+                .game-board {
+                    height: 100%;
+                    display: flex;
+                    flex-direction: row;
+                    justify-content: space-between;
+                    align-items: center;
+                    overflow: hidden;
+
+                    .paddle {
+                        height: var(--paddleHeight);
+                        width: 2px;
+                        background-color: red;
+                    }
+
+                    .ball {
+                        @include width-height(20px, 20px);
+                        border-radius: 50px;
+                        background-color: aqua;
+                    }
+                }
+               
+            }
+        }
+
+        .lobby-buttons-wrapper {
+            @include flex-row-alignCenter();
+            gap: 10px;
+            justify-content: center;
+
+            .bos {
+                border-top-left-radius: 0;
+                border-top-right-radius: 0;
+            }
+
+            .game-modes-button {
+                @include flex-row-alignCenter();
+                justify-content: center;
+                .chevron-icon {
+                    position: absolute;
+                    right: 10px;
+                }
+                .game-modes-dropdown {
+                    position: absolute;
+                    width: 100%;
+                    border-top-left-radius: 10px;
+                    border-top-right-radius: 10px;
+                    background-color: $DarkPalette;
+                    top: -94px;
+
+                    ul {
+                        list-style-type: none;
+                        padding: 0;
+                        margin: 0;
+                        li {
+                            &:first-child {
+                                border-top-left-radius: 10px;
+                                border-top-right-radius: 10px;
+                            }
+                            padding: 6px;
+                            &:hover {
+                                background-color: #102031;
+                            }
+                        }
+                    }
+                }
+            }
+
+            button {
+                all: unset;
+                cursor: pointer;
+                text-align: center;
+                border-radius: 10px;
+                background-color: $DarkPalette;
+                width: 250px;
+                height: 40px;
+                position: relative;
+            }
+        }   
+    }    
 }

@@ -8,6 +8,7 @@ import { friendsDatas } from "../Types/Datas-Examples";
 import { fetchSearchUsersToAdd } from "../Api/User-Fetch";
 import { useAppSelector } from "../Redux/Hooks";
 import Avatar from "../Images-Icons/pp.jpg";
+import { SearchBarFunctionality } from "../Types/Utils-Types";
 
 function AddFriendModal() {
     const [showFriendList, setShowFriendList] = useState<boolean>(true);
@@ -43,7 +44,7 @@ function AddFriendModal() {
                                 )
                             }
                         </div> :
-                        <SearchBarPlayers functionality="addFriend" fetchUserFunction={fetchSearchUsersToAdd} />
+                        <SearchBarPlayers functionality={SearchBarFunctionality.ADD_FRIEND} fetchUserFunction={fetchSearchUsersToAdd} />
                     }
                 </div>
             </div>

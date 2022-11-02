@@ -6,8 +6,8 @@ import ProfilPic from "../../Images-Icons/pp.jpg"
 import { Link, useLocation } from 'react-router-dom';
 import { useAppSelector } from '../../Redux/Hooks';
 import DropdownNotification from './Dropdown-Notification';
-
 import ResponsiveMenu from './Responsive-Menu';
+import PartyButton from './Party-Button';
 
 function NotifIcon(props: {handleNotifDropdownClick: Function}) {
     const {handleNotifDropdownClick} = props;
@@ -56,6 +56,7 @@ function Header() {
             </Link>
             <div className='header-right'>
                 <div className='icons-header'>
+                    <PartyButton />
                     <NotifIcon handleNotifDropdownClick={handleNotifDropdownClick} />
                     <IconUserPlus onClick={() => modalStatus.setStatus()} />
                     <Link to="/chat" aria-label="Link to the chat">

@@ -33,8 +33,77 @@
             align-items: center;
             gap: 10px;
 
-            svg {
+            .crown-svg {
                 @include width-height(25px, 25px);
+            }
+
+            .header-party-container {
+                .header-party-wrapper {
+                    padding: 4px;
+                    background-color: $HeaderPartyBackground;
+                    @include flex-row-alignCenter();
+                    gap: 8px;
+                    border-radius: 99999px;
+                    .fill-item {
+                        @include width-height(30px, 30px);
+                        position: relative;
+                        svg {
+                            position: absolute;
+                            top: -13px;
+                            left: 5.5px;
+                            @include width-height(18px, 18px);
+                            color: gold;
+                        }
+                        .player-avatar {
+                            @include avatar-player(30px);
+                        }
+                    }
+
+                    .party-item {
+                        @include width-height(30px, 30px);
+                        cursor: pointer;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        background-color: $HeaderPartyGrey;
+                        border-radius: 50%;
+
+                        &:hover {
+                            background-color: $HeaderPartyGreyHover;
+                        }
+
+                        svg {
+                            @include width-height(20px, 20px);
+                        }
+                    }
+
+                    .party-separtor {
+                        @include width-height(1px, 25px);
+                        background-color: $HeaderPartyGrey;
+                    }
+                    
+                }
+            }
+            
+
+            .party-button {
+                all: unset;
+                cursor: pointer;
+                @include flex-row-alignCenter();
+                gap: 3px;
+                font-size: 11px;
+                background-color: $HeaderPartyGrey;
+                padding: 6px;
+                border-radius: 3px;
+                font-weight: bold;
+                text-transform: uppercase;
+
+                svg {
+                    @include width-height(20px, 20px);
+                    padding: 2px;
+                    border: 1.5px solid white;
+                    border-radius: 50%;
+                } 
             }
         }
 

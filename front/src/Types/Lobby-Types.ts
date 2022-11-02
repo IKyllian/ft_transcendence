@@ -1,0 +1,52 @@
+import { BlockLike } from "typescript";
+import { UserInterface } from "./User-Types";
+
+export enum GameMode {
+	RANKED = 'Ranked',
+	PRIVATE_MATCH = 'Private Match',
+	BONUS_2v2 = '2v2',
+};
+
+export enum PlayerType {
+    Player_A_Back,
+    Player_A_Front,
+    Player_B_Front,
+    Player_B_Back,
+    Spectator
+}
+
+export enum GameType {
+	Singles,
+	Doubles,
+}
+
+export type GameSettings =
+{
+    game_type: GameType,
+    up_down_border: number,
+    player_back_advance: number,
+    player_front_advance: number,
+    paddle_size_h: number,
+    paddle_speed: number,
+    ball_start_speed: number,
+    ball_acceleration: number,
+    point_for_victory: number
+}
+
+export interface GameModeState {
+    gameModes: GameMode[],
+    indexSelected: number,
+}
+
+export interface GameUser {
+	user: UserInterface,
+	isReady: boolean,
+	pos?: PlayerType,
+    isLeader: boolean,
+}
+
+export interface PartyInterface {
+	id: string,
+	players: GameUser[],
+	gameSetting: GameSettings,
+}
