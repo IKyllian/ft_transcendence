@@ -34,7 +34,7 @@ export enum channelOption {
 export enum notificationType {
 	FRIEND_REQUEST = 'friend_request',
 	CHANNEL_INVITE = 'channel_invite',
-	GAME_INVITE = 'game_invite'
+	PARTY_INVITE = 'party_invite'
 };
 
 export enum ResponseType {

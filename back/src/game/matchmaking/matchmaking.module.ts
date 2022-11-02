@@ -6,12 +6,14 @@ import { QueueService } from "./queue/queue.service";
 import { MatchmakingGateway } from "./matchmaking.gateway";
 import { GameModule } from "../game.module";
 import { AuthModule } from "src/auth/auth.module";
+import { NotificationModule } from "src/notification/notification.module";
 
 @Module({
 	imports: [
 		forwardRef(() => AuthModule),
 		UserModule,
 		GameModule,
+		NotificationModule,
 	],
 	providers: [
 		PartyService,

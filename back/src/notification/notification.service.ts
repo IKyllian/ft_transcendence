@@ -59,6 +59,27 @@ export class NotificationService {
 		return this.notifRepo.save(notif);
 	}
 
+	async createPartyInviteNotif(user: User, addresseeId: number) {
+		const addressee = await this.userService.findOneBy({ id: addresseeId });
+		if (!addressee)
+			throw new NotFoundException('User not found');
+		const inviteAlreadySent = await this.notifRepo.findOne({
+			where: {
+				addressee: { id: addressee.id },
+				requester: { id: user.id },
+				type: notificationType.PARTY_INVITE,
+			}
+		});
+		if (inviteAlreadySent)
+			throw new BadRequestException('Invite already sent');
+		const notif = this.notifRepo.create({
+			addressee,
+			requester: user,
+			type: notificationType.PARTY_INVITE,
+		});
+		return this.notifRepo.save(notif);
+	}
+
 	findOne(options: FindOneOptions<Notification>): Promise<Notification | null> {
 		return this.notifRepo.findOne(options);
 	}
@@ -86,5 +107,11 @@ export class NotificationService {
 
 	delete(id: number) {
 		return this.notifRepo.delete(id);
+	}
+
+	deletePartyInvite(id: number) {
+		setTimeout(() => {
+			this.notifRepo.delete(id);
+		}, 21000, id)
 	}
 }
