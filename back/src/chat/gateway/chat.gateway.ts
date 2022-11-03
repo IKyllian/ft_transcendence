@@ -123,6 +123,17 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		const chanInfo = await this.channelService.getChannelById(socket.user.id, room.id);
 		socket.emit('roomData', chanInfo);
 		socket.join(`channel-${ chanInfo.id }`);
+		const notif = await this.notificationService.findOne({
+			where: {
+				addressee: { id: socket.user.id },
+				channel: { id: chanInfo.id },
+				type: notificationType.CHANNEL_MESSAGE,
+			}
+		});
+		if (notif) {
+			await this.notificationService.delete(notif.id);
+			this.server.to(`user-${socket.user.id}`).emit('DeleteNotification', notif.id);
+		}
 	}
 
 	@UseGuards(WsJwtGuard)
@@ -140,8 +151,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		@ConnectedSocket() socket: AuthenticatedSocket,
 		@MessageBody() data: ChannelMessageDto,
 		) {
+			//TODO inchannelGuard
 			const message = await this.channelMsgService.create(socket.user.id, data);
 			this.server.to(`channel-${ data.chanId }`).emit('NewChannelMessage', message);
+			this.notificationService.sendMessageNotif(socket, data.chanId);
 	}
 
 	@UseGuards(WsJwtGuard)

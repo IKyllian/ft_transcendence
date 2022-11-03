@@ -7,6 +7,7 @@ import { ChannelService } from 'src/chat/channel/channel.service';
 import { notificationType } from 'src/utils/types/types';
 import { FindOneOptions, Repository } from 'typeorm';
 import { ChannelNotFoundException } from 'src/utils/exceptions';
+import { AuthenticatedSocket } from 'src/utils/types/auth-socket';
 
 @Injectable()
 export class NotificationService {
@@ -103,6 +104,32 @@ export class NotificationService {
 				id,
 			}
 		});
+	}
+
+	async sendMessageNotif(socket: AuthenticatedSocket, chanId: number) {
+		const socketsInRoom = await socket.in(`channel-${chanId}`).fetchSockets() as unknown as AuthenticatedSocket[];
+		const usersInRoomId: number[] = socketsInRoom.map(socket => socket.user.id);
+		const usersToSendNotif = await this.channelService.getUsersInChannelExecptInArgs(chanId, usersInRoomId);
+
+		usersToSendNotif.forEach(async user => {
+			const notifExist = await this.notifRepo.findOne({
+				where: {
+					channel: { id: chanId },
+					addressee: { id: user.id },
+					type: notificationType.CHANNEL_MESSAGE
+				}
+			});
+			if (!notifExist) {
+				const notif = this.notifRepo.create({
+					channel: { id: chanId },
+					addressee: { id: user.id },
+					type: notificationType.CHANNEL_MESSAGE
+				});
+				const notifToSend = await this.notifRepo.save(notif);
+				console.log(notifToSend);
+				socket.to(`user-${user.id}`).emit('NewNotification', notifToSend);
+			}
+		})
 	}
 
 	delete(id: number) {

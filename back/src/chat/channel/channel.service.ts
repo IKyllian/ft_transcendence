@@ -329,6 +329,22 @@ export class ChannelService {
 		}
 	}
 
+	getUsersInChannelExecptInArgs(chanId: number, usersId: number[]) {
+		const query = this.userRepo
+		.createQueryBuilder("user")
+		.select("user.id")
+		.innerJoin("user.channelUser", "channelUser", "channelUser.channel.id = :chanId",
+		{ chanId })
+
+		if (usersId.length > 0) {
+			return query
+				.where("user.id NOT IN (:...usersId)", { usersId: usersId })
+				.getMany();
+		} else {
+			return query.getMany();
+		}
+	}
+
 	async getUsersToInvite(dto: SearchToInviteInChanDto) {
 		const usersJoined = this.userRepo
 		.createQueryBuilder("user")

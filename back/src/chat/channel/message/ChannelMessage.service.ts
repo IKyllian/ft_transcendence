@@ -21,6 +21,7 @@ export class ChannelMessageService {
 		if (!chanUser) {
 			throw new NotInChannelException();
 		}
+		//TODO just use chanId ?
 		const channel = await this.channelService.findOneBy({ id: messageDto.chanId });
 		if (!channel)
 			throw new ChannelNotFoundException();

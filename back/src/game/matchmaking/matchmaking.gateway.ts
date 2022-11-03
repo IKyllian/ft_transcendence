@@ -106,11 +106,10 @@ export class MatchmakingGateway {
 	@SubscribeMessage('SetReadyState')
 	setReadyState(
 		@GetUser() user: User,
-		@ConnectedSocket() socket: Socket,
 		@MessageBody() data: IsReadyDto,
 	) {
 		console.log('set Ready', data)
-		this.partyService.setReadyState(user, socket, data.isReady);
+		this.partyService.setReadyState(user, data.isReady);
 	}
 
 	@UseGuards(WsJwtGuard)
@@ -129,13 +128,20 @@ export class MatchmakingGateway {
 		console.log(socket.id)
 	}
 
-	// @UseGuards(WsJwtGuard)
+	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('test')
 	async test(@ConnectedSocket() socket: AuthenticatedSocket, @GetUser() user: User) {
-		console.log(socket)
+		// console.log(socket)
 		const socketConnected = await this.server.sockets.allSockets();
 		const mySocket: Map<string, AuthenticatedSocket> = this.server.sockets.sockets as Map<string, AuthenticatedSocket>;
-		console.log(mySocket.get(socket.id).user)
+		// console.log(mySocket)
+		// const sockets = await socket.in("user-8").fetchSockets() as unknown as AuthenticatedSocket[];
+		const userIdInRoom = (await socket.in("user-8").fetchSockets() as unknown as AuthenticatedSocket[]).map(e => e.user.id)
+		// const userIdInChan = sockets.map(e => e.user.id)
+		console.log(userIdInRoom)
+		// mySocket.forEach((e) => {
+		// 	console.log(e.user)
+		// })
 		// if (!this.partyService.partyJoined.getParty(user.id)) {
 		// 	const party = this.partyService.createParty(user);
 		// 	socket.emit("PartyCreated", party);

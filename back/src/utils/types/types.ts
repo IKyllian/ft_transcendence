@@ -1,3 +1,5 @@
+import { MESSAGES } from "@nestjs/core/constants";
+
 export type JwtPayload = {
 	sub: number,
 	username: string,
@@ -34,7 +36,8 @@ export enum channelOption {
 export enum notificationType {
 	FRIEND_REQUEST = 'friend_request',
 	CHANNEL_INVITE = 'channel_invite',
-	PARTY_INVITE = 'party_invite'
+	PARTY_INVITE = 'party_invite',
+	CHANNEL_MESSAGE = 'channel_message',
 };
 
 export enum ResponseType {

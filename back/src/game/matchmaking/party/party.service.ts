@@ -64,7 +64,7 @@ export class PartyService {
 		}
 	}
 
-	setReadyState(user: User, socket: Socket, isReady: boolean) {
+	setReadyState(user: User, isReady: boolean) {
 		let party = this.partyJoined.getParty(user.id);
 		if (party) {
 			const gameUser = this.getGameUserInParty(user.id, party.players);
