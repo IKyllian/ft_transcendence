@@ -67,16 +67,6 @@ export class ChannelController {
 		return this.channelService.leave(user, id);
 	}
 
-	//test
-	@Get(':id')
-	@UseGuards(JwtGuard)
-	async getChannel(
-		@Param('id', ParseIntPipe) id: number,
-		@GetUser() user: User,
-		) {
-			return await this.channelService.getChannelById(user, id);
-	}
-
 	@Delete(':id')
 	async deleteChannel(
 		@Param('id') id: number,

@@ -70,8 +70,7 @@ export class PartyService {
 			const gameUser = this.getGameUserInParty(user.id, party.players);
 			if (gameUser) {
 				gameUser.isReady = isReady;
-				socket.emit('PartyUpdate', party);
-				socket.to(`party-${party.id}`).emit('PartyUpdate', party);
+				this.emitUpdateParty(party);
 			}
 		}
 	}

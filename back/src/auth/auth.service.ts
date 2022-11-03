@@ -149,8 +149,10 @@ export class AuthService {
 	}
 
 	verifyToken(token: string, options?: JwtVerifyOptions) {
-		options.secret = this.config.get('ACCESS_SECRET')
-		return this.jwt.verify(token, options);
+		// if (!options)
+		// 	options: JwtVerifyOptions;
+		// options.secret = this.config.get('ACCESS_SECRET')
+		return this.jwt.verify(token, { secret: this.config.get('ACCESS_SECRET') });
 	}
 
 	async verify(token: string) {
@@ -159,11 +161,11 @@ export class AuthService {
 				secret: this.config.get('ACCESS_SECRET')
 			});
 			return await this.userService.findOne({
-				relations: {
-					statistic: true,
-					channelUser: true,
-					blocked: true,
-				},
+				// relations: {
+				// 	statistic: true,
+				// 	channelUser: true,
+				// 	blocked: true,
+				// },
 				where: {
 					id: decoded.sub,
 				}
