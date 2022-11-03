@@ -7,6 +7,8 @@ import { ConfigModule } from '@nestjs/config';
 import { UserModule } from './user/user.module';
 import { ChatModule } from './chat/chat.module';
 import { NotificationModule } from './notification/notification.module';
+import { GameModule } from './game/game.module';
+import { MatchmakingModule } from './game/matchmaking/matchmaking.module';
 import entities from './typeorm';
 
 @Module({
@@ -14,6 +16,8 @@ import entities from './typeorm';
     AuthModule,
     UserModule,
     ChatModule,
+	  GameModule,
+    MatchmakingModule,
     ConfigModule.forRoot({ envFilePath: '.env', isGlobal: true }),
     NotificationModule,
     TypeOrmModule.forRoot({

@@ -1,13 +1,14 @@
 import { ForbiddenException, Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { AuthDto } from "./dto/auth.dto";
 import * as argon from 'argon2';
-import { JwtService } from "@nestjs/jwt";
+import { JwtService, JwtVerifyOptions } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
 import { HttpService } from "@nestjs/axios";
 import { lastValueFrom } from "rxjs";
 import { UserService } from "src/user/user.service";
 import { Auth42Dto } from "./dto/auth42.dto";
 import { User } from "src/typeorm";
+import { SignupDto } from "./dto/signup.dto";
 
 @Injectable()
 export class AuthService {
@@ -19,7 +20,7 @@ export class AuthService {
 		private readonly httpService: HttpService,
 	) {}
 
-	async signup(dto: AuthDto) {
+	async signup(dto: SignupDto) {
 		if (await this.userService.nameTaken(dto.username))
 			throw new ForbiddenException('Username taken');
 		const hash = await argon.hash(dto.password);
@@ -145,6 +146,11 @@ export class AuthService {
 		const tokens = await this.signTokens(user.id, user.username);
 		this.updateRefreshHash(user, tokens.refresh_token);
 		return tokens;
+	}
+
+	verifyToken(token: string, options?: JwtVerifyOptions) {
+		options.secret = this.config.get('ACCESS_SECRET')
+		return this.jwt.verify(token, options);
 	}
 
 	async verify(token: string) {

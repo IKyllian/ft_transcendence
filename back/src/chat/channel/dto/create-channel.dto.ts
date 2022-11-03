@@ -1,10 +1,12 @@
-import { IsString, IsNotEmpty, IsOptional } from "class-validator";
+import { IsString, IsNotEmpty, IsOptional, MinLength, MaxLength } from "class-validator";
 import { channelOption } from "src/utils/types/types";
 
 export class CreateChannelDto {
 
 	@IsString()
 	@IsNotEmpty()
+	@MinLength(2)
+	@MaxLength(20)
 	name: string;
 
 	option: channelOption;
@@ -12,5 +14,7 @@ export class CreateChannelDto {
 	@IsString()
 	@IsOptional()
 	@IsNotEmpty()
+	@MinLength(3)
+	@MaxLength(50)
 	password?: string;
 }

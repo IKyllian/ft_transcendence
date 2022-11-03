@@ -3,6 +3,11 @@ export type JwtPayload = {
 	username: string,
 };
 
+export type UserPayload = {
+	id: number,
+	username: string,
+};
+
 export type FindUserParams = Partial<{
 	id: number;
 	id42: number;
@@ -28,7 +33,8 @@ export enum channelOption {
 
 export enum notificationType {
 	FRIEND_REQUEST = 'friend_request',
-	CHANNEL_INVITE = 'channel_invite'
+	CHANNEL_INVITE = 'channel_invite',
+	PARTY_INVITE = 'party_invite'
 };
 
 export enum ResponseType {

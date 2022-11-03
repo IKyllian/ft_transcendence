@@ -3,7 +3,7 @@ import { WebSocketGateway, MessageBody, WebSocketServer, ConnectedSocket, OnGate
 import { Server, Socket } from 'socket.io';
 import { AuthService } from 'src/auth/auth.service';
 import { WsJwtGuard } from 'src/auth/guard/ws-jwt.guard';
-import { ChannelMessage, ChannelUser, User } from 'src/typeorm';
+import { ChannelMessage, ChannelUser, Notification, User } from 'src/typeorm';
 import { ChannelService } from '../channel/channel.service';
 import { ChatSessionManager } from './chat.session';
 import { UserService } from 'src/user/user.service';
@@ -28,26 +28,15 @@ import { MuteUserDto } from '../channel/dto/mute-user.dto';
 import { ChangeRoleDto } from './dto/change-role.dto';
 import { OnTypingChannelDto } from './dto/on-typing-chan.dto';
 import { OnTypingPrivateDto } from './dto/on-typing-priv.dto';
-import { domainToASCII } from 'url';
-
-@Catch()
-class GatewayExceptionFilter extends BaseWsExceptionFilter {
-	catch(exception: any, host: ArgumentsHost) {
-		if (exception instanceof WsException)
-				super.catch(exception, host);
-		else {
-			const properException = new WsException(exception.getResponse());
-			super.catch(properException, host);
-		}
-	}
-}
+import { GatewayExceptionFilter } from 'src/utils/exceptions/filter/Gateway.filter';
+import { PartyService } from 'src/game/matchmaking/party/party.service';
 
 @UseFilters(GatewayExceptionFilter)
 @UsePipes(new ValidationPipe())
 @WebSocketGateway({
 	cors: {
 		credential: true,
-	}
+	},
 })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
@@ -63,15 +52,25 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		private friendshipService: FriendshipService,
 		private notificationService: NotificationService,
 		private convService: ConversationService,
+		private partyService: PartyService,
 		) {}
 
 	// afterInit(serverr: Server) {
 	// 		// console.log(this.server)
 	// }
 
+	//test
+	@SubscribeMessage('hello') 
+	hello(@ConnectedSocket() socket: Socket) {
+		console.log('test')
+		// socket.emit('hello', 'hello');
+		this.server.emit('hello', "cccc")
+	}
+
 	async handleConnection(socket: Socket) {
 		let user: User = null;
 		if (socket.handshake.headers.authorization) {
+			// console.log(socket.handshake.headers)
 			const token = socket.handshake.headers.authorization.split(' ')[1];
 			user = await this.authService.verify(token);
 		}
@@ -88,21 +87,27 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		if (user.status === 'offline') {
 			this.userService.setStatus(user, 'online');
 		}
-		this.session.setUserSocket(socket.id, { user, socket });
+		// this.session.setUserSocket(socket.id, { user, socket });
+		socket.emit('Connection', {
+			friendList: await this.friendshipService.getFriendlist(user),
+			notification: await this.notificationService.getNotification(user),
+			party: this.partyService.partyJoined.getParty(user.id),
+		});
 	}
 
 	async handleDisconnect(socket: Socket) {
+		console.log('disco')
 		if (socket.handshake.headers.authorization) {
 			const payload = this.authService.decodeJwt(socket.handshake.headers.authorization.split(' ')[1]) as JwtPayload;
 			// get usersocket instance instead of call db ?
-			this.session.removeUserSocket(socket.id);
-			const user = await this.userService.findOneBy({ id: payload.sub });
+			// this.session.removeUserSocket(socket.id);
+			const user = await this.userService.findOneBy({ id: payload?.sub });
 			if (user) {
 				this.userService.setStatus(user, 'offline');
 				socket.emit('statusUpdate', { user, status: 'offline' });
 			}
-			console.log(payload.username, 'disconnected');
-		} else
+			console.log(payload?.username, 'disconnected');
+			} else
 				console.log(socket.id, 'disconnected');
 	}
 
@@ -159,7 +164,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		@ConnectedSocket() socket: Socket,
 		@MessageBody() data: PrivateMessageDto,
 	) {
-		console.log(socket.id)
 		const conv = await this.convService.create(user, data.adresseeId, data.content);
 		this.server
 		.to(`user-${user.id}`)
@@ -318,7 +322,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	async changeUserRole(
 		@GetChannelUser() chanUser: ChannelUser,
 		@MessageBody() dto: ChangeRoleDto,
-	){
+	) {
 		const info = await this.channelService.changeUserRole(chanUser, dto);
 		this.server.to(`channel-${dto.chanId}`).emit('ChannelUserUpdate', info.userChanged);
 		if (info.ownerPassed)
