@@ -33,8 +33,13 @@ export type GameSettings =
     point_for_victory: number
 }
 
+export interface ModeState {
+    gameMode: GameMode,
+    isLock: boolean,
+}
+
 export interface GameModeState {
-    gameModes: GameMode[],
+    gameModes: ModeState[],
     indexSelected: number,
 }
 

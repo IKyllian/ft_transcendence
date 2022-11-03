@@ -33,10 +33,6 @@
             align-items: center;
             gap: 10px;
 
-            .crown-svg {
-                @include width-height(25px, 25px);
-            }
-
             .header-party-container {
                 .header-party-wrapper {
                     padding: 4px;
@@ -47,13 +43,32 @@
                     .fill-item {
                         @include width-height(30px, 30px);
                         position: relative;
-                        svg {
+                        .crown-svg {
                             position: absolute;
                             top: -13px;
                             left: 5.5px;
                             @include width-height(18px, 18px);
                             color: gold;
                         }
+                        &:hover {
+                            .party-kick {
+                                opacity: 1;
+                                @include width-height(100%, 100%);
+                                top: 0;
+                                bottom: 0;
+                                right: 0;
+                                left: 0;
+                                margin: auto;
+                                cursor: pointer;
+                                background-color: rgba(0, 0, 0, 0.24);
+                                border-radius: 50%;
+                            }
+                        }
+                        .party-kick {
+                            position: absolute;
+                            opacity: 0;
+                        }
+                        
                         .player-avatar {
                             @include avatar-player(30px);
                         }

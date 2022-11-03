@@ -41,10 +41,6 @@ $GreyLobby: rgb(163, 158, 158);
                 border-radius: 15px;
                 position: relative;
     
-                .lobby-invited {
-                    opacity: 0.5;
-                }
-    
                 .player-avatar {
                     @include avatar-player(80px);
                 }
@@ -140,6 +136,51 @@ $GreyLobby: rgb(163, 158, 158);
             @include flex-row-alignCenter();
             gap: 10px;
             justify-content: center;
+            position: relative;
+
+            .game-modes-dropdown {
+                position: absolute;
+                width: 32.5%;
+                border-top-left-radius: 10px;
+                border-top-right-radius: 10px;
+                background-color: $DarkPalette;
+                top: -94px;
+                right: 0;
+                text-align: center;
+
+                ul {
+                    list-style-type: none;
+                    padding: 0;
+                    margin: 0;
+                    .gameMode-lock {
+                        cursor: auto;
+                        color: grey;
+                        position: relative;
+                        background-color: rgb(0 0 0 / 24%);
+                        
+                        .lock-icon {
+                            position: absolute;
+                            right: 0;
+                            left: 0;
+                            top: 0;
+                            bottom: 0;
+                            margin: auto;
+                            color: rgba(255, 255, 255, 0.772);
+                        }
+                    }
+                    li {
+                        &:first-child {
+                            border-top-left-radius: 10px;
+                            border-top-right-radius: 10px;
+                        }
+                        padding: 6px;
+                        cursor: pointer;
+                        &:hover:not(.gameMode-lock) {
+                            background-color: #102031;
+                        }
+                    }
+                }
+            }
 
             .bos {
                 border-top-left-radius: 0;
@@ -153,35 +194,11 @@ $GreyLobby: rgb(163, 158, 158);
                     position: absolute;
                     right: 10px;
                 }
-                .game-modes-dropdown {
-                    position: absolute;
-                    width: 100%;
-                    border-top-left-radius: 10px;
-                    border-top-right-radius: 10px;
-                    background-color: $DarkPalette;
-                    top: -94px;
-
-                    ul {
-                        list-style-type: none;
-                        padding: 0;
-                        margin: 0;
-                        li {
-                            &:first-child {
-                                border-top-left-radius: 10px;
-                                border-top-right-radius: 10px;
-                            }
-                            padding: 6px;
-                            &:hover {
-                                background-color: #102031;
-                            }
-                        }
-                    }
-                }
             }
 
             button {
                 all: unset;
-                cursor: pointer;
+                // cursor: pointer;
                 text-align: center;
                 border-radius: 10px;
                 background-color: $DarkPalette;

@@ -1,18 +1,19 @@
 import { useContext, useState } from "react";
-import { IconUsers, IconSettings, IconX, IconPlus, IconCrown } from "@tabler/icons";
+import { IconUsers, IconSettings, IconX, IconPlus } from "@tabler/icons";
 import Avatar from "../../Images-Icons/pp.jpg";
 import { UserInterface } from "../../Types/User-Types";
-import { useAppSelector } from "../../Redux/Hooks";
+import { useAppDispatch, useAppSelector } from "../../Redux/Hooks";
 import { Link } from "react-router-dom";
 import { SocketContext } from "../../App";
+import { loggedUserIsLeader } from "../../Utils/Utils-Party";
+import { changeModalStatus } from "../../Redux/PartySlice";
 
 function PartyButton() {
-    const {currentUser} = useAppSelector(state => state.auth);
-    const [partyCreated, setPartyCreated] = useState<boolean>(false);
-    const [usersparty, setUsersParty] = useState<UserInterface[]>([currentUser!]);
-
+    const { currentUser } = useAppSelector(state => state.auth);
     const { party } = useAppSelector(state => state.party);
     const { socket } = useContext(SocketContext);
+    const dispatch = useAppDispatch();
+    const userIsLeader: boolean = party && currentUser && loggedUserIsLeader(currentUser.id, party.players) ? true : false;
 
     const onCreateParty = () => {
         socket?.emit("CreateParty");
@@ -20,6 +21,12 @@ function PartyButton() {
 
     const onLeaveParty = () => {
         socket?.emit("LeaveParty");
+    }
+
+    const onKick = (id: number) => {
+        socket?.emit("KickParty", {
+            id: id,
+        });
     }
 
     return party ? (
@@ -34,6 +41,7 @@ function PartyButton() {
                                     </path>
                                 </svg>
                             }
+                            { userIsLeader && !elem.isLeader && <IconX className="party-kick" onClick={() => onKick(elem.user.id)} /> }
                             <img className="player-avatar" src={Avatar} alt="profil pic" />
                         </div>
                     )
@@ -41,7 +49,7 @@ function PartyButton() {
                 {
                     Array.from({length: 4 - party.players.length}, (elem, index) => 
                         <div key={index} className="party-item">
-                            <IconPlus />
+                            <IconPlus onClick={() => dispatch(changeModalStatus(true))} />
                         </div>
                     )
                 }

@@ -1,19 +1,29 @@
 import { useContext, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { SocketContext } from "../../App";
-import { useAppSelector } from "../../Redux/Hooks";
+import { useAppDispatch, useAppSelector } from "../../Redux/Hooks";
 import { UserInterface } from "../../Types/User-Types";
-import { LobbyRequest } from "./game/types/shared.types";
 import { PlayersGameData, NewGameData } from "./game/types/shared.types";
 import Avatar from "../../Images-Icons/pp.jpg";
-import { IconCheck, IconX, IconPlus, IconChevronUp, IconChevronDown } from "@tabler/icons";
-import InvitedSpin from "../Utils/Invited-Spin";
+import { IconCheck, IconX, IconPlus, IconChevronUp, IconChevronDown, IconLock } from "@tabler/icons";
 import { GameModeState, GameMode, PartyInterface, GameUser } from "../../Types/Lobby-Types";
 import { Controller, useForm } from "react-hook-form";
-import ModalPartyInvite from "../Modal-Party-Invite";
+import { changeModalStatus } from "../../Redux/PartySlice";
+import { partyIsReady } from "../../Utils/Utils-Party";
 
 const defaultGameModeState: GameModeState = {
-    gameModes: [GameMode.RANKED, GameMode.PRIVATE_MATCH, GameMode.BONUS_2v2],
+    gameModes: [
+        {
+            gameMode: GameMode.RANKED,
+            isLock: false,   
+        },  {
+            gameMode: GameMode.PRIVATE_MATCH,
+            isLock: false,   
+        }, {
+            gameMode: GameMode.BONUS_2v2,
+            isLock: false,   
+        }
+    ],
     indexSelected: 0,
 }
 
@@ -21,13 +31,13 @@ function Lobby() {
     const {currentUser} = useAppSelector(state => state.auth)
     // const [lobbyUsers, setLobbyUsers] = useState<UserInterface[]>([currentUser!]);
     const [loggedUserIsLeader, setLoggedUserIsLeader] = useState<boolean>(false);
-    const [showModal, setShowModal] = useState<boolean>(false);
     const { handleSubmit, control, watch } = useForm();
     const [gameMode, setGameMode] = useState<GameModeState>(defaultGameModeState);
+    const [showDropdown, setShowDropdown] = useState<boolean>(false);
     const {socket} = useContext(SocketContext);
-    const location = useLocation();
     const navigate = useNavigate();
     const {party} = useAppSelector(state => state.party);
+    const partyReady: boolean = party && partyIsReady(party?.players) ? true : false;
 
     useEffect(() => {
         if (!party || (party && party.players.find(elem => elem.isLeader && elem.user.id === currentUser!.id)))
@@ -46,16 +56,39 @@ function Lobby() {
         setGameMode((prev: GameModeState) => {
             return { ...prev, indexSelected: index };
         });
-    }
-
-    const onCloseModal = () => {
-        setShowModal(false);
+        setShowDropdown(false);
     }
 
     const settingsFormSubmit = handleSubmit((data, e) => {
         e?.preventDefault();
         console.log("Data", data);
     })
+
+    useEffect(() => {
+        if (party && party.players.length > 1) {
+            if (party.players.length > 2) {
+                setGameMode((prev: any) => {
+                    return {...prev, indexSelected: 1 ,gameModes: [...gameMode.gameModes.map(elem => {
+                        if (elem.gameMode === GameMode.RANKED)
+                            return  {...elem, isLock: true };
+                        else if (elem.gameMode === GameMode.BONUS_2v2)
+                            return {...elem, isLock: true };
+                        return elem;
+                    })]}
+                });
+            } else if (party.players.length === 2){
+                setGameMode((prev: any) => {
+                    return {...prev, indexSelected: 1 ,gameModes: [...gameMode.gameModes.map(elem => {
+                        if (elem.gameMode === GameMode.RANKED)
+                            return  {...elem, isLock: true };
+                        else if (elem.gameMode === GameMode.BONUS_2v2)
+                            return  {...elem, isLock: false };
+                        return elem;
+                    })]}
+                });
+            }          
+        }
+    }, [party])
 
     const startGame = () => {
         // if (lobbyUsers.length === 2) {
@@ -156,42 +189,44 @@ function Lobby() {
             navigate("/game", {state: newOject});
         });
 
-        if (location && location.state) {
-            const locationState = location.state as UserInterface;
-            // setLobbyUsers(prev => [...prev, locationState]);
-        }
-
         return () => {
             socket?.off("newgame_data");
         }
     }, [])
     return (
         <div className="lobby-container">
-            <ModalPartyInvite show={showModal} onCloseModal={onCloseModal} />
             <div className="lobby-wrapper">
                 <ul className="lobby-player-list">
                     {
                         party ? party.players.map((elem) => 
-                            <PlayerListItem key={elem.user.id} user={elem} isInvited={false} />
+                            <PlayerListItem key={elem.user.id} user={elem} />
                         )
-                        : <PlayerListItem key={currentUser?.id} user={{isLeader: true, isReady: true, user: currentUser!}} isInvited={false} />
+                        : <PlayerListItem key={currentUser?.id} user={{isLeader: true, isReady: true, user: currentUser!}} />
                     
                     }
                     {
                         Array.from({length:  !party ? 3 : 4 - party.players.length}, (elem, index) => 
-                            <PlayerListItem key={index} isInvited={true} setShowModal={setShowModal} />
+                            <PlayerListItem key={index} />
                         )
                     }
                 </ul>
-                <div className="lobby-settings">
-                    <GameSettings hookForm={{handleSubmit: settingsFormSubmit, control: control, watch: watch}} />
-                    <BoardGame hookForm={{watch: watch}} />
-                </div>
+                {
+                    gameMode.gameModes[gameMode.indexSelected].gameMode === GameMode.PRIVATE_MATCH &&
+                    <div className="lobby-settings">
+                        <GameSettings hookForm={{handleSubmit: settingsFormSubmit, control: control, watch: watch}} />
+                        <BoardGame hookForm={{watch: watch}} />
+                    </div>
+                }
                 <LobbyButtonsContainer
                     gameMode={gameMode}
                     onGameModeChange={onGameModeChange}
                     user={!party ? {isLeader: true, isReady: true, user: currentUser!} : party?.players.find(elem => elem.user.id === currentUser!.id)}
-                    onReady={onReady} />
+                    onReady={onReady}
+                    showDropdown={showDropdown}
+                    setShowDropdown={setShowDropdown}
+                    partyReady={partyReady}
+                    loggedUserIsLeader={loggedUserIsLeader}
+                />
             </div>
         </div>
     );
@@ -247,12 +282,13 @@ function GameSettings(props: {hookForm: {handleSubmit: any, control: any, watch:
     );
 }
 
-function PlayerListItem(props: {user?: GameUser, isInvited?: boolean, setShowModal?: Function}) {
-    const { user, isInvited, setShowModal } = props;
+function PlayerListItem(props: {user?: GameUser}) {
+    const { user } = props;
+    const dispatch = useAppDispatch();
 
     return user ? (
         <li>
-            <img className={`player-avatar ${isInvited ? "lobby-invited" : ""}`} src={Avatar} alt="profil pic" />
+            <img className="player-avatar" src={Avatar} alt="profil pic" />
             <p> {user.user.username} </p>
             { user.isLeader && <span> Leader </span> }
             { !user.isLeader && user.isReady && <span> <IconCheck /> Ready </span> }
@@ -261,28 +297,27 @@ function PlayerListItem(props: {user?: GameUser, isInvited?: boolean, setShowMod
         </li>
     ) : (
         <li className="empty-item">
-            <IconPlus onClick={() => setShowModal!(true)} />
+            <IconPlus onClick={() => dispatch(changeModalStatus(true))} />
             <p> Invite Friend </p>
         </li>
     );
 }
 
-function LobbyButtonsContainer(props: {gameMode: GameModeState, onGameModeChange: Function, user: GameUser | undefined, onReady: Function }) {
-    const { gameMode, onGameModeChange, user, onReady } = props;
-    const [showDropdown, setShowDropdown] = useState<boolean>(false);
-    console.log("user", user);
+function LobbyButtonsContainer(props: {gameMode: GameModeState, onGameModeChange: Function, user: GameUser | undefined, onReady: Function, showDropdown: boolean, setShowDropdown: Function, partyReady: boolean, loggedUserIsLeader: boolean }) {
+    const { gameMode, onGameModeChange, user, onReady, showDropdown, setShowDropdown, partyReady, loggedUserIsLeader } = props;
     return user ? (
         <div className="lobby-buttons-wrapper">
-            <button> Invite Friends </button>
-            { user.isLeader && <button> Start Game </button> }
-            { !user.isLeader && user.isReady && <button onClick={() => onReady(false)}> Ready </button> }
-            { !user.isLeader && !user.isReady && <button onClick={() => onReady(true)}> Not Ready </button> }
-            <button className={`game-modes-button ${showDropdown ? "bos" : ""}`} onClick={() => setShowDropdown(!showDropdown)}>
-                { gameMode.gameModes[gameMode.indexSelected] }
-                { showDropdown && <IconChevronDown className="chevron-icon" /> }
-                { !showDropdown && <IconChevronUp className="chevron-icon" /> }
-                <DropdownGameModes show={showDropdown} gameMode={gameMode} onGameModeChange={onGameModeChange} />
+            <button style={{cursor: "pointer"}}> Invite Friends </button>
+            { user.isLeader && partyReady && <button style={{cursor: "pointer"}}> Start Game </button> }
+            { user.isLeader && !partyReady && <button> Waiting for players </button> }
+            { !user.isLeader && user.isReady && <button style={{cursor: "pointer"}} onClick={() => onReady(false)}> Ready </button> }
+            { !user.isLeader && !user.isReady && <button style={{cursor: "pointer"}} onClick={() => onReady(true)}> Not Ready </button> }
+            <button style={loggedUserIsLeader ? {cursor: "pointer"} : {}} className={`game-modes-button ${showDropdown ? "bos" : ""}`} onClick={() => setShowDropdown(!showDropdown)}>
+                { gameMode.gameModes[gameMode.indexSelected].gameMode }
+                { showDropdown && loggedUserIsLeader && <IconChevronDown className="chevron-icon" /> }
+                { !showDropdown && loggedUserIsLeader && <IconChevronUp className="chevron-icon" /> }
             </button>
+            { loggedUserIsLeader && <DropdownGameModes show={showDropdown} gameMode={gameMode} onGameModeChange={onGameModeChange} /> }
         </div>
     ) : (
         <> </>
@@ -295,9 +330,12 @@ function DropdownGameModes(props: {show: boolean, gameMode: GameModeState, onGam
         <div className="game-modes-dropdown">
             <ul>
                 {
-                    gameMode.gameModes.map((elem, index) =>
-                        <li key={index} onClick={() => onGameModeChange(index)}> {elem} </li>
-                    )
+                    gameMode.gameModes.map((elem, index) => {
+                        if (elem.isLock)
+                            return <li className="gameMode-lock" key={index}> <IconLock className="lock-icon" /> {elem.gameMode} </li>
+                        else
+                            return <li key={index} onClick={() => onGameModeChange(index)}> {elem.gameMode} </li>
+                    })
                 }
             </ul>
         </div>

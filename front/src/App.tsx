@@ -23,6 +23,7 @@ import NotifGameInvite from "./Components/Notif-Game-Invite";
 import NotifError from "./Components/Notif-Error";
 import Game from "./Components/Game/Game";
 import Lobby from "./Components/Game/Lobby";
+import ModalPartyInvite from "./Components/Modal-Party-Invite";
 
 
 interface RouteProps {
@@ -110,6 +111,7 @@ function App() {
 			<ModalProvider>
 				{ eventError !== undefined && <NotifError error={eventError} closeError={closeEventError} />}
 				<AddFriendModal/>
+				<ModalPartyInvite />
 				{ gameInvite && <NotifGameInvite notif={gameInvite} notifOnLeave={gameNotificationLeave} /> }
 				<Header />
 				<main className="page-container">

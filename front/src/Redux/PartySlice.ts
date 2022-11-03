@@ -3,10 +3,12 @@ import { PartyInterface } from '../Types/Lobby-Types';
 
 interface PartyState {
     party?: PartyInterface,
+    modalIsOpen: boolean,
 }
 
 const defaultState: PartyState = {
     party: undefined,
+    modalIsOpen: false,
 }
 
 export const partySlice = createSlice({
@@ -18,8 +20,11 @@ export const partySlice = createSlice({
         },
         leaveParty: (state) => {
             state.party = undefined;
-        }
+        },
+        changeModalStatus: (state, { payload }: PayloadAction<boolean>) => {
+            state.modalIsOpen = payload;
+        },
     }
 });
 
-export const { addParty, leaveParty } = partySlice.actions;
+export const { addParty, leaveParty, changeModalStatus } = partySlice.actions;
