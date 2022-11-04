@@ -35,6 +35,7 @@ export class QueueService {
 			const lobby: MatchmakingLobby = {
 				Player_A_Back: this.queue1v1[0].players[0],
 				Player_B_Back: this.queue1v1[1].players[0],
+				gameMode: party.gameMode,
 			};
 			this.queue1v1.splice(0, 2);
 			console.log('lobby', lobby);
@@ -77,6 +78,7 @@ export class QueueService {
 				Player_A_Front: this.queue2v2[0].players[1],
 				Player_B_Back: this.queue2v2[1].players[0],
 				Player_B_Front: this.queue2v2[1].players[1],
+				gameMode: party.gameMode,
 			};
 			this.queue2v2.splice(0, 2);
 			console.log('lobby', lobby);

@@ -119,6 +119,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		@ConnectedSocket() socket: AuthenticatedSocket,
 		@MessageBody() room: RoomDto,
 	) {
+		this.notificationService.handleInterval();
 		console.log(socket.user.username + ' joined room')
 		const chanInfo = await this.channelService.getChannelById(socket.user.id, room.id);
 		socket.emit('roomData', chanInfo);
@@ -145,14 +146,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		console.log(socket.user.username + ' left room')
 	}
 
-	@UseGuards(WsJwtGuard)
+	@UseGuards(WsJwtGuard, WsInChannelGuard)
 	@SubscribeMessage('ChannelMessage')
 	async sendChannelMessage(
 		@ConnectedSocket() socket: AuthenticatedSocket,
 		@MessageBody() data: ChannelMessageDto,
+		@GetChannelUser() chanUser: ChannelUser,
 		) {
-			//TODO inchannelGuard
-			const message = await this.channelMsgService.create(socket.user.id, data);
+			const message = await this.channelMsgService.create(chanUser, data);
 			this.server.to(`channel-${ data.chanId }`).emit('NewChannelMessage', message);
 			this.notificationService.sendMessageNotif(socket, data.chanId);
 	}

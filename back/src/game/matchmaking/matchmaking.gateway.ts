@@ -59,11 +59,10 @@ export class MatchmakingGateway {
 	@SubscribeMessage('CreateParty')
 	createLobby(
 		@GetUser() user: User,
-		@ConnectedSocket() socket: Socket,
 	) {
 		if (!this.partyService.partyJoined.getParty(user.id)) {
 			const party = this.partyService.createParty(user);
-			socket.emit("PartyUpdate", party);
+			this.server.to(`user-${user.id}`).emit("PartyUpdate", party);
 		}
 	}
 
@@ -80,8 +79,9 @@ export class MatchmakingGateway {
 				type: notificationType.PARTY_INVITE,
 			}
 		});
-		if (!inviteFound)
+		if (!inviteFound) {
 			throw new ForbiddenException('You are not invited to this party');
+		}
 		this.partyService.joinParty(user, requester.id);
 	}
 

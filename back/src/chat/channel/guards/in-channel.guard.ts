@@ -13,7 +13,7 @@ export class InChannelGuard implements CanActivate {
 		const channelUser = await this.channelService.getChannelUser(chanId, req.user.id);
 		if (!channelUser)
 			throw new NotInChannelException();
-		req.user.channelUser = channelUser;
+		req.channelUser = channelUser;
 		return true;
 	}
 }

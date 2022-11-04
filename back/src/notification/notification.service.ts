@@ -8,6 +8,8 @@ import { notificationType } from 'src/utils/types/types';
 import { FindOneOptions, Repository } from 'typeorm';
 import { ChannelNotFoundException } from 'src/utils/exceptions';
 import { AuthenticatedSocket } from 'src/utils/types/auth-socket';
+import { Interval, SchedulerRegistry, Timeout } from '@nestjs/schedule';
+import { CronJob } from 'cron';
 
 @Injectable()
 export class NotificationService {
@@ -20,6 +22,7 @@ export class NotificationService {
 		private notifRepo: Repository<Notification>,
 		@InjectRepository(Channel)
 		private channelRepo: Repository<Channel>,
+		private schedulerRegistry: SchedulerRegistry,
 	) {}
 
 	createFriendRequestNotif(addressee: User, requester: User) {
@@ -140,5 +143,15 @@ export class NotificationService {
 		setTimeout(() => {
 			this.notifRepo.delete(id);
 		}, 21000, id)
+	}
+
+	handleInterval() {
+		// const date = new Date(Date.now() + 10 * 1000);
+		// const job = new CronJob(date, () => {
+		// 	console.log("Interval-----------------------------------------------------------------");
+		// });
+		// // console.log(job)
+		// this.schedulerRegistry.addCronJob("test", job);
+		// job.start();
 	}
 }

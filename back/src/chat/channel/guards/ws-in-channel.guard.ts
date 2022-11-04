@@ -13,7 +13,7 @@ export class WsInChannelGuard implements CanActivate {
 		if (!channelUser) {
 			throw new NotInChannelException();
 		}
-		user.channelUser = channelUser;
+		client.getClient().channelUser = channelUser;
 		return true;
 	}
 }

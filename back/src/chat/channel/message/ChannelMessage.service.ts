@@ -15,20 +15,11 @@ export class ChannelMessageService {
 		private messagesRepo: Repository<ChannelMessage>,
 	) {}
 
-	async create(userId: number, messageDto: ChannelMessageDto) {
-
-		const chanUser = await this.channelService.getChannelUser(messageDto.chanId, userId);
-		if (!chanUser) {
-			throw new NotInChannelException();
-		}
-		//TODO just use chanId ?
-		const channel = await this.channelService.findOneBy({ id: messageDto.chanId });
-		if (!channel)
-			throw new ChannelNotFoundException();
+	async create(chanUser: ChannelUser, messageDto: ChannelMessageDto) {
 		this.channelService.isMuted(chanUser);
 		const message = this.messagesRepo.create({
 			content: messageDto.content,
-			channel,
+			channel: { id: chanUser.channelId },
 			sender: chanUser.user,
 		});
 		return this.messagesRepo.save(message);
