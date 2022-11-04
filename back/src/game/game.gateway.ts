@@ -1,3 +1,4 @@
+import { UnauthorizedException, UseFilters, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import {
 	WebSocketGateway,
 	WebSocketServer,
@@ -8,12 +9,33 @@ import {
 	MessageBody
   } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
-import { NewGameData, PlayersLobbyData, LobbyRequest } from 'src/utils/types/game.types';
+import { AuthService } from 'src/auth/auth.service';
+import { WsJwtGuard } from 'src/auth/guard/ws-jwt.guard';
+import { UserIdDto } from 'src/chat/gateway/dto/user-id.dto';
+import { User } from 'src/typeorm';
+import { UserService } from 'src/user/user.service';
+import { GetUser } from 'src/utils/decorators';
+import { NewGameData, PlayersLobbyData, LobbyRequest, GameMode } from 'src/utils/types/game.types';
+import { JwtPayload, notificationType, UserPayload } from 'src/utils/types/types';
+import { UserSessionManager } from './user.session';
 import { LobbyFactory } from './lobby/lobby.factory';
+import { Party } from './matchmaking/party/party';
+import { GameUser } from './game-user';
+import { PartyService } from './matchmaking/party/party.service';
+import { SocketReservedEventsMap } from 'socket.io/dist/socket';
+import { RoomDto } from 'src/chat/gateway/dto/room.dto';
+import { threadId } from 'worker_threads';
+import { BlobOptions } from 'buffer';
+import { JwtGameGuard } from 'src/auth/guard/jwt-game.guard';
+import { AuthenticatedSocket } from '../utils/types/auth-socket';
+import { QueueService } from './matchmaking/queue/queue.service';
+import { GatewayExceptionFilter } from 'src/utils/exceptions/filter/Gateway.filter';
 
 
-@WebSocketGateway()
-export class GameGateway
+@UseFilters(GatewayExceptionFilter)
+@UsePipes(new ValidationPipe())
+@WebSocketGateway({ namespace: 'game' })
+export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
 {
 
 	/* ----- Initialisation ----- */
@@ -22,12 +44,12 @@ export class GameGateway
 	admin?: Socket;
 //get admin secret from envs
 	admin_secret: string = 'praclarushtaonas';
-
 	constructor(
 		private readonly lobbyfactory: LobbyFactory,
-	  )
-	  {
-	  }
+		private readonly userSession: UserSessionManager,
+		private readonly authService: AuthService,
+		private readonly userService: UserService,
+	  ) {}
 
 	afterInit(server: Server): any
 	{
@@ -37,16 +59,40 @@ export class GameGateway
 
 	/* ----- Connect/Disconnect ----- */
 
-	// async handleConnection(client: Socket)
-	// {
-	// 	console.log("someone connected", client['id']);
-	// }
+	async handleConnection(client: Socket)
+	{
+		console.log("someone connected", client['id']);
+		let user: User = null;
+		if (client.handshake.headers.authorization) {
+			const token = client.handshake.headers.authorization.split(' ')[1];
+			user = await this.authService.verify(token);
+		}
+		if (!user) {
+			// Found something to do in this case
+			console.log(user, 'invalid credential')
+			return client.disconnect();
+		} else if (this.userSession.getUser(user.id)) {
+			client.disconnect();
+			throw new UnauthorizedException("You can't play in multi tab!");
+		}
+		this.userSession.setUser(user.id, user);
+	}
   
-	// async handleDisconnect(client: Socket)
-	// {
-	// 	console.log("someone disconnected ", client['id']);
-	// 	this.lobbyfactory.lobby_quit(client);
-	// }
+	async handleDisconnect(socket: Socket)
+	{
+		// TODO handle different type of disconnect; Ex: multitab error, lost connection
+		if (socket.handshake.headers.authorization) {
+			const payload = this.authService.decodeJwt(socket.handshake.headers.authorization.split(' ')[1]) as JwtPayload;
+			// get usersocket instance instead of call db ?
+			const user = await this.userService.findOneBy({ id: payload?.sub });
+			if (user) {
+				this.userSession.removeUser(user.id)
+			}
+			console.log(payload?.username, 'disconnected');
+		} else
+			console.log(socket.id, 'disconnected');
+		this.lobbyfactory.lobby_quit(socket);
+	}
 
 	@SubscribeMessage('ping')
 	async onPing(client: Socket)
@@ -152,8 +198,10 @@ export class GameGateway
 	/* ----- Users Game Management ----- */
 
 
+	@UseGuards(JwtGameGuard)
 	@SubscribeMessage('user_game_input')
-	async onUserGameInput(@ConnectedSocket() client: Socket,
+	async onUserGameInput(
+	@ConnectedSocket() client: AuthenticatedSocket,
 	@MessageBody() data: any)
 	{
 		this.lobbyfactory.lobby_game_input(client, data);
@@ -178,5 +226,4 @@ export class GameGateway
 	{
 		this.lobbyfactory.send_replay(client, game_id);
 	}
-
   }

@@ -28,20 +28,8 @@ import { MuteUserDto } from '../channel/dto/mute-user.dto';
 import { ChangeRoleDto } from './dto/change-role.dto';
 import { OnTypingChannelDto } from './dto/on-typing-chan.dto';
 import { OnTypingPrivateDto } from './dto/on-typing-priv.dto';
-import { JwtGuard } from 'src/auth/guard/jwt.guard';
-import { NotificationModule } from 'src/notification/notification.module';
-
-@Catch()
-class GatewayExceptionFilter extends BaseWsExceptionFilter {
-	catch(exception: any, host: ArgumentsHost) {
-		if (exception instanceof WsException)
-				super.catch(exception, host);
-		else {
-			const properException = new WsException(exception.getResponse());
-			super.catch(properException, host);
-		}
-	}
-}
+import { GatewayExceptionFilter } from 'src/utils/exceptions/filter/Gateway.filter';
+import { PartyService } from 'src/game/matchmaking/party/party.service';
 
 @UseFilters(GatewayExceptionFilter)
 @UsePipes(new ValidationPipe())
@@ -49,7 +37,6 @@ class GatewayExceptionFilter extends BaseWsExceptionFilter {
 	cors: {
 		credential: true,
 	},
-	// namespace: 'hui'
 })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
@@ -65,11 +52,20 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		private friendshipService: FriendshipService,
 		private notificationService: NotificationService,
 		private convService: ConversationService,
+		private partyService: PartyService,
 		) {}
 
 	// afterInit(serverr: Server) {
 	// 		// console.log(this.server)
 	// }
+
+	//test
+	@SubscribeMessage('hello') 
+	hello(@ConnectedSocket() socket: Socket) {
+		console.log('test')
+		// socket.emit('hello', 'hello');
+		this.server.emit('hello', "cccc")
+	}
 
 	async handleConnection(socket: Socket) {
 		let user: User = null;
@@ -91,7 +87,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		if (user.status === 'offline') {
 			this.userService.setStatus(user, 'online');
 		}
-		this.session.setUserSocket(socket.id, { user, socket });
+		// this.session.setUserSocket(socket.id, { user, socket });
+		socket.emit('Connection', {
+			friendList: await this.friendshipService.getFriendlist(user),
+			notification: await this.notificationService.getNotification(user),
+			party: this.partyService.partyJoined.getParty(user.id),
+		});
 	}
 
 	async handleDisconnect(socket: Socket) {
@@ -99,7 +100,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		if (socket.handshake.headers.authorization) {
 			const payload = this.authService.decodeJwt(socket.handshake.headers.authorization.split(' ')[1]) as JwtPayload;
 			// get usersocket instance instead of call db ?
-			this.session.removeUserSocket(socket.id);
+			// this.session.removeUserSocket(socket.id);
 			const user = await this.userService.findOneBy({ id: payload?.sub });
 			if (user) {
 				this.userService.setStatus(user, 'offline');
@@ -108,7 +109,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			console.log(payload?.username, 'disconnected');
 			} else
 				console.log(socket.id, 'disconnected');
-		}
+	}
 
 	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('JoinChannelRoom')
@@ -346,39 +347,5 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		@MessageBody() dto: OnTypingPrivateDto,
 	) {
 		socket.to(`user-${dto.userId}`).emit('OnTypingPrivate', { user, isTyping: dto.isTyping, convId: dto.convId });
-	}
-
-	@UseGuards(WsJwtGuard)
-	@SubscribeMessage('GameInvite')
-	async sendGameInvite(
-		@GetUser() user: User,
-		@ConnectedSocket() socket: Socket,
-		@MessageBody() dto: UserIdDto,
-	) {
-		// const addressee = await this.userService.findOneBy({ id: dto.id });
-		// if (!addressee) {
-		// 	throw new NotFoundException('User not found');
-		// }
-		const notif: any = {
-			requester: user,
-			type: notificationType.GAME_INVITE
-		}
-
-
-		socket.to(`user-${dto.id}`).emit('NewGameInvite', notif);
-	}
-
-	@UseGuards(WsJwtGuard)
-	@SubscribeMessage('AcceptGameInvite')
-	async acceptGameInvite(
-		@ConnectedSocket() socket: Socket,
-		@GetUser() user: User,
-		@MessageBody() dto: UserIdDto,
-	) {
-		// const addressee = await this.userService.findOneBy({ id: dto.id });
-		// if (!addressee)
-		// 	throw new NotFoundException('User not found');
-
-		socket.to(`user-${dto.id}`).emit('JoinLobby', user);
 	}
 }

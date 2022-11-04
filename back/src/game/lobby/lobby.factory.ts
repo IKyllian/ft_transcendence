@@ -15,56 +15,8 @@ export class LobbyFactory
 	private client_list: Map<Socket['id'], Lobby['game_id']> = new Map<Socket['id'], Lobby['game_id']>();
 	replay_list: Map<string, Array<GameState>> = new Map <string, Array<GameState>>();
 
-	lobby_create(lobby_reques: LobbyRequest): NewGameData
+	lobby_create(lobby_request: LobbyRequest): NewGameData
 	{
-		const lobby_request: LobbyRequest = lobby_reques;
-		// if (lobby_request.Player_A_Back === 'Mario' && lobby_request.Player_B_Back === 'Trent'
-		// && lobby_request.Player_A_Front === 'Luigi' && lobby_request.Player_B_Front === 'Daria')
-		// {
-		// 	let ret:NewGameData =
-		// 	{
-		// 		Player_A_Back: 'Mario',
-		// 		Player_A_Back_secret: 'itsmemario',
-		// 		Player_A_Front: 'Luigi',
-		// 		Player_A_Front_secret: 'ogdgdggY4Ck',
-				
-		// 		Player_B_Front: 'Daria',
-		// 		Player_B_Front_secret: 'lalala-la-la',
-		// 		Player_B_Back: 'Trent',
-		// 		Player_B_Back_secret: 'spiralmystic',
-
-		// 		game_id: '4p_lobbyggfdgdadf',
-		// 		game_settings: lobby_request.game_settings
-		// 	}
-		// 	const lobby = new Lobby(ret, lobby_request.game_settings, this);
-		// 	this.lobby_list.set(lobby.game_id, lobby);
-	
-		// 	return ret;
-		// }
-		// else if (lobby_request.Player_A_Back === 'Mario' && lobby_request.Player_B_Back === 'Luigi')
-		// {
-		// 	let ret:NewGameData =
-		// 	{
-		// 		Player_A_Back: 'Mario',
-		// 		Player_A_Back_secret: '9rzx9PAs0r',
-		// 		Player_B_Back: 'Luigi',
-		// 		Player_B_Back_secret: 'oVugmgY4Ck',
-				
-		// 		Player_A_Front: '',
-		// 		Player_A_Front_secret: '',
-		// 		Player_B_Front: '',
-		// 		Player_B_Front_secret: '',
-				
-		// 		game_id: 'aKnHwyr8z',
-		// 		game_settings: lobby_request.game_settings
-		// 	}
-		// 	const lobby = new Lobby(ret, lobby_request.game_settings, this);
-		// 	this.lobby_list.set(lobby.game_id, lobby);
-	
-		// 	return ret;
-		// }
-
-
 
 		const game_id: string = generate();
 		const player_A_Back_secret: string = generate();
