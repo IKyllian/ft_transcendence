@@ -10,6 +10,7 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
 import { ConversationModule } from './conversation/conversation.module';
 import { NotificationModule } from 'src/notification/notification.module';
 import { MatchmakingModule } from 'src/game/matchmaking/matchmaking.module';
+import { TaskScheduler } from 'src/task-scheduling/task.module';
 
 @Module({
   imports: [
@@ -17,7 +18,7 @@ import { MatchmakingModule } from 'src/game/matchmaking/matchmaking.module';
     ConversationModule,
     NotificationModule,
     UserModule,
-	MatchmakingModule,
+	  MatchmakingModule,
     forwardRef(() => AuthModule),
     TypeOrmModule.forFeature([
       Channel,

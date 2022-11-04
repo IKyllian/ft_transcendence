@@ -4,7 +4,6 @@ import { User } from "src/typeorm";
 import { GameUser } from "../../game-user";
 import { PartyJoinedSessionManager } from "./party.session";
 import { Party } from "./party";
-import { MatchmakingGateway } from "../matchmaking.gateway";
 
 @Injectable()
 export class PartyService {

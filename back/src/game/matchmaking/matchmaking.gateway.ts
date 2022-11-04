@@ -4,6 +4,8 @@ import { Server, Socket } from "socket.io";
 import { WsJwtGuard } from "src/auth/guard/ws-jwt.guard";
 import { UserIdDto } from "src/chat/gateway/dto/user-id.dto";
 import { NotificationService } from "src/notification/notification.service";
+import { TaskScheduler } from "src/task-scheduling/task.module";
+import { TaskService } from "src/task-scheduling/task.service";
 import { User } from "src/typeorm";
 import { GetUser } from "src/utils/decorators";
 import { GatewayExceptionFilter } from "src/utils/exceptions/filter/Gateway.filter";
@@ -28,12 +30,14 @@ export class MatchmakingGateway {
 		private partyService: PartyService,
 		private queueService: QueueService,
 		private notifService: NotificationService,
+		private taskScheduler: TaskService,
 	) {}
 
 
 	afterInit(server: Server)
 	{
 	  this.partyService.server = server;
+	  this.taskScheduler.server = server;
 	}
 
 

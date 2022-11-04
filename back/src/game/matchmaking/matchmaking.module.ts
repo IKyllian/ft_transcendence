@@ -7,6 +7,7 @@ import { MatchmakingGateway } from "./matchmaking.gateway";
 import { GameModule } from "../game.module";
 import { AuthModule } from "src/auth/auth.module";
 import { NotificationModule } from "src/notification/notification.module";
+import { TaskScheduler } from "src/task-scheduling/task.module";
 
 @Module({
 	imports: [
@@ -14,12 +15,13 @@ import { NotificationModule } from "src/notification/notification.module";
 		UserModule,
 		GameModule,
 		NotificationModule,
+		TaskScheduler,
 	],
 	providers: [
 		PartyService,
 		PartyJoinedSessionManager,
 		QueueService,
-		MatchmakingGateway 
+		MatchmakingGateway,
 	],
 	exports: [ PartyService, QueueService ]
 })

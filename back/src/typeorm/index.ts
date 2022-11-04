@@ -9,7 +9,6 @@ import { PrivateMessage } from "./entities/privateMessage"
 import { Statistic } from "./entities/statistic"
 import { User } from "./entities/user"
 import { Notification } from "./entities/notification"
-import { UserTimeout } from "./entities/userTimeout"
 import { MutedUser } from "./entities/mutedUser"
 
 const entities = [
@@ -24,7 +23,6 @@ const entities = [
 	PrivateMessage,
 	BannedUser,
 	Notification,
-	UserTimeout,
 	MutedUser,
 ];
 
@@ -42,6 +40,5 @@ export {
 	PrivateMessage,
 	BannedUser,
 	Notification,
-	UserTimeout,
 	MutedUser,
 }

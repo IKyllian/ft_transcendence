@@ -62,6 +62,5 @@ export enum ChannelUpdateType {
 	LEAVE,
 	BAN,
 	UNBAN,
-	MUTE,
-	UNMUTE,
+	CHANUSER
 }

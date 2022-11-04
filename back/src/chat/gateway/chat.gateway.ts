@@ -1,9 +1,9 @@
-import { ArgumentsHost, Catch, NotFoundException, UseFilters, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import { ArgumentsHost, Catch, forwardRef, Inject, NotFoundException, UseFilters, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { WebSocketGateway, MessageBody, WebSocketServer, ConnectedSocket, OnGatewayConnection, OnGatewayDisconnect, WsException, BaseWsExceptionFilter, SubscribeMessage } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { AuthService } from 'src/auth/auth.service';
 import { WsJwtGuard } from 'src/auth/guard/ws-jwt.guard';
-import { ChannelMessage, ChannelUser, Notification, User, UserTimeout } from 'src/typeorm';
+import { ChannelMessage, ChannelUser, Notification, User } from 'src/typeorm';
 import { ChannelService } from '../channel/channel.service';
 import { ChatSessionManager } from './chat.session';
 import { UserService } from 'src/user/user.service';
@@ -32,6 +32,7 @@ import { GatewayExceptionFilter } from 'src/utils/exceptions/filter/Gateway.filt
 import { PartyService } from 'src/game/matchmaking/party/party.service';
 import { AuthenticatedSocket } from 'src/utils/types/auth-socket';
 import { ChanIdDto } from '../channel/dto/chan-id.dto';
+import { TaskScheduler } from 'src/task-scheduling/task.module';
 
 @UseFilters(GatewayExceptionFilter)
 @UsePipes(new ValidationPipe())
@@ -42,11 +43,11 @@ import { ChanIdDto } from '../channel/dto/chan-id.dto';
 })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
-@WebSocketServer() server: Server;
+	@WebSocketServer() server: Server;
 
 	constructor(
-		private channelMsgService: ChannelMessageService,
 		private privateMsgService: PrivateMessageService,
+		private channelMsgService: ChannelMessageService,
 		private authService: AuthService,
 		private channelService: ChannelService,
 		private readonly session: ChatSessionManager,
@@ -57,9 +58,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		private partyService: PartyService,
 		) {}
 
-	// afterInit(serverr: Server) {
-	// 		// console.log(this.server)
-	// }
+	afterInit(server: Server) {
+			// console.log(this.server)
+	}
 
 	//test
 	@SubscribeMessage('hello') 
@@ -153,6 +154,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		@MessageBody() data: ChannelMessageDto,
 		@GetChannelUser() chanUser: ChannelUser,
 		) {
+			await this.channelService.isMuted(chanUser, this.server);
 			const message = await this.channelMsgService.create(chanUser, data);
 			this.server.to(`channel-${ data.chanId }`).emit('NewChannelMessage', message);
 			this.notificationService.sendMessageNotif(socket, data.chanId);
@@ -301,10 +303,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		@GetChannelUser() chanUser: ChannelUser,
 		@MessageBody() dto: BanUserDto,
 	) {
-		console.log("banning")
+		console.log("banning", dto)
 		const bannedUser = await this.channelService.banUser(chanUser, dto);
-		this.server.to(`channel-${bannedUser.channelId}`).emit('ChannelUpdate', { type: ChannelUpdateType.BAN, data: bannedUser });
-		this.server.to(`user-${dto.userId}`).emit('OnLeave', bannedUser.channelId);
+		this.server.to(`channel-${bannedUser.channel.id}`).emit('ChannelUpdate', { type: ChannelUpdateType.BAN, data: bannedUser });
+		this.server.to(`user-${dto.userId}`).emit('OnLeave', bannedUser.channel);
 	}
 
 	@UseGuards(WsJwtGuard, WsInChannelGuard, ChannelPermissionGuard)
@@ -313,7 +315,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		@MessageBody() dto: BanUserDto,
 	) {
 		const bannedUser = await this.channelService.unbanUser(dto);
-		this.server.to(`channel-${bannedUser.channelId}`).emit('ChannelUpdate', { type: ChannelUpdateType.UNBAN, data: bannedUser });
+		this.server.to(`channel-${dto.chanId}`).emit('ChannelUpdate', { type: ChannelUpdateType.UNBAN, data: bannedUser });
 	}
 
 	@UseGuards(WsJwtGuard, WsInChannelGuard, ChannelPermissionGuard)
@@ -322,8 +324,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		@GetChannelUser() chanUser: ChannelUser,
 		@MessageBody() dto: MuteUserDto,
 	) {
-		const userTimeout: UserTimeout = await this.channelService.muteUser(chanUser, dto);
-		this.server.to(`channel-${dto.chanId}`).emit('ChannelUpdate', { type: ChannelUpdateType.MUTE, data: userTimeout });
+		const user = await this.channelService.muteUser(chanUser, dto);
+		this.server.to(`channel-${dto.chanId}`).emit('ChannelUpdate', { type: ChannelUpdateType.CHANUSER, data: user });
 	}
 
 	@UseGuards(WsJwtGuard, WsInChannelGuard, ChannelPermissionGuard)
@@ -331,8 +333,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	async unMuteUser(
 		@MessageBody() dto: MuteUserDto,
 	) {
-		const userTimeout = await this.channelService.unMuteUser(dto);
-		this.server.to(`channel-${dto.chanId}`).emit('ChannelUpdate', { type: ChannelUpdateType.UNMUTE, data: userTimeout });
+		const user = await this.channelService.unMuteUser(dto);
+		this.server.to(`channel-${dto.chanId}`).emit('ChannelUpdate', { type: ChannelUpdateType.CHANUSER, data: user });
 	}
 
 	@UseGuards(WsJwtGuard, WsInChannelGuard, ChannelPermissionGuard)
@@ -342,9 +344,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		@MessageBody() dto: ChangeRoleDto,
 	) {
 		const info = await this.channelService.changeUserRole(chanUser, dto);
-		this.server.to(`channel-${dto.chanId}`).emit('ChannelUserUpdate', info.userChanged);
+		this.server.to(`channel-${dto.chanId}`).emit('ChannelUpdate', { type: ChannelUpdateType.CHANUSER, data: info.userChanged });
 		if (info.ownerPassed)
-			this.server.to(`channel-${dto.chanId}`).emit('ChannelUserUpdate', info.chanUser);
+			this.server.to(`channel-${dto.chanId}`).emit('ChannelUpdate', { type: ChannelUpdateType.CHANUSER, data: info.chanUser });
 	}
 
 	@UseGuards(WsJwtGuard, WsInChannelGuard)

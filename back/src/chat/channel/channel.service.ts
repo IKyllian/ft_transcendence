@@ -1,12 +1,12 @@
 import { BadRequestException, ForbiddenException, forwardRef, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Channel, User, ChannelUser, BannedUser, UserTimeout, MutedUser } from 'src/typeorm';
+import { Channel, User, ChannelUser, BannedUser, MutedUser } from 'src/typeorm';
 import { FindManyOptions, FindOneOptions, FindOptionsWhere, In, Like, Not, Repository } from 'typeorm';
 import { ChannelExistException, ChannelNotFoundException, NotInChannelException, UnauthorizedActionException } from 'src/utils/exceptions';
 import * as argon from 'argon2';
 import { CreateChannelDto } from './dto/create-channel.dto';
 import { ChannelPasswordDto } from './dto/channel-pwd.dto';
-import { channelOption, channelRole, FindChannelParams, ResponseType, TimeoutType } from 'src/utils/types/types';
+import { channelOption, channelRole, ChannelUpdateType, FindChannelParams, ResponseType, TimeoutType } from 'src/utils/types/types';
 import { BanUserDto } from './dto/ban-user.dto';
 import { UserService } from 'src/user/user.service';
 import { NotificationService } from 'src/notification/notification.service';
@@ -15,6 +15,7 @@ import { SearchToInviteInChanDto } from './dto/search-user-to-invite.dto';
 import { MuteUserDto } from './dto/mute-user.dto';
 import { ChangeRoleDto } from '../gateway/dto/change-role.dto';
 import { ChannelInviteDto } from '../gateway/dto/channel-invite.dto';
+import { Server } from 'socket.io';
 
 @Injectable()
 export class ChannelService {
@@ -28,8 +29,6 @@ export class ChannelService {
 		private channelUserRepo: Repository<ChannelUser>,
 		@InjectRepository(BannedUser)
 		private bannedRepo: Repository<BannedUser>,
-		@InjectRepository(UserTimeout)
-		private timeoutRepo: Repository<UserTimeout>,
 		@InjectRepository(User)
 		private userRepo: Repository<User>,
 		@InjectRepository(MutedUser)
@@ -252,67 +251,80 @@ export class ChannelService {
 		if (dto.time)
 			until = new Date(new Date().getTime() + dto.time * 1000);
 
-		const bannedUser = this.timeoutRepo.create({
+		const bannedUser = this.bannedRepo.create({
 			user: userToBan.user,
 			channel: { id: dto.chanId },
 			until,
-			type: TimeoutType.BAN,
 		});
-
-		return this.timeoutRepo.save(bannedUser);
+		await this.leave(userToBan);
+		return this.bannedRepo.save(bannedUser);
 	}
 
 	async unbanUser(dto: BanUserDto) {
-		const isBanned = await this.timeoutRepo.findOne({
+		const isBanned = await this.bannedRepo.findOne({
 			where: {
 				user: { id: dto.userId },
 				channel: { id: dto.chanId },
-				type: TimeoutType.BAN
 			}
 		});
 		if (!isBanned) {
 			throw new BadRequestException('User is not banned');
 		}
-		await this.timeoutRepo.delete(isBanned.id);
+		await this.bannedRepo.delete(isBanned.id);
 		return isBanned;
 	}
 
-	async isBanned(userId: number, chanId: number): Promise<UserTimeout | undefined> {
-		const isBanned = await this.timeoutRepo.findOne({
+	async isBanned(userId: number, chanId: number): Promise<BannedUser | undefined> {
+		const isBanned = await this.bannedRepo.findOne({
 			where: {
 				user: { id: userId },
 				channel: { id: chanId },
-				type: TimeoutType.BAN
 			}
 		});
 		if (isBanned && isBanned.until) {
 			if (isBanned.until.getTime() < new Date().getTime()) {
-				await this.timeoutRepo.delete(isBanned.id);
+				await this.bannedRepo.delete(isBanned.id);
 				return undefined;
 			}
 		}
 		return isBanned;
 	}
 
-	async isMuted(userId: number, chanId: number): Promise<UserTimeout | undefined> {
-		const isMuted = await this.timeoutRepo.findOne({
-			where: {
-				user: { id: userId },
-				channel: { id: chanId },
-				// type: TimeoutType.MUTED
-			}
-		});
-		if (isMuted && isMuted.until) {
-			if (isMuted.until.getTime() < new Date().getTime()) {
-				await this.timeoutRepo.delete(isMuted.id);
-				return undefined;
+	async isMuted(chanUser: ChannelUser, server: Server): Promise<boolean> {
+		if (chanUser.is_muted) {
+			const isMuted = await this.mutedRepo.findOne({
+				where: {
+					user: { id: chanUser.userId },
+					channel: { id: chanUser.channelId },
+				}
+			});
+			if (isMuted) {
+				if (isMuted.until) {
+					if (isMuted.until.getTime() < new Date().getTime()) {
+						await this.mutedRepo.delete(isMuted.id);
+						chanUser.is_muted = false;
+						const updatedChanUser = await this.channelUserRepo.save(chanUser);
+						server.to(`channel-${chanUser.channelId}`).emit('ChannelUpdate', { type: ChannelUpdateType.CHANUSER, data: updatedChanUser})
+						return false;
+					} else {
+						const until = ((isMuted.until.getTime() - Date.now()) / 1000).toFixed(0)
+						throw new BadRequestException(`You are muted for ${until} seconds`);
+					}
+				} else {
+					throw new BadRequestException(`You are permanently muted`);
+				}
 			}
 		}
-		return isMuted;
+		return false;
 	}
 
 	async muteUser(requester: ChannelUser, dto: MuteUserDto) {
-		const alreadyMuted = await this.isMuted(dto.userId, dto.chanId);
+		const alreadyMuted = await this.mutedRepo.findOne({
+			where: {
+				user: { id: dto.userId },
+				channel: { id: dto.chanId },
+			}
+		});
 		if (alreadyMuted)
 			throw new BadRequestException('User already muted');
 
@@ -326,29 +338,33 @@ export class ChannelService {
 		if (dto.time)
 			until = new Date(new Date().getTime() + dto.time * 1000);
 
-		const mutedUser = this.timeoutRepo.create({
+		const mutedUser = this.mutedRepo.create({
 			user: userToMute.user,
 			channel: { id: dto.chanId },
 			until,
-			type: TimeoutType.MUTED,
 		});
-
-		return this.timeoutRepo.save(mutedUser);
+		await this.mutedRepo.save(mutedUser);
+		userToMute.is_muted = true;
+		return this.channelUserRepo.save(userToMute);
 	}
 
 	async unMuteUser(dto: MuteUserDto) {
-		const isMuted = await this.timeoutRepo.findOne({
+		const chanUser: ChannelUser = await this.getChannelUser(dto.chanId, dto.userId);
+		if (!chanUser) {
+			throw new NotInChannelException();
+		}
+		const isMuted = await this.mutedRepo.findOne({
 			where: {
 				user: { id: dto.userId },
 				channel: { id: dto.chanId },
-				type: TimeoutType.MUTED
 			}
 		});
 		if (!isMuted) {
 			throw new BadRequestException('User is not muted');
 		}
-		await this.timeoutRepo.delete(isMuted.id);
-		return isMuted;
+		await this.mutedRepo.delete(isMuted.id);
+		chanUser.is_muted = false;
+		return this.channelUserRepo.save(chanUser);
 	}
 
 	getUsersInChannelExecptInArgs(chanId: number, usersId: number[]) {

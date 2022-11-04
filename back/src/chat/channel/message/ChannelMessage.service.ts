@@ -16,7 +16,6 @@ export class ChannelMessageService {
 	) {}
 
 	async create(chanUser: ChannelUser, messageDto: ChannelMessageDto) {
-		// this.channelService.isMuted(chanUser);//TODO
 		const message = this.messagesRepo.create({
 			content: messageDto.content,
 			channel: { id: chanUser.channelId },
