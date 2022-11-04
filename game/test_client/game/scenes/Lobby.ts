@@ -20,6 +20,8 @@ export default class Lobby extends Phaser.Scene
 
 	socketmanager: ClientSocketManager = new ClientSocketManager();
 
+	wallpaper?: Phaser.GameObjects.Image;
+
 	Player_A_Back_avatar?: Phaser.GameObjects.Image;
 	Player_A_Back_indicator?: Phaser.GameObjects.Shape;
 	Player_A_Back_name?: Phaser.GameObjects.Text;
@@ -62,6 +64,7 @@ export default class Lobby extends Phaser.Scene
 	anti_spam_count :number = 0;
 	wait_delay: number = 0;
 	connected: boolean = false;
+	starting: boolean = false;
 
 
 	preload ()
@@ -77,6 +80,11 @@ export default class Lobby extends Phaser.Scene
 		this.load.image(
 			'button',
 			'assets/button.png'
+			);
+
+		this.load.image(
+			'versus_wallpaper',
+			'assets/images/versus.jpg'
 			);
 
 		this.game_type = this.game.registry.get('players_data').game_settings.game_type;
@@ -109,6 +117,10 @@ export default class Lobby extends Phaser.Scene
 			game_end: this.game_end.bind(this)
 
         });
+		this.cameras.main.setBackgroundColor('#421278');
+		this.wallpaper = this.add.image(0 ,0 , 'versus_wallpaper')
+						.setOrigin(0,0)
+						.setDisplaySize(800, 600);
 
 		this.Player_A_Back_avatar = this.add.image(130, 130, 'player_a_back_avatar')
 								.setOrigin(0.5,0.5)
@@ -171,6 +183,13 @@ export default class Lobby extends Phaser.Scene
 		{
 			this.input.on('gameobjectdown',this.click_event);
 		}
+
+
+		// this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, (cam, effect) => {
+		// 	this.scene.start('Pong');
+		// })
+
+
 		this.socketmanager.lobby_send_request_status(this.registry.get('players_data').game_id);
 	}
 
@@ -278,40 +297,60 @@ export default class Lobby extends Phaser.Scene
 	{
 		console.log('ready to start');
 
-		this.update_lobby_status(
-			{
-				Player_A_Back: PlayerStatus.Ready,
-				Player_A_Front: PlayerStatus.Ready,
-				Player_B_Front: PlayerStatus.Ready,
-				Player_B_Back: PlayerStatus.Ready,
-			});
-
-		let timer: number = 1;
-		let style: Phaser.Types.GameObjects.Text.TextStyle = 
+		if (!this.starting)
 		{
-			fontSize: '40px',
-			color: '#000000',
-			fontFamily: 'Arial'
-		}
+			this.starting = true;
 
-		this.socketmanager.game_get_round_setup(this.game.registry.get('players_data').game_id);
-		this.countdown = this.add.text(400, 100, timer.toString(), style);
 
-		this.time.addEvent({
-			delay: 1000,
-			callback: function()
-			{
-				timer -= 1;
-				console.log("countdown:", timer);
-				this.countdown.setText(timer.toString());
-				if (timer <= 0)
+			this.update_lobby_status(
 				{
-					this.countdown.destroy();
-					this.launch_pong();
-				}
-			},
-			callbackScope: this,
-			loop: true });
+					Player_A_Back: PlayerStatus.Ready,
+					Player_A_Front: PlayerStatus.Ready,
+					Player_B_Front: PlayerStatus.Ready,
+					Player_B_Back: PlayerStatus.Ready,
+				});
+	
+			let timer: number = 1;
+			let style: Phaser.Types.GameObjects.Text.TextStyle = 
+			{
+				fontSize: '40px',
+				color: '#000000',
+				fontFamily: 'Arial'
+			}
+	
+			this.socketmanager.game_get_round_setup(this.game.registry.get('players_data').game_id);
+			this.countdown = this.add.text(400, 100, timer.toString(), style);
+	
+			// this.time.addEvent({
+			// 	delay: 1000,
+			// 	callback: function()
+			// 	{
+			// 		timer -= 1;
+			// 		//console.log("countdown:", timer);
+			// 		this.countdown.setText(timer.toString());
+			// 		if (timer === 0)
+			// 		{
+			// 			this.countdown.destroy();
+	
+			// 			this.cameras.main.fadeOut(1000, 0, 0, 0);
+						
+			// 			//this.launch_pong();
+			// 		}
+			// 	},
+			// 	callbackScope: this,
+			// 	loop: true });
+	
+	
+			setTimeout(() => { 
+				this.cameras.main.fadeOut(1000, 0, 0, 0);
+		
+			}, 1500);
+	
+			setTimeout(() => { 
+				this.scene.start('Pong');
+			}, 2500);
+
+		}
 
 
 	}
