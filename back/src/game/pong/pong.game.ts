@@ -1,4 +1,4 @@
-import { GameState, GameSettings, RoundSetup, Goal, EndResult } from "src/utils/types/game.types";
+import { GameState, GameSettings, RoundSetup, Goal, EndResult, GameMode } from "src/utils/types/game.types";
 import { Lobby } from "../lobby/lobby";
 import PongCore from "./pong.core"
 
@@ -13,6 +13,7 @@ export class PongGame
 //debug: number = 0;
 	constructor(
 		public game_settings: GameSettings,
+		public game_mode: GameMode,
 	private readonly lobby: Lobby
 	)
 	{

@@ -15,7 +15,7 @@ import { UserIdDto } from 'src/chat/gateway/dto/user-id.dto';
 import { User } from 'src/typeorm';
 import { UserService } from 'src/user/user.service';
 import { GetUser } from 'src/utils/decorators';
-import { NewGameData, PlayersLobbyData, LobbyRequest, GameMode } from 'src/utils/types/game.types';
+import {  PlayersLobbyData, GameMode } from 'src/utils/types/game.types';
 import { JwtPayload, notificationType, UserPayload } from 'src/utils/types/types';
 import { UserSessionManager } from './user.session';
 import { LobbyFactory } from './lobby/lobby.factory';
@@ -101,44 +101,44 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
 
 	/* ----- Administration ----- */
 
-	@SubscribeMessage('admin_authenticate')
-	async onAdminAuthenticate(@ConnectedSocket() client: Socket,
-	@MessageBody() data: string)
-	{
-		if (data == this.admin_secret)
-		{
-			this.admin = client;
-			console.log("admin has logged in");
-			client.emit('admin_connection', true);
-		}
-		else
-		{
-			client.emit('admin_connection', false);
-			//log the incident somewhere
-		}
-	}
+// 	@SubscribeMessage('admin_authenticate')
+// 	async onAdminAuthenticate(@ConnectedSocket() client: Socket,
+// 	@MessageBody() data: string)
+// 	{
+// 		if (data == this.admin_secret)
+// 		{
+// 			this.admin = client;
+// 			console.log("admin has logged in");
+// 			client.emit('admin_connection', true);
+// 		}
+// 		else
+// 		{
+// 			client.emit('admin_connection', false);
+// 			//log the incident somewhere
+// 		}
+// 	}
 
-	@SubscribeMessage('admin_newgame')
-	async onAdminNewGame(@ConnectedSocket() client: Socket,
-	@MessageBody() data: LobbyRequest)
-	{
-		// if (client['id'] == this.admin['id'])
-		// {
-			const gamedata: NewGameData = this.lobbyfactory.lobby_create(data);
-			console.log(gamedata);
+// 	@SubscribeMessage('admin_newgame')
+// 	async onAdminNewGame(@ConnectedSocket() client: Socket,
+// 	@MessageBody() data: LobbyRequest)
+// 	{
+// 		// if (client['id'] == this.admin['id'])
+// 		// {
+// 			const gamedata: NewGameData = this.lobbyfactory.lobby_create(data);
+// 			console.log(gamedata);
 
-//TODO
-//preparer les PlayersGameData de chaque joueur avec le NewGameData
-//envoyer les PlayersGameData au joeuurs concerne
-//-->NEED identification des sockets
+// //TODO
+// //preparer les PlayersGameData de chaque joueur avec le NewGameData
+// //envoyer les PlayersGameData au joeuurs concerne
+// //-->NEED identification des sockets
 
-			client.emit('newgame_data', gamedata);
-		// }
-		// else
-		// {
-		// 	//log the event somewhere
-		// }	
-	}
+// 			client.emit('newgame_data', gamedata);
+// 		// }
+// 		// else
+// 		// {
+// 		// 	//log the event somewhere
+// 		// }	
+// 	}
 
 	@SubscribeMessage('admin_lobby_quantity')
 	async onAdminLobbyQuantity(@ConnectedSocket() client: Socket)
@@ -170,25 +170,28 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
 
 	/* ----- Users Lobby Management ----- */
 
-
+	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('user_join_lobby')
-	async onUserJoinLobby(@ConnectedSocket() client: Socket,
-	@MessageBody() data: PlayersLobbyData)
-	{
-	//	console.log("user join lobby", data);
-		this.lobbyfactory.lobby_join(client, data);
-	}
-
-	@SubscribeMessage('user_is_ready')
-	async onUserisReady(@ConnectedSocket() client: Socket,
+	async onUserJoinLobby(@ConnectedSocket() client: AuthenticatedSocket,
 	@MessageBody() game_id: string)
 	{
-		this.lobbyfactory.lobby_player_ready(client, game_id);
+	//	console.log("user join lobby", data);
+		this.lobbyfactory.lobby_join(client, game_id);
 	}
 
 
+
+//Irrelevant with waitingroom
+	// @SubscribeMessage('user_is_ready')
+	// async onUserisReady(@ConnectedSocket() client: Socket,
+	// @MessageBody() game_id: string)
+	// {
+	// 	this.lobbyfactory.lobby_player_ready(client, game_id);
+	// }
+
+	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('user_lobby_request_status')
-	async onUserLobbyRequestStatus(@ConnectedSocket() client: Socket,
+	async onUserLobbyRequestStatus(@ConnectedSocket() client: AuthenticatedSocket,
 	@MessageBody() game_id: string)
 	{
 		this.lobbyfactory.lobby_request_status(client, game_id);
@@ -208,7 +211,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
 
 
 	@SubscribeMessage('user_game_get_round_setup')
-	async onUserGameGetRoundSetup(@ConnectedSocket() client: Socket,
+	async onUserGameGetRoundSetup(@ConnectedSocket() client: AuthenticatedSocket,
 	@MessageBody() game_id: string)
 	{
 		//this.lobbyfactory.lobby_game_input(data);
@@ -216,13 +219,21 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
 	}
 
 
+
+
+//commented for now
+
 	/* ----- Replay Handling ----- */
 
 
-	@SubscribeMessage('replay_request')
-	async onReplayRequest(@ConnectedSocket() client: Socket,
-	@MessageBody() game_id: string)
-	{
-		this.lobbyfactory.send_replay(client, game_id);
-	}
+	// @SubscribeMessage('replay_request')
+	// async onReplayRequest(@ConnectedSocket() client: Socket,
+	// @MessageBody() game_id: string)
+	// {
+	// 	this.lobbyfactory.send_replay(client, game_id);
+	// }
+
+
+
+
   }

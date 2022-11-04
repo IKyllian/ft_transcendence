@@ -40,14 +40,14 @@ export type PlayersLobbyData =
 }
 
 //data sent to lobby factory to request a new lobby
-export type LobbyRequest =
-{
-	Player_A_Back: string,
-	Player_A_Front: string,
-	Player_B_Front: string,
-	Player_B_Back: string,
-	game_settings: GameSettings
-}
+// export type LobbyRequest =
+// {
+// 	Player_A_Back: string,
+// 	Player_A_Front: string,
+// 	Player_B_Front: string,
+// 	Player_B_Back: string,
+// 	game_settings: GameSettings
+// }
 
 //data sent to lobby factory to request a new lobby
 export type MatchmakingLobby =
@@ -62,19 +62,19 @@ export type MatchmakingLobby =
 
 
 //data sent from back to front with data for the players
-export type NewGameData =
-{
-	Player_A_Back: string,
-	Player_A_Back_secret: string,
-	Player_A_Front: string,
-	Player_A_Front_secret: string,
-	Player_B_Front: string,
-	Player_B_Front_secret: string,
-	Player_B_Back: string,
-	Player_B_Back_secret: string,
-	game_id: string,
-	game_settings: GameSettings
-}
+// export type NewGameData =
+// {
+// 	Player_A_Back: string,
+// 	Player_A_Back_secret: string,
+// 	Player_A_Front: string,
+// 	Player_A_Front_secret: string,
+// 	Player_B_Front: string,
+// 	Player_B_Front_secret: string,
+// 	Player_B_Back: string,
+// 	Player_B_Back_secret: string,
+// 	game_id: string,
+// 	game_settings: GameSettings
+// }
 
 export enum PlayerStatus
 {
