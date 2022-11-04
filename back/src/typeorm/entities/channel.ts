@@ -5,6 +5,7 @@ import { BannedUser } from "./bannedUser";
 import { ChannelMessage } from "./channelMessage";
 import { ChannelUser } from "./channelUser";
 import { User } from "./user";
+import { UserTimeout } from "./userTimeout";
 
 @Entity()
 export class Channel {
@@ -35,5 +36,10 @@ export class Channel {
 		cascade: true,
 	})
 	bannedUsers: BannedUser[];
+
+	@OneToMany(() => UserTimeout, (userTimeout) => userTimeout.channel, {
+		cascade: true,
+	})
+	usersTimeout: UserTimeout[];
 }
 

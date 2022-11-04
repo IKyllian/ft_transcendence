@@ -9,7 +9,7 @@ import { PartyService } from "../party/party.service";
 export class QueueService {
 	constructor(
 		private partyService: PartyService,
-		) {}
+	) {}
 		
 	private queue1v1 = new Array<Party>();
 	private queue2v2 = new Array<Party>();

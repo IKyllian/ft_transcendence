@@ -8,7 +8,7 @@
 	- Add Can add/modify/delete password of a channels
 	- what to do if inviting a ban user?
 	- Invitation on a channel by multiple users to test
-	- On ban, how to handle user
+	- OWNER CAN BAN/MUTE ANYONE AND MODERATOR CAN MUTE MEMBER ?
 
 
 // GAME

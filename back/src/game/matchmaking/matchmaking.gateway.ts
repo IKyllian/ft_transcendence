@@ -52,7 +52,6 @@ export class MatchmakingGateway {
 		}
 		const notif = await this.notifService.createPartyInviteNotif(user, dto.id);
 		socket.to(`user-${dto.id}`).emit('NewPartyInvite', notif);
-		this.notifService.deletePartyInvite(notif.id);
 	}
 
 	@UseGuards(WsJwtGuard)

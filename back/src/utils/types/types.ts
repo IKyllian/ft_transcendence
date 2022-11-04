@@ -51,3 +51,17 @@ export enum RelationStatus {
 	FRIEND = 'friend',
 	NONE = 'none'
 }
+
+export enum TimeoutType {
+	BAN,
+	MUTED
+}
+
+export enum ChannelUpdateType {
+	JOIN,
+	LEAVE,
+	BAN,
+	UNBAN,
+	MUTE,
+	UNMUTE,
+}

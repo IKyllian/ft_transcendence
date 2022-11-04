@@ -8,21 +8,21 @@ import { notificationType } from 'src/utils/types/types';
 import { FindOneOptions, Repository } from 'typeorm';
 import { ChannelNotFoundException } from 'src/utils/exceptions';
 import { AuthenticatedSocket } from 'src/utils/types/auth-socket';
-import { Interval, SchedulerRegistry, Timeout } from '@nestjs/schedule';
-import { CronJob } from 'cron';
+import { TaskService } from 'src/task-scheduling/task.service';
 
 @Injectable()
 export class NotificationService {
 	constructor(
 		private userService: UserService,
-		// private channelService: ChannelService,
 		@Inject(forwardRef(() => ChannelService))
 		private channelService: ChannelService,
+		// @Inject(forwardRef(() => TaskService))
+		// private taskService: TaskService,
+
 		@InjectRepository(Notification)
 		private notifRepo: Repository<Notification>,
 		@InjectRepository(Channel)
 		private channelRepo: Repository<Channel>,
-		private schedulerRegistry: SchedulerRegistry,
 	) {}
 
 	createFriendRequestNotif(addressee: User, requester: User) {
@@ -80,8 +80,11 @@ export class NotificationService {
 			addressee,
 			requester: user,
 			type: notificationType.PARTY_INVITE,
+			delete_at: new Date(Date.now() - 20 * 1000)
 		});
-		return this.notifRepo.save(notif);
+		const notifToSend = await this.notifRepo.save(notif);
+		// this.taskService.handlePartyInviteNotif(notif);
+		return notifToSend;
 	}
 
 	findOne(options: FindOneOptions<Notification>): Promise<Notification | null> {
@@ -137,21 +140,5 @@ export class NotificationService {
 
 	delete(id: number) {
 		return this.notifRepo.delete(id);
-	}
-
-	deletePartyInvite(id: number) {
-		setTimeout(() => {
-			this.notifRepo.delete(id);
-		}, 21000, id)
-	}
-
-	handleInterval() {
-		// const date = new Date(Date.now() + 10 * 1000);
-		// const job = new CronJob(date, () => {
-		// 	console.log("Interval-----------------------------------------------------------------");
-		// });
-		// // console.log(job)
-		// this.schedulerRegistry.addCronJob("test", job);
-		// job.start();
 	}
 }

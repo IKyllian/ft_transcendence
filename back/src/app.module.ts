@@ -11,6 +11,7 @@ import { GameModule } from './game/game.module';
 import { MatchmakingModule } from './game/matchmaking/matchmaking.module';
 import entities from './typeorm';
 import { ScheduleModule } from '@nestjs/schedule';
+import { TaskScheduler } from './task-scheduling/task.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     MatchmakingModule,
     ConfigModule.forRoot({ envFilePath: '.env', isGlobal: true }),
     NotificationModule,
+    TaskScheduler,
     ScheduleModule.forRoot(),
     TypeOrmModule.forRoot({
       type: 'postgres',
