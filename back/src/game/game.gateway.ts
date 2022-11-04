@@ -26,7 +26,6 @@ import { SocketReservedEventsMap } from 'socket.io/dist/socket';
 import { RoomDto } from 'src/chat/gateway/dto/room.dto';
 import { threadId } from 'worker_threads';
 import { BlobOptions } from 'buffer';
-import { JwtGameGuard } from 'src/auth/guard/jwt-game.guard';
 import { AuthenticatedSocket } from '../utils/types/auth-socket';
 import { QueueService } from './matchmaking/queue/queue.service';
 import { GatewayExceptionFilter } from 'src/utils/exceptions/filter/Gateway.filter';
@@ -198,7 +197,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
 	/* ----- Users Game Management ----- */
 
 
-	@UseGuards(JwtGameGuard)
+	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('user_game_input')
 	async onUserGameInput(
 	@ConnectedSocket() client: AuthenticatedSocket,

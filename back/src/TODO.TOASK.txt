@@ -20,9 +20,7 @@
 	- Route for editing user / Channels
 	- Check routes for delete entities
 	- error when trying to connect with a login 42 with a password
-	- Create message notif: channel: quand qqn envoie un msg,
-	creer notif pour chaque user du channel, emit a tout les membres online
-	(si pas deja fait) et suprimer notif quand join / leave room
+	- on socket connection, add args if in channel room to rejoin it?
 
 //ISSUE ?
 	- mute is canceled if user quit and rejoin channel

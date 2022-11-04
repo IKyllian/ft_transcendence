@@ -10,6 +10,7 @@ import { NotificationModule } from './notification/notification.module';
 import { GameModule } from './game/game.module';
 import { MatchmakingModule } from './game/matchmaking/matchmaking.module';
 import entities from './typeorm';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import entities from './typeorm';
     MatchmakingModule,
     ConfigModule.forRoot({ envFilePath: '.env', isGlobal: true }),
     NotificationModule,
+    ScheduleModule.forRoot(),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.POSTGRES_HOST,

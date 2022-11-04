@@ -1,7 +1,6 @@
 import { ForbiddenException, UnauthorizedException, UseFilters, UseGuards, UsePipes, ValidationPipe } from "@nestjs/common";
 import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
-import { JwtGameGuard } from "src/auth/guard/jwt-game.guard";
 import { WsJwtGuard } from "src/auth/guard/ws-jwt.guard";
 import { UserIdDto } from "src/chat/gateway/dto/user-id.dto";
 import { NotificationService } from "src/notification/notification.service";
@@ -11,6 +10,7 @@ import { GatewayExceptionFilter } from "src/utils/exceptions/filter/Gateway.filt
 import { AuthenticatedSocket } from "src/utils/types/auth-socket";
 import { GameMode } from "src/utils/types/game.types";
 import { notificationType } from "src/utils/types/types";
+import { ConnectionOptionsReader } from "typeorm";
 import { UserSessionManager } from "../user.session";
 import { IsReadyDto } from "./dto/boolean.dto";
 import { IdDto } from "./dto/id.dto";
@@ -59,11 +59,10 @@ export class MatchmakingGateway {
 	@SubscribeMessage('CreateParty')
 	createLobby(
 		@GetUser() user: User,
-		@ConnectedSocket() socket: Socket,
 	) {
 		if (!this.partyService.partyJoined.getParty(user.id)) {
 			const party = this.partyService.createParty(user);
-			socket.emit("PartyUpdate", party);
+			this.server.to(`user-${user.id}`).emit("PartyUpdate", party);
 		}
 	}
 
@@ -80,8 +79,9 @@ export class MatchmakingGateway {
 				type: notificationType.PARTY_INVITE,
 			}
 		});
-		if (!inviteFound)
+		if (!inviteFound) {
 			throw new ForbiddenException('You are not invited to this party');
+		}
 		this.partyService.joinParty(user, requester.id);
 	}
 
@@ -106,11 +106,10 @@ export class MatchmakingGateway {
 	@SubscribeMessage('SetReadyState')
 	setReadyState(
 		@GetUser() user: User,
-		@ConnectedSocket() socket: Socket,
 		@MessageBody() data: IsReadyDto,
 	) {
 		console.log('set Ready', data)
-		this.partyService.setReadyState(user, socket, data.isReady);
+		this.partyService.setReadyState(user, data.isReady);
 	}
 
 	@UseGuards(WsJwtGuard)
@@ -124,15 +123,36 @@ export class MatchmakingGateway {
 	}
 
 	@UseGuards(WsJwtGuard)
+	@SubscribeMessage('test2')
+	test2(@ConnectedSocket() socket: AuthenticatedSocket) {
+		console.log(socket.id)
+	}
+
+	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('test')
-	test(@ConnectedSocket() socket: Socket, @GetUser() user: User) {
-		if (!this.partyService.partyJoined.getParty(user.id)) {
-			const party = this.partyService.createParty(user);
-			socket.emit("PartyCreated", party);
-			socket.join(`party-${party.id}`)
-		}
-		const party = this.partyService.partyJoined.getParty(user.id);
-		console.log(party)
-		party.gameSetting.ball_acceleration++;
+	async test(@ConnectedSocket() socket: AuthenticatedSocket, @GetUser() user: User) {
+		// console.log(socket)
+		const socketConnected = await this.server.sockets.allSockets();
+		const mySocket: Map<string, AuthenticatedSocket> = this.server.sockets.sockets as Map<string, AuthenticatedSocket>;
+		// console.log(mySocket)
+		// const sockets = await socket.in("user-8").fetchSockets() as unknown as AuthenticatedSocket[];
+		const userIdInRoom = (await socket.in("user-8").fetchSockets() as unknown as AuthenticatedSocket[]).map(e => e.user.id)
+		// const userIdInChan = sockets.map(e => e.user.id)
+		console.log(userIdInRoom)
+		// mySocket.forEach((e) => {
+		// 	console.log(e.user)
+		// })
+		// if (!this.partyService.partyJoined.getParty(user.id)) {
+		// 	const party = this.partyService.createParty(user);
+		// 	socket.emit("PartyCreated", party);
+		// 	socket.join(`party-${party.id}`)
+		// }
+		// const party = this.partyService.partyJoined.getParty(user.id);
+		// console.log(party)
+		// party.gameSetting.ball_acceleration++;
+		
+
+		//channel message notif
+		// recuper tout les sockets de la room, 
 	}
 }

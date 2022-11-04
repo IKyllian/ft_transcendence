@@ -1,6 +1,6 @@
 import { Socket } from "socket.io";
-import { UserPayload } from "src/utils/types/types";
+import { User } from "src/typeorm";
 
 export interface AuthenticatedSocket extends Socket {
-	userInfo: UserPayload;
+	user: User;
 }

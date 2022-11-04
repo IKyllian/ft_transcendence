@@ -174,7 +174,7 @@ export class ChannelService {
 		return this.channelRepo.save(channel);
 	}
 
-	async getChannelById(user: User, id: number) {
+	async getChannelById(userId: number, id: number) {
 		const channel = await this.channelRepo.findOne({
 			relations: {
 				channelUsers: { user: true },
@@ -188,7 +188,7 @@ export class ChannelService {
 		if (!channel)
 			throw new ChannelNotFoundException();
 		
-		const inChannel = this.isInChannel(channel, user.id);
+		const inChannel = this.isInChannel(channel, userId);
 		if (!inChannel)
 			throw new BadRequestException('User not in channel');
 		return channel;
@@ -215,7 +215,7 @@ export class ChannelService {
 		return this.channelRepo.delete(id);
 	}
 
-	async banUser(user: User, dto: BanUserDto) {
+	async banUser(requesterId: number, dto: BanUserDto) {
 		let channel = await this.channelRepo.findOne({
 			relations: {
 				channelUsers: { user: true },
@@ -233,7 +233,7 @@ export class ChannelService {
 		const userToBan = await this.getChannelUser(channel.id, dto.userId);
 		if (!userToBan)
 			throw new NotInChannelException();
-		else if (userToBan.role === 'owner' || user.id === dto.userId)
+		else if (userToBan.role === 'owner' || requesterId === dto.userId)
 			throw new BadRequestException("You don't have permissions");
 
 		let until = null;
@@ -326,6 +326,22 @@ export class ChannelService {
 				chanUser.is_muted = false;
 				this.channelRepo.save(chanUser);
 			}
+		}
+	}
+
+	getUsersInChannelExecptInArgs(chanId: number, usersId: number[]) {
+		const query = this.userRepo
+		.createQueryBuilder("user")
+		.select("user.id")
+		.innerJoin("user.channelUser", "channelUser", "channelUser.channel.id = :chanId",
+		{ chanId })
+
+		if (usersId.length > 0) {
+			return query
+				.where("user.id NOT IN (:...usersId)", { usersId: usersId })
+				.getMany();
+		} else {
+			return query.getMany();
 		}
 	}
 

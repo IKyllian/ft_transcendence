@@ -1,7 +1,7 @@
 import { ClassSerializerInterceptor, ForbiddenException, Injectable, UseInterceptors } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { ChannelMessage, ChannelUser } from "src/typeorm";
-import { ChannelNotFoundException } from "src/utils/exceptions";
+import { ChannelNotFoundException, NotInChannelException } from "src/utils/exceptions";
 import { Repository } from "typeorm";
 import { ChannelService } from "../channel.service";
 import { ChannelMessageDto } from "./dto/channelMessage.dto";
@@ -16,13 +16,10 @@ export class ChannelMessageService {
 	) {}
 
 	async create(chanUser: ChannelUser, messageDto: ChannelMessageDto) {
-		const channel = await this.channelService.findOneBy({ id: messageDto.chanId });
-		if (!channel)
-			throw new ChannelNotFoundException();
 		this.channelService.isMuted(chanUser);
 		const message = this.messagesRepo.create({
 			content: messageDto.content,
-			channel,
+			channel: { id: chanUser.channelId },
 			sender: chanUser.user,
 		});
 		return this.messagesRepo.save(message);

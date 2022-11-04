@@ -7,7 +7,7 @@ import { channelRole } from "src/utils/types/types";
 @Injectable()
 export class ChannelPermissionGuard implements CanActivate {
 	canActivate(context: ExecutionContext): boolean {
-		const channelUser = context.switchToHttp().getRequest().channelUser;
+		const channelUser = context.switchToHttp().getRequest().user.channelUser;
 		if (channelUser.role === channelRole.MODERATOR || channelUser.role === channelRole.OWNER)
 			return true;
 		throw new ChannelPermissionException();

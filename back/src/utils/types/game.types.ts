@@ -56,6 +56,8 @@ export type MatchmakingLobby =
 	Player_A_Front?: GameUser,
 	Player_B_Back: GameUser,
 	Player_B_Front?: GameUser,
+	gameMode: GameMode,
+	game_settings?: GameSettings
 }
 
 
