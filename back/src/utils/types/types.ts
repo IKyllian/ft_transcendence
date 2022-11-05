@@ -60,7 +60,7 @@ export enum TimeoutType {
 export enum ChannelUpdateType {
 	JOIN,
 	LEAVE,
-	BAN,
-	UNBAN,
-	CHANUSER
+	TIMEOUT,
+	UNTIMEOUT,
+	CHANUSER,
 }

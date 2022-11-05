@@ -4,7 +4,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { CronJob } from "cron";
 import { Server } from "socket.io";
 import { ChannelService } from "src/chat/channel/channel.service";
-import { BannedUser, ChannelUser, MutedUser, Notification } from "src/typeorm";
+import { ChannelUser, Notification, UserTimeout } from "src/typeorm";
 import { ChannelUpdateType, notificationType } from "src/utils/types/types";
 import { Repository } from "typeorm";
 
@@ -16,10 +16,8 @@ export class TaskService {
 
 		@InjectRepository(Notification)
 		private notifRepo: Repository<Notification>,
-		@InjectRepository(BannedUser)
-		private bannedRepo: Repository<BannedUser>,
-		@InjectRepository(MutedUser)
-		private mutedRepo: Repository<MutedUser>,
+		@InjectRepository(UserTimeout)
+		private timeoutRepo: Repository<UserTimeout>,
 		@InjectRepository(ChannelUser)
 		private chanUserRepo: Repository<ChannelUser>,
 	) {}
@@ -32,32 +30,33 @@ export class TaskService {
 
 	@Interval('timedout-user', 30000)
 	async handleTimedoutUser() {
-		const userToUnban = await this.bannedRepo
-			.createQueryBuilder('banned')
-			.where("banned.until < :now", { now: new Date() })
+		const users = await this.timeoutRepo
+			.createQueryBuilder('timeout')
+			.where("timeout.until < :now", { now: new Date() })
 			.getMany();
-		if (userToUnban) {
-			userToUnban.forEach(async (banned) => {
-				await this.bannedRepo.delete(banned.id);
-				this.server.to(`channel-${banned.channelId}`).emit('ChannelUpdate', { type: ChannelUpdateType.UNBAN, data: banned });
+
+		if (users) {
+			users.forEach(async (timeout) => {
+				await this.timeoutRepo.delete(timeout.id);
+				this.server.to(`channel-${timeout.channelId}`).emit('ChannelUpdate', { type: ChannelUpdateType.TIMEOUT, data: timeout });
 			});
 		}
 
-		const userToUnmute = await this.mutedRepo
-			.createQueryBuilder('muted')
-			.where("muted.until < :now", { now: new Date() })
-			.getMany();
-		if (userToUnmute) {
-			userToUnmute.forEach(async (muted) => {
-				await this.mutedRepo.delete(muted.id);
-				const chanUser = await this.chanService.getChannelUser(muted.channelId, muted.userId);
-				if (chanUser) {
-					chanUser.is_muted = false;
-					const updatedChanUser = await this.chanUserRepo.save(chanUser);
-					this.server.to(`channel-${muted.channelId}`).emit('ChannelUpdate', { type: ChannelUpdateType.CHANUSER, data: updatedChanUser });
-				}
-			});
-		}
+		// const userToUnmute = await this.mutedRepo
+		// 	.createQueryBuilder('muted')
+		// 	.where("muted.until < :now", { now: new Date() })
+		// 	.getMany();
+		// if (userToUnmute) {
+		// 	userToUnmute.forEach(async (muted) => {
+		// 		await this.mutedRepo.delete(muted.id);
+		// 		const chanUser = await this.chanService.getChannelUser(muted.channelId, muted.userId);
+		// 		if (chanUser) {
+		// 			chanUser.is_muted = false;
+		// 			const updatedChanUser = await this.chanUserRepo.save(chanUser);
+		// 			this.server.to(`channel-${muted.channelId}`).emit('ChannelUpdate', { type: ChannelUpdateType.CHANUSER, data: updatedChanUser });
+		// 		}
+		// 	});
+		// }
 	}
 
 	@Interval('party-notifications', 10000)

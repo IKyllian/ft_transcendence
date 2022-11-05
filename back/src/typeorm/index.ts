@@ -1,5 +1,4 @@
 import { Avatar } from "./entities/avatar"
-import { BannedUser } from "./entities/bannedUser"
 import { Channel } from "./entities/channel"
 import { ChannelMessage } from "./entities/channelMessage"
 import { ChannelUser } from "./entities/channelUser"
@@ -9,7 +8,7 @@ import { PrivateMessage } from "./entities/privateMessage"
 import { Statistic } from "./entities/statistic"
 import { User } from "./entities/user"
 import { Notification } from "./entities/notification"
-import { MutedUser } from "./entities/mutedUser"
+import { UserTimeout } from "./entities/userTimeout"
 
 const entities = [
 	User,
@@ -21,9 +20,8 @@ const entities = [
 	Avatar,
 	Conversation,
 	PrivateMessage,
-	BannedUser,
 	Notification,
-	MutedUser,
+	UserTimeout,
 ];
 
 export default entities;
@@ -38,7 +36,6 @@ export {
 	Avatar,
 	Conversation,
 	PrivateMessage,
-	BannedUser,
 	Notification,
-	MutedUser,
+	UserTimeout
 }
