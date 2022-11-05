@@ -49,6 +49,8 @@ export class UserController {
 		console.log(file);
 		if (!file)
 			throw new ForbiddenException('Image is missing')
+		if (file.mimetype != 'image/png' && file.mimetype != 'image/jpeg' && file.mimetype != 'image/jpg')
+			throw new ForbiddenException('Invalid file extension ' + file.mimetype)
 		this.userService.updateAvatar(user, file.path);
 		return of({imagePath: file.path})
 	}
