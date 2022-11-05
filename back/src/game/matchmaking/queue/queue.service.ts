@@ -84,4 +84,14 @@ export class QueueService {
 			console.log('lobby', lobby);
 		}
 	}
+
+	leaveQueue(user: User) {
+		const party = this.partyService.partyJoined.getParty(user.id);
+		if (party) {
+			this.queue1v1.filter((queueing) => queueing.id !== party.id);
+			this.queue2v2.filter((queueing) => queueing.id !== party.id);
+			party.players.forEach(player => player.isReady = false);
+			this.partyService.emitPartyUpdate(party);
+		}
+	}
 }

@@ -3,7 +3,6 @@ import { ChatGateway } from './gateway/chat.gateway';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from 'src/auth/auth.module';
 import { Channel, User, ChannelUser, Statistic, ChannelMessage, Conversation, PrivateMessage } from 'src/typeorm';
-import { ChatSessionManager } from './gateway/chat.session';
 import { ChannelModule } from './channel/channel.module';
 import { UserModule } from 'src/user/user.module';
 import { APP_INTERCEPTOR } from '@nestjs/core';
@@ -30,7 +29,7 @@ import { TaskScheduler } from 'src/task-scheduling/task.module';
       // PrivateMessage, // useless?
     ]),
   ],
-  providers: [ChatGateway, ChatSessionManager,
+  providers: [ChatGateway,
     {
       provide: APP_INTERCEPTOR,
       useClass: ClassSerializerInterceptor,

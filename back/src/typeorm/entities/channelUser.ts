@@ -32,8 +32,5 @@ export class ChannelUser  {
 	role: channelRole;
 	
 	@Column({ default: false })
-	is_muted!: boolean;
-	
-	@Column({ nullable: true })
-	mutedTime?: Date;
+	is_muted: boolean;
 }

@@ -5,7 +5,6 @@ import { AuthService } from 'src/auth/auth.service';
 import { WsJwtGuard } from 'src/auth/guard/ws-jwt.guard';
 import { ChannelMessage, ChannelUser, Notification, User } from 'src/typeorm';
 import { ChannelService } from '../channel/channel.service';
-import { ChatSessionManager } from './chat.session';
 import { UserService } from 'src/user/user.service';
 import { ChannelUpdateType, JwtPayload, notificationType } from 'src/utils/types/types';
 import { GetChannelUser, GetUser } from 'src/utils/decorators';
@@ -50,7 +49,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		private channelMsgService: ChannelMessageService,
 		private authService: AuthService,
 		private channelService: ChannelService,
-		private readonly session: ChatSessionManager,
 		private userService: UserService,
 		private friendshipService: FriendshipService,
 		private notificationService: NotificationService,
@@ -60,14 +58,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	afterInit(server: Server) {
 			// console.log(this.server)
-	}
-
-	//test
-	@SubscribeMessage('hello') 
-	hello(@ConnectedSocket() socket: Socket) {
-		console.log('test')
-		// socket.emit('hello', 'hello');
-		this.server.emit('hello', "cccc")
 	}
 
 	async handleConnection(socket: AuthenticatedSocket) {
@@ -91,7 +81,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		if (user.status === 'offline') {
 			this.userService.setStatus(user, 'online');
 		}
-		// this.session.setUserSocket(socket.id, { user, socket });
 		socket.emit('Connection', {
 			friendList: await this.friendshipService.getFriendlist(user),
 			notification: await this.notificationService.getNotification(user),
@@ -103,8 +92,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		console.log('disco')
 		if (socket.handshake.headers.authorization) {
 			const payload = this.authService.decodeJwt(socket.handshake.headers.authorization.split(' ')[1]) as JwtPayload;
-			// get usersocket instance instead of call db ?
-			// this.session.removeUserSocket(socket.id);
 			const user = await this.userService.findOneBy({ id: payload?.sub });
 			if (user) {
 				this.userService.setStatus(user, 'offline');

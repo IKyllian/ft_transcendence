@@ -1,5 +1,5 @@
 import { ForbiddenException, UnauthorizedException, UseFilters, UseGuards, UsePipes, ValidationPipe } from "@nestjs/common";
-import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
+import { ConnectedSocket, MessageBody, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
 import { WsJwtGuard } from "src/auth/guard/ws-jwt.guard";
 import { UserIdDto } from "src/chat/gateway/dto/user-id.dto";
@@ -22,7 +22,7 @@ import { QueueService } from "./queue/queue.service";
 @UseFilters(GatewayExceptionFilter)
 @UsePipes(new ValidationPipe())
 @WebSocketGateway()
-export class MatchmakingGateway {
+export class MatchmakingGateway implements OnGatewayDisconnect {
 	@WebSocketServer() server: Server;
 
 	constructor(
@@ -38,6 +38,12 @@ export class MatchmakingGateway {
 	{
 	  this.partyService.server = server;
 	  this.taskScheduler.server = server;
+	}
+
+	handleDisconnect(socket: AuthenticatedSocket) {
+		if (socket.user) {
+			this.queueService.leaveQueue(socket.user);
+		}
 	}
 
 
@@ -126,6 +132,14 @@ export class MatchmakingGateway {
 	}
 
 	@UseGuards(WsJwtGuard)
+	@SubscribeMessage('StopQueue')
+	stopQueue(
+		@GetUser() user: User,
+	) {
+			this.queueService.leaveQueue(user);
+	}
+
+	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('test2')
 	test2(@ConnectedSocket() socket: AuthenticatedSocket) {
 		console.log(socket.id)
@@ -142,20 +156,5 @@ export class MatchmakingGateway {
 		const userIdInRoom = (await socket.in("user-8").fetchSockets() as unknown as AuthenticatedSocket[]).map(e => e.user.id)
 		// const userIdInChan = sockets.map(e => e.user.id)
 		console.log(userIdInRoom)
-		// mySocket.forEach((e) => {
-		// 	console.log(e.user)
-		// })
-		// if (!this.partyService.partyJoined.getParty(user.id)) {
-		// 	const party = this.partyService.createParty(user);
-		// 	socket.emit("PartyCreated", party);
-		// 	socket.join(`party-${party.id}`)
-		// }
-		// const party = this.partyService.partyJoined.getParty(user.id);
-		// console.log(party)
-		// party.gameSetting.ball_acceleration++;
-		
-
-		//channel message notif
-		// recuper tout les sockets de la room, 
 	}
 }

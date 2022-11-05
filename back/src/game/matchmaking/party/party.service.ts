@@ -17,7 +17,7 @@ export class PartyService {
 		return gameUser.find((e) => e.user.id === id);
 	}
 
-	emitUpdateParty(party: Party) {
+	emitPartyUpdate(party: Party) {
 		party.players.forEach((player) => {
 			this.server.to(`user-${player.user.id}`).emit('PartyUpdate', party);
 		})
@@ -38,7 +38,7 @@ export class PartyService {
 		if (!party) { throw new NotFoundException('party not found'); }
 		party.join(user);
 		this.partyJoined.setParty(user.id, party);
-		this.emitUpdateParty(party);
+		this.emitPartyUpdate(party);
 	}
 
 	leaveParty(user: User) {
@@ -51,7 +51,7 @@ export class PartyService {
 			}
 			party.leave(user);
 			this.partyJoined.removeParty(user.id);
-			this.emitUpdateParty(party);
+			this.emitPartyUpdate(party);
 			this.server.to(`user-${user.id}`).emit('PartyLeave');
 		}
 	}
@@ -69,7 +69,7 @@ export class PartyService {
 			const gameUser = this.getGameUserInParty(user.id, party.players);
 			if (gameUser) {
 				gameUser.isReady = isReady;
-				this.emitUpdateParty(party);
+				this.emitPartyUpdate(party);
 			}
 		}
 	}
