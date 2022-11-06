@@ -40,6 +40,12 @@ export class User {
 	@JoinTable({ name: 'blocked_users' })
 	blocked: User[];
 
+	@Column({ default: 1200 })
+	singlesElo: number;
+
+	@Column({ default: 1200 })
+	doublesElo: number;
+
 	@Exclude()
 	@Column({ nullable: true, select: false })
 	hash?: string

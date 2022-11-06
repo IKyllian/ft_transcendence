@@ -50,15 +50,15 @@ export type LobbyRequest =
 }
 
 //data sent to lobby factory to request a new lobby
-export type MatchmakingLobby =
-{
-	Player_A_Back: GameUser,
-	Player_A_Front?: GameUser,
-	Player_B_Back: GameUser,
-	Player_B_Front?: GameUser,
-	gameMode: GameMode,
-	game_settings?: GameSettings
-}
+// export type MatchmakingLobby =
+// {
+// 	Player_A_Back: GameUser,
+// 	Player_A_Front?: GameUser,
+// 	Player_B_Back: GameUser,
+// 	Player_B_Front?: GameUser,
+// 	gameMode: GameMode,
+// 	game_settings?: GameSettings
+// }
 
 
 //data sent from back to front with data for the players
@@ -186,4 +186,14 @@ export enum GameMode {
 	OneVsOne,
 	TwoVsTwo,
 	Custom
+}
+
+export enum TeamSide {
+	BLUE,
+	RED,
+}
+
+export enum PlayerPosition {
+	FRONT,
+	BACK,
 }

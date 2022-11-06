@@ -1,14 +1,12 @@
 import { BadRequestException } from "@nestjs/common";
 import { generate } from "shortid";
 import { Socket } from "socket.io";
-import { GameSettings } from "src/game/game-settings";
 import { User } from "src/typeorm";
-import { GameMode, GameType, PlayerType } from "src/utils/types/game.types";
+import { GameMode, GameSettings, GameType, PlayerType } from "src/utils/types/game.types";
 import { GameUser } from "../../game-user";
 
 export class Party {
 
-	// ownerId: number;
 	constructor(leader: User)
 	{
 		this.id = generate();
@@ -22,7 +20,7 @@ export class Party {
 
 	gameMode: GameMode = GameMode.OneVsOne;
 
-	gameSetting: GameSettings = new GameSettings();
+	gameSetting: GameSettings;
 
 	join(user: User) {
 		if (this.players.find((p) => p.user.id === user.id)) {

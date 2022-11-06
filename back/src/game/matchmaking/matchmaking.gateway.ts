@@ -127,8 +127,11 @@ export class MatchmakingGateway implements OnGatewayDisconnect {
 		@GetUser() user: User,
 		@MessageBody() data: { gameMode: GameMode}
 	) {
-		if (data.gameMode === GameMode.OneVsOne)
+		if (data.gameMode === GameMode.OneVsOne) {
 			this.queueService.join1v1Queue(user);
+		} else if (data.gameMode === GameMode.TwoVsTwo) {
+			this.queueService.join2v2Queue(user);
+		}
 	}
 
 	@UseGuards(WsJwtGuard)
