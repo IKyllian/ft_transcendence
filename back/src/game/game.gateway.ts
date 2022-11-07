@@ -35,7 +35,7 @@ import { GatewayExceptionFilter } from 'src/utils/exceptions/filter/Gateway.filt
 
 @UseFilters(GatewayExceptionFilter)
 @UsePipes(new ValidationPipe())
-@WebSocketGateway({ namespace: 'game' })
+@WebSocketGateway(/*{ namespace: 'game' }*/)
 export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
 {
 
@@ -51,12 +51,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
 		private readonly authService: AuthService,
 		private readonly userService: UserService,
 	  ) {}
-
-	afterInit(server: Server): any
-	{
-	  this.lobbyfactory.server = server;
-	}
-
 
 	/* ----- Connect/Disconnect ----- */
 

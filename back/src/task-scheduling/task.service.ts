@@ -91,8 +91,8 @@ export class TaskService {
 			}
 		}
 		// matchFound.forEach((match) => this.lobbyFactory.lobby_create(match));
+		console.log("MatchFound: ", matchFound);
 		matchFound.forEach((match) => this.lobbyFactory.lobby_create(match));
-		// console.log("MatchFound: ", matchFound);
 	}
 
 	@Interval('doubles-queue', 3000)
@@ -137,7 +137,7 @@ export class TaskService {
 			potentialLobby = [];
 		}
 		// matchFound.forEach((match) => ) // call game Karim function to create game
-		console.log("MatchFound: ", matchFound);
+		// console.log("MatchFound: ", matchFound);
 	}
 
 	@Interval('timedout-user', 30000)

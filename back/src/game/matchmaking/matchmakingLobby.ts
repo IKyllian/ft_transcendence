@@ -4,9 +4,9 @@ import { GameUser } from "../game-user";
 
 export class MatchmakingLobby {
 	constructor(lobby1: QueueLobbby, lobby2: QueueLobbby, public game_settings: GameSettings) {
-		if (this.game_settings.game_type === GameType.Doubles) {
+		if (this.game_settings.game_type === GameType.Singles) {
 			this.Player_A_Back = lobby1.players[0];
-			this.Player_B_Back = lobby1.players[0];
+			this.Player_B_Back = lobby2.players[0];
 		} else {
 			if (lobby1.players[0].position === PlayerPosition.BACK) {
 				this.Player_A_Back = lobby1.players[0];
