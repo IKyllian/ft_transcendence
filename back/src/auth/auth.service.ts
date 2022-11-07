@@ -33,24 +33,6 @@ export class AuthService {
 	})
 	
 
-	/* async signup(dto: SignupDto) {
-		if (await this.userService.nameTaken(dto.username))
-			throw new ForbiddenException('Username taken');
-		const hash = await argon.hash(dto.password);
-		const params = {
-			username: dto.username,
-			hash,
-		}
-		const user = await this.userService.create(params);
-		const tokens = await this.signTokens(user.id, user.username);
-		this.updateRefreshHash(user, tokens.refresh_token);
-		return {
-			access_token: tokens.access_token,
-			refresh_token: tokens.refresh_token,
-			user: user,
-		}
-	} */
-
 	async signup(dto: SignupDto) {
 		if (await this.userService.nameTaken(dto.username))
 			throw new ForbiddenException('Username already in use');
