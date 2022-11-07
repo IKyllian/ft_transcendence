@@ -1,6 +1,7 @@
 import { Socket } from "socket.io";
 import { AuthenticatedSocket } from "src/utils/types/auth-socket";
-import { GameType, PlayerStatus, GameSettings, GameState, LobbyStatus, PlayerInput, PlayerType, RoundSetup, MatchmakingLobby } from "src/utils/types/game.types";
+import { GameType, PlayerStatus, GameSettings, GameState, LobbyStatus, PlayerInput, PlayerType, RoundSetup } from "src/utils/types/game.types";
+import { MatchmakingLobby } from "../matchmaking/matchmakingLobby";
 import { PongGame } from "../pong/pong.game";
 import { LobbyFactory } from "./lobby.factory";
 
@@ -42,7 +43,7 @@ export class Lobby
 	constructor(
 		public lobby_data: MatchmakingLobby,
 		public game_id: string,
-	//	public game_settings: GameSettings,
+	//	public game_settings: game_settings,
 		readonly factory: LobbyFactory
 		)
 	{
@@ -55,7 +56,7 @@ export class Lobby
 
 	// constructor(
 	// 	public gamedata: NewGameData,
-	// 	public game_settings: GameSettings,
+	// 	public game_settings: game_settings,
 	// 	readonly factory: LobbyFactory
 	// 	)
 	// {

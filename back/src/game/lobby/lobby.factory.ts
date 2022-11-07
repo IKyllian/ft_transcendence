@@ -2,9 +2,10 @@ import { Server } from 'socket.io';
 import { generate } from 'shortid'
 import { Lobby } from './lobby';
 import { Socket } from 'socket.io';
-import { GameState, GameType, MatchmakingLobby, GameSettings, NewGameData, PlayersGameData, PlayerType } from 'src/utils/types/game.types';
+import { GameState, GameType, GameSettings, NewGameData, PlayersGameData, PlayerType } from 'src/utils/types/game.types';
 import { AuthenticatedSocket } from 'src/utils/types/auth-socket';
-//import  * as DefaultGameSettings from '../game-settings';
+import { MatchmakingLobby } from '../matchmaking/matchmakingLobby';
+//import  * as Defaultgame_settings from '../game-settings';
 
 
 //TODO
@@ -25,7 +26,7 @@ export class LobbyFactory
 		// const lobby = new Lobby(ret, lobby_request.game_settings,  this);
 		const lobby = new Lobby(lobby_request, game_id,  this);
 		this.lobby_list.set(lobby.game_id, lobby);
-		
+
 		let player_data: PlayersGameData =
 		{
 			Player_A_Back: lobby_request.Player_A_Back,
