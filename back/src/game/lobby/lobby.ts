@@ -9,7 +9,7 @@ export class Lobby
 	//public game_id: string;
 	public game_type: GameType = GameType.Singles;
 	public creation_date: Date = new Date();
-	public game: PongGame = new PongGame(this.lobby_data.game_settings, this.lobby_data.gameMode, this);
+	public game: PongGame = new PongGame(this.lobby_data.game_settings, this);
 
 
 	//changer les spects en room

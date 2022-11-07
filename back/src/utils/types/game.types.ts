@@ -56,7 +56,7 @@ export type MatchmakingLobby =
 	Player_A_Front?: GameUser,
 	Player_B_Back: GameUser,
 	Player_B_Front?: GameUser,
-	gameMode: GameMode,
+//	gameMode: GameMode,
 	game_settings?: GameSettings
 }
 
@@ -75,6 +75,21 @@ export type MatchmakingLobby =
 // 	game_id: string,
 // 	game_settings: GameSettings
 // }
+
+
+// data sent from back to front with data for the players
+export type NewGameData =
+{
+	Player_A_Back: GameUser,
+	Player_A_Front?: GameUser,
+	Player_B_Back: GameUser,
+	Player_B_Front?: GameUser,
+//	player_type: PlayerType,
+	game_id: string,
+	game_settings: GameSettings
+}
+
+
 
 export enum PlayerStatus
 {
@@ -171,6 +186,7 @@ export enum EndResult
 //game settings for the core
 export type GameSettings =
 {
+	ranked: boolean,
 	game_type: GameType,
 	up_down_border: number,
 	player_back_advance: number,
@@ -182,8 +198,8 @@ export type GameSettings =
 	point_for_victory: number
 }
 
-export enum GameMode {
-	OneVsOne,
-	TwoVsTwo,
-	Custom
-}
+// export enum GameMode {
+// 	OneVsOne,
+// 	TwoVsTwo,
+// 	Custom
+// }
