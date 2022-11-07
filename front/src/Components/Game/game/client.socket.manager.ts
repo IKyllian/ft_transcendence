@@ -1,5 +1,5 @@
 import { io, Socket } from "socket.io-client";
-import { EndResult, GameState, LobbyStatus, PlayerInput, PlayersLobbyData, RoundSetup } from './types/shared.types';
+import { EndResult, GameState, LobbyStatus, PlayerInput, RoundSetup } from './types/shared.types';
 import { useContext } from "react";
 import { SocketContext } from "../../../App";
 
@@ -61,11 +61,11 @@ export default class ClientSocketManager
 
 	//Lobby Emits
 	
-	lobby_send_join = (lobbydata: PlayersLobbyData) =>
+	lobby_send_join = (game_id: string) =>
 	{
 		if (this.socket instanceof Socket)
 		{
-			this.socket.emit('user_join_lobby', lobbydata);
+			this.socket.emit('user_join_lobby', game_id);
 		}
 	}
 
