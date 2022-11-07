@@ -161,6 +161,13 @@ export class UserService {
 		await this.userRepo.delete(user.id)
 	}
 
+	async deletePending(id: number) {
+		const user = await this.findOnePending({ where: {id} });
+		if (!user)
+			throw new NotFoundException('Pending user not found');
+		await this.pendingUserRepo.delete(user.id)
+	}
+
 	async blockUser(user: User, id: number) {
 		const toBlock = await this.findOneBy({ id });
 		if (!toBlock)

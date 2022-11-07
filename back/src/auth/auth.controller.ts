@@ -7,6 +7,7 @@ import { Auth42Dto } from "./dto/auth42.dto";
 import { JwtGuard } from "./guard/jwt.guard";
 import { RefreshGuard } from "./guard/refresh.guard";
 import { SignupDto } from "./dto/signup.dto";
+import { ActivateDto } from "./dto/activate.dto";
 
 @Controller('auth')
 export class AuthController {
@@ -16,6 +17,12 @@ export class AuthController {
 	@Post('signup')
 	signup(@Body() dto: SignupDto) {
 		return this.authService.signup(dto);
+	}
+
+	@HttpCode(HttpStatus.CREATED)
+	@Post('activate')
+	activate(@Body() dto: ActivateDto) {
+		return this.authService.activate(dto);
 	}
 
 	@HttpCode(HttpStatus.OK)

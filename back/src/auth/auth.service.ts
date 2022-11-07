@@ -12,6 +12,7 @@ import { SignupDto } from "./dto/signup.dto";
 import * as nodemailer from 'nodemailer';
 import * as googleapis from 'googleapis';
 import { PendingUser } from "src/typeorm/entities/pendingUser";
+import { ActivateDto } from "./dto/activate.dto";
 
 @Injectable()
 export class AuthService {
@@ -64,6 +65,32 @@ export class AuthService {
 		const user = await this.userService.createPending(params);
 		this.sendValidationMail(user);
 		return {
+			user: user,
+		}
+	}
+
+	async activate(dto: ActivateDto) {
+		const pendingUser = await this.userService.findOnePending({
+			where: { validation_code: dto.code }
+		});
+			
+		if (!pendingUser)
+			throw new ForbiddenException('Validation code not found');
+		
+		const params = {
+			username: pendingUser.username,
+			email: pendingUser.email,
+			hash: pendingUser.hash,
+		}
+
+		// Create final user and delete pending user
+		const user = await this.userService.create(params);
+		await this.userService.deletePending(pendingUser.id);
+		const tokens = await this.signTokens(user.id, user.username);
+		this.updateRefreshHash(user, tokens.refresh_token);
+		return {
+			access_token: tokens.access_token,
+			refresh_token: tokens.refresh_token,
 			user: user,
 		}
 	}
@@ -222,9 +249,9 @@ export class AuthService {
             subject: 'Pong Game account validation',
             html: `
             <h1>test !!!!</h1>
-            <a href=http://localhost:3000/api/activate/${user.validation_code}>Click here</a>`,
+            <a href=http://localhost:3000/api/activate?code=${user.validation_code}>Click here</a>`,
         }
-		
+
         this.transporter.sendMail(message, function(err, info) {
             if (err)
                 console.log(err);
