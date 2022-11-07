@@ -44,9 +44,10 @@ function DropdownNotification() {
     return notifications && notifications.length > 0 ? (
         <div className="notif-dropdown-wrapper">
             {
-                notifications.map((elem) => 
-                    <NotifItem key={elem.id} notification={elem}  />
-                )
+                notifications.map((elem) => {
+                    if (elem.type !== "game_invite")
+                        return <NotifItem key={elem.id} notification={elem} />
+                })
             }
         </div>
     ) : (

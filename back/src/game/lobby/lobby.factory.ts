@@ -2,7 +2,9 @@ import { Server } from 'socket.io';
 import { generate } from 'shortid'
 import { Lobby } from './lobby';
 import { Socket } from 'socket.io';
-import { GameState, LobbyRequest, NewGameData, GameType, PlayersLobbyData } from 'src/utils/types/game.types';
+import { GameState, GameType, MatchmakingLobby, GameSettings, NewGameData, PlayersGameData, PlayerType } from 'src/utils/types/game.types';
+import { AuthenticatedSocket } from 'src/utils/types/auth-socket';
+//import  * as DefaultGameSettings from '../game-settings';
 
 
 //TODO
@@ -15,55 +17,117 @@ export class LobbyFactory
 	private client_list: Map<Socket['id'], Lobby['game_id']> = new Map<Socket['id'], Lobby['game_id']>();
 	replay_list: Map<string, Array<GameState>> = new Map <string, Array<GameState>>();
 
-	lobby_create(lobby_request: LobbyRequest): NewGameData
-	{
 
+	lobby_create(lobby_request: MatchmakingLobby): string
+	{
 		const game_id: string = generate();
-		const player_A_Back_secret: string = generate();
-		const player_B_Back_secret: string = generate();
+
+// emit a la room d'un user (tt les sockets)
+		// this.server.to('user_' + lobby_request.Player_A_Back.user.id);
+
+
+		//lobby_request.Player_A_Back.user.
+		// if (lobby_request.gameMode === GameMode.OneVsOne)
+		// {
+		// 	lobby_request.game_settings =
+		// 	{
+		// 		    //Default Game Settings 1v1
+		// 			game_type:  GameType.Singles, //(enum)Singles or Doubles
+		// 			up_down_border: 20, //pixels
+		// 			player_back_advance: 20,
+		// 			player_front_advance: 60,
+		// 			paddle_size_h: 150, //pixels
+		// 			paddle_speed: 13, // pixels per update
+		// 			ball_start_speed: 5, //pixels per update
+		// 			ball_acceleration: 1, //pixels per update per collision
+		// 			point_for_victory: 2,
+		// 	}
+		// }
+		// else if (lobby_request.gameMode === GameMode.TwoVsTwo)
+		// {
+		// 	lobby_request.game_settings =
+		// 	{
+		// 		    //Default Game Settings 2v2
+		// 			game_type:  GameType.Doubles, //(enum)Singles or Doubles
+		// 			up_down_border: 20, //pixels
+		// 			player_back_advance: 20,
+		// 			player_front_advance: 60,
+		// 			paddle_size_h: 150, //pixels
+		// 			paddle_speed: 13, // pixels per update
+		// 			ball_start_speed: 5, //pixels per update
+		// 			ball_acceleration: 1, //pixels per update per collision
+		// 			point_for_victory: 2,
+		// 	}		
+		// }
+
+
+		// const lobby = new Lobby(ret, lobby_request.game_settings,  this);
+		const lobby = new Lobby(lobby_request, game_id,  this);
+		this.lobby_list.set(lobby.game_id, lobby);
+
+
+
+
+		// let ng_data: NewGameData =
+		// {
+		// 	Player_A_Back: lobby_request.Player_A_Back,
+		// 	Player_B_Back: lobby_request.Player_B_Back,
+		// 	game_id: game_id,
+		// 	game_settings: lobby_request.game_settings
+		// }
 
 		// if (lobby_request.game_settings.game_type === GameType.Doubles)
 		// {
-		// 	const player_A_Front_secret: string = generate();
-		// 	const player_B_Front_secret: string = generate();
-		// 	ret =
-		// 	{
-		// 		Player_A_Back : lobby_request.Player_A_Back,
-		// 		Player_A_Back_secret : player_A_Back_secret,
-		// 		Player_B_Back : lobby_request.Player_B_Back,
-		// 		Player_B_Back_secret : player_B_Back_secret,
-		// 		Player_A_Front: lobby_request.Player_A_Front,
-		// 		Player_A_Front_secret: player_A_Front_secret,
-		// 		Player_B_Front: lobby_request.Player_B_Front,
-		// 		Player_B_Front_secret: player_B_Front_secret,
-
-		// 		game_id : game_id,
-		// 		game_settings: lobby_request.game_settings
-		// 	};
+		// 	ng_data.Player_A_Back = lobby_request.Player_A_Back;
+		// 	ng_data.Player_B_Back = lobby_request.Player_B_Back;
 		// }
-		// else
-		// {
-			let ret:NewGameData =
-			{
-				Player_A_Back : lobby_request.Player_A_Back,
-				Player_A_Back_secret : player_A_Back_secret,
-				Player_B_Back : lobby_request.Player_B_Back,
-				Player_B_Back_secret : player_B_Back_secret,
-				Player_A_Front: '',
-				Player_A_Front_secret: '',
-				Player_B_Front: '',
-				Player_B_Front_secret: '',
-				game_id : game_id,
-				game_settings: lobby_request.game_settings,
-			};
 
-		// }
-console.log(ret)
-		const lobby = new Lobby(ret, lobby_request.game_settings,  this);
-		this.lobby_list.set(lobby.game_id, lobby);
+		// this.server.to('user_' + lobby_request.Player_A_Back.user.id).emit("plop", ng_data);
 
-		return ret;
+
+		let player_data: PlayersGameData =
+		{
+			Player_A_Back: lobby_request.Player_A_Back,
+			Player_B_Back: lobby_request.Player_B_Back,
+			game_id: game_id,
+			game_settings: lobby_request.game_settings,
+			player_type: PlayerType.Spectator
+		}
+
+		if (lobby_request.game_settings.game_type === GameType.Doubles)
+		{
+			player_data.Player_A_Back = lobby_request.Player_A_Back;
+			player_data.Player_B_Back = lobby_request.Player_B_Back;
+		}
+
+
+
+
+		player_data.player_type = PlayerType.Player_A_Back;
+		this.server.to('user_' + lobby_request.Player_A_Back.user.id).emit("newgame_data", player_data);
+
+
+		player_data.player_type = PlayerType.Player_B_Back;
+		this.server.to('user_' + lobby_request.Player_B_Back.user.id).emit("newgame_data", player_data);
+
+		if (lobby_request.game_settings.game_type === GameType.Doubles)
+		{
+			player_data.player_type = PlayerType.Player_A_Front;
+			this.server.to('user_' + lobby_request.Player_A_Front.user.id).emit("newgame_data", player_data);
+	
+			player_data.player_type = PlayerType.Player_B_Front;
+			this.server.to('user_' + lobby_request.Player_B_Front.user.id).emit("newgame_data", player_data);
+		}
+
+
+
+
+//ajouter une ref au lobby dans le return ? 
+//pour acces a this.already_started & this.already_finished
+		return game_id;
 	}
+
+
 
 	lobby_delete(game_id: string)
 	{
@@ -93,21 +157,21 @@ console.log(ret)
 		//const serializedMap = [...this.lobby_list.entries()];
 	}
 
-	lobby_join(client: Socket, data: PlayersLobbyData)
+	lobby_join(client: AuthenticatedSocket, game_id: string)
 	{
 
-		let lobby: Lobby | undefined =  this.lobby_list.get(data.game_id);
+		let lobby: Lobby | undefined =  this.lobby_list.get(game_id);
 		if (lobby !== undefined)
 		{
 
-			lobby.lobby_add(client, data.player_secret);
-			this.client_list.set(client['id'], data.game_id);
+			lobby.lobby_add(client);
+			this.client_list.set(client['id'], game_id);
 			client.emit('lobby_join_response', true);
 		}
 		else
 		{
 			client.emit('lobby_join_response', false);
-			console.log("unable to join room, not found: ", data.game_id);
+			console.log("unable to join room, not found: ", game_id);
 		}
 	}
 
@@ -126,22 +190,22 @@ console.log(ret)
 		return this.client_list.get(client['id']);
 	}
 
-	lobby_request_status(client: Socket, game_id: string)
+	lobby_request_status(client: AuthenticatedSocket, game_id: string)
 	{
 		this.lobby_list.get(game_id)?.lobby_send_lobby_status(client);
 	}
 
-	lobby_player_ready(client: Socket, game_id: string)
-	{
-		this.lobby_list.get(game_id)?.player_ready(client);
-	}
+	// lobby_player_ready(client: Socket, game_id: string)
+	// {
+	// 	this.lobby_list.get(game_id)?.player_ready(client);
+	// }
 
-	lobby_game_input(client: Socket, data: any)
+	lobby_game_input(client: AuthenticatedSocket, data: any)
 	{
 		this.lobby_list.get(data[0])?.game_receive_input(client, data[1]);
 	}
 
-	lobby_game_get_round_setup(client: Socket, game_id: string)
+	lobby_game_get_round_setup(client: AuthenticatedSocket, game_id: string)
 	{
 		this.lobby_list.get(game_id)?.game_send_round_setup(client);
 	}

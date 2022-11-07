@@ -14,20 +14,20 @@ export default class Pong extends Phaser.Scene
 	me: PlayerType = PlayerType.Spectator;
 	socketmanager?: ClientSocketManager;
 
-	game_settings: GameSettings;
-	game_type: GameType;
+	game_settings: GameSettings | undefined = undefined;
+	game_type: GameType = GameType.Singles;
 
 
 
 
-	sound_a;
-	sound_b;
-	sound_c;
-	sound_clapping;
+	sound_a?: any;
+	sound_b?: any;
+	sound_c?: any;
+	sound_clapping?: any;
 
 
 
-	core: PongCore;
+	core?: PongCore;
 	game_id?: string;
 
 	//Displayed elements
@@ -43,8 +43,8 @@ export default class Pong extends Phaser.Scene
 	asset_Player_B_Back?: Phaser.GameObjects.Shape;
 
 	//Input Keys
-	key_UP?;
-	key_DOWN?;
+	key_UP?: any;
+	key_DOWN?: any;
 
 	input_UP: boolean = false;
 	input_DOWN: boolean = false;
@@ -83,7 +83,7 @@ export default class Pong extends Phaser.Scene
 	};
 
 
-	update_interval;
+	update_interval: any;
 	is_lagging: boolean = true;
 	lag_count: number = 0;
 
@@ -105,16 +105,18 @@ export default class Pong extends Phaser.Scene
 		this.game_id = this.registry.get('players_data').game_id;
 
 		this.game_settings = this.game.registry.get('players_data').game_settings;
-console.log("setings: ", this.game_settings);
+		console.log("setings: ", this.game_settings);
 		this.game_type = this.game.registry.get('players_data').game_settings.game_type;
-	
-		this.core = new PongCore(this.game_settings);
 
-		this.game_state.game_type = this.game.registry.get('players_data').game_settings.game_type;
-		this.game_state.Player_A_Back.x = this.game_settings.player_back_advance;
-		this.game_state.Player_A_Front.x = this.game_settings.player_front_advance;
-		this.game_state.Player_B_Back.x = 800 - this.game_settings.player_back_advance;
-		this.game_state.Player_B_Front.x = 800 - this.game_settings.player_front_advance;
+		if (this.game_settings) {
+			this.core = new PongCore(this.game_settings);
+
+			this.game_state.game_type = this.game.registry.get('players_data').game_settings.game_type;
+			this.game_state.Player_A_Back.x = this.game_settings.player_back_advance;
+			this.game_state.Player_A_Front.x = this.game_settings.player_front_advance;
+			this.game_state.Player_B_Back.x = 800 - this.game_settings.player_back_advance;
+			this.game_state.Player_B_Front.x = 800 - this.game_settings.player_front_advance;
+		}
 
 		this.me = this.game.registry.get('players_data').player_type;
 
@@ -160,17 +162,19 @@ console.log("setings: ", this.game_settings);
 		this.asset_lag_icon = this.add.image(400, 300, 'lag_icon');
 		this.asset_lag_icon.setAlpha(1);
 // console.log("paddle h", this.game_settings.paddle_size_h);
-		this.upper_limit = this.add.rectangle(0, 0, 800, this.game_settings.up_down_border , 0x000000).setOrigin(0,0);
-		this.lower_limit = this.add.rectangle(0, (600 - (this.game_settings.up_down_border)), 800, this.game_settings.up_down_border, 0x000000).setOrigin(0,0);
-
-		this.asset_Player_A_Back = this.add.rectangle(this.game_settings.player_back_advance, 300, 10, this.game_settings.paddle_size_h, 0x000000).setOrigin(1,0.5);
-		this.asset_Player_B_Back = this.add.rectangle((600 - this.game_settings.player_back_advance), 300, 10, this.game_settings.paddle_size_h, 0x000000).setOrigin(0,0.5);
-
-		if (this.game_type === GameType.Doubles)
-		{
-			this.asset_Player_A_Front = this.add.rectangle(this.game_settings.player_front_advance, 300, 10, this.game_settings.paddle_size_h, 0x000000).setOrigin(1,0.5);
-			this.asset_Player_B_Front = this.add.rectangle((600 - this.game_settings.player_front_advance), 300, 10, this.game_settings.paddle_size_h, 0x000000).setOrigin(0,0.5);
-		
+		if (this.game_settings) {
+			this.upper_limit = this.add.rectangle(0, 0, 800, this.game_settings.up_down_border , 0x000000).setOrigin(0,0);
+			this.lower_limit = this.add.rectangle(0, (600 - (this.game_settings.up_down_border)), 800, this.game_settings.up_down_border, 0x000000).setOrigin(0,0);
+	
+			this.asset_Player_A_Back = this.add.rectangle(this.game_settings.player_back_advance, 300, 10, this.game_settings.paddle_size_h, 0x000000).setOrigin(1,0.5);
+			this.asset_Player_B_Back = this.add.rectangle((600 - this.game_settings.player_back_advance), 300, 10, this.game_settings.paddle_size_h, 0x000000).setOrigin(0,0.5);
+	
+			if (this.game_type === GameType.Doubles)
+			{
+				this.asset_Player_A_Front = this.add.rectangle(this.game_settings.player_front_advance, 300, 10, this.game_settings.paddle_size_h, 0x000000).setOrigin(1,0.5);
+				this.asset_Player_B_Front = this.add.rectangle((600 - this.game_settings.player_front_advance), 300, 10, this.game_settings.paddle_size_h, 0x000000).setOrigin(0,0.5);
+			
+			}
 		}
 
 		let style: Phaser.Types.GameObjects.Text.TextStyle = 
@@ -256,18 +260,20 @@ console.log("setings: ", this.game_settings);
 		//check received data from server
 		if (this.server_stock.length !== 0)
 		{
-			if (this.me !== PlayerType.Spectator)
+			if (this.core) {
+				if (this.me !== PlayerType.Spectator)
 				this.core.apply_input(this.input_stock[(this.input_stock.length - 1)]);
 
-
-			this.core.move_ball();
-			this.core.client_check_goal();
+				this.core.move_ball();
+				this.core.client_check_goal();
+			}
 
 			this.is_lagging = false;
 			this.lag_count = 0;
-			this.server_stock.forEach(function(elem: GameState)
+			this.server_stock.forEach((elem: GameState) =>
 			{
-				this.core.apply_gamestate(elem);
+				if (this.core)
+					this.core.apply_gamestate(elem);
 				let last_serv;
 	
 				if (this.me === PlayerType.Player_A_Back)
@@ -290,7 +296,7 @@ console.log("setings: ", this.game_settings);
 					}
 				}
 	
-				if(last_serv > this.latest_serv_response)
+				if(last_serv && last_serv > this.latest_serv_response)
 				{
 					this.latest_serv_response = last_serv;
 				}
@@ -298,14 +304,15 @@ console.log("setings: ", this.game_settings);
 			this.server_stock = [];
 			if (this.me !== PlayerType.Spectator)
 			{
-				this.input_stock = this.input_stock.filter(function(elem: PlayerInput)
+				this.input_stock = this.input_stock.filter((elem: PlayerInput) =>
 				{
 					return (elem.number > this.latest_serv_response);
 				}, this);
 		
-				this.input_stock.forEach(function(elem: PlayerInput)
+				this.input_stock.forEach((elem: PlayerInput) =>
 				{
-					this.core.apply_input(elem);
+					if (this.core)
+						this.core.apply_input(elem);
 				}, this);
 			}
 
@@ -318,13 +325,15 @@ console.log("setings: ", this.game_settings);
 			{
 				this.is_lagging = true;
 			}
-
-			if (this.me !== PlayerType.Spectator)
+			if (this.core) {
+				if (this.me !== PlayerType.Spectator)
 				this.core.apply_input(this.input_stock[(this.input_stock.length - 1)]);
-			this.core.update_gamestate();
+				this.core.update_gamestate();
+			}
 		}
 
-		this.game_state = this.core.get_gamestate();
+		if (this.core)
+			this.game_state = this.core.get_gamestate();
 		this.past_stock.push(this.game_state);
 
 		// let past_date: Date = new Date();
@@ -402,7 +411,7 @@ console.log("setings: ", this.game_settings);
 
 		this.time.addEvent({
 			delay: 500,
-			callback: function()
+			callback: () =>
 			{				
 				this.launch_match_result();
 			},
@@ -610,8 +619,6 @@ console.log("setings: ", this.game_settings);
 	{
 		this.sound.stopAll();
 		this.sound_clapping.play();
-
-		this.cameras.main.flash(250, 0 , 0, 0);
 	}
 
 }
