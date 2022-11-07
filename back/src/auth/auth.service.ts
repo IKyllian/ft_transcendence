@@ -228,7 +228,7 @@ export class AuthService {
         const message = {
             from: process.env.MAIL_USER,
             to: user.email,
-            subject: 'Pong Game account validation',
+            subject: 'Pong Game account verification',
             html: `
             <h1>test !!!!</h1>
             <a href=http://localhost:3000/api/auth/activate?code=${user.validation_code}>Click here</a>`,
