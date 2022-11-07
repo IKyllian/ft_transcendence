@@ -8,20 +8,25 @@
 	- Add Can add/modify/delete password of a channels
 	- what to do if inviting a ban user?
 	- Invitation on a channel by multiple users to test
-	- On ban, how to handle user
-
-
-// GAME
-	- When inviting someone to play from friendlist or chat, oponent get a notif to accept or decline. If accepted, Both got a 'popup'
-	with limited time to get ready ?
-
+	- OWNER CAN BAN/MUTE ANYONE AND MODERATOR CAN MUTE MEMBER ?
 
 //TODO
 	- Route for editing user / Channels
 	- Check routes for delete entities
 	- error when trying to connect with a login 42 with a password
 	- on socket connection, add args if in channel room to rejoin it?
+	- USE GLOBAL SERVER
 
 //ISSUE ?
-	- mute is canceled if user quit and rejoin channel
 	- can create username with \n
+
+
+// RANKING AND ELO
+LEGEND: 1450,
+CHAMPION: 1325,
+DIAMOND: 1200,
+GOLD: 1125,
+SILVER: 1000
+
+Max elo to win/lose in one game = 50, if lobby is balanced Winner +25 / Looser -25, Elo between rank = 125 ~= 5 balanced game won/lost
+50/(1+10^(ELODIFF/400))

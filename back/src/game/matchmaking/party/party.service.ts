@@ -4,23 +4,22 @@ import { User } from "src/typeorm";
 import { GameUser } from "../../game-user";
 import { PartyJoinedSessionManager } from "./party.session";
 import { Party } from "./party";
-import { MatchmakingGateway } from "../matchmaking.gateway";
+import { GlobalService } from "src/utils/global/global.service";
 
 @Injectable()
 export class PartyService {
 	constructor(
 		public partyJoined: PartyJoinedSessionManager,
+		private globalService: GlobalService,
 	) {}
-
-	server: Server;
 
 	getGameUserInParty(id: number, gameUser: GameUser[]) {
 		return gameUser.find((e) => e.user.id === id);
 	}
 
-	emitUpdateParty(party: Party) {
+	emitPartyUpdate(party: Party) {
 		party.players.forEach((player) => {
-			this.server.to(`user-${player.user.id}`).emit('PartyUpdate', party);
+			this.globalService.server.to(`user-${player.user.id}`).emit('PartyUpdate', party);
 		})
 	}
 
@@ -39,7 +38,7 @@ export class PartyService {
 		if (!party) { throw new NotFoundException('party not found'); }
 		party.join(user);
 		this.partyJoined.setParty(user.id, party);
-		this.emitUpdateParty(party);
+		this.emitPartyUpdate(party);
 	}
 
 	leaveParty(user: User) {
@@ -52,8 +51,8 @@ export class PartyService {
 			}
 			party.leave(user);
 			this.partyJoined.removeParty(user.id);
-			this.emitUpdateParty(party);
-			this.server.to(`user-${user.id}`).emit('PartyLeave');
+			this.emitPartyUpdate(party);
+			this.globalService.server.to(`user-${user.id}`).emit('PartyLeave');
 		}
 	}
 
@@ -70,7 +69,7 @@ export class PartyService {
 			const gameUser = this.getGameUserInParty(user.id, party.players);
 			if (gameUser) {
 				gameUser.isReady = isReady;
-				this.emitUpdateParty(party);
+				this.emitPartyUpdate(party);
 			}
 		}
 	}

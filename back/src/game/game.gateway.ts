@@ -15,7 +15,9 @@ import { UserIdDto } from 'src/chat/gateway/dto/user-id.dto';
 import { User } from 'src/typeorm';
 import { UserService } from 'src/user/user.service';
 import { GetUser } from 'src/utils/decorators';
-// import {   GameMode } from 'src/utils/types/game.types';
+
+// import { NewGameData, PlayersLobbyData, LobbyRequest } from 'src/utils/types/game.types';
+
 import { JwtPayload, notificationType, UserPayload } from 'src/utils/types/types';
 import { UserSessionManager } from './user.session';
 import { LobbyFactory } from './lobby/lobby.factory';

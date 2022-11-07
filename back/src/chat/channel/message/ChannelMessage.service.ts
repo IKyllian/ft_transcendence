@@ -16,7 +16,6 @@ export class ChannelMessageService {
 	) {}
 
 	async create(chanUser: ChannelUser, messageDto: ChannelMessageDto) {
-		this.channelService.isMuted(chanUser);
 		const message = this.messagesRepo.create({
 			content: messageDto.content,
 			channel: { id: chanUser.channelId },
@@ -26,12 +25,9 @@ export class ChannelMessageService {
 	}
 
 	async createServer(messageDto: ChannelMessageDto) {
-		const channel = await this.channelService.findOneBy({ id: messageDto.chanId });
-		if (!channel)
-			throw new ChannelNotFoundException();
 		const message = this.messagesRepo.create({
 			content: messageDto.content,
-			channel,
+			channel: { id: messageDto.chanId },
 		});
 		return this.messagesRepo.save(message);
 	}

@@ -11,16 +11,20 @@ import { GameModule } from './game/game.module';
 import { MatchmakingModule } from './game/matchmaking/matchmaking.module';
 import entities from './typeorm';
 import { ScheduleModule } from '@nestjs/schedule';
+import { TaskScheduler } from './task-scheduling/task.module';
+import { GlobalModule } from './utils/global/global.module';
 
 @Module({
   imports: [
     AuthModule,
     UserModule,
     ChatModule,
-	  GameModule,
+	GameModule,
+	GlobalModule,
     MatchmakingModule,
     ConfigModule.forRoot({ envFilePath: '.env', isGlobal: true }),
     NotificationModule,
+    TaskScheduler,
     ScheduleModule.forRoot(),
     TypeOrmModule.forRoot({
       type: 'postgres',
@@ -31,7 +35,7 @@ import { ScheduleModule } from '@nestjs/schedule';
       database: process.env.POSTGRES_NAME,
       entities,
       synchronize: true, // Setting synchronize: true shouldn't be used in production - otherwise you can lose production data.
-      // dropSchema: true,
+    //   dropSchema: true,
       // logging: true,
     }),
   ],
