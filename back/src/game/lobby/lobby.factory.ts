@@ -2,7 +2,7 @@ import { Server } from 'socket.io';
 import { generate } from 'shortid'
 import { Lobby } from './lobby';
 import { Socket } from 'socket.io';
-import { GameState, GameType, PlayersLobbyData, GameMode, MatchmakingLobby, GameSettings } from 'src/utils/types/game.types';
+import { GameState, GameType, GameMode, MatchmakingLobby, GameSettings } from 'src/utils/types/game.types';
 import { AuthenticatedSocket } from 'src/utils/types/auth-socket';
 //import  * as DefaultGameSettings from '../game-settings';
 
@@ -22,6 +22,13 @@ export class LobbyFactory
 	{
 		const game_id: string = generate();
 
+
+
+// emit a la room d'un user (tt les sockets)
+		// this.server.to('user_' + lobby_request.Player_A_Back.user.id);
+
+
+		//lobby_request.Player_A_Back.user.
 		if (lobby_request.gameMode === GameMode.OneVsOne)
 		{
 			lobby_request.game_settings =
@@ -58,7 +65,8 @@ export class LobbyFactory
 		// const lobby = new Lobby(ret, lobby_request.game_settings,  this);
 		const lobby = new Lobby(lobby_request, game_id,  this);
 		this.lobby_list.set(lobby.game_id, lobby);
-
+//ajouter une ref au lobby dans le return ? 
+//pour acces a this.already_started & this.already_finished
 		return game_id;
 	}
 

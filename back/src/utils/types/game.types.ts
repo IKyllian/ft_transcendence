@@ -13,31 +13,31 @@ export enum GameType {
 	Doubles
 }
 
-export type Player = {
-	name: string,
-	win: number,
-	loss: number,
-	avatar: string
-}
+// export type Player = {
+// 	name: string,
+// 	win: number,
+// 	loss: number,
+// 	avatar: string
+// }
 
 //data sent to each player before the game
 export type PlayersGameData = {
-	Player_A_Back: Player,
-	Player_A_Front: Player,
-	Player_B_Front: Player,
-	Player_B_Back: Player,
+	Player_A_Back: GameUser,
+	Player_A_Front?: GameUser,
+	Player_B_Front?: GameUser,
+	Player_B_Back: GameUser,
 	player_type: PlayerType,
-	player_secret: string,
+	// player_secret: string,
 	game_id: string,
 	game_settings: GameSettings
 }
 
 //data sent from player to join lobby
-export type PlayersLobbyData = 
-{
-	player_secret: string,
-	game_id: string
-}
+// export type PlayersLobbyData = 
+// {
+// 	player_secret: string,
+// 	game_id: string
+// }
 
 //data sent to lobby factory to request a new lobby
 // export type LobbyRequest =
