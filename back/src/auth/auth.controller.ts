@@ -8,6 +8,7 @@ import { JwtGuard } from "./guard/jwt.guard";
 import { RefreshGuard } from "./guard/refresh.guard";
 import { SignupDto } from "./dto/signup.dto";
 import { ActivateDto } from "./dto/activate.dto";
+import { ForgotPasswordDto } from "./dto/forgotpassword.dto";
 
 @Controller('auth')
 export class AuthController {
@@ -49,5 +50,11 @@ export class AuthController {
 	@Post('refresh')
 	refresh(@GetUser() user: User) {
 		return this.authService.refreshTokens(user["id"], user["refreshToken"]);
+	}
+
+	@HttpCode(HttpStatus.OK)
+	@Post('forgot-password')
+	forgotPassword(dto: ForgotPasswordDto) {
+		
 	}
 }
