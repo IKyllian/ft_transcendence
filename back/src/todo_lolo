@@ -1,0 +1,7 @@
+mdp oublié:
+ 
+ - column reset_code dans User
+ - envoyer mail avec lien genre /resetpassword?code=reset_code
+ - route /reset_password?new= -> si différent de l'ancien, update et supprimer le reset_code, sinon error
+
+
