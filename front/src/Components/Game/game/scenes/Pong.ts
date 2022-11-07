@@ -143,16 +143,16 @@ export default class Pong extends Phaser.Scene
 		if (this.core !== undefined)
 		{
 //console.log('setting triggers for core')
-			this.core.set_pong_triggers({
+			// this.core.set_pong_triggers({
 
-				// play_sound_a: this.play_sound_a.bind(this),
-				// play_sound_b: this.play_sound_b.bind(this),
-				// play_sound_c: this.play_sound_c.bind(this),
-				// play_sound_clapping: this.play_sound_clapping.bind(this)
+			// 	// play_sound_a: this.play_sound_a.bind(this),
+			// 	// play_sound_b: this.play_sound_b.bind(this),
+			// 	// play_sound_c: this.play_sound_c.bind(this),
+			// 	// play_sound_clapping: this.play_sound_clapping.bind(this)
 
 
 
-			});
+			// });
 		}
 
 		this.asset_ball = this.add.image(400, 300, 'ball');
