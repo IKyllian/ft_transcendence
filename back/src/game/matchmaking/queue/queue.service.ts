@@ -1,6 +1,5 @@
 import { BadRequestException, Injectable, UnauthorizedException } from "@nestjs/common";
 import { User } from "src/typeorm";
-import { GameMode } from "src/utils/types/game.types";
 import { QueueLobbby } from "src/utils/types/types";
 import { GameUser } from "../../game-user";
 import { PartyService } from "../party/party.service";

@@ -10,7 +10,7 @@ import { User } from "src/typeorm";
 import { GetUser } from "src/utils/decorators";
 import { GatewayExceptionFilter } from "src/utils/exceptions/filter/Gateway.filter";
 import { AuthenticatedSocket } from "src/utils/types/auth-socket";
-import { GameMode } from "src/utils/types/game.types";
+import { GameType } from "src/utils/types/game.types";
 import { notificationType } from "src/utils/types/types";
 import { ConnectionOptionsReader } from "typeorm";
 import { UserSessionManager } from "../user.session";
@@ -32,13 +32,6 @@ export class MatchmakingGateway implements OnGatewayDisconnect {
 		private notifService: NotificationService,
 		private taskScheduler: TaskService,
 	) {}
-
-
-	afterInit(server: Server)
-	{
-	  this.partyService.server = server;
-	  this.taskScheduler.server = server;
-	}
 
 	handleDisconnect(socket: AuthenticatedSocket) {
 		if (socket.user) {
@@ -125,11 +118,11 @@ export class MatchmakingGateway implements OnGatewayDisconnect {
 	@SubscribeMessage('StartQueue')
 	startQueue(
 		@GetUser() user: User,
-		@MessageBody() data: { gameMode: GameMode}
+		@MessageBody() data: { gameType: GameType}
 	) {
-		if (data.gameMode === GameMode.OneVsOne) {
+		if (data.gameType === GameType.Singles) {
 			this.queueService.join1v1Queue(user);
-		} else if (data.gameMode === GameMode.TwoVsTwo) {
+		} else if (data.gameType === GameType.Doubles) {
 			this.queueService.join2v2Queue(user);
 		}
 	}
@@ -139,25 +132,6 @@ export class MatchmakingGateway implements OnGatewayDisconnect {
 	stopQueue(
 		@GetUser() user: User,
 	) {
-			this.queueService.leaveQueue(user);
-	}
-
-	@UseGuards(WsJwtGuard)
-	@SubscribeMessage('test2')
-	test2(@ConnectedSocket() socket: AuthenticatedSocket) {
-		console.log(socket.id)
-	}
-
-	@UseGuards(WsJwtGuard)
-	@SubscribeMessage('test')
-	async test(@ConnectedSocket() socket: AuthenticatedSocket, @GetUser() user: User) {
-		// console.log(socket)
-		const socketConnected = await this.server.sockets.allSockets();
-		const mySocket: Map<string, AuthenticatedSocket> = this.server.sockets.sockets as Map<string, AuthenticatedSocket>;
-		// console.log(mySocket)
-		// const sockets = await socket.in("user-8").fetchSockets() as unknown as AuthenticatedSocket[];
-		const userIdInRoom = (await socket.in("user-8").fetchSockets() as unknown as AuthenticatedSocket[]).map(e => e.user.id)
-		// const userIdInChan = sockets.map(e => e.user.id)
-		console.log(userIdInRoom)
+		this.queueService.leaveQueue(user);
 	}
 }

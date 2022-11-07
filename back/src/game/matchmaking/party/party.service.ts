@@ -4,14 +4,14 @@ import { User } from "src/typeorm";
 import { GameUser } from "../../game-user";
 import { PartyJoinedSessionManager } from "./party.session";
 import { Party } from "./party";
+import { GlobalService } from "src/utils/global/global.service";
 
 @Injectable()
 export class PartyService {
 	constructor(
 		public partyJoined: PartyJoinedSessionManager,
+		private globalService: GlobalService,
 	) {}
-
-	server: Server;
 
 	getGameUserInParty(id: number, gameUser: GameUser[]) {
 		return gameUser.find((e) => e.user.id === id);
@@ -19,7 +19,7 @@ export class PartyService {
 
 	emitPartyUpdate(party: Party) {
 		party.players.forEach((player) => {
-			this.server.to(`user-${player.user.id}`).emit('PartyUpdate', party);
+			this.globalService.server.to(`user-${player.user.id}`).emit('PartyUpdate', party);
 		})
 	}
 
@@ -52,7 +52,7 @@ export class PartyService {
 			party.leave(user);
 			this.partyJoined.removeParty(user.id);
 			this.emitPartyUpdate(party);
-			this.server.to(`user-${user.id}`).emit('PartyLeave');
+			this.globalService.server.to(`user-${user.id}`).emit('PartyLeave');
 		}
 	}
 

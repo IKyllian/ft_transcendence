@@ -2,7 +2,7 @@ import { BadRequestException } from "@nestjs/common";
 import { generate } from "shortid";
 import { Socket } from "socket.io";
 import { User } from "src/typeorm";
-import { GameMode, GameSettings, GameType, PlayerType } from "src/utils/types/game.types";
+import { GameSettings, GameType, PlayerType } from "src/utils/types/game.types";
 import { GameUser } from "../../game-user";
 
 export class Party {
@@ -17,8 +17,6 @@ export class Party {
 	id: string;
 
 	players: GameUser[] = new Array<GameUser>();
-
-	gameMode: GameMode = GameMode.OneVsOne;
 
 	gameSetting: GameSettings;
 

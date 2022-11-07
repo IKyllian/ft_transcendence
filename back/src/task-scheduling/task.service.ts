@@ -6,9 +6,11 @@ import { exit } from "process";
 import { Server } from "socket.io";
 import { MatchmakingLobby } from "src/game/matchmaking/matchmakingLobby";
 import { QueueService } from "src/game/matchmaking/queue/queue.service";
+import { SettingsFactory } from "src/game/settings.factory";
 import { ChannelUser, Notification, UserTimeout } from "src/typeorm";
-import { GameMode } from "src/utils/types/game.types";
-import { ChannelUpdateType, EloRange, notificationType, QueueLobbby } from "src/utils/types/types";
+import { GlobalService } from "src/utils/global/global.service";
+import { GameType } from "src/utils/types/game.types";
+import { ChannelUpdateType, EloRange, notificationType, QueueLobbby, TimeoutType } from "src/utils/types/types";
 import { Repository } from "typeorm";
 
 @Injectable()
@@ -16,6 +18,7 @@ export class TaskService {
 	constructor(
 		private schedulerRegistry: SchedulerRegistry,
 		private queueService: QueueService,
+		private globalService: GlobalService,
 
 		@InjectRepository(Notification)
 		private notifRepo: Repository<Notification>,
@@ -23,9 +26,7 @@ export class TaskService {
 		private timeoutRepo: Repository<UserTimeout>,
 		@InjectRepository(ChannelUser)
 		private chanUserRepo: Repository<ChannelUser>,
-	) {}
-
-	server: Server;
+	) {};
 
 	getCronJob() {
 		return this.schedulerRegistry.getCronJobs();
@@ -83,7 +84,7 @@ export class TaskService {
 				if (i !== j && mmrDiff <= this.queueService.queue1v1[i].range
 				&& mmrDiff <= this.queueService.queue1v1[j].range) {
 
-					matchFound.push(new MatchmakingLobby(this.queueService.queue1v1[i], this.queueService.queue1v1[j], GameMode.OneVsOne));
+					matchFound.push(new MatchmakingLobby(this.queueService.queue1v1[i], this.queueService.queue1v1[j], new SettingsFactory().defaultSetting(GameType.Singles)));
 
 					this.queueService.queue1v1 = this.queueService.queue1v1.filter((party) => 
 					party.id !== this.queueService.queue1v1[i].id && party.id !== this.queueService.queue1v1[j].id);
@@ -96,7 +97,6 @@ export class TaskService {
 
 	@Interval('doubles-queue', 30000)
 	async handleDoublesQueue() {
-		// TODO sort by elo?
 		let matchFound: MatchmakingLobby[] = [];
 		let potentialLobby: QueueLobbby[] = [];
 		this.queueService.queue2v2.sort((a, b) => a.averageMmr - b.averageMmr);
@@ -130,7 +130,7 @@ export class TaskService {
 							lobby.players.forEach((player) => this.queueService.leaveQueue(player.user));
 						})
 						console.log("GAME FOUND")
-						matchFound.push(new MatchmakingLobby(potentialLobby[0], potentialLobby[1], GameMode.TwoVsTwo));
+						matchFound.push(new MatchmakingLobby(potentialLobby[0], potentialLobby[1], new SettingsFactory().defaultSetting(GameType.Doubles)));
 					}
 				}
 			}
@@ -150,7 +150,7 @@ export class TaskService {
 		if (users) {
 			users.forEach(async (timeout) => {
 				await this.timeoutRepo.delete(timeout.id);
-				this.server.to(`channel-${timeout.channelId}`).emit('ChannelUpdate', { type: ChannelUpdateType.TIMEOUT, data: timeout });
+				this.globalService.server.to(`channel-${timeout.channelId}`).emit('ChannelUpdate', { type: ChannelUpdateType.UNTIMEOUT, data: timeout.id });
 			});
 		}
 	}

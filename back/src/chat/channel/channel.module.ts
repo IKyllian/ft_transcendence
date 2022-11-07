@@ -4,6 +4,7 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { NotificationModule } from "src/notification/notification.module";
 import { Channel, ChannelMessage, ChannelUser, User, UserTimeout } from "src/typeorm";
 import { UserModule } from "src/user/user.module";
+import { GlobalModule } from "src/utils/global/global.module";
 import { ChannelController } from "./channel.controller";
 import { ChannelService } from "./channel.service";
 import { ChannelMessageController } from "./message/channelMessage.controller";
@@ -13,6 +14,7 @@ import { ChannelMessageService } from "./message/ChannelMessage.service";
 	imports: [
 		NotificationModule,
 		UserModule,
+		GlobalModule,
 		TypeOrmModule.forFeature([
 			Channel,
 			ChannelUser,

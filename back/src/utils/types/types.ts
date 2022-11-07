@@ -1,6 +1,5 @@
 import { MESSAGES } from "@nestjs/core/constants";
 import { GameUser } from "src/game/game-user";
-import { GameMode } from "./game.types";
 
 export type JwtPayload = {
 	sub: number,
@@ -56,13 +55,14 @@ export enum RelationStatus {
 
 export enum TimeoutType {
 	BAN,
-	MUTED
+	MUTE,
 }
 
 export enum ChannelUpdateType {
 	JOIN,
 	LEAVE,
-	TIMEOUT,
+	BAN,
+	MUTE,
 	UNTIMEOUT,
 	CHANUSER,
 }

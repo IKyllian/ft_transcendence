@@ -53,11 +53,11 @@ export class ChannelController {
 		return await this.channelService.delete(id);
 	}
 
-	@UseGuards(JwtGuard, InChannelGuard, ChannelPermissionGuard)
-	@Post('unban')
-	unbanUser(
-	@Body() dto: BanUserDto,
-	) {
-		return this.channelService.unbanUser(dto);
-	}
+	// @UseGuards(JwtGuard, InChannelGuard, ChannelPermissionGuard)
+	// @Post('unban')
+	// unbanUser(
+	// @Body() dto: BanUserDto,
+	// ) {
+	// 	return this.channelService.unbanUser(dto);
+	// }
 }

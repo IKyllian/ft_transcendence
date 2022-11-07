@@ -182,11 +182,11 @@ export type GameSettings =
 	point_for_victory: number
 }
 
-export enum GameMode {
-	OneVsOne,
-	TwoVsTwo,
-	Custom
-}
+// export enum GameMode {
+// 	OneVsOne,
+// 	TwoVsTwo,
+// 	Custom
+// }
 
 export enum TeamSide {
 	BLUE,
