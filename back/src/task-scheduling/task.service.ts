@@ -75,6 +75,7 @@ export class TaskService {
 	@Interval('singles-queue', 3000)
 	async handleSinglesQueue() {
 		let matchFound: MatchmakingLobby[] = [];
+		console.log("nb of player in queue", this.queueService.queue1v1.length);
 		this.queueService.queue1v1.sort((a, b) => a.averageMmr - b.averageMmr);
 		const range: EloRange = this.setServerRange(this.queueService.queue1v1.length);
 		this.adjustLobbyEloRange(this.queueService.queue1v1, range);
@@ -95,7 +96,7 @@ export class TaskService {
 		// console.log("MatchFound: ", matchFound);
 	}
 
-	@Interval('doubles-queue', 30000)
+	@Interval('doubles-queue', 3000)
 	async handleDoublesQueue() {
 		let matchFound: MatchmakingLobby[] = [];
 		let potentialLobby: QueueLobbby[] = [];

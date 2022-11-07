@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable, UnauthorizedException } from "@nestjs/common";
 import { User } from "src/typeorm";
+import { GlobalService } from "src/utils/global/global.service";
 import { QueueLobbby } from "src/utils/types/types";
 import { GameUser } from "../../game-user";
 import { PartyService } from "../party/party.service";
@@ -8,6 +9,7 @@ import { PartyService } from "../party/party.service";
 export class QueueService {
 	constructor(
 		private partyService: PartyService,
+		private globalService: GlobalService,
 	) {}
 		
 	public queue1v1 = new Array<QueueLobbby>();
@@ -35,6 +37,7 @@ export class QueueService {
 		queueLobby.timeInQueue = Date.now();
 		queueLobby.averageMmr = user.singlesElo;
 		this.queue1v1.push(queueLobby);
+		this.globalService.server.to(`user-${user.id}`).emit('InQueue', true);
 		console.log("nb of player in queue", this.queue1v1.length)
 	}
 
@@ -58,10 +61,14 @@ export class QueueService {
 		}
 		queueLobby.timeInQueue = Date.now();
 		queueLobby.averageMmr = 0;
-		queueLobby.players.forEach((player) => queueLobby.averageMmr += player.user.doublesElo);
+		queueLobby.players.forEach((player) => {
+		queueLobby.averageMmr += player.user.doublesElo
+		this.globalService.server.to(`user-${player.user.id}`).emit('InQueue', true);
+		});
+			
 		queueLobby.averageMmr /= queueLobby.players.length;
 		this.queue2v2.push(queueLobby);
-		console.log("nb of player in queue", this.queue2v2.length);
+		// console.log("nb of player in queue", this.queue2v2.length);
 
 		// if (party.players.length === 1) {
 		// 	if (this.waitingList.length > 0) {
@@ -89,14 +96,17 @@ export class QueueService {
 	}
 
 	leaveQueue(user: User) {
+		console.log("leaving")
 		const party = this.partyService.partyJoined.getParty(user.id);
 		if (party) {
 			this.queue1v1 = this.queue1v1.filter((queueing) => queueing.id !== party.id);
 			this.queue2v2 = this.queue2v2.filter((queueing) => queueing.id !== party.id);
 			party.players.forEach(player => player.isReady = false);
-			this.partyService.emitPartyUpdate(party);
+			this.partyService.emitPartyUpdate(party, true);
 		} else {
 			console.log("leave")
+			//TODO cancel for each queue lobby players
+			this.globalService.server.to('user-' + user.id).emit('InQueue', false);
 			this.queue1v1 = this.queue1v1.filter((queueing) => queueing.id !== "queue-" + user.id);
 			this.queue2v2 = this.queue2v2.filter((queueing) => queueing.id !== "queue-" + user.id)
 		}

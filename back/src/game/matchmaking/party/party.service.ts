@@ -17,22 +17,18 @@ export class PartyService {
 		return gameUser.find((e) => e.user.id === id);
 	}
 
-	emitPartyUpdate(party: Party) {
+	emitPartyUpdate(party: Party, cancelQueue = false) {
 		party.players.forEach((player) => {
-			this.globalService.server.to(`user-${player.user.id}`).emit('PartyUpdate', party);
+			this.globalService.server.to(`user-${player.user.id}`).emit('PartyUpdate', { party, cancelQueue });
 		})
 	}
 
 	createParty(user: User) {
-		delete user.blocked;
-		delete user.channelUser;
 		this.partyJoined.setParty(user.id, new Party(user));
 		return this.partyJoined.getParty(user.id);
 	}
 
 	joinParty(user: User, requesterId: number) {
-		delete user.blocked;
-		delete user.channelUser;
 		this.leaveParty(user);
 		const party = this.partyJoined.getParty(requesterId);
 		if (!party) { throw new NotFoundException('party not found'); }
