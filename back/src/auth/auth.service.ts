@@ -94,9 +94,10 @@ export class AuthService {
 				statistic: true,
 				blocked: true,
 			},
-			where: {
-				username: dto.username,
-			}
+			where: [ // Should work like OR operator, since username can be an username or an email
+				{ username: dto.username },
+				{ email: dto.username }
+			]
 		}, true);
 		if (!user) 
 			throw new NotFoundException('invalid credentials')
