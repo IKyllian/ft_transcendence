@@ -1,6 +1,6 @@
 import Avatar from "../../Images-Icons/pp.jpg";
 import { useAppDispatch, useAppSelector } from "../../Redux/Hooks";
-import { NotificationInterface } from "../../Types/Notification-Types";
+import { NotificationInterface, notificationType } from "../../Types/Notification-Types";
 import { SocketContext } from "../../App";
 import { useContext } from "react";
 import { Link } from "react-router-dom";
@@ -45,7 +45,7 @@ function DropdownNotification() {
         <div className="notif-dropdown-wrapper">
             {
                 notifications.map((elem) => {
-                    if (elem.type !== "game_invite")
+                    if (elem.type !== notificationType.GAME_INVITE && elem.type !== notificationType.CHANNEL_MESSAGE)
                         return <NotifItem key={elem.id} notification={elem} />
                 })
             }

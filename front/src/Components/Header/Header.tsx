@@ -8,13 +8,13 @@ import { useAppSelector } from '../../Redux/Hooks';
 import DropdownNotification from './Dropdown-Notification';
 import ResponsiveMenu from './Responsive-Menu';
 import PartyButton from './Party-Button';
+import { NotificationInterface, notificationType } from '../../Types/Notification-Types';
 
-function NotifIcon(props: {handleNotifDropdownClick: Function}) {
-    const {handleNotifDropdownClick} = props;
-    const {notifications} = useAppSelector(state => state.notification);
+function NotifIcon(props: {notifications: NotificationInterface[] | undefined ,handleNotifDropdownClick: Function}) {
+    const {handleNotifDropdownClick, notifications} = props;
     return (
         <div className='badge-wrapper'>
-            { notifications !== undefined && notifications.length > 0 && <div className='badge-notif'> {notifications?.length} </div> }
+            { notifications !== undefined && notifications.filter(elem => elem.type !== notificationType.CHANNEL_MESSAGE && elem.type !== notificationType.GAME_INVITE).length > 0 && <div className='badge badge-notif'> {notifications.filter(elem => elem.type !== notificationType.CHANNEL_MESSAGE && elem.type !== notificationType.GAME_INVITE).length} </div> }
             <IconBell onClick={() => handleNotifDropdownClick()} />
         </div>
     );
@@ -25,6 +25,7 @@ function Header() {
     const [showNotifDropdown, setShowNotifDropdown] = useState<boolean>(false);
     const location = useLocation();
     const { currentUser } = useAppSelector(state => state.auth);
+    const {notifications} = useAppSelector(state => state.notification);
     const modalStatus = useContext(ModalContext);
 
     const handleMenuClick = () => {
@@ -57,10 +58,13 @@ function Header() {
             <div className='header-right'>
                 <div className='icons-header'>
                     <PartyButton />
-                    <NotifIcon handleNotifDropdownClick={handleNotifDropdownClick} />
+                    <NotifIcon notifications={notifications} handleNotifDropdownClick={handleNotifDropdownClick} />
                     <IconUserPlus onClick={() => modalStatus.setStatus()} />
                     <Link to="/chat" aria-label="Link to the chat">
-                        <IconMessages />
+                        <div className='badge-wrapper'>
+                            { notifications !== undefined && notifications.filter(elem => elem.type === notificationType.CHANNEL_MESSAGE).length > 0 && <div className='badge badge-message'> </div> }
+                            <IconMessages />
+                        </div>
                     </Link>
                 </div>
                 <Link className='header-profile' to={`/profile/${currentUser?.username}`}>
@@ -70,7 +74,7 @@ function Header() {
                 <IconLogout />
             </div>
             <div className='header-right-responsive'>
-                <NotifIcon handleNotifDropdownClick={handleNotifDropdownClick} />
+                <NotifIcon notifications={notifications} handleNotifDropdownClick={handleNotifDropdownClick} />
                 <img className='header-picture' src={ProfilPic} alt="profil pic" />
                 <IconChevronDown style={{cursor: "pointer"}} onClick={() => handleMenuClick()} />
                 <ResponsiveMenu show={showMenu} handleClick={handleMenuClick} headerModal={modalStatus.setStatus} />

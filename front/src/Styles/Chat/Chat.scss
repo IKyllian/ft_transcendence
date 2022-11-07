@@ -58,16 +58,27 @@
                         margin-top: 2px;
                     }
 
+                    
+
                     .list-item-container {
                         text-decoration: none;
                         display: flex;
+
+                        
+
                         a {
                             width: 100%;
                             padding: 8px;
                             border-radius: 5px;
+                            color: #c2c2c2;
                             &:hover {
                                 background-color: $DarkPalette;
                             }
+                        }
+
+                        .new-msg {
+                            color: white;
+                            font-weight: bold;
                         }
     
                         a[is-target="true"] {

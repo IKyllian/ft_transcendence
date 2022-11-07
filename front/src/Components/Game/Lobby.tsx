@@ -1,12 +1,11 @@
 import { useContext, useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { SocketContext } from "../../App";
 import { useAppDispatch, useAppSelector } from "../../Redux/Hooks";
-import { UserInterface } from "../../Types/User-Types";
 import { PlayersGameData, NewGameData } from "./game/types/shared.types";
 import Avatar from "../../Images-Icons/pp.jpg";
 import { IconCheck, IconX, IconPlus, IconChevronUp, IconChevronDown, IconLock } from "@tabler/icons";
-import { GameModeState, GameMode, PartyInterface, GameUser } from "../../Types/Lobby-Types";
+import { GameModeState, GameMode, Player, GameType } from "../../Types/Lobby-Types";
 import { Controller, useForm } from "react-hook-form";
 import { changeModalStatus } from "../../Redux/PartySlice";
 import { partyIsReady } from "../../Utils/Utils-Party";
@@ -29,14 +28,13 @@ const defaultGameModeState: GameModeState = {
 
 function Lobby() {
     const {currentUser} = useAppSelector(state => state.auth)
-    // const [lobbyUsers, setLobbyUsers] = useState<UserInterface[]>([currentUser!]);
     const [loggedUserIsLeader, setLoggedUserIsLeader] = useState<boolean>(false);
     const { handleSubmit, control, watch } = useForm();
     const [gameMode, setGameMode] = useState<GameModeState>(defaultGameModeState);
     const [showDropdown, setShowDropdown] = useState<boolean>(false);
     const {socket} = useContext(SocketContext);
     const navigate = useNavigate();
-    const {party} = useAppSelector(state => state.party);
+    const {party, isInQueue} = useAppSelector(state => state.party);
     const partyReady: boolean = (!party || (party && partyIsReady(party?.players))) ? true : false;
 
     useEffect(() => {
@@ -64,6 +62,16 @@ function Lobby() {
         console.log("Data", data);
     })
 
+    const startQueue = () => {
+        socket?.emit("StartQueue", {
+            gameType: GameType.Singles,
+        });
+    }
+
+    const cancelQueue = () => {
+        socket?.emit("StopQueue");
+    }
+
     useEffect(() => {
         if (party && party.players.length > 1) {
             if (party.players.length > 2) {
@@ -90,118 +98,95 @@ function Lobby() {
         }
     }, [party])
 
-    const startGame = () => {
-        // if (lobbyUsers.length === 2) {
-        //     const payload: LobbyRequest = {
-        //         Player_A_Back: lobbyUsers[0].username,
-        //         Player_A_Front: "",
-        //         Player_B_Front: "",
-        //         Player_B_Back: lobbyUsers[1].username,
-        //         game_settings: {
-        //             game_type: 0,
-        //             up_down_border: 10,
-        //             player_back_advance: 30,
-        //             player_front_advance: 90,
-        //             paddle_size_h: 500,
-        //             paddle_speed: 15,
-        //             ball_start_speed: 5,
-        //             ball_acceleration: 1,
-        //             point_for_victory: 3
-        //         }
-        //     }
-        //     socket?.emit("admin_newgame", payload);
-        // }
-    }
-
     useEffect(() => {
-        socket?.on("newgame_data", (data: NewGameData) => {
+        socket?.on("newgame_data", (data: PlayersGameData) => {
             console.log("new_game_data", data);
-            let newOject: PlayersGameData | undefined = undefined;
-            if (data.Player_A_Back === currentUser?.username) {
-                    newOject = {
-                        Player_A_Back: {
-                            name: data.Player_A_Back,
-                            win: 0,
-                            loss: 0,
-                            avatar: 'avatars/mario.png'
-                        },
-                        Player_A_Front:
-                        {
-                            name: '',
-                            win: 0,
-                            loss: 0,
-                            avatar: ''
-                        },
-                        Player_B_Front:
-                        {
-                            name: '',
-                            win: 0,
-                            loss: 0,
-                            avatar: ''
-                        },
-                        Player_B_Back:
-                        {
-                            name: data.Player_B_Back,
-                            win: 0,
-                            loss: 0,
-                            avatar: 'avatars/luigi.jpeg'
-                        },
-                        player_type: 0,
-                        player_secret: data.Player_A_Back_secret,
-                        game_id: data.game_id,
-                        game_settings: data.game_settings,
-                    }           
-            } else {
-                newOject = {
-                    Player_A_Back: {
-                        name: data.Player_A_Back,
-                        win: 0,
-                        loss: 0,
-                        avatar: 'avatars/mario.png'
-                    },
-                    Player_A_Front:
-                    {
-                        name: '',
-                        win: 0,
-                        loss: 0,
-                        avatar: ''
-                    },
-                    Player_B_Front:
-                    {
-                        name: '',
-                        win: 0,
-                        loss: 0,
-                        avatar: ''
-                    },
-                    Player_B_Back:
-                    {
-                        name: data.Player_B_Back,
-                        win: 0,
-                        loss: 0,
-                        avatar: 'avatars/luigi.jpeg'
-                    },
-                    player_type: 0,
-                    player_secret: data.Player_B_Back_secret,
-                    game_id: data.game_id,
-                    game_settings: data.game_settings,
-                }
-            }   
-            navigate("/game", {state: newOject});
+            // let newOject: PlayersGameData | undefined = undefined;
+            // if (data.Player_A_Back === currentUser?.username) {
+            //         newOject = {
+            //             Player_A_Back: {
+            //                 name: data.Player_A_Back,
+            //                 win: 0,
+            //                 loss: 0,
+            //                 avatar: 'avatars/mario.png'
+            //             },
+            //             Player_A_Front:
+            //             {
+            //                 name: '',
+            //                 win: 0,
+            //                 loss: 0,
+            //                 avatar: ''
+            //             },
+            //             Player_B_Front:
+            //             {
+            //                 name: '',
+            //                 win: 0,
+            //                 loss: 0,
+            //                 avatar: ''
+            //             },
+            //             Player_B_Back:
+            //             {
+            //                 name: data.Player_B_Back,
+            //                 win: 0,
+            //                 loss: 0,
+            //                 avatar: 'avatars/luigi.jpeg'
+            //             },
+            //             player_type: 0,
+            //             player_secret: data.Player_A_Back_secret,
+            //             game_id: data.game_id,
+            //             game_settings: data.game_settings,
+            //         }           
+            // } else {
+            //     newOject = {
+            //         Player_A_Back: {
+            //             name: data.Player_A_Back,
+            //             win: 0,
+            //             loss: 0,
+            //             avatar: 'avatars/mario.png'
+            //         },
+            //         Player_A_Front:
+            //         {
+            //             name: '',
+            //             win: 0,
+            //             loss: 0,
+            //             avatar: ''
+            //         },
+            //         Player_B_Front:
+            //         {
+            //             name: '',
+            //             win: 0,
+            //             loss: 0,
+            //             avatar: ''
+            //         },
+            //         Player_B_Back:
+            //         {
+            //             name: data.Player_B_Back,
+            //             win: 0,
+            //             loss: 0,
+            //             avatar: 'avatars/luigi.jpeg'
+            //         },
+            //         player_type: 0,
+            //         player_secret: data.Player_B_Back_secret,
+            //         game_id: data.game_id,
+            //         game_settings: data.game_settings,
+            //     }
+            // }   
+            navigate("/game", {state: data});
         });
 
         return () => {
             socket?.off("newgame_data");
         }
     }, [])
-    return (
+    return !isInQueue ? (
         <div className="lobby-container">
             <div className="lobby-wrapper">
                 <ul className="lobby-player-list">
                     {
                         party ? party.players.map((elem) => 
-                            <PlayerListItem key={elem.user.id} user={elem} />
+                            <PlayerListItem key={elem.user.id} user={elem} lobbyLength={party.players.length} gameMode={gameMode.gameModes[gameMode.indexSelected].gameMode} />
                         )
-                        : <PlayerListItem key={currentUser?.id} user={{isLeader: true, isReady: true, user: currentUser!}} />
+                        : <PlayerListItem key={currentUser?.id} user={{isLeader: true, isReady: true, user: currentUser!}} lobbyLength={1} />
                     
                     }
                     {
@@ -226,8 +211,14 @@ function Lobby() {
                     setShowDropdown={setShowDropdown}
                     partyReady={partyReady}
                     loggedUserIsLeader={loggedUserIsLeader}
+                    startQueue={startQueue}
                 />
             </div>
+        </div>
+    ) : (
+        <div className="lobby-container">
+            <h4> In Queue... </h4>
+            <button onClick={() => cancelQueue()}> Stop Queue </button>
         </div>
     );
 }
@@ -343,23 +334,28 @@ function TeamCircles() {
     );
 }
 
-function PlayerListItem(props: {user?: GameUser}) {
-    const { user } = props;
+function PlayerListItem(props: {user?: Player, lobbyLength?: number, gameMode?: GameMode}) {
+    const { user, lobbyLength, gameMode } = props;
     const dispatch = useAppDispatch();
 
     return user ? (
         <li>
-            <TeamCircles />
+            { lobbyLength && ((lobbyLength === 2 && gameMode === GameMode.PRIVATE_MATCH) || lobbyLength > 2) && <TeamCircles /> }
             <img className="player-avatar" src={Avatar} alt="profil pic" />
             <p> {user.user.username} </p>
-            <select className="team-select">
-                <option value="back"> Paddle Back </option>
-                <option value="front"> Paddle Front </option>
-            </select>
+            {
+
+            }
+            {
+                lobbyLength && lobbyLength > 1 && 
+                <select className="team-select">
+                    <option value="back"> Paddle Back </option>
+                    <option value="front"> Paddle Front </option>
+                </select>
+            }
             { user.isLeader && <span> Leader </span> }
             { !user.isLeader && user.isReady && <span> <IconCheck /> Ready </span> }
             { !user.isLeader && !user.isReady && <span> Not Ready </span> }
-            {/* { isInvited && <span> <InvitedSpin /> Invited </span> } */}
         </li>
     ) : (
         <li className="empty-item">
@@ -369,8 +365,8 @@ function PlayerListItem(props: {user?: GameUser}) {
     );
 }
 
-function LobbyButtonsContainer(props: {gameMode: GameModeState, onGameModeChange: Function, user: GameUser | undefined, onReady: Function, showDropdown: boolean, setShowDropdown: Function, partyReady: boolean, loggedUserIsLeader: boolean }) {
-    const { gameMode, onGameModeChange, user, onReady, showDropdown, setShowDropdown, partyReady, loggedUserIsLeader } = props;
+function LobbyButtonsContainer(props: {gameMode: GameModeState, onGameModeChange: Function, user: Player | undefined, onReady: Function, showDropdown: boolean, setShowDropdown: Function, partyReady: boolean, loggedUserIsLeader: boolean, startQueue: Function }) {
+    const { gameMode, onGameModeChange, user, onReady, showDropdown, setShowDropdown, partyReady, loggedUserIsLeader, startQueue } = props;
     const gameModeOnclick = () => {
         if (loggedUserIsLeader)
             setShowDropdown(!showDropdown)
@@ -378,7 +374,7 @@ function LobbyButtonsContainer(props: {gameMode: GameModeState, onGameModeChange
     return user ? (
         <div className="lobby-buttons-wrapper">
             <button style={{cursor: "pointer"}}> Party Chat </button>
-            { user.isLeader && partyReady && <button style={{cursor: "pointer"}}> Start Game </button> }
+            { user.isLeader && partyReady && <button style={{cursor: "pointer"}} onClick={() => startQueue()}> Start Game </button> }
             { user.isLeader && !partyReady && <button> Waiting for players </button> }
             { !user.isLeader && user.isReady && <button style={{cursor: "pointer"}} onClick={() => onReady(false)}> Not Ready </button> }
             { !user.isLeader && !user.isReady && <button style={{cursor: "pointer"}} onClick={() => onReady(true)}> Ready </button> }

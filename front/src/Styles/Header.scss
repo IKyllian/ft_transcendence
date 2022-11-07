@@ -236,16 +236,25 @@
     display: flex;
     position: relative;
     cursor: pointer;
-    .badge-notif {
+    .badge {
         position: absolute;
         border-radius: 50%;
-        @include width-height(15px, 15px);
         background-color: red;
-        right: -3px;
-        top: -4px;
         text-align: center;
         font-size: 10px;
         font-weight: bold;
+    }
+
+    .badge-notif {
+        @include width-height(15px, 15px);
+        right: -3px;
+        top: -4px;
+    }
+
+    .badge-message {
+        @include width-height(10px, 10px);
+        right: -3px;
+        top: -3px;
     }
 }
 

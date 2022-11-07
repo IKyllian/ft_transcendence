@@ -68,7 +68,7 @@ function ChannelSettings() {
                 <SidebarSettings setSidebarItem={setSidebarItem} channelDatas={channelDatas} loggedUserIsOwner={loggedUserIsOwner} />
                 <div className="content-setting-container">
                     <div className="content-wrapper">
-                        <RenderSettingPage item={sidebarItem} channelDatas={channelDatas} loggedUserIsOwner={loggedUserIsOwner} loggedUserToken={authDatas.token} setChannelDatas={setChannelDatas} />
+                        <RenderSettingPage item={sidebarItem} channelDatas={channelDatas} loggedUserIsOwner={loggedUserIsOwner} />
                     </div>
                 </div>
                 <IconX className="leave-icon" onClick={() => navigate(-1)} />

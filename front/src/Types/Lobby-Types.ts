@@ -43,7 +43,7 @@ export interface GameModeState {
     indexSelected: number,
 }
 
-export interface GameUser {
+export interface Player {
 	user: UserInterface,
 	isReady: boolean,
 	pos?: PlayerType,
@@ -52,6 +52,6 @@ export interface GameUser {
 
 export interface PartyInterface {
 	id: string,
-	players: GameUser[],
+	players: Player[],
 	gameSetting: GameSettings,
 }

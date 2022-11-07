@@ -12,7 +12,7 @@ import { UserInterface } from "../Types/User-Types";
 import { copyFriendListArray } from "../Redux/AuthSlice";
 import { PartyInterface } from "../Types/Lobby-Types";
 import { copyNotificationArray } from "../Redux/NotificationSlice";
-import { addParty, leaveParty } from "../Redux/PartySlice";
+import { addParty, changeQueueStatus, leaveParty } from "../Redux/PartySlice";
 
 export function useAppHook() {
     const [socket, setSocket] = useState<Socket | undefined>(undefined);
@@ -66,14 +66,19 @@ export function useAppHook() {
 					dispatch(addParty(data.party));
 			});
 
-			socket.on("PartyUpdate", (data: PartyInterface) => {
+			socket.on("PartyUpdate", (data: {party: PartyInterface, cancelQueue: boolean}) => {
 				console.log("PartyUpdate", data);
-				dispatch(addParty(data));
+				dispatch(addParty(data.party));
+				dispatch(changeQueueStatus(data.cancelQueue));
 			});
 
 			socket.on("PartyLeave", () => {
 				dispatch(leaveParty());
 			});
+
+			socket.on("InQueue", (data: boolean) => {
+				dispatch(changeQueueStatus(data));
+			})
 
 			socket.on("NewNotification", (data: NotificationInterface) => {
 				console.log("NewNotification", data);
@@ -129,6 +134,7 @@ export function useAppHook() {
 			socket?.off("NewNotification");
 			socket?.off("NewConversation");
 			socket?.off("PartyUpdate");
+			socket?.off("InQueue");
 			socket?.off("PartyLeave");
 			socket?.off("NewPartyInvite");
 			socket?.off("FriendListUpdate");
