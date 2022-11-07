@@ -29,7 +29,7 @@ export type PlayersGameData = {
 	player_type: PlayerType,
 	// player_secret: string,
 	game_id: string,
-	game_settings: GameSettings
+	game_settings: GameSettings,
 }
 
 //data sent from player to join lobby
@@ -46,19 +46,8 @@ export type PlayersGameData = {
 // 	Player_A_Front: string,
 // 	Player_B_Front: string,
 // 	Player_B_Back: string,
-// 	game_settings: GameSettings
+// 	game_settings: game_settings
 // }
-
-//data sent to lobby factory to request a new lobby
-
-export type MatchmakingLobby =
-{
-	Player_A_Back: GameUser,
-	Player_A_Front?: GameUser,
-	Player_B_Back: GameUser,
-	Player_B_Front?: GameUser,
-	game_settings?: GameSettings
-}
 
 //data sent from back to front with data for the players
 // export type NewGameData =
@@ -72,7 +61,7 @@ export type MatchmakingLobby =
 // 	Player_B_Back: string,
 // 	Player_B_Back_secret: string,
 // 	game_id: string,
-// 	game_settings: GameSettings
+// 	game_settings: game_settings
 // }
 
 

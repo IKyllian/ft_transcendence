@@ -1,9 +1,7 @@
 import { forwardRef, Inject, Injectable } from "@nestjs/common";
 import { Interval, SchedulerRegistry, Timeout } from "@nestjs/schedule";
 import { InjectRepository } from "@nestjs/typeorm";
-import { CronJob } from "cron";
-import { exit } from "process";
-import { Server } from "socket.io";
+import { LobbyFactory } from "src/game/lobby/lobby.factory";
 import { MatchmakingLobby } from "src/game/matchmaking/matchmakingLobby";
 import { QueueService } from "src/game/matchmaking/queue/queue.service";
 import { SettingsFactory } from "src/game/settings.factory";
@@ -19,13 +17,12 @@ export class TaskService {
 		private schedulerRegistry: SchedulerRegistry,
 		private queueService: QueueService,
 		private globalService: GlobalService,
+		private lobbyFactory: LobbyFactory,
 
 		@InjectRepository(Notification)
 		private notifRepo: Repository<Notification>,
 		@InjectRepository(UserTimeout)
 		private timeoutRepo: Repository<UserTimeout>,
-		@InjectRepository(ChannelUser)
-		private chanUserRepo: Repository<ChannelUser>,
 	) {};
 
 	getCronJob() {
@@ -75,6 +72,7 @@ export class TaskService {
 	@Interval('singles-queue', 3000)
 	async handleSinglesQueue() {
 		let matchFound: MatchmakingLobby[] = [];
+		console.log("nb of player in queue", this.queueService.queue1v1.length);
 		this.queueService.queue1v1.sort((a, b) => a.averageMmr - b.averageMmr);
 		const range: EloRange = this.setServerRange(this.queueService.queue1v1.length);
 		this.adjustLobbyEloRange(this.queueService.queue1v1, range);
@@ -92,10 +90,12 @@ export class TaskService {
 				}
 			}
 		}
+		// matchFound.forEach((match) => this.lobbyFactory.lobby_create(match));
+		matchFound.forEach((match) => this.lobbyFactory.lobby_create(match));
 		// console.log("MatchFound: ", matchFound);
 	}
 
-	@Interval('doubles-queue', 30000)
+	@Interval('doubles-queue', 3000)
 	async handleDoublesQueue() {
 		let matchFound: MatchmakingLobby[] = [];
 		let potentialLobby: QueueLobbby[] = [];

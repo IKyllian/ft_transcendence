@@ -2,9 +2,10 @@ import { Server } from 'socket.io';
 import { generate } from 'shortid'
 import { Lobby } from './lobby';
 import { Socket } from 'socket.io';
-import { GameState, GameType, MatchmakingLobby, GameSettings, NewGameData, PlayersGameData, PlayerType } from 'src/utils/types/game.types';
+import { GameState, GameType, GameSettings, NewGameData, PlayersGameData, PlayerType } from 'src/utils/types/game.types';
 import { AuthenticatedSocket } from 'src/utils/types/auth-socket';
-//import  * as DefaultGameSettings from '../game-settings';
+import { MatchmakingLobby } from '../matchmaking/matchmakingLobby';
+//import  * as Defaultgame_settings from '../game-settings';
 
 
 //TODO
@@ -22,68 +23,9 @@ export class LobbyFactory
 	{
 		const game_id: string = generate();
 
-// emit a la room d'un user (tt les sockets)
-		// this.server.to('user_' + lobby_request.Player_A_Back.user.id);
-
-
-		//lobby_request.Player_A_Back.user.
-		// if (lobby_request.gameMode === GameMode.OneVsOne)
-		// {
-		// 	lobby_request.game_settings =
-		// 	{
-		// 		    //Default Game Settings 1v1
-		// 			game_type:  GameType.Singles, //(enum)Singles or Doubles
-		// 			up_down_border: 20, //pixels
-		// 			player_back_advance: 20,
-		// 			player_front_advance: 60,
-		// 			paddle_size_h: 150, //pixels
-		// 			paddle_speed: 13, // pixels per update
-		// 			ball_start_speed: 5, //pixels per update
-		// 			ball_acceleration: 1, //pixels per update per collision
-		// 			point_for_victory: 2,
-		// 	}
-		// }
-		// else if (lobby_request.gameMode === GameMode.TwoVsTwo)
-		// {
-		// 	lobby_request.game_settings =
-		// 	{
-		// 		    //Default Game Settings 2v2
-		// 			game_type:  GameType.Doubles, //(enum)Singles or Doubles
-		// 			up_down_border: 20, //pixels
-		// 			player_back_advance: 20,
-		// 			player_front_advance: 60,
-		// 			paddle_size_h: 150, //pixels
-		// 			paddle_speed: 13, // pixels per update
-		// 			ball_start_speed: 5, //pixels per update
-		// 			ball_acceleration: 1, //pixels per update per collision
-		// 			point_for_victory: 2,
-		// 	}		
-		// }
-
-
 		// const lobby = new Lobby(ret, lobby_request.game_settings,  this);
 		const lobby = new Lobby(lobby_request, game_id,  this);
 		this.lobby_list.set(lobby.game_id, lobby);
-
-
-
-
-		// let ng_data: NewGameData =
-		// {
-		// 	Player_A_Back: lobby_request.Player_A_Back,
-		// 	Player_B_Back: lobby_request.Player_B_Back,
-		// 	game_id: game_id,
-		// 	game_settings: lobby_request.game_settings
-		// }
-
-		// if (lobby_request.game_settings.game_type === GameType.Doubles)
-		// {
-		// 	ng_data.Player_A_Back = lobby_request.Player_A_Back;
-		// 	ng_data.Player_B_Back = lobby_request.Player_B_Back;
-		// }
-
-		// this.server.to('user_' + lobby_request.Player_A_Back.user.id).emit("plop", ng_data);
-
 
 		let player_data: PlayersGameData =
 		{
@@ -96,12 +38,9 @@ export class LobbyFactory
 
 		if (lobby_request.game_settings.game_type === GameType.Doubles)
 		{
-			player_data.Player_A_Back = lobby_request.Player_A_Back;
-			player_data.Player_B_Back = lobby_request.Player_B_Back;
+			player_data.Player_A_Front = lobby_request.Player_A_Front;
+			player_data.Player_B_Front = lobby_request.Player_B_Front;
 		}
-
-
-
 
 		player_data.player_type = PlayerType.Player_A_Back;
 		this.server.to('user_' + lobby_request.Player_A_Back.user.id).emit("newgame_data", player_data);

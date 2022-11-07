@@ -18,7 +18,7 @@ export class Party {
 
 	players: GameUser[] = new Array<GameUser>();
 
-	gameSetting: GameSettings;
+	game_settings: GameSettings;
 
 	join(user: User) {
 		if (this.players.find((p) => p.user.id === user.id)) {
