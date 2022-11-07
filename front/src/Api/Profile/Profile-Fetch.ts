@@ -12,7 +12,7 @@ export function fetchProfile(username: string, token: string, setUserState: Func
         setUserState({
             isLoggedUser: false,
             user: response.data.user,
-            frindList: response.data.friendList,
+            friendList: response.data.friendList,
             relationStatus: response.data.relationStatus,
         });
     })

@@ -5,5 +5,10 @@ export function loggedUserIsLeader(loggedUserId: number, partyUsers: GameUser[])
 }
 
 export function partyIsReady(partyUsers: GameUser[]): boolean {
-    return partyUsers.find(elem => (!elem.isLeader && !elem.isReady)) ? false : true;
+    if (partyUsers.length === 1)
+        return true;
+    else if (partyUsers.length !== 2 && partyUsers.length !== 4)
+        return false;
+    else
+        return partyUsers.find(elem => (!elem.isLeader && !elem.isReady)) ? false : true;
 }

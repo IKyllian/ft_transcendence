@@ -3,6 +3,8 @@ import { IconDotsVertical } from '@tabler/icons';
 
 import { UserInterface } from "../../../Types/User-Types";
 import FriendListModal from "../Friend-Dropdown";
+import Avatar from "../../../Images-Icons/pp.jpg";
+import { Link } from "react-router-dom";
 
 function FriendItem(props: {name: string, profilPic: string}) {
     const {name, profilPic} = props;
@@ -17,7 +19,9 @@ function FriendItem(props: {name: string, profilPic: string}) {
         <div className="friend-item">
             <div className="friend-content">
                 <img className='friend-avatar' src={profilPic} alt="profil pic" />
-                <p> { name }</p>
+                <Link to={`/profile/${name}`}>
+                    { name }
+                </Link>
             </div>
             <div className="friend-item-menu">
                 <IconDotsVertical onClick={() => handleClick()} />
@@ -27,16 +31,17 @@ function FriendItem(props: {name: string, profilPic: string}) {
     );
 }
 
-function BlockFriends(props: {userDatas: UserInterface}) {
-    const {userDatas} = props;
-    return (
-        // <div className="profile-block-wrapper friends-list">
-        //     {
-        //         friendsDatas.map((elem, index) =>
-        //             <FriendItem key={index} name={elem.username} profilPic={elem.profilPic} />
-        //         )
-        //     }
-        // </div>
+function BlockFriends(props: {friendList: UserInterface[]}) {
+    const {friendList} = props;
+    return friendList.length > 0 ? (
+        <div className="profile-block-wrapper friends-list">
+            {
+                friendList.map((elem, index) =>
+                    <FriendItem key={index} name={elem.username} profilPic={Avatar} />
+                )
+            }
+        </div>
+    ) : (
         <p className="err-no-datas"> No Friends yet </p>
     );
 }

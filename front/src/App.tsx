@@ -24,6 +24,7 @@ import NotifError from "./Components/Notif-Error";
 import Game from "./Components/Game/Game";
 import Lobby from "./Components/Game/Lobby";
 import ModalPartyInvite from "./Components/Modal-Party-Invite";
+import CodeVerification from "./Components/Sign/Code-Verification";
 
 
 interface RouteProps {
@@ -46,6 +47,12 @@ const routes: RouteProps[] = [
 		element:
 			<PublicRoute>
 				<Sign />
+			</PublicRoute>,
+	}, {
+		path: '/account-verification',
+		element:
+			<PublicRoute>
+				<CodeVerification />
 			</PublicRoute>,
 	}, {
 		path: '/set-username',

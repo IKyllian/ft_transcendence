@@ -4,8 +4,8 @@ import BlockFriends from "./Blocks/Block-Friends";
 
 import { UserInterface } from "../../Types/User-Types";
 
-function RenderProfileBlock(props: {blockTitle: string, userDatas: UserInterface}) {
-    const {blockTitle, userDatas} = props;
+function RenderProfileBlock(props: {blockTitle: string, userDatas: UserInterface, friendList: UserInterface[]}) {
+    const {blockTitle, userDatas, friendList} = props;
 
     if (blockTitle === "Achievements") {
         return (
@@ -17,7 +17,7 @@ function RenderProfileBlock(props: {blockTitle: string, userDatas: UserInterface
         );
     } else {
         return (
-           <BlockFriends userDatas={userDatas} />
+           <BlockFriends friendList={friendList} />
         );
     }
 }

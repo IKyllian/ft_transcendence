@@ -37,7 +37,7 @@ function Lobby() {
     const {socket} = useContext(SocketContext);
     const navigate = useNavigate();
     const {party} = useAppSelector(state => state.party);
-    const partyReady: boolean = party && partyIsReady(party?.players) ? true : false;
+    const partyReady: boolean = (!party || (party && partyIsReady(party?.players))) ? true : false;
 
     useEffect(() => {
         if (!party || (party && party.players.find(elem => elem.isLeader && elem.user.id === currentUser!.id)))
@@ -68,7 +68,7 @@ function Lobby() {
         if (party && party.players.length > 1) {
             if (party.players.length > 2) {
                 setGameMode((prev: any) => {
-                    return {...prev, indexSelected: 1 ,gameModes: [...gameMode.gameModes.map(elem => {
+                    return {...prev, indexSelected: 1, gameModes: [...gameMode.gameModes.map(elem => {
                         if (elem.gameMode === GameMode.RANKED)
                             return  {...elem, isLock: true };
                         else if (elem.gameMode === GameMode.BONUS_2v2)
@@ -78,7 +78,7 @@ function Lobby() {
                 });
             } else if (party.players.length === 2){
                 setGameMode((prev: any) => {
-                    return {...prev, indexSelected: 1 ,gameModes: [...gameMode.gameModes.map(elem => {
+                    return {...prev, indexSelected: gameMode.indexSelected === 0 ? 1 : gameMode.indexSelected ,gameModes: [...gameMode.gameModes.map(elem => {
                         if (elem.gameMode === GameMode.RANKED)
                             return  {...elem, isLock: true };
                         else if (elem.gameMode === GameMode.BONUS_2v2)
@@ -235,21 +235,44 @@ function Lobby() {
 function BoardGame(props: {hookForm: {watch: any}}) {
     const { hookForm } = props;
     const paddleSize = hookForm.watch("paddleSize");
+    const playerBackAdvance = hookForm.watch("playerBackAdvance");
+    const playerFrontAdvance = hookForm.watch("playerFrontAdvance");
+
+
+    console.log("paddleSize", paddleSize);
+    console.log("playerBackAdvance", playerBackAdvance);
+    console.log("playerFrontAdvance", playerFrontAdvance);
     
     useEffect(() => {
         const root = document.documentElement;
         root?.style.setProperty(
-            "--paddleHeight",
+            "--PaddleHeight",
             `${paddleSize}px`
-          );
-    }, [paddleSize])
+        );
+
+        root?.style.setProperty(
+            "--PlayerBackAdvance",
+            `${playerBackAdvance}px`
+        );
+
+        root?.style.setProperty(
+            "--PlayerFrontAdvance",
+            `${playerFrontAdvance}px`
+        );
+    }, [paddleSize, playerBackAdvance, playerFrontAdvance])
 
     return (
         <div className="setting-wrapper board-game-wrapper">
             <div className="game-board">
-                <div className="paddle"> </div>
+                <div className="paddle-wrapper">
+                    <div className="paddle paddle-left"> </div>
+                    <div className="paddle paddle-left"> </div>
+                </div>
                 <div className="ball"> </div>
-                <div className="paddle"> </div>
+                <div className="paddle-wrapper">
+                    <div className="paddle paddle-right"> </div>
+                    <div className="paddle paddle-right"> </div>
+                </div>
             </div>
         </div>
     );
@@ -270,7 +293,31 @@ function GameSettings(props: {hookForm: {handleSubmit: any, control: any, watch:
                         render={({ field: { value, onChange }}) => (
                             <label>
                                 Paddle Size
-                                <input type="range" min={50} max={400} onChange={onChange} value={value} />
+                                <input type="range" min={50} max={300} onChange={onChange} value={value} />
+                            </label>
+                            
+                        )}
+                    />
+                    <Controller
+                        control={hookForm.control}
+                        name="playerBackAdvance"
+                        defaultValue={10}
+                        render={({ field: { value, onChange }}) => (
+                            <label>
+                                Player Back Advance
+                                <input type="range" min={10} max={100} onChange={onChange} value={value} />
+                            </label>
+                            
+                        )}
+                    />
+                    <Controller
+                        control={hookForm.control}
+                        name="playerFrontAdvance"
+                        defaultValue={40}
+                        render={({ field: { value, onChange }}) => (
+                            <label>
+                                Player Front Advance
+                                <input type="range" min={40} max={150} onChange={onChange} value={value} />
                             </label>
                             
                         )}
@@ -282,14 +329,33 @@ function GameSettings(props: {hookForm: {handleSubmit: any, control: any, watch:
     );
 }
 
+function TeamCircles() {
+    const [team, setTeam] = useState<number>(1);
+    const handleClick = (teamNumber: number) => {
+        if (teamNumber !== team)
+            setTeam(teamNumber);
+    }
+    return (
+        <div className="teams-wrapper">
+            <div className={`circle-item team1 ${team === 1 ? "team-active" : ""}`} onClick={() => handleClick(1)}> </div>
+            <div className={`circle-item team2 ${team === 2 ? "team-active" : ""}`} onClick={() => handleClick(2)}> </div>
+        </div>
+    );
+}
+
 function PlayerListItem(props: {user?: GameUser}) {
     const { user } = props;
     const dispatch = useAppDispatch();
 
     return user ? (
         <li>
+            <TeamCircles />
             <img className="player-avatar" src={Avatar} alt="profil pic" />
             <p> {user.user.username} </p>
+            <select className="team-select">
+                <option value="back"> Paddle Back </option>
+                <option value="front"> Paddle Front </option>
+            </select>
             { user.isLeader && <span> Leader </span> }
             { !user.isLeader && user.isReady && <span> <IconCheck /> Ready </span> }
             { !user.isLeader && !user.isReady && <span> Not Ready </span> }
@@ -305,14 +371,18 @@ function PlayerListItem(props: {user?: GameUser}) {
 
 function LobbyButtonsContainer(props: {gameMode: GameModeState, onGameModeChange: Function, user: GameUser | undefined, onReady: Function, showDropdown: boolean, setShowDropdown: Function, partyReady: boolean, loggedUserIsLeader: boolean }) {
     const { gameMode, onGameModeChange, user, onReady, showDropdown, setShowDropdown, partyReady, loggedUserIsLeader } = props;
+    const gameModeOnclick = () => {
+        if (loggedUserIsLeader)
+            setShowDropdown(!showDropdown)
+    }
     return user ? (
         <div className="lobby-buttons-wrapper">
-            <button style={{cursor: "pointer"}}> Invite Friends </button>
+            <button style={{cursor: "pointer"}}> Party Chat </button>
             { user.isLeader && partyReady && <button style={{cursor: "pointer"}}> Start Game </button> }
             { user.isLeader && !partyReady && <button> Waiting for players </button> }
-            { !user.isLeader && user.isReady && <button style={{cursor: "pointer"}} onClick={() => onReady(false)}> Ready </button> }
-            { !user.isLeader && !user.isReady && <button style={{cursor: "pointer"}} onClick={() => onReady(true)}> Not Ready </button> }
-            <button style={loggedUserIsLeader ? {cursor: "pointer"} : {}} className={`game-modes-button ${showDropdown ? "bos" : ""}`} onClick={() => setShowDropdown(!showDropdown)}>
+            { !user.isLeader && user.isReady && <button style={{cursor: "pointer"}} onClick={() => onReady(false)}> Not Ready </button> }
+            { !user.isLeader && !user.isReady && <button style={{cursor: "pointer"}} onClick={() => onReady(true)}> Ready </button> }
+            <button style={loggedUserIsLeader ? {cursor: "pointer"} : {}} className={`game-modes-button ${showDropdown ? "bos" : ""}`} onClick={() => gameModeOnclick()}>
                 { gameMode.gameModes[gameMode.indexSelected].gameMode }
                 { showDropdown && loggedUserIsLeader && <IconChevronDown className="chevron-icon" /> }
                 { !showDropdown && loggedUserIsLeader && <IconChevronUp className="chevron-icon" /> }

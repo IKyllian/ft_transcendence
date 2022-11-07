@@ -1,9 +1,13 @@
 @use "./Variables.scss" as *;
 
 $GreyLobby: rgb(163, 158, 158);
+$TeamBlueColor: rgb(0, 98, 255);
+$TeamRedColor: rgb(215, 38, 18);
 
 #root {
-    $paddleHeight: 150px;
+    $PaddleHeight: 150px;
+    $PlayerBackAdvance: 10px;
+    $PlayerFrontAdvance: 40px;
 }
 
 .lobby-container {
@@ -22,6 +26,8 @@ $GreyLobby: rgb(163, 158, 158);
             justify-content: center;
             gap: 10px;
             list-style-type: none;
+            margin: 0;
+            padding: 0;
             .empty-item {
                 justify-content: center;
 
@@ -40,16 +46,54 @@ $GreyLobby: rgb(163, 158, 158);
                 background-color: #131d30;
                 border-radius: 15px;
                 position: relative;
+
+                .teams-wrapper {
+                    position: absolute;
+                    right: 10px;
+                    top: 10px;
+                    @include flex-row-alignCenter();
+                    gap: 5px;
+
+                    .team1 {
+                        background-color: $TeamBlueColor;
+                    }
+
+                    .team2 {
+                        background-color: $TeamRedColor;
+                    }
+
+                    .team-active {
+                        border: 1.5px solid white
+                    }
+
+                    .circle-item {
+                        @include width-height(17px, 17px);
+                        border-radius: 50%;
+                        cursor: pointer
+                    }
+                }
     
                 .player-avatar {
                     @include avatar-player(80px);
                 }
     
                 p {
-                    margin: 10px 0;
+                    margin: 10px 0 0 0;
                     font-size: 15px;
                     font-weight: bold;
                 }
+                
+                .team-select {
+                    cursor: pointer;
+                    padding: 5px;
+                    background-color: #1B263B;
+                    border-radius: 5px;
+                    border: none;
+                    color: white;
+                    margin: 5px 0;
+                    font-size: 11px;
+                }
+
     
                 span {
                     @include flex-row-alignCenter();
@@ -106,7 +150,7 @@ $GreyLobby: rgb(163, 158, 158);
 
             .board-game-wrapper {
                 @include width-height(500px, 350px);
-                padding: 0 10px;
+                padding: 0 var(--PlayerBackAdvance);
 
                 .game-board {
                     height: 100%;
@@ -115,15 +159,31 @@ $GreyLobby: rgb(163, 158, 158);
                     justify-content: space-between;
                     align-items: center;
                     overflow: hidden;
+                    position: relative;
 
-                    .paddle {
-                        height: var(--paddleHeight);
-                        width: 2px;
-                        background-color: red;
+                    .paddle-wrapper {
+                        @include flex-row-alignCenter();
+                        gap: var(--PlayerFrontAdvance);
+                        .paddle-left {
+                            background-color: $TeamBlueColor;
+                        }
+    
+                        .paddle-right {
+                            background-color: $TeamRedColor;
+                        }
+    
+                        .paddle {
+                            height: var(--PaddleHeight);
+                            width: 2px;
+                        }
                     }
 
                     .ball {
                         @include width-height(20px, 20px);
+                        position: absolute;
+                        left: 0;
+                        right: 0;
+                        margin: 0 auto;
                         border-radius: 50px;
                         background-color: aqua;
                     }
