@@ -31,7 +31,7 @@ export class AuthService {
 			pass: process.env.MAIL_PASSWORD
 		}
 	})
-	
+
 
 	async signup(dto: SignupDto) {
 		if (await this.userService.nameTaken(dto.username))
@@ -231,7 +231,7 @@ export class AuthService {
             subject: 'Pong Game account validation',
             html: `
             <h1>test !!!!</h1>
-            <a href=http://localhost:3000/api/activate?code=${user.validation_code}>Click here</a>`,
+            <a href=http://localhost:3000/api/auth/activate?code=${user.validation_code}>Click here</a>`,
         }
 
         this.transporter.sendMail(message, function(err, info) {
