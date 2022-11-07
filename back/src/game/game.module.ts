@@ -11,6 +11,6 @@ import { LobbyFactory } from './lobby/lobby.factory';
 		UserModule,
 	],
 	providers: [GameGateway, LobbyFactory, UserSessionManager],
-	exports: [ UserSessionManager ]
+	exports: [ UserSessionManager, LobbyFactory ]
 })
 export class GameModule {}

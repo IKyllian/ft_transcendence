@@ -4,6 +4,7 @@ export class SettingsFactory {
 	defaultSetting(gameType: GameType): GameSettings {
 		if (gameType === GameType.Singles) {
 			return {
+				ranked: true,
 				game_type: gameType,
 				up_down_border: 20,
 				player_back_advance: 20,
