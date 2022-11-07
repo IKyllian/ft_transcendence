@@ -92,10 +92,10 @@ export default class Pong extends Phaser.Scene
 		this.load.image('ball', 'assets/black_dot.png');
 		this.load.image('lag_icon', 'assets/lag_icon.png');
 
-		this.load.audio('sound_a', 'assets/sound/8bit_effect_a.ogg');
-		this.load.audio('sound_b', 'assets/sound/8bit_effect_b.ogg');
-		this.load.audio('sound_c', 'assets/sound/8bit_effect_c.ogg');
-		this.load.audio('clapping', 'assets/sound/clapping.ogg');
+		// this.load.audio('sound_a', 'assets/sound/8bit_effect_a.ogg');
+		// this.load.audio('sound_b', 'assets/sound/8bit_effect_b.ogg');
+		// this.load.audio('sound_c', 'assets/sound/8bit_effect_c.ogg');
+		// this.load.audio('clapping', 'assets/sound/clapping.ogg');
 	}
 
 	create ()
@@ -121,10 +121,10 @@ export default class Pong extends Phaser.Scene
 		this.me = this.game.registry.get('players_data').player_type;
 
 
-		this.sound_a = this.sound.add('sound_a');
-		this.sound_b = this.sound.add('sound_b');
-		this.sound_c = this.sound.add('sound_c');
-		this.sound_clapping = this.sound.add('clapping');
+		// this.sound_a = this.sound.add('sound_a');
+		// this.sound_b = this.sound.add('sound_b');
+		// this.sound_c = this.sound.add('sound_c');
+		// this.sound_clapping = this.sound.add('clapping');
 	
 
 
@@ -145,15 +145,12 @@ export default class Pong extends Phaser.Scene
 //console.log('setting triggers for core')
 			this.core.set_pong_triggers({
 
-				play_sound_a: this.play_sound_a.bind(this),
-				play_sound_b: this.play_sound_b.bind(this),
-				play_sound_c: this.play_sound_c.bind(this),
-				play_sound_clapping: this.play_sound_clapping.bind(this)
+				// play_sound_a: this.play_sound_a.bind(this),
+				// play_sound_b: this.play_sound_b.bind(this),
+				// play_sound_c: this.play_sound_c.bind(this),
+				// play_sound_clapping: this.play_sound_clapping.bind(this)
 
-				// play_sound_a: this.sound_a.play.bind(this),
-				// play_sound_b: this.sound_b.play.bind(this),
-				// play_sound_c: this.sound_c.play.bind(this),
-				// clapping: this.sound_clapping.play.bind(this)
+
 
 			});
 		}
