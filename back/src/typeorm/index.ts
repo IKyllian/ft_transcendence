@@ -9,6 +9,7 @@ import { PrivateMessage } from "./entities/privateMessage"
 import { Statistic } from "./entities/statistic"
 import { User } from "./entities/user"
 import { Notification } from "./entities/notification"
+import { PendingUser } from "./entities/pendingUser"
 
 const entities = [
 	User,
@@ -22,6 +23,7 @@ const entities = [
 	PrivateMessage,
 	BannedUser,
 	Notification,
+	PendingUser,
 ];
 
 export default entities;

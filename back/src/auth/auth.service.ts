@@ -1,5 +1,5 @@
 import { ForbiddenException, Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
-import { AuthDto } from "./dto/auth.dto";
+import { LoginDto } from "./dto/login.dto";
 import * as argon from 'argon2';
 import { JwtService } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
@@ -8,6 +8,10 @@ import { lastValueFrom } from "rxjs";
 import { UserService } from "src/user/user.service";
 import { Auth42Dto } from "./dto/auth42.dto";
 import { User } from "src/typeorm";
+import { SignupDto } from "./dto/signup.dto";
+import * as nodemailer from 'nodemailer';
+import * as googleapis from 'googleapis';
+import { PendingUser } from "src/typeorm/entities/pendingUser";
 
 @Injectable()
 export class AuthService {
@@ -19,7 +23,16 @@ export class AuthService {
 		private readonly httpService: HttpService,
 	) {}
 
-	async signup(dto: AuthDto) {
+	private transporter : nodemailer.Transporter = nodemailer.createTransport({
+		service: 'gmail',
+		auth: {
+			user: process.env.MAIL_USER,
+			pass: process.env.MAIL_PASSWORD
+		}
+	})
+	
+
+	/* async signup(dto: SignupDto) {
 		if (await this.userService.nameTaken(dto.username))
 			throw new ForbiddenException('Username taken');
 		const hash = await argon.hash(dto.password);
@@ -35,9 +48,27 @@ export class AuthService {
 			refresh_token: tokens.refresh_token,
 			user: user,
 		}
+	} */
+
+	async signup(dto: SignupDto) {
+		if (await this.userService.nameTaken(dto.username))
+			throw new ForbiddenException('Username already in use');
+		if (await this.userService.mailTaken(dto.email))
+			throw new ForbiddenException('Email already in use');
+		const hash = await argon.hash(dto.password);
+		const params = {
+			username: dto.username,
+			email: dto.email,
+			hash,
+		}
+		const user = await this.userService.createPending(params);
+		this.sendValidationMail(user);
+		return {
+			user: user,
+		}
 	}
 
-	async login(dto: AuthDto) {
+	async login(dto: LoginDto) {
 		const user = await this.userService.findOne({
 			relations: {
 				channelUser: {
@@ -183,4 +214,22 @@ export class AuthService {
 		this.userService.logout(user);
 		return { success: true, message: "logged out successfuly" };
 	}
+
+	private async sendValidationMail(user: PendingUser) {		
+        const message = {
+            from: process.env.MAIL_USER,
+            to: user.email,
+            subject: 'Pong Game account validation',
+            html: `
+            <h1>test !!!!</h1>
+            <a href=http://localhost:3000/api/activate/${user.validation_code}>Click here</a>`,
+        }
+		
+        this.transporter.sendMail(message, function(err, info) {
+            if (err)
+                console.log(err);
+            else
+                console.log(info);
+        });
+    }
 }

@@ -22,6 +22,9 @@ export class User {
 	@Column({ unique: true, nullable: true })
 	username: string;
 
+	@Column({ unique: true })
+    email: string;
+
 	@Column({ default: 'offline' })
 	status: userStatus;
 

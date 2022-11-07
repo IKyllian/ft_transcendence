@@ -9,6 +9,9 @@ import { EditUserDto } from "./dto/editUser.dto";
 import * as argon from 'argon2';
 import { SearchDto } from "./dto/search.dto";
 import { FriendshipService } from "./friendship/friendship.service";
+import { PendingUser } from "src/typeorm/entities/pendingUser";
+import { CreatePendingDto } from "./dto/createPending.dto";
+import { v4 as uuidv4 } from "uuid";
 
 @Injectable()
 export class UserService {
@@ -20,6 +23,8 @@ export class UserService {
 		@InjectRepository(Statistic)
 		private statisticRepo: Repository<Statistic>,
 		private friendshipService: FriendshipService,
+		@InjectRepository(PendingUser)
+		private pendingUserRepo: Repository<PendingUser>,
 	) {}
 
 	create(dto: CreateUserDto) {
@@ -27,6 +32,13 @@ export class UserService {
 		const params = {...dto, statistic};
 		const user = this.userRepo.create(params);
 		return this.userRepo.save(user);
+	}
+
+	createPending(dto: CreatePendingDto) {
+		const validation_code: string = uuidv4();		
+		const params = {...dto, validation_code};
+		const user = this.pendingUserRepo.create(params);
+		return this.pendingUserRepo.save(user);
 	}
 
 	findOne(options: FindOneOptions<User>, selectAll?: Boolean): Promise<User | null> {
@@ -42,6 +54,10 @@ export class UserService {
 			];
 		}
 		return this.userRepo.findOne(options);
+	}
+
+	findOnePending(options: FindOneOptions<PendingUser>): Promise<PendingUser | null> {
+		return this.pendingUserRepo.findOne(options);
 	}
 
 	findOneBy(where: FindOptionsWhere<User> | FindOptionsWhere<User>[]): Promise<User | null> {
@@ -66,7 +82,23 @@ export class UserService {
 			.createQueryBuilder("user")
 			.where("LOWER(user.username) = :name", { name: name.toLowerCase() })
 			.getOne();
-		return nameTaken ? true : false;
+		const pendingNameTaken = await this.pendingUserRepo
+			.createQueryBuilder("user")
+			.where("LOWER(user.username) = :name", { name: name.toLowerCase() })
+			.getOne();
+		return nameTaken || pendingNameTaken;
+	}
+
+	async mailTaken(email: string) {
+		const mailTaken = await this.userRepo
+			.createQueryBuilder("user")
+			.where("LOWER(user.email) = :email", { email: email.toLowerCase() })
+			.getOne();
+		const pendingMailTaken = await this.pendingUserRepo
+			.createQueryBuilder("user")
+			.where("LOWER(user.email) = :email", { email: email.toLowerCase() })
+			.getOne();
+		return mailTaken || pendingMailTaken;
 	}
 
 	// TODO ask if usefull
