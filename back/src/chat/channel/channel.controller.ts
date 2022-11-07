@@ -15,8 +15,7 @@ import { MuteUserDto } from "./dto/mute-user.dto";
 export class ChannelController {
 	constructor(
 		private channelService: ChannelService,
-		) {}
-
+	) {}
 
 	@Get('my_channels')
 	@UseGuards(JwtGuard)
@@ -47,36 +46,6 @@ export class ChannelController {
 		return await this.channelService.create(user, channelDto);
 	}
 
-	@Post(':id/join')
-	@UseGuards(JwtGuard)
-	async joinChannel(
-		@GetUser() user: User,
-		@Param('id', ParseIntPipe) id: number,
-		@Body() passDto: ChannelPasswordDto ) {
-			console.log('joining Channel')
-		return await this.channelService.join(user, id, passDto);
-	}
-
-	@Post(':id/leave')
-	@UseGuards(JwtGuard)
-	leaveChannel(
-		@GetUser() user: User,
-		@Param('id', ParseIntPipe) id: number) {
-		// add reason ?
-		console.log('in route leave channel')
-		return this.channelService.leave(user, id);
-	}
-
-	//test
-	@Get(':id')
-	@UseGuards(JwtGuard)
-	async getChannel(
-		@Param('id', ParseIntPipe) id: number,
-		@GetUser() user: User,
-		) {
-			return await this.channelService.getChannelById(user, id);
-	}
-
 	@Delete(':id')
 	async deleteChannel(
 		@Param('id') id: number,
@@ -84,36 +53,11 @@ export class ChannelController {
 		return await this.channelService.delete(id);
 	}
 
-	// TODO redo channel guard for websocket
-	// @UseGuards(JwtGuard)
-	// @Post('ban')
-	// async banUser(
-	// @GetUser() user: User,
-	// @Body() dto: BanUserDto) {
-	// 	return await this.channelService.banUser(user, dto);
+	// @UseGuards(JwtGuard, InChannelGuard, ChannelPermissionGuard)
+	// @Post('unban')
+	// unbanUser(
+	// @Body() dto: BanUserDto,
+	// ) {
+	// 	return this.channelService.unbanUser(dto);
 	// }
-
-	@UseGuards(JwtGuard, InChannelGuard, ChannelPermissionGuard)
-	@Post('unban')
-	unbanUser(
-	@Body() dto: BanUserDto,
-	) {
-		return this.channelService.unbanUser(dto);
-	}
-
-	@UseGuards(JwtGuard, InChannelGuard, ChannelPermissionGuard)
-	@Post('mute')
-	muteUser(
-	@Body() dto: MuteUserDto,
-	) {
-		this.channelService.muteUser(dto);
-	}
-
-	@UseGuards(JwtGuard, InChannelGuard, ChannelPermissionGuard)
-	@Post('mute')
-	unMuteUser(
-	@Body() dto: MuteUserDto,
-	) {
-		this.channelService.unMuteUser(dto);
-	}
 }

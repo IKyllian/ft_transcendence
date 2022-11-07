@@ -2,9 +2,9 @@ import { ClassSerializerInterceptor, forwardRef, Module } from "@nestjs/common";
 import { APP_INTERCEPTOR } from "@nestjs/core";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { NotificationModule } from "src/notification/notification.module";
-import { BannedUser, Channel, ChannelMessage, ChannelUser, User } from "src/typeorm";
+import { Channel, ChannelMessage, ChannelUser, User, UserTimeout } from "src/typeorm";
 import { UserModule } from "src/user/user.module";
-import { ChatModule } from "../chat.module";
+import { GlobalModule } from "src/utils/global/global.module";
 import { ChannelController } from "./channel.controller";
 import { ChannelService } from "./channel.service";
 import { ChannelMessageController } from "./message/channelMessage.controller";
@@ -14,12 +14,12 @@ import { ChannelMessageService } from "./message/ChannelMessage.service";
 	imports: [
 		NotificationModule,
 		UserModule,
-		// forwardRef(() => NotificationModule),
+		GlobalModule,
 		TypeOrmModule.forFeature([
 			Channel,
 			ChannelUser,
 			ChannelMessage,
-			BannedUser,
+			UserTimeout,
 			User,
 		])
 	],

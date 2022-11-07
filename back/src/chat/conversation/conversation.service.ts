@@ -19,7 +19,7 @@ export class ConversationService {
 		const user2 = await this.userService.findOneBy({ id: user2Id });
 		if (!user2)
 			throw new NotFoundException('User not found');
-		else if (await this.conversationExist(user, user2Id))
+		else if (await this.conversationExist(user.id, user2Id))
 			throw new BadRequestException('Conversation already exist');
 		const msg = this.msgRepo.create({
 			sender: user,
@@ -33,7 +33,7 @@ export class ConversationService {
 		 return this.convRepo.save(conv);
 	}
 
-	async conversationExist(user: User, user2Id: number) {
+	async conversationExist(userId: number, user2Id: number) {
 		return await this.convRepo.findOne({
 			relations: {
 				user1: true,
@@ -42,12 +42,12 @@ export class ConversationService {
 			},
 			where: [
 				{
-					user1: { id: user.id},
+					user1: { id: userId},
 					user2: { id: user2Id },
 				},
 				{
 					user1: { id: user2Id },
-					user2: { id: user.id },
+					user2: { id: userId },
 				}
 			]
 		});
@@ -77,7 +77,7 @@ export class ConversationService {
 		const user2 = await this.userService.findOneBy({ id: userId });
 		if (!user2)
 			throw new NotFoundException('User not found');
-		const convExist = await this.conversationExist(user, user2.id);
+		const convExist = await this.conversationExist(user.id, user2.id);
 		if (convExist)
 			return convExist;
 		else

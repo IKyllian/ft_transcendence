@@ -1,134 +1,171 @@
 import { Socket } from "socket.io";
-import { GameType, PlayerStatus, NewGameData, GameSettings, GameState, LobbyStatus, PlayerInput, PlayerType, RoundSetup } from "src/utils/types/game.types";
+import { AuthenticatedSocket } from "src/utils/types/auth-socket";
+import { GameType, PlayerStatus, GameSettings, GameState, LobbyStatus, PlayerInput, PlayerType, RoundSetup, MatchmakingLobby } from "src/utils/types/game.types";
 import { PongGame } from "../pong/pong.game";
 import { LobbyFactory } from "./lobby.factory";
 
 export class Lobby
 {
-	public game_id: string;
+	//public game_id: string;
 	public game_type: GameType = GameType.Singles;
 	public creation_date: Date = new Date();
-	public game: PongGame = new PongGame(this.game_settings, this);
+	public game: PongGame = new PongGame(this.lobby_data.game_settings, this);
+
+
+	//changer les spects en room
 	public spectators: Map<Socket['id'], Socket> = new Map<Socket['id'], Socket>();
 	
 
-	public Player_A_Back?: Socket;
-	public Player_A_Back_id: string = '';
+	public Player_A_Back?: AuthenticatedSocket;
+	// public Player_A_Back_id: string = '';
 	Player_A_Back_status: PlayerStatus = PlayerStatus.Absent;
 
 
-	public Player_A_Front?: Socket;
-	public Player_A_Front_id: string = '';
+	public Player_A_Front?: AuthenticatedSocket;
+	// public Player_A_Front_id: string = '';
 	Player_A_Front_status: PlayerStatus = PlayerStatus.Absent;
 
-	public Player_B_Front?: Socket;
-	public Player_B_Front_id: string = '';
+	public Player_B_Front?: AuthenticatedSocket;
+	// public Player_B_Front_id: string = '';
 	Player_B_Front_status: PlayerStatus = PlayerStatus.Absent;
 
-	public Player_B_Back?: Socket;
-	public Player_B_Back_id: string = '';
+	public Player_B_Back?: AuthenticatedSocket;
+	// public Player_B_Back_id: string = '';
 	Player_B_Back_status: PlayerStatus = PlayerStatus.Absent;
 
 	
 	already_started: boolean = false;
 	already_finished: boolean = false;
 
+
+
 	constructor(
-		public gamedata: NewGameData,
-		public game_settings: GameSettings,
+		public lobby_data: MatchmakingLobby,
+		public game_id: string,
+	//	public game_settings: GameSettings,
 		readonly factory: LobbyFactory
 		)
 	{
-		this.game_id = gamedata.game_id;
-		this.game_type = gamedata.game_settings.game_type;
+	//	this.game_id = gamedata.game_id;
+		this.game_type = lobby_data.game_settings.game_type;
 	}
+
+
+
+
+	// constructor(
+	// 	public gamedata: NewGameData,
+	// 	public game_settings: GameSettings,
+	// 	readonly factory: LobbyFactory
+	// 	)
+	// {
+	// 	this.game_id = gamedata.game_id;
+	// 	this.game_type = gamedata.game_settings.game_type;
+	// }
 
 	game_set_finished()
 	{
 		this.already_finished = true;
 	}
 
-	lobby_add(client: Socket, player_secret: string)
+	lobby_add(client: AuthenticatedSocket)
 	{
-		if (player_secret === this.gamedata.Player_A_Back_secret)
+		if (client.user.id === this.lobby_data.Player_A_Back.user.id)
 		{
+			this.Player_A_Back_status = PlayerStatus.Ready;
 			this.Player_A_Back = client;
-			this.Player_A_Back_id = client.id;
-			this.Player_A_Back_status = PlayerStatus.Present;
 			console.log('room', this.game_id, 'Player_A_Back joined');
 		}
-		else if (player_secret === this.gamedata.Player_B_Back_secret)
+		else if (client.user.id === this.lobby_data.Player_B_Back.user.id)
 		{
+			this.Player_B_Back_status = PlayerStatus.Ready;
 			this.Player_B_Back = client;
-			this.Player_B_Back_id = client.id;
-			this.Player_B_Back_status = PlayerStatus.Present;
 			console.log('room', this.game_id, 'player_B_Back joined');
 		}
 		else if(this.game_type === GameType.Doubles)
 		{
-			if (player_secret === this.gamedata.Player_A_Front_secret)
+			if (client.user.id === this.lobby_data.Player_A_Front.user.id)
 			{
+				this.Player_A_Front_status = PlayerStatus.Ready;
 				this.Player_A_Front = client;
-				this.Player_A_Front_id = client.id;
-				this.Player_A_Front_status = PlayerStatus.Present;
 				console.log('room', this.game_id, 'Player_A_Front joined');
 			}
-			else if (player_secret === this.gamedata.Player_B_Front_secret)
+			else if (client.user.id === this.lobby_data.Player_B_Front.user.id)
 			{
+				this.Player_B_Front_status = PlayerStatus.Ready;
 				this.Player_B_Front = client;
-				this.Player_B_Front_id = client.id;
-				this.Player_B_Front_status = PlayerStatus.Present;
 				console.log('room', this.game_id, 'player_B_Front joined');
 			}
 
 		}
 		else 
 		{
-			this.spectators.set(client['id'], client);
+			this.spectators.set(client.id, client);
 			console.log('room', this.game_id, 'spectator joined, total:', this.spectators.size);
+		}
+
+
+
+		if ((this.Player_A_Back_status === PlayerStatus.Ready 
+			&& this.Player_B_Back_status === PlayerStatus.Ready
+			&& this.game_type === GameType.Singles)
+			||
+			(this.Player_A_Back_status === PlayerStatus.Ready
+			&& this.Player_B_Back_status === PlayerStatus.Ready
+			&&this.Player_A_Front_status === PlayerStatus.Ready
+			&& this.Player_B_Front_status === PlayerStatus.Ready
+			&& this.game_type === GameType.Doubles))
+		{
+			console.log("all players ready ", this.game_id);
+			this.lobby_broadcast_message('lobby_all_ready');
+			if (!this.already_started)
+			{
+				this.game.start();
+				this.already_started = true;
+			}
 		}
 	}
 
 	lobby_disconnect(client: Socket)
 	{
-		if (client.id === this.Player_A_Back_id)
+		if (client.id === this.Player_A_Back.id)
 		{
 			console.log("player_A_Back left from game ", this.game_id);
 			this.Player_A_Back_status = PlayerStatus.Absent;
 			this.Player_A_Back = undefined;
-			this.Player_A_Back_id = '';
+		//	this.Player_A_Back_id = '';
 			//if game_has_started
 			//start timer for abort game
 		}
-		else if (client.id === this.Player_B_Back_id)
+		else if (client.id === this.Player_B_Back.id)
 		{
 			//playerB left
 			console.log("player_B_Back from game ", this.game_id);
 			this.Player_B_Back_status = PlayerStatus.Absent;
 			this.Player_B_Back = undefined;
-			this.Player_B_Back_id = '';
+			//this.Player_B_Back_id = '';
 			//if game_has_started
 			//start timer for abort game
 		}
 		else if(this.game_type === GameType.Doubles)
 		{
 
-			if (client.id === this.Player_A_Front_id)
+			if (client.id === this.Player_A_Front.id)
 			{
 				console.log("player_A_Front left from game ", this.game_id);
 				this.Player_A_Front_status = PlayerStatus.Absent;
 				this.Player_A_Front = undefined;
-				this.Player_A_Front_id = '';
+				//this.Player_A_Front_id = '';
 				//if game_has_started
 				//start timer for abort game
 			}
-			else if (client.id === this.Player_B_Front_id)
+			else if (client.id === this.Player_B_Front.id)
 			{
 				//playerB left
 				console.log("player_B_Front from game ", this.game_id);
 				this.Player_B_Front_status = PlayerStatus.Absent;
 				this.Player_B_Front = undefined;
-				this.Player_B_Front_id = '';
+				//this.Player_B_Front_id = '';
 				//if game_has_started
 				//start timer for abort game
 			}
@@ -155,7 +192,7 @@ export class Lobby
 	// 	});
 	// }
 
-	lobby_send_lobby_status(client: Socket)
+	lobby_send_lobby_status(client: AuthenticatedSocket)
 	{
 		if(this.already_finished)
 		{
@@ -284,83 +321,83 @@ export class Lobby
 
 	}
 
-	player_ready(client: Socket)
-	{
-		if (client.id === this.Player_A_Back_id)
-		{
-			this.Player_A_Back_status = PlayerStatus.Ready;
-			console.log("player A_Back is ready ", this.game_id);
-		}
-		else if (client.id === this.Player_B_Back_id)
-		{
-			this.Player_B_Back_status = PlayerStatus.Ready;
-			console.log("player B_Back is ready ", this.game_id);
-		}
-		else if (this.game_type === GameType.Doubles)
-		{
-			if (client.id === this.Player_A_Front_id)
-			{
-				this.Player_A_Front_status = PlayerStatus.Ready;
-				console.log("player A_Front is ready ", this.game_id);
-			}
-			else if (client.id === this.Player_B_Front_id)
-			{
-				this.Player_B_Front_status = PlayerStatus.Ready;
-				console.log("player B_Front is ready ", this.game_id);
-			}
-		}
-		else
-		{
-			//report incident ?
-			console.log("specytator tried to click player ready", this.game_id);
-		}
+	// player_ready(client: Socket)
+	// {
+	// 	if (client.id === this.Player_A_Back_id)
+	// 	{
+	// 		this.Player_A_Back_status = PlayerStatus.Ready;
+	// 		console.log("player A_Back is ready ", this.game_id);
+	// 	}
+	// 	else if (client.id === this.Player_B_Back_id)
+	// 	{
+	// 		this.Player_B_Back_status = PlayerStatus.Ready;
+	// 		console.log("player B_Back is ready ", this.game_id);
+	// 	}
+	// 	else if (this.game_type === GameType.Doubles)
+	// 	{
+	// 		if (client.id === this.Player_A_Front_id)
+	// 		{
+	// 			this.Player_A_Front_status = PlayerStatus.Ready;
+	// 			console.log("player A_Front is ready ", this.game_id);
+	// 		}
+	// 		else if (client.id === this.Player_B_Front_id)
+	// 		{
+	// 			this.Player_B_Front_status = PlayerStatus.Ready;
+	// 			console.log("player B_Front is ready ", this.game_id);
+	// 		}
+	// 	}
+	// 	else
+	// 	{
+	// 		//report incident ?
+	// 		console.log("specytator tried to click player ready", this.game_id);
+	// 	}
 
-		if ((this.Player_A_Back_status === PlayerStatus.Ready 
-			&& this.Player_B_Back_status === PlayerStatus.Ready
-			&& this.game_type === GameType.Singles)
-			||
-			(this.Player_A_Back_status === PlayerStatus.Ready
-			&& this.Player_B_Back_status === PlayerStatus.Ready
-			&&this.Player_A_Front_status === PlayerStatus.Ready
-			&& this.Player_B_Front_status === PlayerStatus.Ready
-			&& this.game_type === GameType.Doubles))
-		{
-			console.log("all players ready ", this.game_id);
-			this.lobby_broadcast_message('lobby_all_ready');
-			if (!this.already_started)
-			{
-				this.game.start();
-				this.already_started = true;
-			}
-		}
-	}
+	// 	if ((this.Player_A_Back_status === PlayerStatus.Ready 
+	// 		&& this.Player_B_Back_status === PlayerStatus.Ready
+	// 		&& this.game_type === GameType.Singles)
+	// 		||
+	// 		(this.Player_A_Back_status === PlayerStatus.Ready
+	// 		&& this.Player_B_Back_status === PlayerStatus.Ready
+	// 		&&this.Player_A_Front_status === PlayerStatus.Ready
+	// 		&& this.Player_B_Front_status === PlayerStatus.Ready
+	// 		&& this.game_type === GameType.Doubles))
+	// 	{
+	// 		console.log("all players ready ", this.game_id);
+	// 		this.lobby_broadcast_message('lobby_all_ready');
+	// 		if (!this.already_started)
+	// 		{
+	// 			this.game.start();
+	// 			this.already_started = true;
+	// 		}
+	// 	}
+	// }
 
-	game_receive_input(client: Socket, input: PlayerInput)
+	game_receive_input(client: AuthenticatedSocket, input: PlayerInput)
 	{
-		if ((client.id === this.Player_A_Back_id && input.player_type === PlayerType.Player_A_Back)
-			||(client.id === this.Player_B_Back_id && input.player_type === PlayerType.Player_B_Back))
+		if ((client.user.id === this.Player_A_Back.user.id && input.player_type === PlayerType.Player_A_Back)
+			||(client.user.id === this.Player_B_Back.user.id && input.player_type === PlayerType.Player_B_Back))
 			{
 				this.game.core.append_input(input);
 			}
 			else if(this.game_type === GameType.Doubles
-				&& ((client.id === this.Player_A_Front_id && input.player_type === PlayerType.Player_A_Front)
-				||(client.id === this.Player_B_Front_id && input.player_type === PlayerType.Player_B_Front)))
+				&& ((client.user.id === this.Player_A_Front.user.id && input.player_type === PlayerType.Player_A_Front)
+				||(client.user.id === this.Player_B_Front.user.id && input.player_type === PlayerType.Player_B_Front)))
 			{
 				this.game.core.append_input(input);
 			}
 			else
 			{
 //TODO better logging
-				console.log("input incidend", input);
-				console.log("player_type", input.player_type);
-				console.log("client.id", client.id);
-				console.log("this.Player_A_Back_id", this.Player_A_Back_id);
-				console.log("this.Player_B_Back_id", this.Player_B_Back_id);
+				// console.log("input incidend", input);
+				// console.log("player_type", input.player_type);
+				// console.log("client.user.id", client.user.id);
+				// console.log("this.Player_A_Back_id", this.Player_A_Back_id);
+				// console.log("this.Player_B_Back_id", this.Player_B_Back_id);
 			}
 	}
 
 
-	game_send_round_setup(client: Socket)
+	game_send_round_setup(client: AuthenticatedSocket)
 	{
 		let ret: RoundSetup;
 

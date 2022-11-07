@@ -7,14 +7,18 @@ import { ChannelService } from 'src/chat/channel/channel.service';
 import { notificationType } from 'src/utils/types/types';
 import { FindOneOptions, Repository } from 'typeorm';
 import { ChannelNotFoundException } from 'src/utils/exceptions';
+import { AuthenticatedSocket } from 'src/utils/types/auth-socket';
+import { TaskService } from 'src/task-scheduling/task.service';
 
 @Injectable()
 export class NotificationService {
 	constructor(
 		private userService: UserService,
-		// private channelService: ChannelService,
 		@Inject(forwardRef(() => ChannelService))
 		private channelService: ChannelService,
+		// @Inject(forwardRef(() => TaskService))
+		// private taskService: TaskService,
+
 		@InjectRepository(Notification)
 		private notifRepo: Repository<Notification>,
 		@InjectRepository(Channel)
@@ -76,8 +80,11 @@ export class NotificationService {
 			addressee,
 			requester: user,
 			type: notificationType.PARTY_INVITE,
+			delete_at: new Date(Date.now() - 20 * 1000)
 		});
-		return this.notifRepo.save(notif);
+		const notifToSend = await this.notifRepo.save(notif);
+		// this.taskService.handlePartyInviteNotif(notif);
+		return notifToSend;
 	}
 
 	findOne(options: FindOneOptions<Notification>): Promise<Notification | null> {
@@ -105,13 +112,33 @@ export class NotificationService {
 		});
 	}
 
-	delete(id: number) {
-		return this.notifRepo.delete(id);
+	async sendMessageNotif(socket: AuthenticatedSocket, chanId: number) {
+		const socketsInRoom = await socket.in(`channel-${chanId}`).fetchSockets() as unknown as AuthenticatedSocket[];
+		const usersInRoomId: number[] = socketsInRoom.map(socket => socket.user.id);
+		const usersToSendNotif = await this.channelService.getUsersInChannelExecptInArgs(chanId, usersInRoomId);
+
+		usersToSendNotif.forEach(async user => {
+			const notifExist = await this.notifRepo.findOne({
+				where: {
+					channel: { id: chanId },
+					addressee: { id: user.id },
+					type: notificationType.CHANNEL_MESSAGE
+				}
+			});
+			if (!notifExist) {
+				const notif = this.notifRepo.create({
+					channel: { id: chanId },
+					addressee: { id: user.id },
+					type: notificationType.CHANNEL_MESSAGE
+				});
+				const notifToSend = await this.notifRepo.save(notif);
+				console.log(notifToSend);
+				socket.to(`user-${user.id}`).emit('NewNotification', notifToSend);
+			}
+		})
 	}
 
-	deletePartyInvite(id: number) {
-		setTimeout(() => {
-			this.notifRepo.delete(id);
-		}, 21000, id)
+	delete(id: number) {
+		return this.notifRepo.delete(id);
 	}
 }

@@ -1,3 +1,6 @@
+import { MESSAGES } from "@nestjs/core/constants";
+import { GameUser } from "src/game/game-user";
+
 export type JwtPayload = {
 	sub: number,
 	username: string,
@@ -34,7 +37,8 @@ export enum channelOption {
 export enum notificationType {
 	FRIEND_REQUEST = 'friend_request',
 	CHANNEL_INVITE = 'channel_invite',
-	PARTY_INVITE = 'party_invite'
+	PARTY_INVITE = 'party_invite',
+	CHANNEL_MESSAGE = 'channel_message',
 };
 
 export enum ResponseType {
@@ -47,4 +51,33 @@ export enum RelationStatus {
 	PENDIND = 'pending',
 	FRIEND = 'friend',
 	NONE = 'none'
+}
+
+export enum TimeoutType {
+	BAN,
+	MUTE,
+}
+
+export enum ChannelUpdateType {
+	JOIN,
+	LEAVE,
+	BAN,
+	MUTE,
+	UNTIMEOUT,
+	CHANUSER,
+}
+
+export type EloRange = {
+	low: number;
+	mid: number;
+	hight: number;
+	max: number;
+}
+
+export interface QueueLobbby {
+	id: string,
+	players: GameUser[],
+	range?: number,
+	timeInQueue?: number,
+	averageMmr?: number,
 }

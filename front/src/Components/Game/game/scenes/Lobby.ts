@@ -166,7 +166,7 @@ export default class Lobby extends Phaser.Scene
 			game_id: this.game.registry.get('players_data').game_id
 		};
 
-		this.socketmanager.lobby_send_join(lobbydata);
+		this.socketmanager.lobby_send_join(lobbydata.game_id);
 
 		if (this.me !== PlayerType.Spectator)
 		{

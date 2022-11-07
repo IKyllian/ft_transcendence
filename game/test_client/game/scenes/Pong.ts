@@ -610,6 +610,8 @@ console.log("setings: ", this.game_settings);
 	{
 		this.sound.stopAll();
 		this.sound_clapping.play();
+
+		this.cameras.main.flash(250, 0 , 0, 0);
 	}
 
 }
