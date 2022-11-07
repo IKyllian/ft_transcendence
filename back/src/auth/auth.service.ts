@@ -10,7 +10,6 @@ import { Auth42Dto } from "./dto/auth42.dto";
 import { User } from "src/typeorm";
 import { SignupDto } from "./dto/signup.dto";
 import * as nodemailer from 'nodemailer';
-import * as googleapis from 'googleapis';
 import { PendingUser } from "src/typeorm/entities/pendingUser";
 import { ActivateDto } from "./dto/activate.dto";
 
@@ -32,12 +31,21 @@ export class AuthService {
 		}
 	})
 
+	private validateEmail = (email) => {
+		// rien compris mais le type qui a posté ça sur stackoverflow avais l'air de savoir ce qu'il fait
+		return email.match(
+			/^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+		);
+	};
+
 
 	async signup(dto: SignupDto) {
 		if (await this.userService.nameTaken(dto.username))
 			throw new ForbiddenException('Username already in use');
 		if (await this.userService.mailTaken(dto.email))
 			throw new ForbiddenException('Email already in use');
+		if (!this.validateEmail(dto.email))
+			throw new ForbiddenException('Invalid email format');
 		const hash = await argon.hash(dto.password);
 		const params = {
 			username: dto.username,
