@@ -1,4 +1,4 @@
-import { BallData, Coordinates, EndResult, GameSettings, GameState, GameType, Goal, Movement, Player, PlayerInput, PlayerType, RoundSetup, ScoreBoard } from "./types/shared.types";
+import { BallData, Coordinates, EndResult, GameSettings, GameState, GameType, Goal, Movement, PlayerInput, PlayerType, RoundSetup, ScoreBoard } from "./types/shared.types";
 
 //paddle designations
 //paddle A_back  ( [I] I    I  I  )

@@ -1,24 +1,12 @@
 import 'phaser';
 import Pong from './scenes/Pong';
 import Lobby from './scenes/Lobby';
-import { LobbyRequest, PlayersGameData } from './types/shared.types';
+import { PlayersGameData } from './types/shared.types';
 import { io, Socket } from 'socket.io-client';
 import MatchResult from './scenes/MatchResult';
 import { useContext } from 'react';
 import { SocketContext } from '../../../App';
 //import ReplayPlayer from './scenes/ReplayPlayer';
-
-
-export function admin_new_game(request: LobbyRequest): void
-{
-	const {socket} = useContext(SocketContext);
-	// const sock: Socket = io('http://localhost:6161');
-
-	socket!.emit('admin_authenticate', 'praclarushtaonas');
-
-	socket!.emit('admin_newgame', request);
-
-}
 
 export function launch_game(players_data: PlayersGameData, socket: Socket): void
 {

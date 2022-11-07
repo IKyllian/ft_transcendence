@@ -2,7 +2,7 @@ import 'phaser';
 import { io } from "socket.io-client";
 import ClientSocketManager from '../client.socket.manager';
 import PongCore from '../pong.core';
-import { GameState, Goal, Movement, Player, PlayerInput, PlayerType, BallData, EndResult, RoundSetup, GameType, GameSettings } from '../types/shared.types';
+import { GameState, Goal, Movement, PlayerInput, PlayerType, BallData, EndResult, RoundSetup, GameType, GameSettings } from '../types/shared.types';
 
 export default class Pong extends Phaser.Scene
 {

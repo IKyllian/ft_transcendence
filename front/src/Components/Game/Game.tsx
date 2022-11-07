@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { SocketContext } from "../../App";
-import { launch_game, admin_new_game } from "./game/libpong";
+import { launch_game } from "./game/libpong";
 import { PlayersGameData } from "./game/types/shared.types";
 
 function Game() {
