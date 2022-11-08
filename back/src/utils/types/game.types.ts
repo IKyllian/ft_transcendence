@@ -27,8 +27,17 @@ export type PlayersGameData = {
 	// Player_B_Front?: Player,
 	// Player_B_Back?: Player,
 	players: Player[],
+	// player_type: PlayerType,
+	game_id: string,
+	game_settings: GameSettings,
+}
+
+export type PlayersGameDataFront = {
+	Player_A_Back?: Player,
+	Player_A_Front?: Player,
+	Player_B_Back?: Player,
+	Player_B_Front?: Player,
 	player_type: PlayerType,
-	// player_secret: string,
 	game_id: string,
 	game_settings: GameSettings,
 }

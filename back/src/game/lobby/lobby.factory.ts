@@ -2,7 +2,7 @@ import { Server } from 'socket.io';
 import { generate } from 'shortid'
 import { Lobby } from './lobby';
 import { Socket } from 'socket.io';
-import { GameState, GameType, GameSettings, NewGameData, PlayersGameData, PlayerType, TeamSide, PlayerPosition } from 'src/utils/types/game.types';
+import { GameState, GameType, GameSettings, NewGameData, PlayersGameData, PlayerType, TeamSide, PlayerPosition, PlayersGameDataFront } from 'src/utils/types/game.types';
 import { AuthenticatedSocket } from 'src/utils/types/auth-socket';
 import { MatchmakingLobby } from '../matchmaking/matchmakingLobby';
 import { GlobalService } from 'src/utils/global/global.service';
@@ -46,24 +46,49 @@ export class LobbyFactory
 			players: lobby_request.players,
 			game_id: game_id,
 			game_settings: lobby_request.game_settings,
-			player_type: PlayerType.Spectator
+			// player_type: PlayerType.Spectator
 		}
+
+		// FOR FRONT DATA
+		let dataToFront: PlayersGameDataFront = {
+			game_id: game_id,
+			player_type: PlayerType.Spectator,
+			game_settings: lobby_request.game_settings,
+		}
+
 
 		lobby_request.players.forEach((player) => {
 			if (player.team === TeamSide.BLUE) {
 				if (player.pos === PlayerPosition.BACK) {
-					player_data.player_type = PlayerType.Player_A_Back;
+					dataToFront.Player_A_Back = player;
 				} else {
-					player_data.player_type = PlayerType.Player_A_Front;
+					dataToFront.Player_A_Front = player;
 				}
 			} else {
 				if (player.pos === PlayerPosition.BACK) {
-					player_data.player_type = PlayerType.Player_B_Back;
+					dataToFront.Player_B_Back = player;
 				} else {
-					player_data.player_type = PlayerType.Player_B_Front;
+					dataToFront.Player_B_Front = player;
 				}
 			}
-			this.globalService.server.to('user-' + player.user.id).emit("newgame_data", player_data);
+		});
+
+
+		lobby_request.players.forEach((player) => {
+			if (player.team === TeamSide.BLUE) {
+				if (player.pos === PlayerPosition.BACK) {
+					dataToFront.player_type = PlayerType.Player_A_Back;
+				} else {
+					dataToFront.player_type = PlayerType.Player_A_Front;
+				}
+			} else {
+				if (player.pos === PlayerPosition.BACK) {
+					dataToFront.player_type = PlayerType.Player_B_Back;
+				} else {
+					dataToFront.player_type = PlayerType.Player_B_Front;
+				}
+			}
+			this.globalService.server.to('user-' + player.user.id).emit("newgame_data", dataToFront);
 		});
 
 		// if (lobby_request.game_settings.game_type === GameType.Doubles)
