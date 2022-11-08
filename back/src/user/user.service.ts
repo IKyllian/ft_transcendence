@@ -144,14 +144,25 @@ export class UserService {
 		await this.userRepo.save(user);
 	}
 
-	async logout(user: User) {
-		user.refresh_hash = null;
-		this.userRepo.save(user);
+	async updateForgotCode(user: User, code: string) {
+		user.forgot_code = code;
+		await this.userRepo.save(user);
 	}
 
 	async updateRefreshHash(user: User, hash: string) {
 		user.refresh_hash = hash;
 		await this.userRepo.save(user);
+	}
+
+	async updatePassword(user: User, hash: string) {
+		user.hash = hash;
+		user.forgot_code = null;
+		await this.userRepo.save(user);
+	}
+
+	async logout(user: User) {
+		user.refresh_hash = null;
+		this.userRepo.save(user);
 	}
 
 	async deleteUser(id: number) {

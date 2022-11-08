@@ -12,6 +12,9 @@ import { SignupDto } from "./dto/signup.dto";
 import * as nodemailer from 'nodemailer';
 import { PendingUser } from "src/typeorm/entities/pendingUser";
 import { ActivateDto } from "./dto/activate.dto";
+import { ForgotPasswordDto } from "./dto/forgot-password.dto";
+import { v4 as uuidv4 } from "uuid";
+import { ResetPasswordDto } from "./dto/reset-password.dto";
 
 @Injectable()
 export class AuthService {
@@ -240,7 +243,7 @@ export class AuthService {
             subject: 'Pong Game account verification',
             html: `
             <h1>test !!!!</h1>
-            <a href=http://localhost:3000/api/auth/activate?code=${user.validation_code}>Click here</a>`,
+            <a href=http://localhost:5000/api/auth/activate?code=${user.validation_code}>Click here</a>`,
         }
 
         this.transporter.sendMail(message, function(err, info) {
@@ -250,4 +253,50 @@ export class AuthService {
                 console.log(info);
         });
     }
+
+	async forgotPassword(dto: ForgotPasswordDto) {		
+		const user = await this.userService.findOne({
+			where: { email: dto.email }
+		})
+
+		if (!user)
+			throw new NotFoundException("Email not found");
+
+		const validation_code: string = uuidv4();
+		this.userService.updateForgotCode(user, validation_code);
+
+		const message = {
+            from: process.env.MAIL_USER,
+            to: user.email,
+            subject: 'Pong Game - Password reset request',
+            html: `
+            <h1>Password Reset</h1>
+			<p>Hi, you have submitted a password reset request on <b>Pong Game</b></p>
+			<p>To set your new password, <a href=http://localhost:5000/api/auth/reset-password?code=${validation_code}>Click here</a></p>
+            `,
+        }
+
+        this.transporter.sendMail(message, function(err, info) {
+            if (err)
+                console.log(err);
+            else
+                console.log(info);
+        });
+
+		return { success: true }
+	}
+
+	async resetPassword(dto: ResetPasswordDto) {
+		const user = await this.userService.findOne({
+			where: { forgot_code: dto.code }
+		})
+
+		if (!user)
+			throw new NotFoundException("Invalid code");
+
+		const hash = await argon.hash(dto.newPassword);
+
+		this.userService.updatePassword(user, hash);
+		return { success: true }
+	}
 }

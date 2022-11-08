@@ -8,7 +8,8 @@ import { JwtGuard } from "./guard/jwt.guard";
 import { RefreshGuard } from "./guard/refresh.guard";
 import { SignupDto } from "./dto/signup.dto";
 import { ActivateDto } from "./dto/activate.dto";
-import { ForgotPasswordDto } from "./dto/forgotpassword.dto";
+import { ForgotPasswordDto } from "./dto/forgot-password.dto";
+import { ResetPasswordDto } from "./dto/reset-password.dto";
 
 @Controller('auth')
 export class AuthController {
@@ -54,7 +55,13 @@ export class AuthController {
 
 	@HttpCode(HttpStatus.OK)
 	@Post('forgot-password')
-	forgotPassword(dto: ForgotPasswordDto) {
-		
+	forgotPassword(@Body() dto: ForgotPasswordDto) {
+		return this.authService.forgotPassword(dto);
+	}
+
+	@HttpCode(HttpStatus.OK)
+	@Post('reset-password')
+	resetPassword(@Body() dto: ResetPasswordDto) {
+		return this.authService.resetPassword(dto);
 	}
 }
