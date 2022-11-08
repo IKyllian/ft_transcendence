@@ -1,6 +1,7 @@
 import { BadRequestException } from "@nestjs/common";
 import { generate } from "shortid";
 import { Socket } from "socket.io";
+import { SettingsFactory } from "src/game/settings.factory";
 import { User } from "src/typeorm";
 import { GameSettings, GameType, PlayerType } from "src/utils/types/game.types";
 import { GameUser } from "../../game-user";
@@ -12,6 +13,7 @@ export class Party {
 		this.id = generate();
 		this.players.push(new GameUser(leader));
 		this.players[0].isLeader = true;
+		this.game_settings = new SettingsFactory().defaultSetting(GameType.Singles);
 	}
 
 	id: string;

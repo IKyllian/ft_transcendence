@@ -136,8 +136,7 @@ export class TaskService {
 			}
 			potentialLobby = [];
 		}
-		// matchFound.forEach((match) => ) // call game Karim function to create game
-		// console.log("MatchFound: ", matchFound);
+		matchFound.forEach((match) => this.lobbyFactory.lobby_create(match));
 	}
 
 	@Interval('timedout-user', 30000)

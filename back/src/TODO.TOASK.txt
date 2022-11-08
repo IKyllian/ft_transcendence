@@ -19,6 +19,7 @@
 
 //ISSUE ?
 	- can create username with \n
+	- in queue and then joining party ?
 
 
 // RANKING AND ELO

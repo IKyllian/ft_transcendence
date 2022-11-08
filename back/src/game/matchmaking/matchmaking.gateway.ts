@@ -12,10 +12,7 @@ import { GatewayExceptionFilter } from "src/utils/exceptions/filter/Gateway.filt
 import { AuthenticatedSocket } from "src/utils/types/auth-socket";
 import { GameType } from "src/utils/types/game.types";
 import { notificationType } from "src/utils/types/types";
-import { ConnectionOptionsReader } from "typeorm";
-import { UserSessionManager } from "../user.session";
 import { IsReadyDto } from "./dto/boolean.dto";
-import { IdDto } from "./dto/id.dto";
 import { PartyService } from "./party/party.service";
 import { QueueService } from "./queue/queue.service";
 
@@ -26,11 +23,9 @@ export class MatchmakingGateway implements OnGatewayDisconnect {
 	@WebSocketServer() server: Server;
 
 	constructor(
-		private readonly userSession: UserSessionManager,
 		private partyService: PartyService,
 		private queueService: QueueService,
 		private notifService: NotificationService,
-		private taskScheduler: TaskService,
 	) {}
 
 	handleDisconnect(socket: AuthenticatedSocket) {
@@ -120,11 +115,7 @@ export class MatchmakingGateway implements OnGatewayDisconnect {
 		@GetUser() user: User,
 		@MessageBody() data: { gameType: GameType}
 	) {
-		if (data.gameType === GameType.Singles) {
-			this.queueService.join1v1Queue(user);
-		} else if (data.gameType === GameType.Doubles) {
-			this.queueService.join2v2Queue(user);
-		}
+		this.queueService.joinQueue(user, data.gameType);
 	}
 
 	@UseGuards(WsJwtGuard)
