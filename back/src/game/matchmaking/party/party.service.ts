@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
 import { Server, Socket } from "socket.io";
 import { User } from "src/typeorm";
 import { Player } from "../../player";
@@ -7,12 +7,16 @@ import { Party } from "./party";
 import { GlobalService } from "src/utils/global/global.service";
 import { PlayerPosition, TeamSide } from "src/utils/types/game.types";
 import { contains } from "class-validator";
+import { SettingDto } from "../dto/game-settings.dto";
+import { LobbyFactory } from "src/game/lobby/lobby.factory";
+import { MatchmakingLobby } from "../matchmakingLobby";
 
 @Injectable()
 export class PartyService {
 	constructor(
 		public partyJoined: PartyJoinedSessionManager,
 		private globalService: GlobalService,
+		private lobbyFactory: LobbyFactory,
 	) {}
 
 	getPlayerInParty(id: number, player: Player[]) {
@@ -23,6 +27,15 @@ export class PartyService {
 		party.players.forEach((player) => {
 			this.globalService.server.to(`user-${player.user.id}`).emit('PartyUpdate', { party, cancelQueue });
 		})
+	}
+
+	partyIsReady(party: Party) : boolean {
+		party.players.forEach((player) => {
+			if (!player.isReady && !player.isLeader) {
+				throw new BadRequestException('Party is not ready !');
+			}
+		})
+		return true;
 	}
 
 	createParty(user: User) {
@@ -91,6 +104,25 @@ export class PartyService {
 				player.pos = pos;
 				this.emitPartyUpdate(party);
 			}
+		}
+	}
+
+	setSettings(user: User, settings: SettingDto) {
+		const party = this.partyJoined.getParty(user.id);
+		if (party) {
+			party.game_settings = settings;
+			this.emitPartyUpdate(party);
+		}
+	}
+
+	setCustomGame(user: User) {
+		const party = this.partyJoined.getParty(user.id);
+		if (party) {
+			this.partyIsReady(party);
+			let redTeam: Player[] = party.players.filter((player) => player.team === TeamSide.RED);
+			let blueTeam: Player[] = party.players.filter((player) => player.team === TeamSide.BLUE);
+			const match = new MatchmakingLobby({ id: 'red', players: redTeam }, { id: 'blue', players: blueTeam }, party.game_settings);
+			this.lobbyFactory.lobby_create(match);
 		}
 	}
 

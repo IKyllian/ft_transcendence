@@ -3,7 +3,7 @@ import { GameType } from "src/utils/types/game.types"
 
 export class SettingDto {
 
-	ranked: boolean;
+	is_ranked: boolean;
 
 	game_type: GameType;
 

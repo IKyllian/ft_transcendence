@@ -46,11 +46,8 @@ export class LobbyFactory
 			player_data.Player_B_Front = lobby_request.Player_B_Front;
 		}
 
-		console.log('user-' + lobby_request.Player_A_Back.user.id, 'user-' + lobby_request.Player_B_Back.user.id)
 		player_data.player_type = PlayerType.Player_A_Back;
 		this.globalService.server.to('user-' + lobby_request.Player_A_Back.user.id).emit("newgame_data", player_data);
-
-
 		player_data.player_type = PlayerType.Player_B_Back;
 		this.globalService.server.to('user-' + lobby_request.Player_B_Back.user.id).emit("newgame_data", player_data);
 
@@ -62,9 +59,6 @@ export class LobbyFactory
 			player_data.player_type = PlayerType.Player_B_Front;
 			this.globalService.server.to('user-' + lobby_request.Player_B_Front.user.id).emit("newgame_data", player_data);
 		}
-
-
-
 
 //ajouter une ref au lobby dans le return ? 
 //pour acces a this.already_started & this.already_finished

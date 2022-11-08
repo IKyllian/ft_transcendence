@@ -108,15 +108,15 @@ export class TaskService {
 				if (i !== j && mmrDiff <= this.queueService.queue2v2[i].range
 				&& mmrDiff <= this.queueService.queue2v2[j].range) {
 					if (this.queueService.queue2v2[j].players.length === 1) {
-						let match: boolean = false;
+						let pair: boolean = false;
 						potentialLobby.forEach((solo) => {
 							if (solo.players.length === 1) {
 								solo.players.push(this.queueService.queue2v2[j].players[0]);
 								solo.averageMmr = (solo.averageMmr + this.queueService.queue2v2[j].averageMmr) / 2;
-								match = true;
+								pair = true;
 							}
 						});
-						if (!match) {
+						if (!pair) {
 							let soloLobby: QueueLobbby = JSON.parse(JSON.stringify(this.queueService.queue2v2[i]));
 							potentialLobby.push(soloLobby);
 						}

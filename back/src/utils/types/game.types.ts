@@ -174,7 +174,7 @@ export enum EndResult
 //game settings for the core
 export type GameSettings =
 {
-	ranked: boolean,
+	is_ranked: boolean,
 	game_type: GameType,
 	up_down_border: number,
 	player_back_advance: number,
@@ -186,15 +186,6 @@ export type GameSettings =
 	point_for_victory: number
 }
 
-// export enum GameMode {
-// 	OneVsOne,
-// 	TwoVsTwo,
-// 	Custom
-
-// }
-
-// }
-
 export enum TeamSide {
 	BLUE,
 	RED,
@@ -204,4 +195,3 @@ export enum PlayerPosition {
 	FRONT,
 	BACK,
 }
-

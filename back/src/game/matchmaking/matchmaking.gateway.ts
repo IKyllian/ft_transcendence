@@ -35,6 +35,11 @@ export class MatchmakingGateway implements OnGatewayDisconnect {
 		}
 	}
 
+	/**
+	 *
+	 * PARTY EVENTS
+	 *
+	 */
 
 	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('PartyInvite')
@@ -101,6 +106,13 @@ export class MatchmakingGateway implements OnGatewayDisconnect {
 		this.partyService.kickFromParty(user, data.id);
 	}
 
+
+	/**
+	 *
+	 * PARTY GAME SETTINGS EVENTS
+	 *
+	 */
+
 	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('SetReadyState')
 	setReadyState(
@@ -133,16 +145,22 @@ export class MatchmakingGateway implements OnGatewayDisconnect {
 	@SubscribeMessage('SetSettings')
 	setSetting(
 		@GetUser() user: User,
-		@MessageBody() data: SettingDto,
+		@MessageBody() settings: SettingDto,
 	) {
-		//TODO
+		this.partyService.setSettings(user, settings)
 	}
+
+	/**
+	 *
+	 * QUEUE EVENTS
+	 *
+	 */
 
 	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('StartQueue')
 	startQueue(
 		@GetUser() user: User,
-		@MessageBody() data: { gameType: GameType}
+		@MessageBody() data: { gameType: GameType }
 	) {
 		this.queueService.joinQueue(user, data.gameType);
 	}
