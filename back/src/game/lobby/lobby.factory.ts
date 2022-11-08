@@ -2,7 +2,7 @@ import { Server } from 'socket.io';
 import { generate } from 'shortid'
 import { Lobby } from './lobby';
 import { Socket } from 'socket.io';
-import { GameState, GameType, GameSettings, NewGameData, PlayersGameData, PlayerType, TeamSide, PlayerPosition, PlayersGameDataFront } from 'src/utils/types/game.types';
+import { GameState, GameType, GameSettings, NewGameData, PlayersGameData, PlayerType, TeamSide, PlayerPosition } from 'src/utils/types/game.types';
 import { AuthenticatedSocket } from 'src/utils/types/auth-socket';
 import { MatchmakingLobby } from '../matchmaking/matchmakingLobby';
 import { GlobalService } from 'src/utils/global/global.service';
@@ -32,25 +32,7 @@ export class LobbyFactory
 		const lobby = new Lobby(lobby_request, game_id,  this);
 		this.lobby_list.set(lobby.game_id, lobby);
 
-		// let player_data: PlayersGameData =
-		// {
-		// 	Player_A_Back: lobby_request.Player_A_Back,
-		// 	Player_B_Back: lobby_request.Player_B_Back,
-		// 	game_id: game_id,
-		// 	game_settings: lobby_request.game_settings,
-		// 	player_type: PlayerType.Spectator
-		// }
-
-		let player_data: PlayersGameData =
-		{
-			players: lobby_request.players,
-			game_id: game_id,
-			game_settings: lobby_request.game_settings,
-			// player_type: PlayerType.Spectator
-		}
-
-		// FOR FRONT DATA
-		let dataToFront: PlayersGameDataFront = {
+		let dataToFront: PlayersGameData = {
 			game_id: game_id,
 			player_type: PlayerType.Spectator,
 			game_settings: lobby_request.game_settings,
@@ -72,7 +54,6 @@ export class LobbyFactory
 				}
 			}
 		});
-
 
 		lobby_request.players.forEach((player) => {
 			if (player.team === TeamSide.BLUE) {

@@ -22,21 +22,10 @@ export enum GameType {
 
 //data sent to each player before the game
 export type PlayersGameData = {
-	// Player_A_Back?: Player,
-	// Player_A_Front?: Player,
-	// Player_B_Front?: Player,
-	// Player_B_Back?: Player,
-	players: Player[],
-	// player_type: PlayerType,
-	game_id: string,
-	game_settings: GameSettings,
-}
-
-export type PlayersGameDataFront = {
 	Player_A_Back?: Player,
 	Player_A_Front?: Player,
-	Player_B_Back?: Player,
 	Player_B_Front?: Player,
+	Player_B_Back?: Player,
 	player_type: PlayerType,
 	game_id: string,
 	game_settings: GameSettings,
