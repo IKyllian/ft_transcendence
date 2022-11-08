@@ -31,16 +31,16 @@ export class TwoFactorController {
 		if (user.two_factor_enabled)
 			throw new UnauthorizedException('2FA already enabled for this user');
 
-		const realuser = await this.userService.findOne({ // TEMPORAIRE jusqu'a ce que j'ai trouvé pq y'a pas le two_factor_secret dans le user
+		const userWithSecret = await this.userService.findOne({
 			where: {
 				id: user.id,
 			}
 		}, true);
 
-		console.log(realuser.two_factor_enabled);
+		console.log(userWithSecret.two_factor_enabled);
 		
 		
-		const isValid = this.twoFactorService.verify(body.code, realuser);
+		const isValid = this.twoFactorService.verify(body.code, userWithSecret);
 
 		if (!isValid)
 			throw new UnauthorizedException('Invalid 2FA code');
