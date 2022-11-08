@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { PartyInterface } from '../Types/Lobby-Types';
+import { PartyInterface, TeamSide, Player } from '../Types/Lobby-Types';
 
 interface PartyState {
     party?: PartyInterface,
@@ -30,7 +30,11 @@ export const partySlice = createSlice({
             if (payload !== state.isInQueue)
                 state.isInQueue = payload;
         },
+        cancelQueue: (state, { payload }: PayloadAction<boolean>) => {
+            if (payload === true && state.isInQueue)
+                state.isInQueue = false;
+        },
     }
 });
 
-export const { addParty, leaveParty, changeModalStatus, changeQueueStatus } = partySlice.actions;
+export const { addParty, leaveParty, changeModalStatus, changeQueueStatus, cancelQueue} = partySlice.actions;

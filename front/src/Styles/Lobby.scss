@@ -36,6 +36,13 @@ $TeamRedColor: rgb(215, 38, 18);
                     cursor: pointer;
                 }
             }
+            
+            .team-blue {
+                background-color: rgba(0, 98, 255, 0.57)
+            }
+            .team-red {
+                background-color: rgba(249, 25, 0, 0.72);
+            }
 
             li {
                 @include width-height(200px, 200px);
@@ -46,7 +53,7 @@ $TeamRedColor: rgb(215, 38, 18);
                 background-color: #131d30;
                 border-radius: 15px;
                 position: relative;
-
+                box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
                 .teams-wrapper {
                     position: absolute;
                     right: 10px;
@@ -72,7 +79,10 @@ $TeamRedColor: rgb(215, 38, 18);
                         cursor: pointer
                     }
                 }
-    
+                
+                .avatar-shadow {
+                    box-shadow: rgb(68, 11, 11) 0px 7px 29px 0px;
+                }
                 .player-avatar {
                     @include avatar-player(80px);
                 }
@@ -197,6 +207,11 @@ $TeamRedColor: rgb(215, 38, 18);
             gap: 10px;
             justify-content: center;
             position: relative;
+
+            .start-button {
+                cursor: pointer;
+                // background-color: $LightBluePalette;
+            }
 
             .game-modes-dropdown {
                 position: absolute;

@@ -1,3 +1,4 @@
+import { Socket } from "socket.io-client";
 import { Channel } from "./Chat-Types";
 
 export interface ExampleUser {

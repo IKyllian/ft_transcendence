@@ -2,13 +2,14 @@ import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { SocketContext } from "../../App";
 import { useAppDispatch, useAppSelector } from "../../Redux/Hooks";
-import { PlayersGameData, NewGameData } from "./game/types/shared.types";
+import { PlayersGameData } from "./game/types/shared.types";
 import Avatar from "../../Images-Icons/pp.jpg";
-import { IconCheck, IconX, IconPlus, IconChevronUp, IconChevronDown, IconLock } from "@tabler/icons";
-import { GameModeState, GameMode, Player, GameType } from "../../Types/Lobby-Types";
+import { IconCheck, IconPlus, IconChevronUp, IconChevronDown, IconLock } from "@tabler/icons";
+import { GameModeState, GameMode, Player, GameType, TeamSide } from "../../Types/Lobby-Types";
 import { Controller, useForm } from "react-hook-form";
-import { changeModalStatus } from "../../Redux/PartySlice";
+import { changeModalStatus, changeQueueStatus } from "../../Redux/PartySlice";
 import { partyIsReady } from "../../Utils/Utils-Party";
+import { fetchIsAlreadyInGame } from "../../Api/Lobby";
 
 const defaultGameModeState: GameModeState = {
     gameModes: [
@@ -27,13 +28,14 @@ const defaultGameModeState: GameModeState = {
 }
 
 function Lobby() {
-    const {currentUser} = useAppSelector(state => state.auth)
+    const {currentUser, token} = useAppSelector(state => state.auth)
     const [loggedUserIsLeader, setLoggedUserIsLeader] = useState<boolean>(false);
     const { handleSubmit, control, watch } = useForm();
     const [gameMode, setGameMode] = useState<GameModeState>(defaultGameModeState);
     const [showDropdown, setShowDropdown] = useState<boolean>(false);
     const {socket} = useContext(SocketContext);
     const navigate = useNavigate();
+    const dispatch = useAppDispatch();
     const {party, isInQueue} = useAppSelector(state => state.party);
     const partyReady: boolean = (!party || (party && partyIsReady(party?.players))) ? true : false;
 
@@ -72,6 +74,14 @@ function Lobby() {
         socket?.emit("StopQueue");
     }
 
+    const onChangeTeam = (teamSide: TeamSide, player: Player) => {
+        if (player.team !== teamSide) {
+            socket?.emit("SetTeamSide", {
+                team: teamSide,
+            });
+        }
+    }
+
     useEffect(() => {
         if (party && party.players.length > 1) {
             if (party.players.length > 2) {
@@ -95,85 +105,32 @@ function Lobby() {
                     })]}
                 });
             }          
+        } else if (party && party.players.length === 1) {
+            setGameMode((prev: any) => {
+                return {...prev, gameModes: [...gameMode.gameModes.map(elem => {
+                    if (elem.isLock)
+                        return  {...elem, isLock: false };
+                    return elem;
+                })]}
+            });
         }
     }, [party])
 
     useEffect(() => {
-        socket?.on("newgame_data", (data: PlayersGameData) => {
-            console.log("new_game_data", data);
-            // let newOject: PlayersGameData | undefined = undefined;
-            // if (data.Player_A_Back === currentUser?.username) {
-            //         newOject = {
-            //             Player_A_Back: {
-            //                 name: data.Player_A_Back,
-            //                 win: 0,
-            //                 loss: 0,
-            //                 avatar: 'avatars/mario.png'
-            //             },
-            //             Player_A_Front:
-            //             {
-            //                 name: '',
-            //                 win: 0,
-            //                 loss: 0,
-            //                 avatar: ''
-            //             },
-            //             Player_B_Front:
-            //             {
-            //                 name: '',
-            //                 win: 0,
-            //                 loss: 0,
-            //                 avatar: ''
-            //             },
-            //             Player_B_Back:
-            //             {
-            //                 name: data.Player_B_Back,
-            //                 win: 0,
-            //                 loss: 0,
-            //                 avatar: 'avatars/luigi.jpeg'
-            //             },
-            //             player_type: 0,
-            //             player_secret: data.Player_A_Back_secret,
-            //             game_id: data.game_id,
-            //             game_settings: data.game_settings,
-            //         }           
-            // } else {
-            //     newOject = {
-            //         Player_A_Back: {
-            //             name: data.Player_A_Back,
-            //             win: 0,
-            //             loss: 0,
-            //             avatar: 'avatars/mario.png'
-            //         },
-            //         Player_A_Front:
-            //         {
-            //             name: '',
-            //             win: 0,
-            //             loss: 0,
-            //             avatar: ''
-            //         },
-            //         Player_B_Front:
-            //         {
-            //             name: '',
-            //             win: 0,
-            //             loss: 0,
-            //             avatar: ''
-            //         },
-            //         Player_B_Back:
-            //         {
-            //             name: data.Player_B_Back,
-            //             win: 0,
-            //             loss: 0,
-            //             avatar: 'avatars/luigi.jpeg'
-            //         },
-            //         player_type: 0,
-            //         player_secret: data.Player_B_Back_secret,
-            //         game_id: data.game_id,
-            //         game_settings: data.game_settings,
-            //     }
-            // }   
-            navigate("/game", {state: data});
-        });
-
+        const checkGame = async () => {
+            await fetchIsAlreadyInGame(token).then(result => { 
+                if (!result) {
+                    socket?.on("newgame_data", (data: PlayersGameData) => {
+                        console.log("new_game_data", data);
+                        dispatch(changeQueueStatus(false));
+                        navigate("/game", {state: data});
+                    });
+                } else
+                    navigate("/");
+                return result
+            });
+        }
+        checkGame();     
         return () => {
             socket?.off("newgame_data");
         }
@@ -184,10 +141,9 @@ function Lobby() {
                 <ul className="lobby-player-list">
                     {
                         party ? party.players.map((elem) => 
-                            <PlayerListItem key={elem.user.id} user={elem} lobbyLength={party.players.length} gameMode={gameMode.gameModes[gameMode.indexSelected].gameMode} />
+                            <PlayerListItem key={elem.user.id} user={elem} lobbyLength={party.players.length} gameMode={gameMode.gameModes[gameMode.indexSelected].gameMode} onChangeTeam={onChangeTeam} loggedUserId={currentUser?.id} />
                         )
-                        : <PlayerListItem key={currentUser?.id} user={{isLeader: true, isReady: true, user: currentUser!}} lobbyLength={1} />
-                    
+                        : <PlayerListItem key={currentUser?.id} user={{isLeader: true, isReady: true, user: currentUser!, team: TeamSide.BLUE}} lobbyLength={1} />
                     }
                     {
                         Array.from({length:  !party ? 3 : 4 - party.players.length}, (elem, index) => 
@@ -205,7 +161,7 @@ function Lobby() {
                 <LobbyButtonsContainer
                     gameMode={gameMode}
                     onGameModeChange={onGameModeChange}
-                    user={!party ? {isLeader: true, isReady: true, user: currentUser!} : party?.players.find(elem => elem.user.id === currentUser!.id)}
+                    user={!party ? {isLeader: true, isReady: true, user: currentUser!, team: TeamSide.BLUE} : party?.players.find(elem => elem.user.id === currentUser!.id)}
                     onReady={onReady}
                     showDropdown={showDropdown}
                     setShowDropdown={setShowDropdown}
@@ -273,7 +229,7 @@ function GameSettings(props: {hookForm: {handleSubmit: any, control: any, watch:
     const { hookForm } = props;
     
     return (
-        <div className=" setting-wrapper game-settings">
+        <div className="setting-wrapper game-settings">
             <p> Settings </p>
             <form onSubmit={(e) => hookForm.handleSubmit(e)}>
                 <div>
@@ -320,32 +276,26 @@ function GameSettings(props: {hookForm: {handleSubmit: any, control: any, watch:
     );
 }
 
-function TeamCircles() {
-    const [team, setTeam] = useState<number>(1);
-    const handleClick = (teamNumber: number) => {
-        if (teamNumber !== team)
-            setTeam(teamNumber);
-    }
+function TeamCircles(props: {user: Player, onChangeTeam: Function}) {
+    const {user, onChangeTeam} = props;
     return (
         <div className="teams-wrapper">
-            <div className={`circle-item team1 ${team === 1 ? "team-active" : ""}`} onClick={() => handleClick(1)}> </div>
-            <div className={`circle-item team2 ${team === 2 ? "team-active" : ""}`} onClick={() => handleClick(2)}> </div>
+            <div className={`circle-item team1 ${user.team === TeamSide.BLUE ? "team-active" : ""}`} onClick={() => onChangeTeam(TeamSide.BLUE, user.user.id)}> </div>
+            <div className={`circle-item team2 ${user.team === TeamSide.RED ? "team-active" : ""}`} onClick={() => onChangeTeam(TeamSide.RED, user.user.id)}> </div>
         </div>
     );
 }
 
-function PlayerListItem(props: {user?: Player, lobbyLength?: number, gameMode?: GameMode}) {
-    const { user, lobbyLength, gameMode } = props;
+function PlayerListItem(props: {user?: Player, lobbyLength?: number, gameMode?: GameMode, onChangeTeam?: Function, loggedUserId?: number}) {
+    const { user, lobbyLength, gameMode, onChangeTeam, loggedUserId } = props;
     const dispatch = useAppDispatch();
+    const displayTeam: boolean = lobbyLength && (gameMode === GameMode.PRIVATE_MATCH || lobbyLength > 2) ? true : false;
 
     return user ? (
-        <li>
-            { lobbyLength && ((lobbyLength === 2 && gameMode === GameMode.PRIVATE_MATCH) || lobbyLength > 2) && <TeamCircles /> }
-            <img className="player-avatar" src={Avatar} alt="profil pic" />
+        <li className={`${displayTeam ? `team-${user.team === TeamSide.BLUE ? "blue" : "red" }` : ""}`} >
+            { displayTeam && onChangeTeam && loggedUserId === user.user.id && <TeamCircles user={user} onChangeTeam={onChangeTeam} /> }
+            <img className={`player-avatar ${displayTeam ? "avatar-shadow" : ""}`} src={Avatar} alt="profil pic" />
             <p> {user.user.username} </p>
-            {
-
-            }
             {
                 lobbyLength && lobbyLength > 1 && 
                 <select className="team-select">
@@ -374,10 +324,10 @@ function LobbyButtonsContainer(props: {gameMode: GameModeState, onGameModeChange
     return user ? (
         <div className="lobby-buttons-wrapper">
             <button style={{cursor: "pointer"}}> Party Chat </button>
-            { user.isLeader && partyReady && <button style={{cursor: "pointer"}} onClick={() => startQueue()}> Start Game </button> }
+            { user.isLeader && partyReady && <button className="start-button" onClick={() => startQueue()}> Start Game </button> }
             { user.isLeader && !partyReady && <button> Waiting for players </button> }
-            { !user.isLeader && user.isReady && <button style={{cursor: "pointer"}} onClick={() => onReady(false)}> Not Ready </button> }
-            { !user.isLeader && !user.isReady && <button style={{cursor: "pointer"}} onClick={() => onReady(true)}> Ready </button> }
+            { !user.isLeader && user.isReady && <button className="start-button" onClick={() => onReady(false)}> Not Ready </button> }
+            { !user.isLeader && !user.isReady && <button className="start-button" onClick={() => onReady(true)}> Ready </button> }
             <button style={loggedUserIsLeader ? {cursor: "pointer"} : {}} className={`game-modes-button ${showDropdown ? "bos" : ""}`} onClick={() => gameModeOnclick()}>
                 { gameMode.gameModes[gameMode.indexSelected].gameMode }
                 { showDropdown && loggedUserIsLeader && <IconChevronDown className="chevron-icon" /> }

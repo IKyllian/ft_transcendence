@@ -20,6 +20,16 @@ export enum GameType {
 	Doubles,
 }
 
+export enum TeamSide {
+	BLUE,
+	RED,
+}
+
+export enum PlayerPosition {
+	FRONT,
+	BACK,
+}
+
 export type GameSettings =
 {
     game_type: GameType,
@@ -46,8 +56,9 @@ export interface GameModeState {
 export interface Player {
 	user: UserInterface,
 	isReady: boolean,
-	pos?: PlayerType,
+	pos?: PlayerPosition,
     isLeader: boolean,
+    team: TeamSide,
 }
 
 export interface PartyInterface {
