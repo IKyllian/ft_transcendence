@@ -177,7 +177,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
 		async onUserJoinLobby(@ConnectedSocket() client: AuthenticatedSocket,
 		@MessageBody() game_id: string)
 		{
-		console.log("joining lobby, ", client?.user)
+		console.log("joining lobby, ", client.user)
 	//	console.log("user join lobby", data);
 		this.lobbyfactory.lobby_join(client, game_id);
 	}

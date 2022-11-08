@@ -23,6 +23,7 @@ export class QueueService {
 		const maxPlayers: number = game_mode === GameType.Singles ? 1 : 2;
 		const party = this.partyService.partyJoined.getParty(user.id);
 		if (!party) {
+			//TODO OOOOOO player pos undefined if solo
 			queueLobby = { id: "queue-" + user.id, players: [ new Player(user) ]};
 		} else {
 			this.partyService.partyIsReady(party);
