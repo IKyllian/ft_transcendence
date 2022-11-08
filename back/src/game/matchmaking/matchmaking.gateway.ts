@@ -10,9 +10,10 @@ import { User } from "src/typeorm";
 import { GetUser } from "src/utils/decorators";
 import { GatewayExceptionFilter } from "src/utils/exceptions/filter/Gateway.filter";
 import { AuthenticatedSocket } from "src/utils/types/auth-socket";
-import { GameType } from "src/utils/types/game.types";
+import { GameType, PlayerPosition, TeamSide } from "src/utils/types/game.types";
 import { notificationType } from "src/utils/types/types";
 import { IsReadyDto } from "./dto/boolean.dto";
+import { SettingDto } from "./dto/game-settings.dto";
 import { PartyService } from "./party/party.service";
 import { QueueService } from "./queue/queue.service";
 
@@ -45,8 +46,9 @@ export class MatchmakingGateway implements OnGatewayDisconnect {
 		console.log("party invite")
 		if (!this.partyService.partyJoined.getParty(user.id)) {
 			const party = this.partyService.createParty(user);
-			socket.emit("PartyCreated", party);
-			socket.join(`party-${party.id}`)
+			// socket.emit("PartyCreated", party);
+			this.server.to(`user-${user.id}`).emit("PartyUpdate", { party, cancelQueue: true });
+			// socket.join(`party-${party.id}`)
 		}
 		const notif = await this.notifService.createPartyInviteNotif(user, dto.id);
 		socket.to(`user-${dto.id}`).emit('NewPartyInvite', notif);
@@ -59,7 +61,7 @@ export class MatchmakingGateway implements OnGatewayDisconnect {
 	) {
 		if (!this.partyService.partyJoined.getParty(user.id)) {
 			const party = this.partyService.createParty(user);
-			this.server.to(`user-${user.id}`).emit("PartyUpdate", party);
+			this.server.to(`user-${user.id}`).emit("PartyUpdate", { party, cancelQueue: true });
 		}
 	}
 
@@ -107,6 +109,33 @@ export class MatchmakingGateway implements OnGatewayDisconnect {
 	) {
 		console.log('set Ready', data)
 		this.partyService.setReadyState(user, data.isReady);
+	}
+
+	@UseGuards(WsJwtGuard)
+	@SubscribeMessage('SetTeamSide')
+	setTeamSide(
+		@GetUser() user: User,
+		@MessageBody() data: { team: TeamSide },
+	) {
+		this.partyService.setTeamSide(user, data.team);
+	}
+
+	@UseGuards(WsJwtGuard)
+	@SubscribeMessage('SetPlayerPos')
+	setPlayerPos(
+		@GetUser() user: User,
+		@MessageBody() data: { pos: PlayerPosition },
+	) {
+		this.partyService.setPlayerPos(user, data.pos);
+	}
+
+	@UseGuards(WsJwtGuard)
+	@SubscribeMessage('SetSettings')
+	setSetting(
+		@GetUser() user: User,
+		@MessageBody() data: SettingDto,
+	) {
+		//TODO
 	}
 
 	@UseGuards(WsJwtGuard)

@@ -1,10 +1,12 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { Server, Socket } from "socket.io";
 import { User } from "src/typeorm";
-import { GameUser } from "../../game-user";
+import { Player } from "../../player";
 import { PartyJoinedSessionManager } from "./party.session";
 import { Party } from "./party";
 import { GlobalService } from "src/utils/global/global.service";
+import { PlayerPosition, TeamSide } from "src/utils/types/game.types";
+import { contains } from "class-validator";
 
 @Injectable()
 export class PartyService {
@@ -13,8 +15,8 @@ export class PartyService {
 		private globalService: GlobalService,
 	) {}
 
-	getGameUserInParty(id: number, gameUser: GameUser[]) {
-		return gameUser.find((e) => e.user.id === id);
+	getPlayerInParty(id: number, player: Player[]) {
+		return player.find((e) => e.user.id === id);
 	}
 
 	emitPartyUpdate(party: Party, cancelQueue = false) {
@@ -40,8 +42,8 @@ export class PartyService {
 	leaveParty(user: User) {
 		const party = this.partyJoined.getParty(user.id);
 		if (party) {
-			const gameUser = this.getGameUserInParty(user.id, party.players);
-			if (gameUser && gameUser.isLeader && party.players.length > 1) {
+			const player = this.getPlayerInParty(user.id, party.players);
+			if (player && player.isLeader && party.players.length > 1) {
 				party.players[1].isLeader = true;
 				party.players.forEach((player) => player.isReady = false);
 			}
@@ -54,17 +56,39 @@ export class PartyService {
 
 	kickFromParty(user: User, id: number) {
 		const party = this.partyJoined.getParty(user.id);
-		if (party && this.getGameUserInParty(user.id, party.players).isLeader) {
-			this.leaveParty(this.getGameUserInParty(id, party.players).user);
+		if (party && this.getPlayerInParty(user.id, party.players).isLeader) {
+			this.leaveParty(this.getPlayerInParty(id, party.players).user);
 		}
 	}
 
 	setReadyState(user: User, isReady: boolean) {
-		let party = this.partyJoined.getParty(user.id);
+		const party = this.partyJoined.getParty(user.id);
 		if (party) {
-			const gameUser = this.getGameUserInParty(user.id, party.players);
-			if (gameUser) {
-				gameUser.isReady = isReady;
+			const player = this.getPlayerInParty(user.id, party.players);
+			if (player) {
+				player.isReady = isReady;
+				this.emitPartyUpdate(party);
+			}
+		}
+	}
+
+	setTeamSide(user: User, teamSide: TeamSide) {
+		const party = this.partyJoined.getParty(user.id);
+		if (party) {
+			const player = this.getPlayerInParty(user.id, party.players);
+			if (player) {
+				player.team = teamSide;
+				this.emitPartyUpdate(party);
+			}
+		}
+	}
+
+	setPlayerPos(user: User, pos: PlayerPosition) {
+		const party = this.partyJoined.getParty(user.id);
+		if (party) {
+			const player = this.getPlayerInParty(user.id, party.players);
+			if (player) {
+				player.pos = pos;
 				this.emitPartyUpdate(party);
 			}
 		}

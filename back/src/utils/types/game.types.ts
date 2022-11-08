@@ -1,4 +1,4 @@
-import { GameUser } from "src/game/game-user"
+import { Player } from "src/game/player"
 
 export enum PlayerType {
 	Player_A_Back,
@@ -22,10 +22,10 @@ export enum GameType {
 
 //data sent to each player before the game
 export type PlayersGameData = {
-	Player_A_Back: GameUser,
-	Player_A_Front?: GameUser,
-	Player_B_Front?: GameUser,
-	Player_B_Back: GameUser,
+	Player_A_Back: Player,
+	Player_A_Front?: Player,
+	Player_B_Front?: Player,
+	Player_B_Back: Player,
 	player_type: PlayerType,
 	// player_secret: string,
 	game_id: string,
@@ -68,10 +68,10 @@ export type PlayersGameData = {
 // data sent from back to front with data for the players
 export type NewGameData =
 {
-	Player_A_Back: GameUser,
-	Player_A_Front?: GameUser,
-	Player_B_Back: GameUser,
-	Player_B_Front?: GameUser,
+	Player_A_Back: Player,
+	Player_A_Front?: Player,
+	Player_B_Back: Player,
+	Player_B_Front?: Player,
 //	player_type: PlayerType,
 	game_id: string,
 	game_settings: GameSettings

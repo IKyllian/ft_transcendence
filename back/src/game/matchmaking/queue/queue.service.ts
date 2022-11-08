@@ -3,7 +3,7 @@ import { User } from "src/typeorm";
 import { GlobalService } from "src/utils/global/global.service";
 import { GameType } from "src/utils/types/game.types";
 import { QueueLobbby } from "src/utils/types/types";
-import { GameUser } from "../../game-user";
+import { Player } from "../../player";
 import { PartyService } from "../party/party.service";
 
 @Injectable()
@@ -20,13 +20,13 @@ export class QueueService {
 	// 	let queueLobby: QueueLobbby
 	// 	let party = this.partyService.partyJoined.getParty(user.id);
 	// 	if (!party) {
-	// 		queueLobby = { id: "queue-" + user.id, players: [ new GameUser(user) ]};
+	// 		queueLobby = { id: "queue-" + user.id, players: [ new Player(user) ]};
 	// 	} else {
 	// 		if (party.players.length > 1) {
 	// 			throw new BadRequestException("Too many players for this mode");
 	// 		}
-	// 		const gameUser = this.partyService.getGameUserInParty(user.id, party.players)
-	// 		if (!gameUser.isLeader) {
+	// 		const player = this.partyService.getPlayerInParty(user.id, party.players)
+	// 		if (!player.isLeader) {
 	// 			throw new UnauthorizedException("You are not the leader of this party");
 	// 		}
 	// 		queueLobby = party;
@@ -47,13 +47,13 @@ export class QueueService {
 		const maxPlayers: number = game_mode === GameType.Singles ? 1 : 2;
 		const party = this.partyService.partyJoined.getParty(user.id);
 		if (!party) {
-			queueLobby = { id: "queue-" + user.id, players: [ new GameUser(user) ]};
+			queueLobby = { id: "queue-" + user.id, players: [ new Player(user) ]};
 		} else {
 			if (party.players.length > maxPlayers) {
 				throw new BadRequestException("Too many players for this mode");
 			}
-			const gameUser = this.partyService.getGameUserInParty(user.id, party.players)
-			if (!gameUser.isLeader) {
+			const player = this.partyService.getPlayerInParty(user.id, party.players)
+			if (!player.isLeader) {
 				throw new UnauthorizedException("You are not the leader of this party");
 			}
 			queueLobby = party;
