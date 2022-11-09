@@ -20,6 +20,9 @@ export class MatchmakingLobby {
 				this.players.push(blueTeam.players[1]);
 				this.players.push(redTeam.players[1]);
 			}
+		} else {
+			blueTeam.players.forEach((player) => this.players.push(player));
+			redTeam.players.forEach((player) => this.players.push(player));
 		}
 		// if (this.game_settings.game_type === GameType.Singles) {
 		// 	this.Player_A_Back = blueTeam.players[0];

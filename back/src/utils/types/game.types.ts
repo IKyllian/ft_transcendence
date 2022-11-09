@@ -3,8 +3,8 @@ import { Player } from "src/game/player"
 export enum PlayerType {
 	Player_A_Back,
 	Player_A_Front,
-	Player_B_Front,
 	Player_B_Back,
+	Player_B_Front,
 	Spectator
 }
 
@@ -191,6 +191,6 @@ export enum TeamSide {
 }
 
 export enum PlayerPosition {
-	FRONT,
 	BACK,
+	FRONT,
 }

@@ -54,6 +54,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
 
 	async handleConnection(client: AuthenticatedSocket)
 	{
+		console.log(client.id);
 		let user: User = null;
 		client.multiTab = false;
 		if (client.handshake.headers.authorization) {

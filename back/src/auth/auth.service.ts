@@ -9,6 +9,8 @@ import { UserService } from "src/user/user.service";
 import { Auth42Dto } from "./dto/auth42.dto";
 import { User } from "src/typeorm";
 import { SignupDto } from "./dto/signup.dto";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
 
 @Injectable()
 export class AuthService {
@@ -18,6 +20,9 @@ export class AuthService {
 		private config: ConfigService,
 		private userService: UserService,
 		private readonly httpService: HttpService,
+		
+		@InjectRepository(User)
+		private userRepo: Repository<User>,
 	) {}
 
 	async signup(dto: SignupDto) {
@@ -39,18 +44,16 @@ export class AuthService {
 	}
 
 	async login(dto: AuthDto) {
-		const user = await this.userService.findOne({
-			relations: {
-				channelUser: {
-					channel: true,
-				},
-				statistic: true,
-				blocked: true,
-			},
-			where: {
-				username: dto.username,
-			}
-		}, true);
+		const user = await this.userRepo
+			.createQueryBuilder("user")
+			.addSelect('user.hash')
+			.where("LOWER(user.username) = :name", { name: dto.username.toLowerCase() })
+			.innerJoinAndSelect("user.channelUser", "ChannelUser")
+			.innerJoinAndSelect("ChannelUser.channel", "Channel")
+			.innerJoinAndSelect("user.statistic", "Statistic")
+			.leftJoinAndSelect("user.blocked", "Blocked")
+			.getOne();
+
 		if (!user) 
 			throw new NotFoundException('invalid credentials')
 

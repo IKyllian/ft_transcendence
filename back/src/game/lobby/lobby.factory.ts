@@ -71,6 +71,7 @@ export class LobbyFactory
 			}
 			this.globalService.server.to('user-' + player.user.id).emit("newgame_data", dataToFront);
 		});
+		console.log(dataToFront.game_settings)
 
 		// if (lobby_request.game_settings.game_type === GameType.Doubles)
 		// {

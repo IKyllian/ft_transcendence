@@ -7,10 +7,12 @@ export class Player {
 	) {
 		this.isReady = false;
 		this.isLeader = false;
+		this.team = TeamSide.BLUE;
+		this.pos = PlayerPosition.BACK;
 	}
 	isReady: boolean;
 	isLeader: boolean;
-	pos?: PlayerPosition;
+	pos: PlayerPosition;
 	team: TeamSide;
 
 }

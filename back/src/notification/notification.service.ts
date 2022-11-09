@@ -80,7 +80,7 @@ export class NotificationService {
 			addressee,
 			requester: user,
 			type: notificationType.PARTY_INVITE,
-			delete_at: new Date(Date.now() - 20 * 1000)
+			delete_at: new Date(Date.now() + 20 * 1000)
 		});
 		const notifToSend = await this.notifRepo.save(notif);
 		// this.taskService.handlePartyInviteNotif(notif);
