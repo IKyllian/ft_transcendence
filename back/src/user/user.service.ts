@@ -51,7 +51,8 @@ export class UserService {
 				'hash',
 				'refresh_hash',
 				'two_factor_enabled',
-				'two_factor_secret'
+				'two_factor_secret',
+				'two_factor_authenticated'
 			];
 		}
 		return this.userRepo.findOne(options);

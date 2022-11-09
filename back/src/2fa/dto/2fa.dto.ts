@@ -3,7 +3,7 @@ import {
 	IsString,
 } from 'class-validator'
 
-export class EnableTwoFactorDto {
+export class TwoFactorDto {
 	@IsString()
 	@IsNotEmpty()
 	code: string;
