@@ -18,7 +18,7 @@ export class TwoFactorController {
 
 	@Post('generate')
 	@UseGuards(Jwt1faGuard)
-	async register(@Res() response: Response, @GetUser() user: User) {
+	async generate(@Res() response: Response, @GetUser() user: User) {
 		const { otpUrl } = await this.twoFactorService.generateTwoFactorSecret(user);
 		
 		return this.twoFactorService.pipeQrCodeStream(response, otpUrl);
@@ -26,25 +26,21 @@ export class TwoFactorController {
 
 	@Post('enable')
 	@UseGuards(Jwt1faGuard)
-	async enableTwoFactor(@GetUser() user: User, @Body() body: EnableTwoFactorDto) {
-		console.log(user.two_factor_enabled);
-		
-		if (user.two_factor_enabled)
-			throw new UnauthorizedException('2FA already enabled for this user');
-
+	async enableTwoFactor(@GetUser() user: User, @Body() body: EnableTwoFactorDto) {		
 		const userWithSecret = await this.userService.findOne({
 			where: {
 				id: user.id,
 			}
 		}, true);
-
-		console.log(userWithSecret.two_factor_enabled);
 		
+		if (userWithSecret.two_factor_enabled)
+			throw new UnauthorizedException('2FA already enabled for this user');
 		
 		const isValid = this.twoFactorService.verify(body.code, userWithSecret);
 
 		if (!isValid)
 			throw new UnauthorizedException('Invalid 2FA code');
+
 		await this.userService.setTwoFactorEnabled(user, true);
 		return {success: true}
 	}

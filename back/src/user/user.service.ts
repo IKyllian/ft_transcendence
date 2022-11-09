@@ -50,6 +50,7 @@ export class UserService {
 				'status',
 				'hash',
 				'refresh_hash',
+				'two_factor_enabled',
 				'two_factor_secret'
 			];
 		}
