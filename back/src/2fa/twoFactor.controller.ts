@@ -6,6 +6,7 @@ import { TwoFactorService } from "./TwoFactor.service";
 import { Response } from 'express';
 import { EnableTwoFactorDto } from "./dto/enable2fa.dto";
 import { UserService } from "src/user/user.service";
+import { Jwt1faGuard } from "src/auth/guard/jwt1fa.guard";
 
 @Controller('2fa')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -16,7 +17,7 @@ export class TwoFactorController {
 	){}
 
 	@Post('generate')
-	@UseGuards(JwtGuard)
+	@UseGuards(Jwt1faGuard)
 	async register(@Res() response: Response, @GetUser() user: User) {
 		const { otpUrl } = await this.twoFactorService.generateTwoFactorSecret(user);
 		
@@ -24,7 +25,7 @@ export class TwoFactorController {
 	}
 
 	@Post('enable')
-	@UseGuards(JwtGuard)
+	@UseGuards(Jwt1faGuard)
 	async enableTwoFactor(@GetUser() user: User, @Body() body: EnableTwoFactorDto) {
 		console.log(user.two_factor_enabled);
 		

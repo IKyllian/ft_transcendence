@@ -5,7 +5,8 @@ import { ExtractJwt, Strategy } from "passport-jwt";
 import { UserService } from "src/user/user.service";
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
+export class Jwt1faStrategy extends PassportStrategy(Strategy, 'jwt-1fa') {
+    // autorise l'utilisateur à accéder uniquement à la page pour valider son code 2fa
 	constructor(
 		config: ConfigService,
 		private userService: UserService,
@@ -20,15 +21,13 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
 		sub: number;
 		username: string;
 	}) {
-		const user = await this.userService.findOne({
+		return await this.userService.findOne({
 			select: [
 				"id",
 				"id42",
 				"username",
 				"avatar",
 				"refresh_hash",
-				"two_factor_enabled",
-				"two_factor_authenticated"
 			],
 			relations: {
 				channelUser: true,
@@ -39,7 +38,5 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
 				id: payload.sub,
 			}
 		});
-		if (!user.two_factor_enabled) return user;
-		else if (user.two_factor_authenticated) return user;
 	}
 }

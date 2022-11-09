@@ -59,6 +59,10 @@ export class User {
 	two_factor_enabled: boolean;
 
 	@Exclude()
+	@Column({ default: false, select: false })
+	two_factor_authenticated: boolean;
+
+	@Exclude()
 	@Column({ nullable: true, select: false })
 	forgot_code?: string
 } 
