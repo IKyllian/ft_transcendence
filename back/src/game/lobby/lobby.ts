@@ -1,6 +1,6 @@
 import { Socket } from "socket.io";
 import { AuthenticatedSocket } from "src/utils/types/auth-socket";
-import { GameType, PlayerStatus, GameSettings, GameState, LobbyStatus, PlayerInput, PlayerType, RoundSetup } from "src/utils/types/game.types";
+import { GameType, TeamSide, PlayerPosition, PlayerStatus, GameSettings, GameState, LobbyStatus, PlayerInput, PlayerType, RoundSetup } from "src/utils/types/game.types";
 import { MatchmakingLobby } from "../matchmaking/matchmakingLobby";
 import { PongGame } from "../pong/pong.game";
 import { LobbyFactory } from "./lobby.factory";
@@ -404,12 +404,25 @@ export class Lobby
 
 	game_receive_input(client: AuthenticatedSocket, input: PlayerInput)
 	{
-		const player = this.playerSockets.find((socket) => socket.id === client.id);
-		if (player) {
+
+		const player = this.lobby_data.players.find((player) => player.user.id === client.user.id);
+
+		if (player && this.convert_player_enums(player.team, player.pos) === input.player_type)
+		{
 			this.game.core.append_input(input);
-		} else {
-			console.log("T QUI ???")
 		}
+		else
+		{
+			console.log("input incidend", this.game_id);
+		}
+
+
+		// const player = this.playerSockets.find((socket) => socket.id === client.id);
+		// if (player) {
+		// 	this.game.core.append_input(input);
+		// } else {
+		// 	console.log("T QUI ???")
+		// }
 // 		if ((client.user.id === this.Player_A_Back.user.id && input.player_type === PlayerType.Player_A_Back)
 // 			||(client.user.id === this.Player_B_Back.user.id && input.player_type === PlayerType.Player_B_Back))
 // 			{
@@ -440,5 +453,24 @@ export class Lobby
 		ret = this.game.core.get_round_setup();
 		client.emit('round_setup', ret);
 	}
+
+    convert_player_enums(team: TeamSide, pos: PlayerPosition): PlayerType
+    {
+        if (team === TeamSide.BLUE)
+        {
+            if (pos === PlayerPosition.BACK)
+                return PlayerType.Player_A_Back;
+            else
+                return PlayerType.Player_A_Front;
+        }
+        else
+        {
+            if (pos === PlayerPosition.BACK)
+                return PlayerType.Player_B_Back
+            else
+                return PlayerType.Player_B_Front
+        }
+    }
+
 
 }
