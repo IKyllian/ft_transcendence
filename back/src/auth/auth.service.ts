@@ -105,7 +105,7 @@ export class AuthService {
 		if (!user) 
 			throw new NotFoundException('invalid credentials')
 		this.userService.setTwoFactorAuthenticated(user, false);
-		
+
 		const pwdMatches = await argon.verify(
 			user.hash,
 			dto.password,
@@ -241,10 +241,12 @@ export class AuthService {
         const message = {
             from: process.env.MAIL_USER,
             to: user.email,
-            subject: 'Pong Game account verification',
+            subject: 'Pong Game - Account verification',
             html: `
-            <h1>test !!!!</h1>
-            <a href=http://localhost:5000/api/auth/activate?code=${user.validation_code}>Click here</a>`,
+            <h3>Account Verification</h3>
+			<p>Hi, you have recently created an account on <b>Pong Game</b></p>
+			<p>To validate your email, please <a href=http://localhost:5000/api/auth/activate?code=${user.validation_code}>Click here</a></p>
+            `,
         }
 
         this.transporter.sendMail(message, function(err, info) {
@@ -271,7 +273,7 @@ export class AuthService {
             to: user.email,
             subject: 'Pong Game - Password reset request',
             html: `
-            <h1>Password Reset</h1>
+            <h3>Password Reset</h3>
 			<p>Hi, you have submitted a password reset request on <b>Pong Game</b></p>
 			<p>To set your new password, <a href=http://localhost:5000/api/auth/reset-password?code=${validation_code}>Click here</a></p>
             `,
