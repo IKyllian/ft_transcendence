@@ -61,6 +61,9 @@ export class PongGame
 				this.lobby.lobby_broadcast_data('match_winner', gamestate.result);
 				this.lobby.game_set_finished();
 				clearInterval(this.update_interval);
+				if (this.game_settings.is_ranked) {
+
+				}
 				
 				//save replay
 				this.lobby.factory.save_replay(this.lobby.game_id, this.saved_states);

@@ -1,7 +1,7 @@
 import { User } from "src/typeorm";
 import { PlayerPosition, PlayerType, TeamSide } from "src/utils/types/game.types";
 
-export class GameUser {
+export class Player {
 	constructor(
 		public user: User,
 	) {
@@ -10,7 +10,7 @@ export class GameUser {
 	}
 	isReady: boolean;
 	isLeader: boolean;
-	position?: PlayerPosition;
-	teamSide?: TeamSide;
+	pos?: PlayerPosition;
+	team: TeamSide;
 
 }

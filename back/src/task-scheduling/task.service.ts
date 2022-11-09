@@ -72,7 +72,6 @@ export class TaskService {
 	@Interval('singles-queue', 3000)
 	async handleSinglesQueue() {
 		let matchFound: MatchmakingLobby[] = [];
-		console.log("nb of player in queue", this.queueService.queue1v1.length);
 		this.queueService.queue1v1.sort((a, b) => a.averageMmr - b.averageMmr);
 		const range: EloRange = this.setServerRange(this.queueService.queue1v1.length);
 		this.adjustLobbyEloRange(this.queueService.queue1v1, range);
@@ -92,7 +91,6 @@ export class TaskService {
 		}
 		// matchFound.forEach((match) => this.lobbyFactory.lobby_create(match));
 		matchFound.forEach((match) => this.lobbyFactory.lobby_create(match));
-		// console.log("MatchFound: ", matchFound);
 	}
 
 	@Interval('doubles-queue', 3000)
@@ -110,15 +108,15 @@ export class TaskService {
 				if (i !== j && mmrDiff <= this.queueService.queue2v2[i].range
 				&& mmrDiff <= this.queueService.queue2v2[j].range) {
 					if (this.queueService.queue2v2[j].players.length === 1) {
-						let match: boolean = false;
+						let pair: boolean = false;
 						potentialLobby.forEach((solo) => {
 							if (solo.players.length === 1) {
 								solo.players.push(this.queueService.queue2v2[j].players[0]);
 								solo.averageMmr = (solo.averageMmr + this.queueService.queue2v2[j].averageMmr) / 2;
-								match = true;
+								pair = true;
 							}
 						});
-						if (!match) {
+						if (!pair) {
 							let soloLobby: QueueLobbby = JSON.parse(JSON.stringify(this.queueService.queue2v2[i]));
 							potentialLobby.push(soloLobby);
 						}
@@ -136,8 +134,7 @@ export class TaskService {
 			}
 			potentialLobby = [];
 		}
-		// matchFound.forEach((match) => ) // call game Karim function to create game
-		console.log("MatchFound: ", matchFound);
+		matchFound.forEach((match) => this.lobbyFactory.lobby_create(match));
 	}
 
 	@Interval('timedout-user', 30000)

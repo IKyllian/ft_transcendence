@@ -22,7 +22,7 @@ import { JwtPayload, notificationType, UserPayload } from 'src/utils/types/types
 import { UserSessionManager } from './user.session';
 import { LobbyFactory } from './lobby/lobby.factory';
 import { Party } from './matchmaking/party/party';
-import { GameUser } from './game-user';
+import { Player } from './player';
 import { PartyService } from './matchmaking/party/party.service';
 import { SocketReservedEventsMap } from 'socket.io/dist/socket';
 import { RoomDto } from 'src/chat/gateway/dto/room.dto';
@@ -42,9 +42,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
 	/* ----- Initialisation ----- */
 
 	@WebSocketServer() server: Server;
-	admin?: Socket;
-//get admin secret from envs
-	admin_secret: string = 'praclarushtaonas';
+
 	constructor(
 		private readonly lobbyfactory: LobbyFactory,
 		private readonly userSession: UserSessionManager,
@@ -52,47 +50,49 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
 		private readonly userService: UserService,
 	  ) {}
 
-	afterInit(server: Server): any
-	{
-	  this.lobbyfactory.server = server;
-	}
-
-
 	/* ----- Connect/Disconnect ----- */
 
-	async handleConnection(client: Socket)
+	async handleConnection(client: AuthenticatedSocket)
 	{
-		console.log("someone connected", client['id']);
 		let user: User = null;
+		client.multiTab = false;
 		if (client.handshake.headers.authorization) {
 			const token = client.handshake.headers.authorization.split(' ')[1];
 			user = await this.authService.verify(token);
 		}
-		if (!user) {
-			// Found something to do in this case
-			console.log(user, 'invalid credential')
-			return client.disconnect();
-		} else if (this.userSession.getUser(user.id)) {
+		if (user) {
+			client.user = user;
+			console.log("Game Gateway Connection: ", client.user.username);
+			if (this.userSession.getUser(user.id)) {
+				client.multiTab = true;
+				client.emit('MultiTabError');
+				client.disconnect();
+			} else {
+				this.userSession.setUser(user.id, user);
+				client.emit('Connected')
+			}
+		} else {
+			console.log('invalid credential')
 			client.disconnect();
-			throw new UnauthorizedException("You can't play in multi tab!");
 		}
-		this.userSession.setUser(user.id, user);
 	}
   
-	async handleDisconnect(socket: Socket)
+	async handleDisconnect(socket: AuthenticatedSocket)
 	{
 		// TODO handle different type of disconnect; Ex: multitab error, lost connection
 		if (socket.handshake.headers.authorization) {
 			const payload = this.authService.decodeJwt(socket.handshake.headers.authorization.split(' ')[1]) as JwtPayload;
 			// get usersocket instance instead of call db ?
 			const user = await this.userService.findOneBy({ id: payload?.sub });
-			if (user) {
+			if (user && socket.multiTab === false) {
 				this.userSession.removeUser(user.id)
+				// console.log("Game Gateway Deconnection: ", user.username) 
 			}
-			console.log(payload?.username, 'disconnected');
-		} else
-			console.log(socket.id, 'disconnected');
-		this.lobbyfactory.lobby_quit(socket);
+		}
+ 		// } else
+		// 	console.log(socket.id, 'disconnected');
+		// this.lobbyfactory.lobby_quit(socket);
+		console.log("Game Gateway Deconnection: ", socket.user.username) 
 	}
 
 	@SubscribeMessage('ping')
@@ -142,41 +142,42 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
 // 		// }	
 // 	}
 
-	@SubscribeMessage('admin_lobby_quantity')
-	async onAdminLobbyQuantity(@ConnectedSocket() client: Socket)
-	{
-		if (client['id'] == this.admin['id'])
-		{
-			client.emit('lobby_quantity', this.lobbyfactory.get_lobby_quantity());
-		}
-		else
-		{
-			//log the event somewhere
-		}	
-	}
+	// @SubscribeMessage('admin_lobby_quantity')
+	// async onAdminLobbyQuantity(@ConnectedSocket() client: Socket)
+	// {
+	// 	if (client['id'] == this.admin['id'])
+	// 	{
+	// 		client.emit('lobby_quantity', this.lobbyfactory.get_lobby_quantity());
+	// 	}
+	// 	else
+	// 	{
+	// 		//log the event somewhere
+	// 	}	
+	// }
 
-	@SubscribeMessage('admin_lobby_list')
-	async onAdminLobbyList(@ConnectedSocket() client: Socket,
-	@MessageBody() data: {player_A: string, player_B: string})
-	{
-		if (client['id'] == this.admin['id'])
+	// @SubscribeMessage('admin_lobby_list')
+	// async onAdminLobbyList(@ConnectedSocket() client: Socket,
+	// @MessageBody() data: {player_A: string, player_B: string})
+	// {
+	// 	if (client['id'] == this.admin['id'])
+	// 	{
+	// 		client.emit('lobby_list', this.lobbyfactory.get_lobby_list());
+	// 	}
+	// 	else
+	// 	{
+		// 		//log the event somewhere
+		// 	}	
+		// }
+		
+		
+		/* ----- Users Lobby Management ----- */
+		
+		@UseGuards(WsJwtGuard)
+		@SubscribeMessage('user_join_lobby')
+		async onUserJoinLobby(@ConnectedSocket() client: AuthenticatedSocket,
+		@MessageBody() game_id: string)
 		{
-			client.emit('lobby_list', this.lobbyfactory.get_lobby_list());
-		}
-		else
-		{
-			//log the event somewhere
-		}	
-	}
-
-
-	/* ----- Users Lobby Management ----- */
-
-	@UseGuards(WsJwtGuard)
-	@SubscribeMessage('user_join_lobby')
-	async onUserJoinLobby(@ConnectedSocket() client: AuthenticatedSocket,
-	@MessageBody() game_id: string)
-	{
+		console.log("joining lobby, ", client?.user)
 	//	console.log("user join lobby", data);
 		this.lobbyfactory.lobby_join(client, game_id);
 	}
@@ -198,14 +199,14 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
 	{
 		this.lobbyfactory.lobby_request_status(client, game_id);
 	}
-
+	
 	/* ----- Users Game Management ----- */
-
-
+	
+	
 	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('user_game_input')
 	async onUserGameInput(
-	@ConnectedSocket() client: AuthenticatedSocket,
+		@ConnectedSocket() client: AuthenticatedSocket,
 	@MessageBody() data: any)
 	{
 		this.lobbyfactory.lobby_game_input(client, data);

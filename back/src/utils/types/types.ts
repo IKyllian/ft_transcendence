@@ -1,5 +1,5 @@
 import { MESSAGES } from "@nestjs/core/constants";
-import { GameUser } from "src/game/game-user";
+import { Player } from "src/game/player";
 
 export type JwtPayload = {
 	sub: number,
@@ -76,7 +76,7 @@ export type EloRange = {
 
 export interface QueueLobbby {
 	id: string,
-	players: GameUser[],
+	players: Player[],
 	range?: number,
 	timeInQueue?: number,
 	averageMmr?: number,

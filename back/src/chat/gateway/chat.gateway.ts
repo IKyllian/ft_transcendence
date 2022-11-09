@@ -78,7 +78,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			// socket.emit('connection', 'failed');
 		}
 		socket.user = user;
-		console.log(user.username, 'connected')
+		// console.log(user.username, 'connected')
 		this.server.to(socket.id).emit('StatusUpdate', user);
 		socket.join(`user-${user.id}`);
 		if (user.status === 'offline') {
@@ -99,9 +99,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				this.userService.setStatus(user, 'offline');
 				socket.emit('statusUpdate', { user, status: 'offline' });
 			}
-			console.log(payload?.username, 'disconnected');
+			// console.log(payload?.username, 'disconnected');
 			} else
 				console.log(socket.id, 'disconnected');
+			// TODO emit disconnected for front retry to reconnect ?
 	}
 
 	@UseGuards(WsJwtGuard)

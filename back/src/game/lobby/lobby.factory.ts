@@ -5,15 +5,19 @@ import { Socket } from 'socket.io';
 import { GameState, GameType, GameSettings, NewGameData, PlayersGameData, PlayerType } from 'src/utils/types/game.types';
 import { AuthenticatedSocket } from 'src/utils/types/auth-socket';
 import { MatchmakingLobby } from '../matchmaking/matchmakingLobby';
+import { GlobalService } from 'src/utils/global/global.service';
+import { Injectable } from '@nestjs/common';
 //import  * as Defaultgame_settings from '../game-settings';
 
 
 //TODO
 //rework client handling
-
+@Injectable()
 export class LobbyFactory
 {
-	server: Server;
+	// server: Server;
+	constructor(private globalService: GlobalService) {}
+
 	private lobby_list: Map<Lobby['game_id'], Lobby> = new Map<Lobby['game_id'], Lobby>();
 	private client_list: Map<Socket['id'], Lobby['game_id']> = new Map<Socket['id'], Lobby['game_id']>();
 	replay_list: Map<string, Array<GameState>> = new Map <string, Array<GameState>>();
@@ -43,23 +47,18 @@ export class LobbyFactory
 		}
 
 		player_data.player_type = PlayerType.Player_A_Back;
-		this.server.to('user_' + lobby_request.Player_A_Back.user.id).emit("newgame_data", player_data);
-
-
+		this.globalService.server.to('user-' + lobby_request.Player_A_Back.user.id).emit("newgame_data", player_data);
 		player_data.player_type = PlayerType.Player_B_Back;
-		this.server.to('user_' + lobby_request.Player_B_Back.user.id).emit("newgame_data", player_data);
+		this.globalService.server.to('user-' + lobby_request.Player_B_Back.user.id).emit("newgame_data", player_data);
 
 		if (lobby_request.game_settings.game_type === GameType.Doubles)
 		{
 			player_data.player_type = PlayerType.Player_A_Front;
-			this.server.to('user_' + lobby_request.Player_A_Front.user.id).emit("newgame_data", player_data);
+			this.globalService.server.to('user-' + lobby_request.Player_A_Front.user.id).emit("newgame_data", player_data);
 	
 			player_data.player_type = PlayerType.Player_B_Front;
-			this.server.to('user_' + lobby_request.Player_B_Front.user.id).emit("newgame_data", player_data);
+			this.globalService.server.to('user-' + lobby_request.Player_B_Front.user.id).emit("newgame_data", player_data);
 		}
-
-
-
 
 //ajouter une ref au lobby dans le return ? 
 //pour acces a this.already_started & this.already_finished
