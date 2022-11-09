@@ -9,7 +9,7 @@ import { BallData, Coordinates, EndResult, GameSettings, GameState, GameType, Go
 export default class PongCore
 {
 	//for client only
-	// private pong_triggers: any;
+	//private pong_triggers: any;
 
 	//Modifiable Game Settings
 	game_type: GameType = GameType.Singles; //(enum)Singles or Doubles
@@ -315,7 +315,7 @@ export default class PongCore
 			this.ball_data.vector.y *= -1;
 	//		this.ball_data.velocity += this.ball_acceleration;
 
-			// this.pong_triggers?.play_sound_a();
+			// this.pong_triggers?.sound_event_wall();
 		}
 		//check down wall
 		if (this.ball_data.position.y >= (this.field_height - this.up_down_border))
@@ -324,7 +324,7 @@ export default class PongCore
 			this.ball_data.vector.y *= -1;
 	//		this.ball_data.velocity += this.ball_acceleration;
 	
-			// this.pong_triggers?.play_sound_a();
+			// this.pong_triggers?.sound_event_wall();
 		}
 
 		//check paddle A_back ( [I] I   I I )
@@ -340,7 +340,7 @@ export default class PongCore
 //do something cool with vectors for bounce
 				this.ball_data.velocity += this.ball_acceleration;
 				
-				// this.pong_triggers?.play_sound_b();
+				// this.pong_triggers?.sound_event_paddle();
 			}
 		}
 
@@ -357,7 +357,7 @@ export default class PongCore
 //do something cool with vectors for bounce
 				this.ball_data.velocity += this.ball_acceleration;
 				
-				// this.pong_triggers?.play_sound_b();
+				// this.pong_triggers?.sound_event_paddle();
 			}
 		}	
 
@@ -377,7 +377,7 @@ export default class PongCore
 	//do something cool with vectors for bounce
 					this.ball_data.velocity += this.ball_acceleration;
 					
-					// this.pong_triggers?.play_sound_b();
+					// this.pong_triggers?.sound_event_paddle();
 				}
 			}
 	
@@ -394,7 +394,7 @@ export default class PongCore
 	//do something cool with vectors for bounce
 					this.ball_data.velocity += this.ball_acceleration;
 					
-					// this.pong_triggers?.play_sound_b();
+					// this.pong_triggers?.sound_event_paddle();
 				}
 			}
 		}
@@ -540,7 +540,7 @@ console.log("client check goal");
 		if (this.ball_data.position.x < 0
 			|| this.ball_data.position.x > this.field_width )
 		{
-			// this.pong_triggers?.play_sound_clapping();
+			// this.pong_triggers?.sound_event_goal();
 		}
 
 	}
