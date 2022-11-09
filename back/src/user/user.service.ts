@@ -214,6 +214,8 @@ export class UserService {
 
 	async setTwoFactorEnabled(user: User, status: boolean) {
 		user.two_factor_enabled = status;
+		if (status)
+			user.two_factor_authenticated = true;
 		this.userRepo.save(user);
 	}
 }
