@@ -7,6 +7,7 @@ export class Player {
 	) {
 		this.isReady = false;
 		this.isLeader = false;
+		this.team = TeamSide.BLUE;
 	}
 	isReady: boolean;
 	isLeader: boolean;

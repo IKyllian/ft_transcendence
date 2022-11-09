@@ -44,13 +44,6 @@ export function useAppHook() {
 			connectSocket();
 			fetchNotifications(token, dispatch);
 			fetchFriendList(token, dispatch);
-
-			// setTimeout(function() {
-			// 	setGameInvite(true);
-			// 	setTimeout(function() {
-			// 		gameNotificationLeave();
-			// 	}, 15000);
-			// }, 2000);
 		}
 	}, [isAuthenticated])
 
@@ -88,6 +81,9 @@ export function useAppHook() {
 			socket.on("NewPartyInvite", (data: NotificationInterface) => {
 				console.log("NewPartyInvite", data);
 				setGameInvite(data);
+				setTimeout(function() {
+					setGameInvite(undefined);
+				}, 15000);
 			});
 
 			socket.on("DeleteNotification", (data: number) => {
