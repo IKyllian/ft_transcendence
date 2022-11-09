@@ -108,12 +108,12 @@ export class AuthService {
 			]
 		}, true);
 
-		const pending = await this.userService.findOnePending(
-			{ where: [
+		const pending = await this.userService.findOnePending({
+			where: [
 				{ username: dto.username },
 				{ email: dto.username }
-			]}
-		);
+			]
+		});
 
 		if (pending)
 			throw new UnauthorizedException("Email not validated");
