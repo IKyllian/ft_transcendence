@@ -71,6 +71,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			user = await this.authService.verify(token);
 		}
 
+		
 		if (!user) {
 			// throw new WsException('invalid credential');
 			console.log(user, 'invalid credential')
@@ -78,6 +79,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			// socket.emit('connection', 'failed');
 		}
 		socket.user = user;
+		// if (user.username === 'chak') {
+		// 	console.log(socket)
+		// }
 		console.log(user.username, 'connected')
 		this.server.to(socket.id).emit('StatusUpdate', user);
 		socket.join(`user-${user.id}`);
@@ -99,9 +103,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				this.userService.setStatus(user, 'offline');
 				socket.emit('statusUpdate', { user, status: 'offline' });
 			}
-			console.log(payload?.username, 'disconnected');
+			// console.log(payload?.username, 'disconnected');
 			} else
 				console.log(socket.id, 'disconnected');
+			// TODO emit disconnected for front retry to reconnect ?
 	}
 
 	@UseGuards(WsJwtGuard)

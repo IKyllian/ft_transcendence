@@ -1,10 +1,10 @@
-import { GameUser } from "src/game/game-user"
+import { Player } from "src/game/player"
 
 export enum PlayerType {
 	Player_A_Back,
 	Player_A_Front,
-	Player_B_Front,
 	Player_B_Back,
+	Player_B_Front,
 	Spectator
 }
 
@@ -22,12 +22,11 @@ export enum GameType {
 
 //data sent to each player before the game
 export type PlayersGameData = {
-	Player_A_Back: GameUser,
-	Player_A_Front?: GameUser,
-	Player_B_Front?: GameUser,
-	Player_B_Back: GameUser,
+	Player_A_Back?: Player,
+	Player_A_Front?: Player,
+	Player_B_Front?: Player,
+	Player_B_Back?: Player,
 	player_type: PlayerType,
-	// player_secret: string,
 	game_id: string,
 	game_settings: GameSettings,
 }
@@ -68,10 +67,10 @@ export type PlayersGameData = {
 // data sent from back to front with data for the players
 export type NewGameData =
 {
-	Player_A_Back: GameUser,
-	Player_A_Front?: GameUser,
-	Player_B_Back: GameUser,
-	Player_B_Front?: GameUser,
+	Player_A_Back: Player,
+	Player_A_Front?: Player,
+	Player_B_Back: Player,
+	Player_B_Front?: Player,
 //	player_type: PlayerType,
 	game_id: string,
 	game_settings: GameSettings
@@ -174,7 +173,7 @@ export enum EndResult
 //game settings for the core
 export type GameSettings =
 {
-	ranked: boolean,
+	is_ranked: boolean,
 	game_type: GameType,
 	up_down_border: number,
 	player_back_advance: number,
@@ -186,22 +185,12 @@ export type GameSettings =
 	point_for_victory: number
 }
 
-// export enum GameMode {
-// 	OneVsOne,
-// 	TwoVsTwo,
-// 	Custom
-
-// }
-
-// }
-
 export enum TeamSide {
 	BLUE,
 	RED,
 }
 
 export enum PlayerPosition {
-	FRONT,
 	BACK,
+	FRONT,
 }
-

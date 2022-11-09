@@ -4,7 +4,7 @@ import { ChannelMessage, ChannelUser } from "src/typeorm";
 import { ChannelNotFoundException, NotInChannelException } from "src/utils/exceptions";
 import { Repository } from "typeorm";
 import { ChannelService } from "../channel.service";
-import { ChannelMessageDto } from "./dto/channelMessage.dto";
+import { ChannelMessageDto, MessageToSkipDto } from "./dto/channelMessage.dto";
 
 @Injectable()
 @UseInterceptors(ClassSerializerInterceptor)
@@ -32,7 +32,7 @@ export class ChannelMessageService {
 		return this.messagesRepo.save(message);
 	}
 
-	async getMessages(chanId: number) {
+	async getMessages(chanId: number, data: MessageToSkipDto) {
 		const channel = await this.channelService.findOneBy({ id: chanId });
 		if (!channel)
 			throw new ChannelNotFoundException();
@@ -45,6 +45,8 @@ export class ChannelMessageService {
 				}
 			},
 			order: { send_at: 'DESC' },
+			skip: data.skip,
+			take: 20,
 		});
 	}
 }

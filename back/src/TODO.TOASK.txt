@@ -19,6 +19,8 @@
 
 //ISSUE ?
 	- can create username with \n
+	- in queue and then joining party ?
+	- sending hash to front ?
 
 
 // RANKING AND ELO
