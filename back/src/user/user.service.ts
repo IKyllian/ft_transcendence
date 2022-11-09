@@ -35,9 +35,7 @@ export class UserService {
 	}
 
 	createPending(dto: CreatePendingDto) {
-		const validation_code: string = uuidv4();		
-		const params = {...dto, validation_code};
-		const user = this.pendingUserRepo.create(params);
+		const user = this.pendingUserRepo.create({...dto});
 		return this.pendingUserRepo.save(user);
 	}
 

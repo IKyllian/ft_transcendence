@@ -10,7 +10,6 @@ import { Auth42Dto } from "./dto/auth42.dto";
 import { User } from "src/typeorm";
 import { SignupDto } from "./dto/signup.dto";
 import * as nodemailer from 'nodemailer';
-import { PendingUser } from "src/typeorm/entities/pendingUser";
 import { ActivateDto } from "./dto/activate.dto";
 import { ForgotPasswordDto } from "./dto/forgot-password.dto";
 import { v4 as uuidv4 } from "uuid";
@@ -49,17 +48,23 @@ export class AuthService {
 			throw new ForbiddenException('Email already in use');
 		if (!this.validateEmail(dto.email))
 			throw new ForbiddenException('Invalid email format');
+
 		const hash = await argon.hash(dto.password);
+		const validation_code: string = uuidv4();	
 		const params = {
+			validation_code,
 			username: dto.username,
 			email: dto.email,
 			hash,
 		}
-		const user = await this.userService.createPending(params);
-		this.sendValidationMail(user);
-		return {
-			user: user,
-		}
+
+		const mailResult = await this.sendValidationMail(dto.email, validation_code);
+		if (mailResult?.error)
+			return { error: mailResult.error };
+		
+		await this.userService.createPending(params);
+		
+		return { success: true, email: params.email }
 	}
 
 	async activate(dto: ActivateDto) {
@@ -102,8 +107,19 @@ export class AuthService {
 				{ email: dto.username }
 			]
 		}, true);
-		if (!user) 
+
+		const pending = await this.userService.findOnePending(
+			{ where: [
+				{ username: dto.username },
+				{ email: dto.username }
+			]}
+		);
+
+		if (pending)
+			throw new UnauthorizedException("Email not validated");
+		if (!user)
 			throw new NotFoundException('invalid credentials')
+
 		this.userService.setTwoFactorAuthenticated(user, false);
 
 		const pwdMatches = await argon.verify(
@@ -237,24 +253,23 @@ export class AuthService {
 		return { success: true, message: "logged out successfuly" };
 	}
 
-	private async sendValidationMail(user: PendingUser) {		
+	private async sendValidationMail(email: string, code: string) {		
         const message = {
             from: process.env.MAIL_USER,
-            to: user.email,
+            to: email,
             subject: 'Pong Game - Account verification',
             html: `
             <h3>Account Verification</h3>
 			<p>Hi, you have recently created an account on <b>Pong Game</b></p>
-			<p>To validate your email, please <a href=http://localhost:5000/api/auth/activate?code=${user.validation_code}>Click here</a></p>
+			<p>To validate your email, please <a href=http://localhost:5000/api/auth/activate?code=${code}>Click here</a></p>
             `,
         }
 
-        this.transporter.sendMail(message, function(err, info) {
-            if (err)
-                console.log(err);
-            else
-                console.log(info);
-        });
+		try {
+        	return await this.transporter.sendMail(message);
+		} catch(err) {
+			return { error: err };
+		}
     }
 
 	async forgotPassword(dto: ForgotPasswordDto) {		
