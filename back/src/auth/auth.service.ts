@@ -104,7 +104,8 @@ export class AuthService {
 		}, true);
 		if (!user) 
 			throw new NotFoundException('invalid credentials')
-
+		this.userService.setTwoFactorAuthenticated(user, false);
+		
 		const pwdMatches = await argon.verify(
 			user.hash,
 			dto.password,
