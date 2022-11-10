@@ -1,193 +1,49 @@
-import { useContext, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { SocketContext } from "../../App";
-import { useAppDispatch, useAppSelector } from "../../Redux/Hooks";
-import { PlayersGameData, NewGameData } from "./game/types/shared.types";
+import { useEffect } from "react";
+import { useAppDispatch } from "../../Redux/Hooks";
 import Avatar from "../../Images-Icons/pp.jpg";
-import { IconCheck, IconX, IconPlus, IconChevronUp, IconChevronDown, IconLock } from "@tabler/icons";
-import { GameModeState, GameMode, Player, GameType } from "../../Types/Lobby-Types";
-import { Controller, useForm } from "react-hook-form";
+import { IconCheck, IconPlus, IconChevronUp, IconChevronDown, IconLock } from "@tabler/icons";
+import { GameModeState, GameMode, Player, TeamSide, PlayerPosition } from "../../Types/Lobby-Types";
+import { Controller } from "react-hook-form";
 import { changeModalStatus } from "../../Redux/PartySlice";
-import { partyIsReady } from "../../Utils/Utils-Party";
-
-const defaultGameModeState: GameModeState = {
-    gameModes: [
-        {
-            gameMode: GameMode.RANKED,
-            isLock: false,   
-        },  {
-            gameMode: GameMode.PRIVATE_MATCH,
-            isLock: false,   
-        }, {
-            gameMode: GameMode.BONUS_2v2,
-            isLock: false,   
-        }
-    ],
-    indexSelected: 0,
-}
+import { useLobbyHook } from "../../Hooks/Lobby-Hook";
 
 function Lobby() {
-    const {currentUser} = useAppSelector(state => state.auth)
-    const [loggedUserIsLeader, setLoggedUserIsLeader] = useState<boolean>(false);
-    const { handleSubmit, control, watch } = useForm();
-    const [gameMode, setGameMode] = useState<GameModeState>(defaultGameModeState);
-    const [showDropdown, setShowDropdown] = useState<boolean>(false);
-    const {socket} = useContext(SocketContext);
-    const navigate = useNavigate();
-    const {party, isInQueue} = useAppSelector(state => state.party);
-    const partyReady: boolean = (!party || (party && partyIsReady(party?.players))) ? true : false;
+    const {
+        currentUser,
+        isInQueue,
+        party,
+        gameMode,
+        loggedUserIsLeader,
+        showDropdown,
+        partyReady,
+        formHook,
+        setShowDropdown,
+        onReady,
+        onGameModeChange,
+        settingsFormSubmit,
+        startQueue,
+        cancelQueue,
+        onChangeTeam,
+        onChangePos,
+    } = useLobbyHook();
 
-    useEffect(() => {
-        if (!party || (party && party.players.find(elem => elem.isLeader && elem.user.id === currentUser!.id)))
-            setLoggedUserIsLeader(true);
-        else
-            setLoggedUserIsLeader(false);
-    }, [party])
-
-    const onReady = (isReady: boolean) => {
-        socket?.emit("SetReadyState", {
-            isReady: isReady,
-        });
-    }
-
-    const onGameModeChange = (index: number) => {
-        setGameMode((prev: GameModeState) => {
-            return { ...prev, indexSelected: index };
-        });
-        setShowDropdown(false);
-    }
-
-    const settingsFormSubmit = handleSubmit((data, e) => {
-        e?.preventDefault();
-        console.log("Data", data);
-    })
-
-    const startQueue = () => {
-        socket?.emit("StartQueue", {
-            gameType: GameType.Singles,
-        });
-    }
-
-    const cancelQueue = () => {
-        socket?.emit("StopQueue");
-    }
-
-    useEffect(() => {
-        if (party && party.players.length > 1) {
-            if (party.players.length > 2) {
-                setGameMode((prev: any) => {
-                    return {...prev, indexSelected: 1, gameModes: [...gameMode.gameModes.map(elem => {
-                        if (elem.gameMode === GameMode.RANKED)
-                            return  {...elem, isLock: true };
-                        else if (elem.gameMode === GameMode.BONUS_2v2)
-                            return {...elem, isLock: true };
-                        return elem;
-                    })]}
-                });
-            } else if (party.players.length === 2){
-                setGameMode((prev: any) => {
-                    return {...prev, indexSelected: gameMode.indexSelected === 0 ? 1 : gameMode.indexSelected ,gameModes: [...gameMode.gameModes.map(elem => {
-                        if (elem.gameMode === GameMode.RANKED)
-                            return  {...elem, isLock: true };
-                        else if (elem.gameMode === GameMode.BONUS_2v2)
-                            return  {...elem, isLock: false };
-                        return elem;
-                    })]}
-                });
-            }          
-        }
-    }, [party])
-
-    useEffect(() => {
-        socket?.on("newgame_data", (data: PlayersGameData) => {
-            console.log("new_game_data", data);
-            // let newOject: PlayersGameData | undefined = undefined;
-            // if (data.Player_A_Back === currentUser?.username) {
-            //         newOject = {
-            //             Player_A_Back: {
-            //                 name: data.Player_A_Back,
-            //                 win: 0,
-            //                 loss: 0,
-            //                 avatar: 'avatars/mario.png'
-            //             },
-            //             Player_A_Front:
-            //             {
-            //                 name: '',
-            //                 win: 0,
-            //                 loss: 0,
-            //                 avatar: ''
-            //             },
-            //             Player_B_Front:
-            //             {
-            //                 name: '',
-            //                 win: 0,
-            //                 loss: 0,
-            //                 avatar: ''
-            //             },
-            //             Player_B_Back:
-            //             {
-            //                 name: data.Player_B_Back,
-            //                 win: 0,
-            //                 loss: 0,
-            //                 avatar: 'avatars/luigi.jpeg'
-            //             },
-            //             player_type: 0,
-            //             player_secret: data.Player_A_Back_secret,
-            //             game_id: data.game_id,
-            //             game_settings: data.game_settings,
-            //         }           
-            // } else {
-            //     newOject = {
-            //         Player_A_Back: {
-            //             name: data.Player_A_Back,
-            //             win: 0,
-            //             loss: 0,
-            //             avatar: 'avatars/mario.png'
-            //         },
-            //         Player_A_Front:
-            //         {
-            //             name: '',
-            //             win: 0,
-            //             loss: 0,
-            //             avatar: ''
-            //         },
-            //         Player_B_Front:
-            //         {
-            //             name: '',
-            //             win: 0,
-            //             loss: 0,
-            //             avatar: ''
-            //         },
-            //         Player_B_Back:
-            //         {
-            //             name: data.Player_B_Back,
-            //             win: 0,
-            //             loss: 0,
-            //             avatar: 'avatars/luigi.jpeg'
-            //         },
-            //         player_type: 0,
-            //         player_secret: data.Player_B_Back_secret,
-            //         game_id: data.game_id,
-            //         game_settings: data.game_settings,
-            //     }
-            // }   
-            navigate("/game", {state: data});
-        });
-
-        return () => {
-            socket?.off("newgame_data");
-        }
-    }, [])
     return !isInQueue ? (
         <div className="lobby-container">
             <div className="lobby-wrapper">
                 <ul className="lobby-player-list">
                     {
                         party ? party.players.map((elem) => 
-                            <PlayerListItem key={elem.user.id} user={elem} lobbyLength={party.players.length} gameMode={gameMode.gameModes[gameMode.indexSelected].gameMode} />
+                            <PlayerListItem
+                                key={elem.user.id}
+                                user={elem}
+                                lobbyLength={party.players.length}
+                                gameMode={gameMode.gameModes[gameMode.indexSelected].gameMode}
+                                onChangeTeam={onChangeTeam}
+                                loggedUserId={currentUser?.id}
+                                onChangePos={onChangePos} 
+                            />
                         )
-                        : <PlayerListItem key={currentUser?.id} user={{isLeader: true, isReady: true, user: currentUser!}} lobbyLength={1} />
-                    
+                        : <PlayerListItem key={currentUser?.id} user={{isLeader: true, isReady: true, user: currentUser!, team: TeamSide.BLUE}} lobbyLength={1} />
                     }
                     {
                         Array.from({length:  !party ? 3 : 4 - party.players.length}, (elem, index) => 
@@ -198,14 +54,14 @@ function Lobby() {
                 {
                     gameMode.gameModes[gameMode.indexSelected].gameMode === GameMode.PRIVATE_MATCH &&
                     <div className="lobby-settings">
-                        <GameSettings hookForm={{handleSubmit: settingsFormSubmit, control: control, watch: watch}} />
-                        <BoardGame hookForm={{watch: watch}} />
+                        <GameSettings hookForm={{handleSubmit: settingsFormSubmit, control: formHook.control, watch: formHook.watch}} />
+                        <BoardGame hookForm={{watch: formHook.watch}} />
                     </div>
                 }
                 <LobbyButtonsContainer
                     gameMode={gameMode}
                     onGameModeChange={onGameModeChange}
-                    user={!party ? {isLeader: true, isReady: true, user: currentUser!} : party?.players.find(elem => elem.user.id === currentUser!.id)}
+                    user={!party ? {isLeader: true, isReady: true, user: currentUser!, team: TeamSide.BLUE} : party?.players.find(elem => elem.user.id === currentUser!.id)}
                     onReady={onReady}
                     showDropdown={showDropdown}
                     setShowDropdown={setShowDropdown}
@@ -255,14 +111,14 @@ function BoardGame(props: {hookForm: {watch: any}}) {
     return (
         <div className="setting-wrapper board-game-wrapper">
             <div className="game-board">
-                <div className="paddle-wrapper">
-                    <div className="paddle paddle-left"> </div>
-                    <div className="paddle paddle-left"> </div>
+                <div className="paddle-wrapper left-wrapper">
+                    <div className="paddle paddle-left paddle-back"> </div>
+                    <div className="paddle paddle-left paddle-front"> </div>
                 </div>
                 <div className="ball"> </div>
-                <div className="paddle-wrapper">
-                    <div className="paddle paddle-right"> </div>
-                    <div className="paddle paddle-right"> </div>
+                <div className="paddle-wrapper right-wrapper">
+                    <div className="paddle paddle-right paddle-back"> </div>
+                    <div className="paddle paddle-right paddle-front"> </div>
                 </div>
             </div>
         </div>
@@ -273,85 +129,130 @@ function GameSettings(props: {hookForm: {handleSubmit: any, control: any, watch:
     const { hookForm } = props;
     
     return (
-        <div className=" setting-wrapper game-settings">
+        <div className="setting-wrapper game-settings">
             <p> Settings </p>
             <form onSubmit={(e) => hookForm.handleSubmit(e)}>
-                <div>
-                    <Controller
-                        control={hookForm.control}
-                        name="paddleSize"
-                        defaultValue={150}
-                        render={({ field: { value, onChange }}) => (
-                            <label>
-                                Paddle Size
-                                <input type="range" min={50} max={300} onChange={onChange} value={value} />
-                            </label>
-                            
-                        )}
-                    />
-                    <Controller
-                        control={hookForm.control}
-                        name="playerBackAdvance"
-                        defaultValue={10}
-                        render={({ field: { value, onChange }}) => (
-                            <label>
-                                Player Back Advance
-                                <input type="range" min={10} max={100} onChange={onChange} value={value} />
-                            </label>
-                            
-                        )}
-                    />
-                    <Controller
-                        control={hookForm.control}
-                        name="playerFrontAdvance"
-                        defaultValue={40}
-                        render={({ field: { value, onChange }}) => (
-                            <label>
-                                Player Front Advance
-                                <input type="range" min={40} max={150} onChange={onChange} value={value} />
-                            </label>
-                            
-                        )}
-                    />
-                </div>
-                <button className="setting-submit" type="submit"> submit </button>
+                <Controller
+                    control={hookForm.control}
+                    name="paddleSize"
+                    defaultValue={150}
+                    render={({ field: { value, onChange }}) => (
+                        <label>
+                            Paddle Size
+                            <input type="range" min={10} max={200} onChange={onChange} value={value} />
+                        </label>
+                        
+                    )}
+                />
+                <Controller
+                    control={hookForm.control}
+                    name="playerBackAdvance"
+                    defaultValue={20}
+                    render={({ field: { value, onChange }}) => (
+                        <label>
+                            Player Back Advance
+                            <input type="range" min={10} max={180} onChange={onChange} value={value} />
+                        </label>
+                        
+                    )}
+                />
+                <Controller
+                    control={hookForm.control}
+                    name="playerFrontAdvance"
+                    defaultValue={60}
+                    render={({ field: { value, onChange }}) => (
+                        <label>
+                            Player Front Advance
+                            <input type="range" min={60} max={350} onChange={onChange} value={value} />
+                        </label>
+                        
+                    )}
+                />
+                <Controller
+                    control={hookForm.control}
+                    name="paddleSpeed"
+                    defaultValue={13}
+                    render={({ field: { value, onChange }}) => (
+                        <label>
+                            Paddle Speed
+                            <input type="range" min={5} max={25} onChange={onChange} value={value} />
+                        </label>
+                        
+                    )}
+                />
+                <Controller
+                    control={hookForm.control}
+                    name="ballStartSpeed"
+                    defaultValue={5}
+                    render={({ field: { value, onChange }}) => (
+                        <label>
+                            Ball Start Speed
+                            <input type="range" min={5} max={25} onChange={onChange} value={value} />
+                        </label>
+                        
+                    )}
+                />
+                <Controller
+                    control={hookForm.control}
+                    name="ballAcceleration"
+                    defaultValue={1}
+                    render={({ field: { value, onChange }}) => (
+                        <label>
+                            Ball Acceleration
+                            <input type="range" min={0.5} max={3} onChange={onChange} value={value} />
+                        </label>
+                        
+                    )}
+                />
+                <Controller
+                    control={hookForm.control}
+                    name="pointForVictory"
+                    defaultValue={2}
+                    render={({ field: { value, onChange }}) => (
+                        <label>
+                            Point For Victory
+                            <input type="range" min={1} max={10} onChange={onChange} value={value} />
+                        </label>
+                        
+                    )}
+                />
+                <button className="setting-submit" type="submit"> Submit </button>
             </form>
         </div>
     );
 }
 
-function TeamCircles() {
-    const [team, setTeam] = useState<number>(1);
-    const handleClick = (teamNumber: number) => {
-        if (teamNumber !== team)
-            setTeam(teamNumber);
-    }
+function TeamCircles(props: {user: Player, onChangeTeam: Function}) {
+    const {user, onChangeTeam} = props;
     return (
         <div className="teams-wrapper">
-            <div className={`circle-item team1 ${team === 1 ? "team-active" : ""}`} onClick={() => handleClick(1)}> </div>
-            <div className={`circle-item team2 ${team === 2 ? "team-active" : ""}`} onClick={() => handleClick(2)}> </div>
+            <div className={`circle-item team1 ${user.team === TeamSide.BLUE ? "team-active" : ""}`} onClick={() => onChangeTeam(TeamSide.BLUE, user.user.id)}> </div>
+            <div className={`circle-item team2 ${user.team === TeamSide.RED ? "team-active" : ""}`} onClick={() => onChangeTeam(TeamSide.RED, user.user.id)}> </div>
         </div>
     );
 }
 
-function PlayerListItem(props: {user?: Player, lobbyLength?: number, gameMode?: GameMode}) {
-    const { user, lobbyLength, gameMode } = props;
+function PlayerListItem(props: {user?: Player, lobbyLength?: number, gameMode?: GameMode, onChangeTeam?: Function, loggedUserId?: number, onChangePos?: Function}) {
+    const { user, lobbyLength, gameMode, onChangeTeam, loggedUserId, onChangePos } = props;
     const dispatch = useAppDispatch();
+    const displayTeam: boolean = lobbyLength && (gameMode === GameMode.PRIVATE_MATCH || lobbyLength > 2) ? true : false;
 
+    console.log("User in player list", user);
     return user ? (
-        <li>
-            { lobbyLength && ((lobbyLength === 2 && gameMode === GameMode.PRIVATE_MATCH) || lobbyLength > 2) && <TeamCircles /> }
-            <img className="player-avatar" src={Avatar} alt="profil pic" />
+        <li className={`${displayTeam ? `team-${user.team === TeamSide.BLUE ? "blue" : "red" }` : ""}`} >
+            { displayTeam && onChangeTeam && loggedUserId === user.user.id && <TeamCircles user={user} onChangeTeam={onChangeTeam} /> }
+            <img className={`player-avatar ${displayTeam ? "avatar-shadow" : ""}`} src={Avatar} alt="profil pic" />
             <p> {user.user.username} </p>
             {
-
+                user.user.id === loggedUserId && lobbyLength && onChangePos && lobbyLength > 1 &&
+                <select onChange={(e) => onChangePos(e, user)} value={user.pos === PlayerPosition.BACK ? PlayerPosition.BACK : PlayerPosition.FRONT} className="team-select">
+                    <option value={PlayerPosition.BACK} > Paddle Back </option>
+                    <option value={PlayerPosition.FRONT} > Paddle Front </option>
+                </select>
             }
             {
-                lobbyLength && lobbyLength > 1 && 
-                <select className="team-select">
-                    <option value="back"> Paddle Back </option>
-                    <option value="front"> Paddle Front </option>
-                </select>
+                user.user.id !== loggedUserId &&
+                <p className="player-pos"> {user.pos === PlayerPosition.BACK ? "Paddle Back" : "Paddle Front"} </p>
             }
             { user.isLeader && <span> Leader </span> }
             { !user.isLeader && user.isReady && <span> <IconCheck /> Ready </span> }
@@ -374,10 +275,10 @@ function LobbyButtonsContainer(props: {gameMode: GameModeState, onGameModeChange
     return user ? (
         <div className="lobby-buttons-wrapper">
             <button style={{cursor: "pointer"}}> Party Chat </button>
-            { user.isLeader && partyReady && <button style={{cursor: "pointer"}} onClick={() => startQueue()}> Start Game </button> }
+            { user.isLeader && partyReady && <button className="start-button" onClick={() => startQueue()}> Start Game </button> }
             { user.isLeader && !partyReady && <button> Waiting for players </button> }
-            { !user.isLeader && user.isReady && <button style={{cursor: "pointer"}} onClick={() => onReady(false)}> Not Ready </button> }
-            { !user.isLeader && !user.isReady && <button style={{cursor: "pointer"}} onClick={() => onReady(true)}> Ready </button> }
+            { !user.isLeader && user.isReady && <button className="start-button" onClick={() => onReady(false)}> Not Ready </button> }
+            { !user.isLeader && !user.isReady && <button className="start-button" onClick={() => onReady(true)}> Ready </button> }
             <button style={loggedUserIsLeader ? {cursor: "pointer"} : {}} className={`game-modes-button ${showDropdown ? "bos" : ""}`} onClick={() => gameModeOnclick()}>
                 { gameMode.gameModes[gameMode.indexSelected].gameMode }
                 { showDropdown && loggedUserIsLeader && <IconChevronDown className="chevron-icon" /> }

@@ -12,7 +12,7 @@ import { UserInterface } from "../Types/User-Types";
 import { copyFriendListArray } from "../Redux/AuthSlice";
 import { PartyInterface } from "../Types/Lobby-Types";
 import { copyNotificationArray } from "../Redux/NotificationSlice";
-import { addParty, changeQueueStatus, leaveParty } from "../Redux/PartySlice";
+import { addParty, cancelQueue, changeQueueStatus, leaveParty } from "../Redux/PartySlice";
 
 export function useAppHook() {
     const [socket, setSocket] = useState<Socket | undefined>(undefined);
@@ -44,13 +44,6 @@ export function useAppHook() {
 			connectSocket();
 			fetchNotifications(token, dispatch);
 			fetchFriendList(token, dispatch);
-
-			// setTimeout(function() {
-			// 	setGameInvite(true);
-			// 	setTimeout(function() {
-			// 		gameNotificationLeave();
-			// 	}, 15000);
-			// }, 2000);
 		}
 	}, [isAuthenticated])
 
@@ -69,7 +62,7 @@ export function useAppHook() {
 			socket.on("PartyUpdate", (data: {party: PartyInterface, cancelQueue: boolean}) => {
 				console.log("PartyUpdate", data);
 				dispatch(addParty(data.party));
-				dispatch(changeQueueStatus(data.cancelQueue));
+				dispatch(cancelQueue(data.cancelQueue));
 			});
 
 			socket.on("PartyLeave", () => {
@@ -88,6 +81,9 @@ export function useAppHook() {
 			socket.on("NewPartyInvite", (data: NotificationInterface) => {
 				console.log("NewPartyInvite", data);
 				setGameInvite(data);
+				setTimeout(function() {
+					setGameInvite(undefined);
+				}, 15000);
 			});
 
 			socket.on("DeleteNotification", (data: number) => {

@@ -1,8 +1,8 @@
 @use "./Variables.scss" as *;
 
-$GreyLobby: rgb(163, 158, 158);
+$GreyLobby: rgb(207, 203, 203);
 $TeamBlueColor: rgb(0, 98, 255);
-$TeamRedColor: rgb(215, 38, 18);
+$TeamRedColor: rgb(247, 30, 6);
 
 #root {
     $PaddleHeight: 150px;
@@ -36,6 +36,17 @@ $TeamRedColor: rgb(215, 38, 18);
                     cursor: pointer;
                 }
             }
+            
+            .team-blue {
+                background-color: rgba(0, 98, 255, 0.57);
+                box-shadow: rgba(13, 110, 255, 0.25) 0px 12px 28px 0px, rgba(13, 110, 255, 0.25) 0px 2px 4px 0px, rgba(13, 110, 255, 0.25) 0px 0px 0px 1px inset;
+                border: 1.5px solid $TeamBlueColor
+            }
+            .team-red {
+                background-color: rgba(249, 25, 0, 0.72);
+                box-shadow: rgba(255, 13, 13, 0.25) 0px 12px 28px 0px, rgba(255, 13, 13, 0.25) 0px 2px 4px 0px, rgba(255, 13, 13, 0.25) 0px 0px 0px 1px inset;
+                border: 1.5px solid $TeamRedColor
+            }
 
             li {
                 @include width-height(200px, 200px);
@@ -46,7 +57,6 @@ $TeamRedColor: rgb(215, 38, 18);
                 background-color: #131d30;
                 border-radius: 15px;
                 position: relative;
-
                 .teams-wrapper {
                     position: absolute;
                     right: 10px;
@@ -72,7 +82,10 @@ $TeamRedColor: rgb(215, 38, 18);
                         cursor: pointer
                     }
                 }
-    
+                
+                .avatar-shadow {
+                    box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+                }
                 .player-avatar {
                     @include avatar-player(80px);
                 }
@@ -93,7 +106,11 @@ $TeamRedColor: rgb(215, 38, 18);
                     margin: 5px 0;
                     font-size: 11px;
                 }
-
+                
+                .player-pos {
+                    margin: 10px 0;
+                    font-size: 10px;
+                }
     
                 span {
                     @include flex-row-alignCenter();
@@ -120,29 +137,33 @@ $TeamRedColor: rgb(215, 38, 18);
             .game-settings {
                 @include width-height(350px, 350px);
                 padding: 10px;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-around;
     
                 p {
                     text-align: center;
-                    margin: 10px 0;
+                    margin: 0;
                 }
     
                 form {
-                    height: 85%;
                     display: flex;
                     flex-direction: column;
                     justify-content: space-between;
-                    gap: 10px;
+                    gap: 5px;
+
                     label {
                         @include flex-row-alignCenter();
                         justify-content: space-between;
+                        font-size: 13px;
                     }
 
                     .setting-submit {
                         all: unset;
                         cursor: pointer;
-                        margin: 0 auto;
+                        margin: 15px auto 0 auto;
                         border: 1px solid white;
-                        padding: 8px;
+                        padding: 5px;
                         border-radius: 7px;
                     }
                 }
@@ -150,7 +171,6 @@ $TeamRedColor: rgb(215, 38, 18);
 
             .board-game-wrapper {
                 @include width-height(500px, 350px);
-                padding: 0 var(--PlayerBackAdvance);
 
                 .game-board {
                     height: 100%;
@@ -161,9 +181,29 @@ $TeamRedColor: rgb(215, 38, 18);
                     overflow: hidden;
                     position: relative;
 
+                    .left-wrapper {
+                        .paddle-front {
+                            left: var(--PlayerFrontAdvance);
+                        }
+
+                        .paddle-back {
+                            left: var(--PlayerBackAdvance);
+                        }
+                    }
+
+                    .right-wrapper {
+                        .paddle-front {
+                            right: var(--PlayerFrontAdvance);
+                        }
+
+                        .paddle-back {
+                            right: var(--PlayerBackAdvance);
+                        }
+                    }
+
                     .paddle-wrapper {
                         @include flex-row-alignCenter();
-                        gap: var(--PlayerFrontAdvance);
+                        position: relative;
                         .paddle-left {
                             background-color: $TeamBlueColor;
                         }
@@ -175,6 +215,7 @@ $TeamRedColor: rgb(215, 38, 18);
                         .paddle {
                             height: var(--PaddleHeight);
                             width: 2px;
+                            position: absolute;
                         }
                     }
 
@@ -197,6 +238,10 @@ $TeamRedColor: rgb(215, 38, 18);
             gap: 10px;
             justify-content: center;
             position: relative;
+
+            .start-button {
+                cursor: pointer;
+            }
 
             .game-modes-dropdown {
                 position: absolute;
@@ -258,7 +303,6 @@ $TeamRedColor: rgb(215, 38, 18);
 
             button {
                 all: unset;
-                // cursor: pointer;
                 text-align: center;
                 border-radius: 10px;
                 background-color: $DarkPalette;
