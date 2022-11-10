@@ -26,8 +26,8 @@ export enum TeamSide {
 }
 
 export enum PlayerPosition {
-	FRONT,
 	BACK,
+    FRONT,
 }
 
 export type GameSettings =
@@ -64,5 +64,5 @@ export interface Player {
 export interface PartyInterface {
 	id: string,
 	players: Player[],
-	gameSetting: GameSettings,
+	game_settings: GameSettings,
 }

@@ -25,29 +25,32 @@ const defaultGameModeState: GameModeState = {
     indexSelected: 0,
 }
 
-interface GameSettingsString
-{
-    up_down_border: string,
-    player_back_advance: string,
-    player_front_advance: string,
-    paddle_size_h: string,
-    paddle_speed: string,
-    ball_start_speed: string,
-    ball_acceleration: string,
-    point_for_victory: string,
+const defaultSettings: GameSettings = {
+    game_type: GameType.Singles,
+    up_down_border: 20, 
+    player_back_advance: 20,
+    player_front_advance: 60,
+    paddle_size_h: 150, 
+    paddle_speed: 13,
+    ball_start_speed: 5,
+    ball_acceleration: 1,
+    point_for_victory: 2,
 }
 
 export function useLobbyHook() {
+    const {party, isInQueue} = useAppSelector(state => state.party);
     const {currentUser, token} = useAppSelector(state => state.auth)
     const [loggedUserIsLeader, setLoggedUserIsLeader] = useState<boolean>(false);
-    const { handleSubmit, control, watch } = useForm<GameSettingsString>();
+    const { handleSubmit, control, watch, setValue, getValues, formState } = useForm<GameSettings>({defaultValues: !party ? defaultSettings : party.game_settings});
     const [gameMode, setGameMode] = useState<GameModeState>(defaultGameModeState);
     const [showDropdown, setShowDropdown] = useState<boolean>(false);
     const {socket} = useContext(SocketContext);
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
-    const {party, isInQueue} = useAppSelector(state => state.party);
     const partyReady: boolean = (!party || (party && partyIsReady(party?.players))) ? true : false;
+
+    console.log("party", party);
+    
 
     useEffect(() => {
         if (!party || (party && party.players.find(elem => elem.isLeader && elem.user.id === currentUser!.id)))
@@ -55,6 +58,10 @@ export function useLobbyHook() {
         else
             setLoggedUserIsLeader(false);
     }, [party])
+
+    // useEffect(() => {
+    //     setValue
+    // }, [party?.game_settings])
 
     const onReady = (isReady: boolean) => {
         socket?.emit("SetReadyState", {
@@ -69,25 +76,17 @@ export function useLobbyHook() {
         setShowDropdown(false);
     }
 
-    const settingsFormSubmit = handleSubmit((data: GameSettingsString, e) => {
+    const settingsFormSubmit = handleSubmit((data: GameSettings, e) => {
         e?.preventDefault();
-        console.log("Data", data);
         const gameSettings: GameSettings & {is_ranked :boolean} = {
-            game_type: selectGameMode(),
-            up_down_border: parseInt(data.up_down_border),
-            player_back_advance: parseInt(data.player_back_advance),
-            player_front_advance: parseInt(data.player_front_advance),
-            paddle_size_h: parseInt(data.paddle_size_h),
-            paddle_speed: parseInt(data.paddle_speed),
-            ball_start_speed: parseInt(data.ball_start_speed),
-            ball_acceleration: parseInt(data.ball_acceleration),
-            point_for_victory: parseInt(data.point_for_victory),
-            is_ranked: gameMode.gameModes[gameMode.indexSelected].gameMode === GameMode.RANKED ? true : false,
+            ...data, game_type: selectGameMode(), is_ranked: gameMode.gameModes[gameMode.indexSelected].gameMode === GameMode.RANKED ? true : false,
         }
-        socket?.emit("SetSettings", {
-            settings: gameSettings,
-        });
+        socket?.emit("SetSettings", gameSettings);
     })
+
+    const onInputChange = (e: any, field: any) => {
+        setValue(field, parseInt(e.target.value));
+    }
 
     const startCheck = () : boolean => {
         if (party && !party.players.find(elem => elem.isLeader === false && elem.isReady === false)) {
@@ -226,8 +225,11 @@ export function useLobbyHook() {
         partyReady,
         formHook : {
             watch,
-            control
+            control,
+            setValue,
+            getValues,
         },
+        onInputChange,
         setShowDropdown,
         onReady,
         onGameModeChange,

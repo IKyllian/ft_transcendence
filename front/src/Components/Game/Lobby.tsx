@@ -2,8 +2,8 @@ import { useEffect } from "react";
 import { useAppDispatch } from "../../Redux/Hooks";
 import Avatar from "../../Images-Icons/pp.jpg";
 import { IconCheck, IconPlus, IconChevronUp, IconChevronDown, IconLock } from "@tabler/icons";
-import { GameModeState, GameMode, Player, TeamSide, PlayerPosition } from "../../Types/Lobby-Types";
-import { Controller } from "react-hook-form";
+import { GameModeState, GameMode, Player, TeamSide, PlayerPosition, GameSettings } from "../../Types/Lobby-Types";
+import { Controller, UseFormGetValues } from "react-hook-form";
 import { changeModalStatus } from "../../Redux/PartySlice";
 import { useLobbyHook } from "../../Hooks/Lobby-Hook";
 
@@ -17,6 +17,7 @@ function Lobby() {
         showDropdown,
         partyReady,
         formHook,
+        onInputChange,
         setShowDropdown,
         onReady,
         onGameModeChange,
@@ -54,7 +55,7 @@ function Lobby() {
                 {
                     gameMode.gameModes[gameMode.indexSelected].gameMode === GameMode.PRIVATE_MATCH &&
                     <div className="lobby-settings">
-                        <GameSettings hookForm={{handleSubmit: settingsFormSubmit, control: formHook.control, watch: formHook.watch}} />
+                        <GameSettingsWrapper hookForm={{handleSubmit: settingsFormSubmit, control: formHook.control, watch: formHook.watch, getValues: formHook.getValues}} onInputChange={onInputChange} />
                         <BoardGame hookForm={{watch: formHook.watch}} />
                     </div>
                 }
@@ -125,8 +126,8 @@ function BoardGame(props: {hookForm: {watch: any}}) {
     );
 }
 
-function GameSettings(props: {hookForm: {handleSubmit: any, control: any, watch: any}}) {
-    const { hookForm } = props;
+function GameSettingsWrapper(props: {hookForm: {handleSubmit: any, control: any, watch: any, getValues: UseFormGetValues<GameSettings>}, onInputChange: Function}) {
+    const { hookForm, onInputChange } = props;
     
     return (
         <div className="setting-wrapper game-settings">
@@ -135,11 +136,11 @@ function GameSettings(props: {hookForm: {handleSubmit: any, control: any, watch:
                 <Controller
                     control={hookForm.control}
                     name="paddle_size_h"
-                    defaultValue={150}
-                    render={({ field: { value, onChange }}) => (
+                    defaultValue={hookForm.getValues("paddle_size_h")}
+                    render={({ field: { value }}) => (
                         <label>
                             Paddle Size
-                            <input type="range" min={10} max={200} onChange={onChange} value={value} />
+                            <input type="range" min={10} max={200} onChange={(e) => onInputChange(e, "paddle_size_h")} value={value} />
                         </label>
                         
                     )}
@@ -147,11 +148,11 @@ function GameSettings(props: {hookForm: {handleSubmit: any, control: any, watch:
                 <Controller
                     control={hookForm.control}
                     name="player_back_advance"
-                    defaultValue={20}
-                    render={({ field: { value, onChange }}) => (
+                    defaultValue={hookForm.getValues().player_back_advance}
+                    render={({ field: { value }}) => (
                         <label>
                             Player Back Advance
-                            <input type="range" min={10} max={180} onChange={onChange} value={value} />
+                            <input type="range" min={10} max={180} onChange={(e) => onInputChange(e, "player_back_advance")} value={value} />
                         </label>
                         
                     )}
@@ -159,11 +160,11 @@ function GameSettings(props: {hookForm: {handleSubmit: any, control: any, watch:
                 <Controller
                     control={hookForm.control}
                     name="player_front_advance"
-                    defaultValue={60}
-                    render={({ field: { value, onChange }}) => (
+                    defaultValue={hookForm.getValues("player_front_advance")}
+                    render={({ field: { value }}) => (
                         <label>
                             Player Front Advance
-                            <input type="range" min={60} max={350} onChange={onChange} value={value} />
+                            <input type="range" min={60} max={350} onChange={(e) => onInputChange(e, "player_front_advance")} value={value} />
                         </label>
                         
                     )}
@@ -171,11 +172,11 @@ function GameSettings(props: {hookForm: {handleSubmit: any, control: any, watch:
                 <Controller
                     control={hookForm.control}
                     name="paddle_speed"
-                    defaultValue={13}
-                    render={({ field: { value, onChange }}) => (
+                    defaultValue={hookForm.getValues("paddle_speed")}
+                    render={({ field: { value }}) => (
                         <label>
                             Paddle Speed
-                            <input type="range" min={5} max={25} onChange={onChange} value={value} />
+                            <input type="range" min={5} max={25} onChange={(e) => onInputChange(e, "paddle_speed")} value={value} />
                         </label>
                         
                     )}
@@ -183,11 +184,11 @@ function GameSettings(props: {hookForm: {handleSubmit: any, control: any, watch:
                 <Controller
                     control={hookForm.control}
                     name="ball_start_speed"
-                    defaultValue={5}
-                    render={({ field: { value, onChange }}) => (
+                    defaultValue={hookForm.getValues("ball_start_speed")}
+                    render={({ field: { value }}) => (
                         <label>
                             Ball Start Speed
-                            <input type="range" min={5} max={25} onChange={onChange} value={value} />
+                            <input type="range" min={5} max={25} onChange={(e) => onInputChange(e, "ball_start_speed")} value={value} />
                         </label>
                         
                     )}
@@ -195,11 +196,11 @@ function GameSettings(props: {hookForm: {handleSubmit: any, control: any, watch:
                 <Controller
                     control={hookForm.control}
                     name="ball_acceleration"
-                    defaultValue={1}
-                    render={({ field: { value, onChange }}) => (
+                    defaultValue={hookForm.getValues("ball_acceleration")}
+                    render={({ field: { value }}) => (
                         <label>
                             Ball Acceleration
-                            <input type="range" min={0.5} max={3} onChange={onChange} value={value} />
+                            <input type="range" min={0.5} max={3} onChange={(e) => onInputChange(e, "ball_acceleration")} value={value} />
                         </label>
                         
                     )}
@@ -207,11 +208,11 @@ function GameSettings(props: {hookForm: {handleSubmit: any, control: any, watch:
                 <Controller
                     control={hookForm.control}
                     name="point_for_victory"
-                    defaultValue={2}
-                    render={({ field: { value, onChange }}) => (
+                    defaultValue={hookForm.getValues("point_for_victory")}
+                    render={({ field: { value }}) => (
                         <label>
                             Point For Victory
-                            <input type="range" min={1} max={10} onChange={onChange} value={value} />
+                            <input type="range" min={1} max={10} onChange={(e) => onInputChange(e, "point_for_victory")} value={value} />
                         </label>
                         
                     )}
@@ -237,7 +238,6 @@ function PlayerListItem(props: {user?: Player, lobbyLength?: number, gameMode?: 
     const dispatch = useAppDispatch();
     const displayTeam: boolean = lobbyLength && (gameMode === GameMode.PRIVATE_MATCH || lobbyLength > 2) ? true : false;
 
-    console.log("User in player list", user);
     return user ? (
         <li className={`${displayTeam ? `team-${user.team === TeamSide.BLUE ? "blue" : "red" }` : ""}`} >
             { displayTeam && onChangeTeam && loggedUserId === user.user.id && <TeamCircles user={user} onChangeTeam={onChangeTeam} /> }
