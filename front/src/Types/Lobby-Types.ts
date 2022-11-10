@@ -40,7 +40,7 @@ export type GameSettings =
     paddle_speed: number,
     ball_start_speed: number,
     ball_acceleration: number,
-    point_for_victory: number
+    point_for_victory: number,
 }
 
 export interface ModeState {

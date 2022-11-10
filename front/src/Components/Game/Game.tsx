@@ -15,7 +15,8 @@ function Game() {
     useEffect(() => {
         if (location && location.state) {
             const locationState = location.state as PlayersGameData;
-            const gameSocket = io(`${socketUrl}/game`, {extraHeaders: {
+            console.log("locationState", locationState);
+            const gameSocket = io(`${socketUrl}`, {extraHeaders: {
                 "Authorization": `Bearer ${token}`,
             }});
             console.log("gameSocket", gameSocket);

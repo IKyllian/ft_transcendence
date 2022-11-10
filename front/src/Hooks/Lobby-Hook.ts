@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { SocketContext } from "../App";
 import { useAppDispatch, useAppSelector } from "../Redux/Hooks";
 import { PlayersGameData } from "../Components/Game/game/types/shared.types";
-import { GameModeState, GameMode, Player, GameType, TeamSide, PlayerPosition } from "../Types/Lobby-Types";
+import { GameModeState, GameMode, Player, GameType, TeamSide, PlayerPosition, GameSettings } from "../Types/Lobby-Types";
 import { useForm } from "react-hook-form";
 import { changeQueueStatus } from "../Redux/PartySlice";
 import { partyIsReady } from "../Utils/Utils-Party";
@@ -25,10 +25,22 @@ const defaultGameModeState: GameModeState = {
     indexSelected: 0,
 }
 
+interface GameSettingsString
+{
+    up_down_border: string,
+    player_back_advance: string,
+    player_front_advance: string,
+    paddle_size_h: string,
+    paddle_speed: string,
+    ball_start_speed: string,
+    ball_acceleration: string,
+    point_for_victory: string,
+}
+
 export function useLobbyHook() {
     const {currentUser, token} = useAppSelector(state => state.auth)
     const [loggedUserIsLeader, setLoggedUserIsLeader] = useState<boolean>(false);
-    const { handleSubmit, control, watch } = useForm();
+    const { handleSubmit, control, watch } = useForm<GameSettingsString>();
     const [gameMode, setGameMode] = useState<GameModeState>(defaultGameModeState);
     const [showDropdown, setShowDropdown] = useState<boolean>(false);
     const {socket} = useContext(SocketContext);
@@ -57,9 +69,24 @@ export function useLobbyHook() {
         setShowDropdown(false);
     }
 
-    const settingsFormSubmit = handleSubmit((data, e) => {
+    const settingsFormSubmit = handleSubmit((data: GameSettingsString, e) => {
         e?.preventDefault();
         console.log("Data", data);
+        const gameSettings: GameSettings & {is_ranked :boolean} = {
+            game_type: selectGameMode(),
+            up_down_border: parseInt(data.up_down_border),
+            player_back_advance: parseInt(data.player_back_advance),
+            player_front_advance: parseInt(data.player_front_advance),
+            paddle_size_h: parseInt(data.paddle_size_h),
+            paddle_speed: parseInt(data.paddle_speed),
+            ball_start_speed: parseInt(data.ball_start_speed),
+            ball_acceleration: parseInt(data.ball_acceleration),
+            point_for_victory: parseInt(data.point_for_victory),
+            is_ranked: gameMode.gameModes[gameMode.indexSelected].gameMode === GameMode.RANKED ? true : false,
+        }
+        socket?.emit("SetSettings", {
+            settings: gameSettings,
+        });
     })
 
     const startCheck = () : boolean => {

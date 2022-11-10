@@ -81,9 +81,9 @@ function Lobby() {
 
 function BoardGame(props: {hookForm: {watch: any}}) {
     const { hookForm } = props;
-    const paddleSize = hookForm.watch("paddleSize");
-    const playerBackAdvance = hookForm.watch("playerBackAdvance");
-    const playerFrontAdvance = hookForm.watch("playerFrontAdvance");
+    const paddleSize = hookForm.watch("paddle_size_h");
+    const playerBackAdvance = hookForm.watch("player_back_advance");
+    const playerFrontAdvance = hookForm.watch("player_front_advance");
 
 
     console.log("paddleSize", paddleSize);
@@ -134,7 +134,7 @@ function GameSettings(props: {hookForm: {handleSubmit: any, control: any, watch:
             <form onSubmit={(e) => hookForm.handleSubmit(e)}>
                 <Controller
                     control={hookForm.control}
-                    name="paddleSize"
+                    name="paddle_size_h"
                     defaultValue={150}
                     render={({ field: { value, onChange }}) => (
                         <label>
@@ -146,7 +146,7 @@ function GameSettings(props: {hookForm: {handleSubmit: any, control: any, watch:
                 />
                 <Controller
                     control={hookForm.control}
-                    name="playerBackAdvance"
+                    name="player_back_advance"
                     defaultValue={20}
                     render={({ field: { value, onChange }}) => (
                         <label>
@@ -158,7 +158,7 @@ function GameSettings(props: {hookForm: {handleSubmit: any, control: any, watch:
                 />
                 <Controller
                     control={hookForm.control}
-                    name="playerFrontAdvance"
+                    name="player_front_advance"
                     defaultValue={60}
                     render={({ field: { value, onChange }}) => (
                         <label>
@@ -170,7 +170,7 @@ function GameSettings(props: {hookForm: {handleSubmit: any, control: any, watch:
                 />
                 <Controller
                     control={hookForm.control}
-                    name="paddleSpeed"
+                    name="paddle_speed"
                     defaultValue={13}
                     render={({ field: { value, onChange }}) => (
                         <label>
@@ -182,7 +182,7 @@ function GameSettings(props: {hookForm: {handleSubmit: any, control: any, watch:
                 />
                 <Controller
                     control={hookForm.control}
-                    name="ballStartSpeed"
+                    name="ball_start_speed"
                     defaultValue={5}
                     render={({ field: { value, onChange }}) => (
                         <label>
@@ -194,7 +194,7 @@ function GameSettings(props: {hookForm: {handleSubmit: any, control: any, watch:
                 />
                 <Controller
                     control={hookForm.control}
-                    name="ballAcceleration"
+                    name="ball_acceleration"
                     defaultValue={1}
                     render={({ field: { value, onChange }}) => (
                         <label>
@@ -206,7 +206,7 @@ function GameSettings(props: {hookForm: {handleSubmit: any, control: any, watch:
                 />
                 <Controller
                     control={hookForm.control}
-                    name="pointForVictory"
+                    name="point_for_victory"
                     defaultValue={2}
                     render={({ field: { value, onChange }}) => (
                         <label>
