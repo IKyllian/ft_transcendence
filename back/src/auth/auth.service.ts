@@ -48,9 +48,9 @@ export class AuthService {
 			.createQueryBuilder("user")
 			.addSelect('user.hash')
 			.where("LOWER(user.username) = :name", { name: dto.username.toLowerCase() })
-			.innerJoinAndSelect("user.channelUser", "ChannelUser")
-			.innerJoinAndSelect("ChannelUser.channel", "Channel")
-			.innerJoinAndSelect("user.statistic", "Statistic")
+			.leftJoinAndSelect("user.channelUser", "ChannelUser")
+			.leftJoinAndSelect("ChannelUser.channel", "Channel")
+			.leftJoinAndSelect("user.statistic", "Statistic")
 			.leftJoinAndSelect("user.blocked", "Blocked")
 			.getOne();
 

@@ -57,7 +57,7 @@ export class TaskService {
 	adjustLobbyEloRange(queue: QueueLobbby[], serverRange: EloRange) {
 		queue.forEach((party) => {
 			const timeInQueue: number = (Date.now() - party.timeInQueue) / 1000;
-			console.log(timeInQueue, this.queueService.queue1v1.length);
+			// console.log(timeInQueue, this.queueService.queue1v1.length);
 			if (timeInQueue > 120)
 				party.range = serverRange.max;
 			else if (timeInQueue > 60)
@@ -71,6 +71,7 @@ export class TaskService {
 
 	@Interval('singles-queue', 3000)
 	async handleSinglesQueue() {
+		if (this.queueService.queue1v1.length < 2) { return; }
 		let matchFound: MatchmakingLobby[] = [];
 		this.queueService.queue1v1.sort((a, b) => a.averageMmr - b.averageMmr);
 		const range: EloRange = this.setServerRange(this.queueService.queue1v1.length);
@@ -82,7 +83,6 @@ export class TaskService {
 				&& mmrDiff <= this.queueService.queue1v1[j].range) {
 
 					matchFound.push(new MatchmakingLobby(this.queueService.queue1v1[i], this.queueService.queue1v1[j], new SettingsFactory().defaultSetting(GameType.Singles)));
-
 					this.queueService.queue1v1 = this.queueService.queue1v1.filter((party) => 
 					party.id !== this.queueService.queue1v1[i].id && party.id !== this.queueService.queue1v1[j].id);
 					console.log("GAME FOUND")
@@ -95,6 +95,7 @@ export class TaskService {
 
 	@Interval('doubles-queue', 3000)
 	async handleDoublesQueue() {
+		if (this.queueService.queue2v2.length < 4) { return; }
 		let matchFound: MatchmakingLobby[] = [];
 		let potentialLobby: QueueLobbby[] = [];
 		this.queueService.queue2v2.sort((a, b) => a.averageMmr - b.averageMmr);
@@ -117,13 +118,13 @@ export class TaskService {
 							}
 						});
 						if (!pair) {
-							let soloLobby: QueueLobbby = JSON.parse(JSON.stringify(this.queueService.queue2v2[i]));
+							let soloLobby: QueueLobbby = JSON.parse(JSON.stringify(this.queueService.queue2v2[j]));
 							potentialLobby.push(soloLobby);
 						}
 					} else if (this.queueService.queue2v2[j].players.length > 1) {
 						potentialLobby.push(this.queueService.queue2v2[j]);
 					}
-					if (potentialLobby.length > 1 && potentialLobby[1].players.length > 1) {
+					if (potentialLobby.length == 2 && potentialLobby[0].players.length === 2 && potentialLobby[1].players.length === 2) {
 						potentialLobby.forEach((lobby) => {
 							lobby.players.forEach((player) => this.queueService.leaveQueue(player.user));
 						})

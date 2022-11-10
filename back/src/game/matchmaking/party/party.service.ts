@@ -4,7 +4,7 @@ import { Player } from "../../player";
 import { PartyJoinedSessionManager } from "./party.session";
 import { Party } from "./party";
 import { GlobalService } from "src/utils/global/global.service";
-import { GameType, PlayerPosition, TeamSide } from "src/utils/types/game.types";
+import { GameMode, GameType, PlayerPosition, TeamSide } from "src/utils/types/game.types";
 import { SettingDto } from "../dto/game-settings.dto";
 import { LobbyFactory } from "src/game/lobby/lobby.factory";
 import { MatchmakingLobby } from "../matchmakingLobby";
@@ -22,6 +22,7 @@ export class PartyService {
 	}
 
 	emitPartyUpdate(party: Party, cancelQueue = false) {
+		console.log("in Party update")
 		party.players.forEach((player) => {
 			this.globalService.server.to(`user-${player.user.id}`).emit('PartyUpdate', { party, cancelQueue });
 		})
@@ -46,6 +47,7 @@ export class PartyService {
 		const party = this.partyJoined.getParty(requesterId);
 		if (!party) { throw new NotFoundException('party not found'); }
 		party.join(user);
+		console.log('joining Party', user.username)
 		this.partyJoined.setParty(user.id, party);
 		this.emitPartyUpdate(party);
 	}
@@ -107,27 +109,43 @@ export class PartyService {
 
 	setSettings(user: User, settings: SettingDto) {
 		const party = this.partyJoined.getParty(user.id);
-		if (party) {
+		if (party && this.getPlayerInParty(user.id, party.players).isLeader) {
 			party.game_settings = settings;
 			this.emitPartyUpdate(party);
 		}
 	}
 
-	setCustomGame(user: User, game_mode: GameType) {
+	setCustomGame(user: User, game_type: GameType) {
 		const party = this.partyJoined.getParty(user.id);
 		if (!party) {
 			throw new BadRequestException("You don't have friends :(");
 		}
 		this.partyIsReady(party);
-		const maxPlayers: number = game_mode === GameType.Singles ? 2 : 4;
+		if (!this.getPlayerInParty(user.id, party.players).isLeader) {
+			throw new BadRequestException('You are not leader');
+		}
+
+		const maxPlayers: number = game_type === GameType.Singles ? 2 : 4;
 		if (party.players.length > maxPlayers) {
 			throw new BadRequestException("Too many players for this mode");
 		}
 		party.game_settings.is_ranked = false;
+		party.game_settings.game_type = game_type;
 		let redTeam: Player[] = party.players.filter((player) => player.team === TeamSide.RED);
 		let blueTeam: Player[] = party.players.filter((player) => player.team === TeamSide.BLUE);
 		const match = new MatchmakingLobby({ id: 'blue', players: blueTeam }, { id: 'red', players: redTeam }, party.game_settings);
+		console.log("match", match);
 		this.lobbyFactory.lobby_create(match);
+	}
+
+	setGameMode(user: User, game_mode: GameMode) {
+		const party = this.partyJoined.getParty(user.id);
+		if (party) {
+			party.game_mode = game_mode;
+			party.players.forEach((player) => {
+				this.globalService.server.to(`user-${player.user.id}`).emit('GameModeUpdate', party.game_mode);
+			})
+		}
 	}
 
 }
