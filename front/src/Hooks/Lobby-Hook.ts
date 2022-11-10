@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { SocketContext } from "../App";
 import { useAppDispatch, useAppSelector } from "../Redux/Hooks";
 import { PlayersGameData } from "../Components/Game/game/types/shared.types";
-import { GameModeState, GameMode, Player, GameType, TeamSide, PlayerPosition } from "../Types/Lobby-Types";
+import { GameModeState, GameMode, Player, GameType, TeamSide, PlayerPosition, GameSettings } from "../Types/Lobby-Types";
 import { useForm } from "react-hook-form";
 import { changeQueueStatus } from "../Redux/PartySlice";
 import { partyIsReady } from "../Utils/Utils-Party";
@@ -25,17 +25,32 @@ const defaultGameModeState: GameModeState = {
     indexSelected: 0,
 }
 
+const defaultSettings: GameSettings = {
+    game_type: GameType.Singles,
+    up_down_border: 20, 
+    player_back_advance: 20,
+    player_front_advance: 60,
+    paddle_size_h: 150, 
+    paddle_speed: 13,
+    ball_start_speed: 5,
+    ball_acceleration: 1,
+    point_for_victory: 2,
+}
+
 export function useLobbyHook() {
+    const {party, isInQueue} = useAppSelector(state => state.party);
     const {currentUser, token} = useAppSelector(state => state.auth)
     const [loggedUserIsLeader, setLoggedUserIsLeader] = useState<boolean>(false);
-    const { handleSubmit, control, watch } = useForm();
+    const { handleSubmit, control, watch, setValue, getValues, formState } = useForm<GameSettings>({defaultValues: !party ? defaultSettings : party.game_settings});
     const [gameMode, setGameMode] = useState<GameModeState>(defaultGameModeState);
     const [showDropdown, setShowDropdown] = useState<boolean>(false);
     const {socket} = useContext(SocketContext);
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
-    const {party, isInQueue} = useAppSelector(state => state.party);
     const partyReady: boolean = (!party || (party && partyIsReady(party?.players))) ? true : false;
+
+    console.log("party", party);
+    
 
     useEffect(() => {
         if (!party || (party && party.players.find(elem => elem.isLeader && elem.user.id === currentUser!.id)))
@@ -43,6 +58,10 @@ export function useLobbyHook() {
         else
             setLoggedUserIsLeader(false);
     }, [party])
+
+    // useEffect(() => {
+    //     setValue
+    // }, [party?.game_settings])
 
     const onReady = (isReady: boolean) => {
         socket?.emit("SetReadyState", {
@@ -57,10 +76,17 @@ export function useLobbyHook() {
         setShowDropdown(false);
     }
 
-    const settingsFormSubmit = handleSubmit((data, e) => {
+    const settingsFormSubmit = handleSubmit((data: GameSettings, e) => {
         e?.preventDefault();
-        console.log("Data", data);
+        const gameSettings: GameSettings & {is_ranked :boolean} = {
+            ...data, game_type: selectGameMode(), is_ranked: gameMode.gameModes[gameMode.indexSelected].gameMode === GameMode.RANKED ? true : false,
+        }
+        socket?.emit("SetSettings", gameSettings);
     })
+
+    const onInputChange = (e: any, field: any) => {
+        setValue(field, parseInt(e.target.value));
+    }
 
     const startCheck = () : boolean => {
         if (party && !party.players.find(elem => elem.isLeader === false && elem.isReady === false)) {
@@ -199,8 +225,11 @@ export function useLobbyHook() {
         partyReady,
         formHook : {
             watch,
-            control
+            control,
+            setValue,
+            getValues,
         },
+        onInputChange,
         setShowDropdown,
         onReady,
         onGameModeChange,

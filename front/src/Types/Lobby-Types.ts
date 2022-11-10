@@ -26,8 +26,8 @@ export enum TeamSide {
 }
 
 export enum PlayerPosition {
-	FRONT,
 	BACK,
+    FRONT,
 }
 
 export type GameSettings =
@@ -40,7 +40,7 @@ export type GameSettings =
     paddle_speed: number,
     ball_start_speed: number,
     ball_acceleration: number,
-    point_for_victory: number
+    point_for_victory: number,
 }
 
 export interface ModeState {
@@ -64,5 +64,5 @@ export interface Player {
 export interface PartyInterface {
 	id: string,
 	players: Player[],
-	gameSetting: GameSettings,
+	game_settings: GameSettings,
 }
