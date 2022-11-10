@@ -78,35 +78,12 @@ export class FriendshipService {
 	 * @returns List of users who can receive friend request
 	 */
 	async searchUsersToAdd(user: User, dto: SearchDto) {
-		// const friendShipByRequester = this.friendshipRepo
-		// 	.createQueryBuilder("friendship")
-		// 	.select("friendship.addressee.id")
-		// 	.where("friendship.requester.id = :id", { id: user.id })
-		// 	.andWhere("friendship.status != 'declined'")
-
-		// const friendShipByAddressee = this.friendshipRepo
-		// 	.createQueryBuilder("friendship")
-		// 	.select("friendship.requester.id")
-		// 	.where("friendship.addressee.id = :id", { id: user.id })
-		// 	.andWhere("friendship.status = 'declined'")
-
-		// return this.userRepo
-		// 	.createQueryBuilder("user")
-		// 	.where("user.id NOT IN (" + friendShipByRequester.getQuery() + ")")
-		// 	.setParameters(friendShipByRequester.getParameters())
-		// 	.orWhere("user.id NOT IN (" + friendShipByAddressee.getQuery() + ")")
-		// 	.setParameters(friendShipByAddressee.getParameters())
-		// 	.andWhere("LOWER(user.username) LIKE :name", { name: `%${dto.str.toLowerCase()}%` })
-		// 	.getMany()
-
 		const userList = await this.userRepo
 			.createQueryBuilder("user")
 			.where("LOWER(user.username) LIKE :name", { name: `%${dto.str.toLowerCase()}%` })
 			.andWhere("user.id != :userId", { userId: user.id })
 			.take(10)
 			.getMany()
-
-		// console.log(userList)
 
 		let userInfoList = [];
 		for (const userInList of userList) {
@@ -115,7 +92,6 @@ export class FriendshipService {
 			if (relationStatus !== RelationStatus.FRIEND)
 				userInfoList.push({ user: userInList, relationStatus });
 		}
-		console.log(userInfoList)
 		return userInfoList;
 	}
 
@@ -133,33 +109,7 @@ export class FriendshipService {
 		return this.friendshipRepo.save(request);
 	}
 
-	//TODO try with query builder
 	async getFriendlist(user: User) {
-		// const friendRequestAccepted = await this.friendshipRepo.find({
-		// 	relations: {
-		// 		requester: true,
-		// 		addressee: true
-		// 	},
-		// 	where: [
-		// 		{ requester: {
-		// 			id: user.id,
-		// 		}, status: 'accepted' },
-
-		// 		{ addressee: {
-		// 			id: user.id,
-		// 		}, status: 'accepted' },
-		// 	]
-		// });
-		// let friendList: User[] = [];
-		// friendRequestAccepted.forEach((friendship) => {
-		// 	if (friendship.requester.id === user.id) {
-		// 		friendList.push(friendship.addressee);
-		// 	} else {
-		// 		friendList.push(friendship.requester);
-		// 	}
-		// });
-		// return friendList;
-
 		const friendShipByRequester = this.friendshipRepo
 			.createQueryBuilder("friendship")
 			.select("friendship.addressee.id")
