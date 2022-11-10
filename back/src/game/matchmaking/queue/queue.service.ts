@@ -49,7 +49,6 @@ export class QueueService {
 	}
 
 	leaveQueue(user: User) {
-		console.log("leaving")
 		const party = this.partyService.partyJoined.getParty(user.id);
 		if (party) {
 			this.queue1v1 = this.queue1v1.filter((queueing) => queueing.id !== party.id);

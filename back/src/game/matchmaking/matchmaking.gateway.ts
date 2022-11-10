@@ -14,6 +14,7 @@ import { GameType, PlayerPosition, TeamSide } from "src/utils/types/game.types";
 import { notificationType } from "src/utils/types/types";
 import { IsReadyDto } from "./dto/boolean.dto";
 import { SettingDto } from "./dto/game-settings.dto";
+import { StartQueueDto } from "./dto/start-queue.dto";
 import { PartyService } from "./party/party.service";
 import { QueueService } from "./queue/queue.service";
 
@@ -136,7 +137,7 @@ export class MatchmakingGateway implements OnGatewayDisconnect {
 	@SubscribeMessage('SetPlayerPos')
 	setPlayerPos(
 		@GetUser() user: User,
-		@MessageBody() data: { pos: PlayerPosition },
+		@MessageBody() data: { pos: PlayerPosition }, //TODO DTO
 	) {
 		this.partyService.setPlayerPos(user, data.pos);
 	}
@@ -160,9 +161,13 @@ export class MatchmakingGateway implements OnGatewayDisconnect {
 	@SubscribeMessage('StartQueue')
 	startQueue(
 		@GetUser() user: User,
-		@MessageBody() data: { gameType: GameType }
+		@MessageBody() data: StartQueueDto,
 	) {
-		this.queueService.joinQueue(user, data.gameType);
+		if (data.isRanked) {
+			this.queueService.joinQueue(user, data.gameType);
+		} else {
+			this.partyService.setCustomGame(user, data.gameType);
+		}
 	}
 
 	@UseGuards(WsJwtGuard)

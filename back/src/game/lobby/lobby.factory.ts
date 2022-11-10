@@ -2,11 +2,12 @@ import { Server } from 'socket.io';
 import { generate } from 'shortid'
 import { Lobby } from './lobby';
 import { Socket } from 'socket.io';
-import { GameState, GameType, GameSettings, NewGameData, PlayersGameData, PlayerType } from 'src/utils/types/game.types';
+import { GameState, GameType, GameSettings, NewGameData, PlayersGameData, PlayerType, TeamSide, PlayerPosition } from 'src/utils/types/game.types';
 import { AuthenticatedSocket } from 'src/utils/types/auth-socket';
 import { MatchmakingLobby } from '../matchmaking/matchmakingLobby';
 import { GlobalService } from 'src/utils/global/global.service';
 import { Injectable } from '@nestjs/common';
+import { Player } from '../player';
 //import  * as Defaultgame_settings from '../game-settings';
 
 
@@ -31,34 +32,66 @@ export class LobbyFactory
 		const lobby = new Lobby(lobby_request, game_id,  this);
 		this.lobby_list.set(lobby.game_id, lobby);
 
-		let player_data: PlayersGameData =
-		{
-			Player_A_Back: lobby_request.Player_A_Back,
-			Player_B_Back: lobby_request.Player_B_Back,
+		let dataToFront: PlayersGameData = {
 			game_id: game_id,
+			player_type: PlayerType.Spectator,
 			game_settings: lobby_request.game_settings,
-			player_type: PlayerType.Spectator
 		}
 
-		if (lobby_request.game_settings.game_type === GameType.Doubles)
-		{
-			player_data.Player_A_Front = lobby_request.Player_A_Front;
-			player_data.Player_B_Front = lobby_request.Player_B_Front;
-		}
 
-		player_data.player_type = PlayerType.Player_A_Back;
-		this.globalService.server.to('user-' + lobby_request.Player_A_Back.user.id).emit("newgame_data", player_data);
-		player_data.player_type = PlayerType.Player_B_Back;
-		this.globalService.server.to('user-' + lobby_request.Player_B_Back.user.id).emit("newgame_data", player_data);
+		lobby_request.players.forEach((player) => {
+			if (player.team === TeamSide.BLUE) {
+				if (player.pos === PlayerPosition.BACK) {
+					dataToFront.Player_A_Back = player;
+				} else {
+					dataToFront.Player_A_Front = player;
+				}
+			} else {
+				if (player.pos === PlayerPosition.BACK) {
+					dataToFront.Player_B_Back = player;
+				} else {
+					dataToFront.Player_B_Front = player;
+				}
+			}
+		});
 
-		if (lobby_request.game_settings.game_type === GameType.Doubles)
-		{
-			player_data.player_type = PlayerType.Player_A_Front;
-			this.globalService.server.to('user-' + lobby_request.Player_A_Front.user.id).emit("newgame_data", player_data);
+		lobby_request.players.forEach((player) => {
+			if (player.team === TeamSide.BLUE) {
+				if (player.pos === PlayerPosition.BACK) {
+					dataToFront.player_type = PlayerType.Player_A_Back;
+				} else {
+					dataToFront.player_type = PlayerType.Player_A_Front;
+				}
+			} else {
+				if (player.pos === PlayerPosition.BACK) {
+					dataToFront.player_type = PlayerType.Player_B_Back;
+				} else {
+					dataToFront.player_type = PlayerType.Player_B_Front;
+				}
+			}
+			this.globalService.server.to('user-' + player.user.id).emit("newgame_data", dataToFront);
+		});
+		console.log(dataToFront.game_settings)
+
+		// if (lobby_request.game_settings.game_type === GameType.Doubles)
+		// {
+		// 	player_data.Player_A_Front = lobby_request.Player_A_Front;
+		// 	player_data.Player_B_Front = lobby_request.Player_B_Front;
+		// }
+
+		// player_data.player_type = PlayerType.Player_A_Back;
+		// this.globalService.server.to('user-' + lobby_request.Player_A_Back.user.id).emit("newgame_data", player_data);
+		// player_data.player_type = PlayerType.Player_B_Back;
+		// this.globalService.server.to('user-' + lobby_request.Player_B_Back.user.id).emit("newgame_data", player_data);
+
+		// if (lobby_request.game_settings.game_type === GameType.Doubles)
+		// {
+		// 	player_data.player_type = PlayerType.Player_A_Front;
+		// 	this.globalService.server.to('user-' + lobby_request.Player_A_Front.user.id).emit("newgame_data", player_data);
 	
-			player_data.player_type = PlayerType.Player_B_Front;
-			this.globalService.server.to('user-' + lobby_request.Player_B_Front.user.id).emit("newgame_data", player_data);
-		}
+		// 	player_data.player_type = PlayerType.Player_B_Front;
+		// 	this.globalService.server.to('user-' + lobby_request.Player_B_Front.user.id).emit("newgame_data", player_data);
+		// }
 
 //ajouter une ref au lobby dans le return ? 
 //pour acces a this.already_started & this.already_finished

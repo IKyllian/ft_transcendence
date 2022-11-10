@@ -1,8 +1,7 @@
 import 'phaser';
-import { io } from "socket.io-client";
 import ClientSocketManager from '../client.socket.manager';
 import PongCore from '../pong.core';
-import { GameState, Goal, Movement, PlayerInput, PlayerType, BallData, EndResult, RoundSetup, GameType, GameSettings } from '../types/shared.types';
+import { GameState, Goal, Movement, PlayerInput, PlayerType, EndResult, RoundSetup, GameType, GameSettings } from '../types/shared.types';
 
 export default class Pong extends Phaser.Scene
 {
@@ -17,26 +16,22 @@ export default class Pong extends Phaser.Scene
 	game_settings: GameSettings | undefined = undefined;
 	game_type: GameType = GameType.Singles;
 
-
-
-
-	sound_a?: any;
-	sound_b?: any;
-	sound_c?: any;
-	sound_clapping?: any;
-
-
+	// sound_a?: any;
+	// sound_b?: any;
+	// sound_clapping?: any;
 
 	core?: PongCore;
 	game_id?: string;
 
 	//Displayed elements
-	asset_ball?: Phaser.GameObjects.Image;
+	//Images
+	//asset_lag_icon?: Phaser.GameObjects.Image;
+	//Texts
 	asset_scoreboard?: Phaser.GameObjects.Text;
+	//Shapes
 	upper_limit?: Phaser.GameObjects.Shape;
 	lower_limit?: Phaser.GameObjects.Shape;
-	asset_lag_icon?: Phaser.GameObjects.Image;
-
+	asset_ball?: Phaser.GameObjects.Shape;
 	asset_Player_A_Back?: Phaser.GameObjects.Shape;
 	asset_Player_A_Front?: Phaser.GameObjects.Shape;
 	asset_Player_B_Front?: Phaser.GameObjects.Shape;
@@ -87,14 +82,15 @@ export default class Pong extends Phaser.Scene
 	is_lagging: boolean = true;
 	lag_count: number = 0;
 
+//test
+	frame_count: number = 0;
+
 	preload ()
 	{
-		this.load.image('ball', 'assets/black_dot.png');
-		this.load.image('lag_icon', 'assets/lag_icon.png');
+	//	this.load.image('lag_icon', 'assets/lag_icon.png');
 
 		// this.load.audio('sound_a', 'assets/sound/8bit_effect_a.ogg');
 		// this.load.audio('sound_b', 'assets/sound/8bit_effect_b.ogg');
-		// this.load.audio('sound_c', 'assets/sound/8bit_effect_c.ogg');
 		// this.load.audio('clapping', 'assets/sound/clapping.ogg');
 	}
 
@@ -103,31 +99,15 @@ export default class Pong extends Phaser.Scene
 		this.socketmanager = this.registry.get('socketmanager');
 		this.next_round_setup = this.registry.get('round_setup');
 		this.game_id = this.registry.get('players_data').game_id;
-
 		this.game_settings = this.game.registry.get('players_data').game_settings;
-		console.log("setings: ", this.game_settings);
 		this.game_type = this.game.registry.get('players_data').game_settings.game_type;
-
-		if (this.game_settings) {
-			this.core = new PongCore(this.game_settings);
-
-			this.game_state.game_type = this.game.registry.get('players_data').game_settings.game_type;
-			this.game_state.Player_A_Back.x = this.game_settings.player_back_advance;
-			this.game_state.Player_A_Front.x = this.game_settings.player_front_advance;
-			this.game_state.Player_B_Back.x = 800 - this.game_settings.player_back_advance;
-			this.game_state.Player_B_Front.x = 800 - this.game_settings.player_front_advance;
-		}
-
 		this.me = this.game.registry.get('players_data').player_type;
-
+	
 
 		// this.sound_a = this.sound.add('sound_a');
 		// this.sound_b = this.sound.add('sound_b');
-		// this.sound_c = this.sound.add('sound_c');
 		// this.sound_clapping = this.sound.add('clapping');
 	
-
-
 		if (this.socketmanager !== undefined)
 		{
 			this.socketmanager.set_pong_triggers({
@@ -139,39 +119,33 @@ export default class Pong extends Phaser.Scene
 
 		}
 
+		//placing visual elements outside of board for their first instanciation to prevent ghosted visuals
+		// this.asset_lag_icon = this.add.image(10400, 300, 'lag_icon');
+		// this.asset_lag_icon.setAlpha(1);
 
-		if (this.core !== undefined)
+		if (this.game_settings)
 		{
-//console.log('setting triggers for core')
-			// this.core.set_pong_triggers({
+			this.core = new PongCore(this.game_settings);
 
-			// 	// play_sound_a: this.play_sound_a.bind(this),
-			// 	// play_sound_b: this.play_sound_b.bind(this),
-			// 	// play_sound_c: this.play_sound_c.bind(this),
-			// 	// play_sound_clapping: this.play_sound_clapping.bind(this)
-
-
-
-			// });
-		}
-
-		this.asset_ball = this.add.image(400, 300, 'ball');
-		this.asset_lag_icon = this.add.image(400, 300, 'lag_icon');
-		this.asset_lag_icon.setAlpha(1);
-// console.log("paddle h", this.game_settings.paddle_size_h);
-		if (this.game_settings) {
-			this.upper_limit = this.add.rectangle(0, 0, 800, this.game_settings.up_down_border , 0x000000).setOrigin(0,0);
-			this.lower_limit = this.add.rectangle(0, (600 - (this.game_settings.up_down_border)), 800, this.game_settings.up_down_border, 0x000000).setOrigin(0,0);
+			this.game_state.game_type = this.game.registry.get('players_data').game_settings.game_type;
+			this.game_state.Player_A_Back.x = this.game_settings.player_back_advance;
+			this.game_state.Player_A_Front.x = this.game_settings.player_front_advance;
+			this.game_state.Player_B_Back.x = 800 - this.game_settings.player_back_advance;
+			this.game_state.Player_B_Front.x = 800 - this.game_settings.player_front_advance;
+			this.asset_ball = this.add.circle(10400, 300, 5, 0x000000);
+			this.upper_limit = this.add.rectangle(10000, 0, 800, this.game_settings.up_down_border , 0x000000).setOrigin(0,0);
+			this.lower_limit = this.add.rectangle(10000, (600 - (this.game_settings.up_down_border)), 800, this.game_settings.up_down_border, 0x000000).setOrigin(0,0);
 	
-			this.asset_Player_A_Back = this.add.rectangle(this.game_settings.player_back_advance, 300, 10, this.game_settings.paddle_size_h, 0x000000).setOrigin(1,0.5);
-			this.asset_Player_B_Back = this.add.rectangle((600 - this.game_settings.player_back_advance), 300, 10, this.game_settings.paddle_size_h, 0x000000).setOrigin(0,0.5);
+			this.asset_Player_A_Back = this.add.rectangle(10000, 300, 10, this.game_settings.paddle_size_h, 0x000000).setOrigin(1,0.5);
+			this.asset_Player_B_Back = this.add.rectangle((10000), 300, 10, this.game_settings.paddle_size_h, 0x000000).setOrigin(0,0.5);
 	
 			if (this.game_type === GameType.Doubles)
 			{
-				this.asset_Player_A_Front = this.add.rectangle(this.game_settings.player_front_advance, 300, 10, this.game_settings.paddle_size_h, 0x000000).setOrigin(1,0.5);
-				this.asset_Player_B_Front = this.add.rectangle((600 - this.game_settings.player_front_advance), 300, 10, this.game_settings.paddle_size_h, 0x000000).setOrigin(0,0.5);
+				this.asset_Player_A_Front = this.add.rectangle(10000, 300, 10, this.game_settings.paddle_size_h, 0x000000).setOrigin(1,0.5);
+				this.asset_Player_B_Front = this.add.rectangle((10000), 300, 10, this.game_settings.paddle_size_h, 0x000000).setOrigin(0,0.5);
 			
 			}
+			
 		}
 
 		let style: Phaser.Types.GameObjects.Text.TextStyle = 
@@ -183,7 +157,7 @@ export default class Pong extends Phaser.Scene
 
 		let text: string;
 		text = this.game_state.score.Team_A.toString() + " - " + this.game_state.score.Team_B.toString();
-		this.asset_scoreboard = this.add.text(400, 100, text, style)
+		this.asset_scoreboard = this.add.text(10000, 100, text, style);
 
 
 		if (this.me !== PlayerType.Spectator)
@@ -194,7 +168,16 @@ export default class Pong extends Phaser.Scene
 
 		this.socketmanager?.game_get_round_setup(this.game_id!);
 
+		if (this.core !== undefined)
+		{
+			// this.core.set_pong_triggers({
+			// 	sound_event_wall: this.sound_event_wall.bind(this),
+			// 	sound_event_paddle: this.sound_event_paddle.bind(this),
+			// 	sound_event_goal: this.sound_event_goal.bind(this)
+			// });
+		}
 
+		this.place_assets();
 
 		clearInterval(this.update_interval);
 		this.update_interval = setInterval(
@@ -205,8 +188,57 @@ export default class Pong extends Phaser.Scene
 		  1000 / 60);
 	}
 
+
+	place_assets()
+	{
+		if (this.game_settings)
+		{
+			// this.asset_lag_icon!.x = 400;
+			this.asset_ball!.x = 400;
+			this.upper_limit!.x = 0;
+			this.lower_limit!.x = 0;
+
+			this.asset_Player_A_Back!.x = this.game_settings.player_back_advance;
+			this.asset_Player_B_Back!.x = (600 - this.game_settings.player_back_advance); 
+			this.asset_scoreboard!.x = 400;
+			if (this.game_type === GameType.Doubles)
+			{
+				this.asset_Player_A_Front!.x = this.game_settings.player_front_advance;
+				this.asset_Player_B_Front!.x = (600 - this.game_settings.player_front_advance);
+			}
+		}
+	}
+
 	frame_advance()
 	{
+
+		if (this.frame_count === 0)
+		{
+			this.frame_count++;
+		//	this.place_assets();
+			return;
+		}
+		else if (this.frame_count === 1)
+		{
+			this.asset_Player_A_Back!.x = this.game_state.Player_A_Back.x;
+			this.asset_Player_A_Back!.y = this.game_state.Player_A_Back.y;
+			this.asset_Player_B_Back!.x = this.game_state.Player_B_Back.x;
+			this.asset_Player_B_Back!.y = this.game_state.Player_B_Back.y;
+			this.asset_ball!.x = this.game_state.balldata.position.x;
+			this.asset_ball!.y = this.game_state.balldata.position.y;
+
+			if (this.game_type === GameType.Doubles)
+			{
+				this.asset_Player_A_Front!.x = this.game_state.Player_A_Front.x;
+				this.asset_Player_A_Front!.y = this.game_state.Player_A_Front.y;
+				this.asset_Player_B_Front!.x = this.game_state.Player_B_Front.x;
+				this.asset_Player_B_Front!.y = this.game_state.Player_B_Front.y;
+			}
+			this.frame_count++;
+			return;
+		}
+
+
 		if (this.next_round_setup === undefined)
 		{
 			this.socketmanager?.game_get_round_setup(this.game_id!);
@@ -250,7 +282,7 @@ export default class Pong extends Phaser.Scene
 
 			this.input_number++;
 			this.input_stock.push(player_input);
-			this.socketmanager?.game_send_input(this.registry.get('players_data').game_id, player_input);
+			this.socketmanager?.game_send_input(this.game_id!, player_input);
 		}
 
 
@@ -316,7 +348,7 @@ export default class Pong extends Phaser.Scene
 		}
 		else
 		{
-			//no responde from server
+			//no response from server
 			this.lag_count++;
 			if (this.lag_count >= 15)
 			{
@@ -333,19 +365,12 @@ export default class Pong extends Phaser.Scene
 			this.game_state = this.core.get_gamestate();
 		this.past_stock.push(this.game_state);
 
-		// let past_date: Date = new Date();
-		// past_date.setMilliseconds(past_date.getMilliseconds() - 100);
-
 		//Display
 
 		if (this.game_type === GameType.Singles)
-		{
 			this.display_singles();
-		}
 		else
-		{
 			this.display_doubles();
-		}
 
 		if (this.asset_scoreboard !== undefined)
 		{
@@ -354,7 +379,7 @@ export default class Pong extends Phaser.Scene
 			this.asset_scoreboard?.setText(text);
 		}
 
-		this.lag_check();
+//		this.lag_check();
 	}
 
 
@@ -368,43 +393,18 @@ export default class Pong extends Phaser.Scene
 		this.server_stock.push(gamestate);
 	}
 
-	// display_score = () =>
+	// lag_check = () =>
 	// {
-	// 	let text: string;
-	// 	text = this.game_state.score.Team_A.toString() + " - " + this.game_state.score.Team_B.toString();
-
-
-	// 	this.asset_scoreboard?.setText(text);
+	// 	if (this.is_lagging && this.game_state.result === EndResult.Undecided)
+	// 		this.asset_lag_icon!.setAlpha(1);
+	// 	else
+	// 		this.asset_lag_icon!.setAlpha(0);
 	// }
-
-	acknowledge_server_authority = (gamestate: GameState) =>
-	{
-
-	}
-
-	lag_check = () =>
-	{
-		if (this.is_lagging && this.game_state.result === EndResult.Undecided)
-			this.asset_lag_icon!.setAlpha(1);
-		else
-			this.asset_lag_icon!.setAlpha(0);
-	}
-
 
 	game_end = (winner: EndResult) =>
 	{
 		this.game.registry.set('winner', winner);
-//TODO
-//clear l'interval ?
-		// setTimeout(() => { 
-			clearInterval(this.update_interval);
-		// }, 100);
-
-		// setTimeout(() => { 
-		// 	this.scene.start('MatchResult');
-		// //	this.scene.remove('Pong');
-		// }, 500);
-
+		clearInterval(this.update_interval);
 
 		this.time.addEvent({
 			delay: 500,
@@ -485,8 +485,6 @@ export default class Pong extends Phaser.Scene
 			this.past_stock.shift();
 		}
 	}
-
-
 
 	display_doubles = () =>
 	{
@@ -591,120 +589,23 @@ export default class Pong extends Phaser.Scene
 			this.past_stock.shift();
 		}
 
-
 	}
 
-	play_sound_a = () =>
-	{
-		this.sound.stopAll();
-		this.sound_a.play();
-	}
+	// sound_event_wall = () =>
+	// {
+	// 	this.sound.stopAll();
+	// 	this.sound_a.play();
+	// }
 
-	play_sound_b = () =>
-	{
-		this.sound.stopAll();
-		this.sound_b.play();
-	}
+	// sound_event_paddle = () =>
+	// {
+	// 	this.sound.stopAll();
+	// 	this.sound_b.play();
+	// }
 
-	play_sound_c = () =>
-	{
-		this.sound.stopAll();
-		this.sound_c.play();
-	}
-
-	play_sound_clapping = () =>
-	{
-		this.sound.stopAll();
-		this.sound_clapping.play();
-	}
-
+	// sound_event_goal = () =>
+	// {
+	// 	this.sound.stopAll();
+	// 	this.sound_clapping.play();
+	// }
 }
-
-
-
-
-
-/*
-		if (this.me === PlayerType.Player_A_Back)
-		{
-			if ( this.asset_player_A !== undefined
-				&& this.asset_player_B !== undefined
-				&& this.asset_ball !== undefined )
-				{
-					this.asset_player_A.x = this.game_state.player_A.x;
-					this.asset_player_A.y = this.game_state.player_A.y;
-
-					if(new Date(this.past_stock[0].last_processed_time_B).getTime() > past_date.getTime() )
-					{
-						this.asset_player_B.x = this.past_stock[0].player_B.x;
-						this.asset_player_B.y = this.past_stock[0].player_B.y;
-						this.past_stock.shift();
-					}
-					else
-					{
-						this.asset_player_B.x = this.game_state.player_B.x;
-						this.asset_player_B.y = this.game_state.player_B.y;
-					}
-					this.asset_ball.x = this.game_state.balldata.position.x;
-					this.asset_ball.y = this.game_state.balldata.position.y;			
-				}
-		
-
-		}
-		else if (this.me === PlayerType.Player_B)
-		{
-			if ( this.asset_player_A !== undefined
-				&& this.asset_player_B !== undefined
-				&& this.asset_ball !== undefined )
-				{
-					this.asset_player_B.x = this.game_state.player_B.x;
-					this.asset_player_B.y = this.game_state.player_B.y;
-
-					if(new Date(this.past_stock[0].last_processed_time_A).getTime() > past_date.getTime() )
-					{
-						this.asset_player_A.x = this.past_stock[0].player_A.x;
-						this.asset_player_A.y = this.past_stock[0].player_A.y;
-						this.past_stock.shift();
-					}
-					else
-					{
-						this.asset_player_A.x = this.game_state.player_A.x;
-						this.asset_player_A.y = this.game_state.player_A.y;
-					}
-					this.asset_ball.x = this.game_state.balldata.position.x;
-					this.asset_ball.y = this.game_state.balldata.position.y;			
-				}
-		
-
-		}
-		else
-		{
-			if ( this.asset_player_A !== undefined
-				&& this.asset_player_B !== undefined
-				&& this.asset_ball !== undefined )
-				{
-
-					if(new Date(this.past_stock[0].last_processed_time_A).getTime() > past_date.getTime() )
-					{
-						this.asset_player_A.x = this.past_stock[0].player_A.x;
-						this.asset_player_A.y = this.past_stock[0].player_A.y;
-						this.asset_player_B.x = this.past_stock[0].player_B.x;
-						this.asset_player_B.y = this.past_stock[0].player_B.y;
-						this.asset_ball.x = this.past_stock[0].balldata.position.x;
-						this.asset_ball.y = this.past_stock[0].balldata.position.y;
-						this.past_stock.shift();
-					}
-					else
-					{
-						this.asset_player_A.x = this.game_state.player_A.x;
-						this.asset_player_A.y = this.game_state.player_A.y;
-						this.asset_player_B.x = this.game_state.player_B.x;
-						this.asset_player_B.y = this.game_state.player_B.y;
-						this.asset_ball.x = this.game_state.balldata.position.x;
-						this.asset_ball.y = this.game_state.balldata.position.y;			
-					}
-				}
-		
-
-		}
-		*/

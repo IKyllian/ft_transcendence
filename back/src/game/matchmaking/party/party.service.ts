@@ -1,12 +1,10 @@
 import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
-import { Server, Socket } from "socket.io";
 import { User } from "src/typeorm";
 import { Player } from "../../player";
 import { PartyJoinedSessionManager } from "./party.session";
 import { Party } from "./party";
 import { GlobalService } from "src/utils/global/global.service";
-import { PlayerPosition, TeamSide } from "src/utils/types/game.types";
-import { contains } from "class-validator";
+import { GameType, PlayerPosition, TeamSide } from "src/utils/types/game.types";
 import { SettingDto } from "../dto/game-settings.dto";
 import { LobbyFactory } from "src/game/lobby/lobby.factory";
 import { MatchmakingLobby } from "../matchmakingLobby";
@@ -115,15 +113,21 @@ export class PartyService {
 		}
 	}
 
-	setCustomGame(user: User) {
+	setCustomGame(user: User, game_mode: GameType) {
 		const party = this.partyJoined.getParty(user.id);
-		if (party) {
-			this.partyIsReady(party);
-			let redTeam: Player[] = party.players.filter((player) => player.team === TeamSide.RED);
-			let blueTeam: Player[] = party.players.filter((player) => player.team === TeamSide.BLUE);
-			const match = new MatchmakingLobby({ id: 'red', players: redTeam }, { id: 'blue', players: blueTeam }, party.game_settings);
-			this.lobbyFactory.lobby_create(match);
+		if (!party) {
+			throw new BadRequestException("You don't have friends :(");
 		}
+		this.partyIsReady(party);
+		const maxPlayers: number = game_mode === GameType.Singles ? 2 : 4;
+		if (party.players.length > maxPlayers) {
+			throw new BadRequestException("Too many players for this mode");
+		}
+		party.game_settings.is_ranked = false;
+		let redTeam: Player[] = party.players.filter((player) => player.team === TeamSide.RED);
+		let blueTeam: Player[] = party.players.filter((player) => player.team === TeamSide.BLUE);
+		const match = new MatchmakingLobby({ id: 'blue', players: blueTeam }, { id: 'red', players: redTeam }, party.game_settings);
+		this.lobbyFactory.lobby_create(match);
 	}
 
 }

@@ -3,8 +3,8 @@ import { Player } from "src/game/player"
 export enum PlayerType {
 	Player_A_Back,
 	Player_A_Front,
-	Player_B_Front,
 	Player_B_Back,
+	Player_B_Front,
 	Spectator
 }
 
@@ -22,12 +22,11 @@ export enum GameType {
 
 //data sent to each player before the game
 export type PlayersGameData = {
-	Player_A_Back: Player,
+	Player_A_Back?: Player,
 	Player_A_Front?: Player,
 	Player_B_Front?: Player,
-	Player_B_Back: Player,
+	Player_B_Back?: Player,
 	player_type: PlayerType,
-	// player_secret: string,
 	game_id: string,
 	game_settings: GameSettings,
 }
@@ -192,6 +191,6 @@ export enum TeamSide {
 }
 
 export enum PlayerPosition {
-	FRONT,
 	BACK,
+	FRONT,
 }
