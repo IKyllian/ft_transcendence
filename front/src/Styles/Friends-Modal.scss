@@ -48,7 +48,7 @@
     flex-direction: column;
     gap: 10px;
     margin-top: 15px;
-    overflow-y: scroll;
+    @include overflowScroll("y");
     &-item {
         width: 90%;
         @include flex-row-alignCenter();

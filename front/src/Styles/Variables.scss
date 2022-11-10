@@ -85,6 +85,21 @@ $OfflineColor: rgb(194, 29, 29);
     height: $height;
 }
 
+@mixin overflowScroll($typeOverflow) {
+    @if $typeOverflow == "x" {
+        overflow-x: scroll;
+    } @else if $typeOverflow == "y" {
+        overflow-y: scroll;
+    } @else {
+        overflow: scroll;
+    }
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}
+
 @font-face {
     font-family: Montserrat;
     src: url("../../public/Font/Montserrat/static/Montserrat-Regular.ttf");

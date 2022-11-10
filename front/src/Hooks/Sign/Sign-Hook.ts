@@ -53,6 +53,7 @@ export function useSignHook() {
         const url: string = "https://api.intra.42.fr/oauth/authorize";
         const params: string = `?client_id=${uid}&redirect_uri=http://localhost:3000/sign&response_type=code`;
         const ret = window.location.replace(url+params);
+        // const ret = window.open(url+params, "", "popup");
     }
 
     return {

@@ -182,7 +182,7 @@
         display: flex;
         flex-direction: column;
         gap: 5px;
-        overflow-y: scroll;
+        @include overflowScroll("y");
         .no-notif {
             margin: auto;
         }
@@ -198,7 +198,7 @@
             .notif-content {
                 width: 100%;
                 margin: 0 5px 0 10px;
-                overflow: scroll;
+                @include overflowScroll("");
                 p {
                     margin: 0;
                     &:first-child {

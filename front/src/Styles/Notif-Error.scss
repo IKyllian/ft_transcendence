@@ -13,8 +13,8 @@
     width: 250px;
     min-height: 50px;
     max-height: 150px;
-    overflow: scroll;
     background-color: rgb(208, 22, 22);
+    @include overflowScroll("");
     .notif-content-container {
         position: relative;
         display: flex;

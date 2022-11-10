@@ -66,8 +66,8 @@ body {
 }
 
 input:-webkit-autofill {
-	transition: background-color 5000s ease-in-out 0s;
-	-webkit-text-fill-color: rgb(255, 255, 255);
+	transition: background-color 5000s ease-in-out 0s !important; 
+	-webkit-text-fill-color: rgb(255, 255, 255) !important;
 }
 
 a, button{
