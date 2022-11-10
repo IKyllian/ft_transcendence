@@ -10,9 +10,9 @@ import { addChannel, addPrivateConv, removeChannel, } from "../Redux/ChatSlice";
 import { Channel, Conversation } from "../Types/Chat-Types";
 import { UserInterface } from "../Types/User-Types";
 import { copyFriendListArray } from "../Redux/AuthSlice";
-import { PartyInterface } from "../Types/Lobby-Types";
+import { GameMode, PartyInterface } from "../Types/Lobby-Types";
 import { copyNotificationArray } from "../Redux/NotificationSlice";
-import { addParty, cancelQueue, changeQueueStatus, leaveParty } from "../Redux/PartySlice";
+import { addParty, cancelQueue, changePartyGameMode, changeQueueStatus, leaveParty } from "../Redux/PartySlice";
 
 export function useAppHook() {
     const [socket, setSocket] = useState<Socket | undefined>(undefined);
@@ -64,6 +64,10 @@ export function useAppHook() {
 				dispatch(addParty(data.party));
 				dispatch(cancelQueue(data.cancelQueue));
 			});
+
+			socket.on("GameModeUpdate", (data: GameMode) => {
+				dispatch(changePartyGameMode(data));
+			})
 
 			socket.on("PartyLeave", () => {
 				dispatch(leaveParty());

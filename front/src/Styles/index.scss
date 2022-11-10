@@ -65,6 +65,11 @@ body {
 	background-size: cover;
 }
 
+input:-webkit-autofill {
+	transition: background-color 5000s ease-in-out 0s;
+	-webkit-text-fill-color: rgb(255, 255, 255);
+}
+
 a, button{
 	color: $WhitePalette;
 	text-decoration: none;

@@ -134,11 +134,10 @@ export function useLobbyHook() {
     }
 
     const startQueue = () => {
-        console.log("selectGameMode", selectGameMode());
         if (startCheck()) {
             socket?.emit("StartQueue", {
                 gameType: selectGameMode(),
-                isRanked: gameMode.gameModes[gameMode.indexSelected].gameMode === GameMode.RANKED ? true : false,
+                isRanked: (party && (party.game_mode === GameMode.RANKED || party.game_mode === GameMode.RANKED_2v2)) ||  (gameMode.gameModes[gameMode.indexSelected].gameMode === GameMode.RANKED || gameMode.gameModes[gameMode.indexSelected].gameMode === GameMode.RANKED_2v2) ? true : false,
             });
         }
     }
@@ -201,7 +200,7 @@ export function useLobbyHook() {
                 })]}
             });
         }
-    }, [party])
+    }, [party?.players])
 
     useEffect(() => {
         const checkGame = async () => {
