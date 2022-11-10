@@ -543,4 +543,9 @@ export default class PongCore
 		}
 
 	}
+
+	classy_bounce = () =>
+	{
+		
+	}
 }

@@ -16,16 +16,16 @@ export default class Pong extends Phaser.Scene
 	game_settings: GameSettings | undefined = undefined;
 	game_type: GameType = GameType.Singles;
 
-	sound_a?: any;
-	sound_b?: any;
-	sound_clapping?: any;
+	// sound_a?: any;
+	// sound_b?: any;
+	// sound_clapping?: any;
 
 	core?: PongCore;
 	game_id?: string;
 
 	//Displayed elements
 	//Images
-	asset_lag_icon?: Phaser.GameObjects.Image;
+	//asset_lag_icon?: Phaser.GameObjects.Image;
 	//Texts
 	asset_scoreboard?: Phaser.GameObjects.Text;
 	//Shapes
@@ -82,9 +82,12 @@ export default class Pong extends Phaser.Scene
 	is_lagging: boolean = true;
 	lag_count: number = 0;
 
+//test
+	frame_count: number = 0;
+
 	preload ()
 	{
-		this.load.image('lag_icon', 'assets/lag_icon.png');
+	//	this.load.image('lag_icon', 'assets/lag_icon.png');
 
 		// this.load.audio('sound_a', 'assets/sound/8bit_effect_a.ogg');
 		// this.load.audio('sound_b', 'assets/sound/8bit_effect_b.ogg');
@@ -117,8 +120,8 @@ export default class Pong extends Phaser.Scene
 		}
 
 		//placing visual elements outside of board for their first instanciation to prevent ghosted visuals
-		this.asset_lag_icon = this.add.image(10400, 300, 'lag_icon');
-		this.asset_lag_icon.setAlpha(1);
+		// this.asset_lag_icon = this.add.image(10400, 300, 'lag_icon');
+		// this.asset_lag_icon.setAlpha(1);
 
 		if (this.game_settings)
 		{
@@ -190,7 +193,7 @@ export default class Pong extends Phaser.Scene
 	{
 		if (this.game_settings)
 		{
-			this.asset_lag_icon!.x = 400;
+			// this.asset_lag_icon!.x = 400;
 			this.asset_ball!.x = 400;
 			this.upper_limit!.x = 0;
 			this.lower_limit!.x = 0;
@@ -208,6 +211,34 @@ export default class Pong extends Phaser.Scene
 
 	frame_advance()
 	{
+
+		if (this.frame_count === 0)
+		{
+			this.frame_count++;
+		//	this.place_assets();
+			return;
+		}
+		else if (this.frame_count === 1)
+		{
+			this.asset_Player_A_Back!.x = this.game_state.Player_A_Back.x;
+			this.asset_Player_A_Back!.y = this.game_state.Player_A_Back.y;
+			this.asset_Player_B_Back!.x = this.game_state.Player_B_Back.x;
+			this.asset_Player_B_Back!.y = this.game_state.Player_B_Back.y;
+			this.asset_ball!.x = this.game_state.balldata.position.x;
+			this.asset_ball!.y = this.game_state.balldata.position.y;
+
+			if (this.game_type === GameType.Doubles)
+			{
+				this.asset_Player_A_Front!.x = this.game_state.Player_A_Front.x;
+				this.asset_Player_A_Front!.y = this.game_state.Player_A_Front.y;
+				this.asset_Player_B_Front!.x = this.game_state.Player_B_Front.x;
+				this.asset_Player_B_Front!.y = this.game_state.Player_B_Front.y;
+			}
+			this.frame_count++;
+			return;
+		}
+
+
 		if (this.next_round_setup === undefined)
 		{
 			this.socketmanager?.game_get_round_setup(this.game_id!);
@@ -348,7 +379,7 @@ export default class Pong extends Phaser.Scene
 			this.asset_scoreboard?.setText(text);
 		}
 
-		this.lag_check();
+//		this.lag_check();
 	}
 
 
@@ -362,13 +393,13 @@ export default class Pong extends Phaser.Scene
 		this.server_stock.push(gamestate);
 	}
 
-	lag_check = () =>
-	{
-		if (this.is_lagging && this.game_state.result === EndResult.Undecided)
-			this.asset_lag_icon!.setAlpha(1);
-		else
-			this.asset_lag_icon!.setAlpha(0);
-	}
+	// lag_check = () =>
+	// {
+	// 	if (this.is_lagging && this.game_state.result === EndResult.Undecided)
+	// 		this.asset_lag_icon!.setAlpha(1);
+	// 	else
+	// 		this.asset_lag_icon!.setAlpha(0);
+	// }
 
 	game_end = (winner: EndResult) =>
 	{
@@ -560,21 +591,21 @@ export default class Pong extends Phaser.Scene
 
 	}
 
-	sound_event_wall = () =>
-	{
-		this.sound.stopAll();
-		this.sound_a.play();
-	}
+	// sound_event_wall = () =>
+	// {
+	// 	this.sound.stopAll();
+	// 	this.sound_a.play();
+	// }
 
-	sound_event_paddle = () =>
-	{
-		this.sound.stopAll();
-		this.sound_b.play();
-	}
+	// sound_event_paddle = () =>
+	// {
+	// 	this.sound.stopAll();
+	// 	this.sound_b.play();
+	// }
 
-	sound_event_goal = () =>
-	{
-		this.sound.stopAll();
-		this.sound_clapping.play();
-	}
+	// sound_event_goal = () =>
+	// {
+	// 	this.sound.stopAll();
+	// 	this.sound_clapping.play();
+	// }
 }

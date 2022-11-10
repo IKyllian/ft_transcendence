@@ -91,6 +91,11 @@ export default class Pong extends Phaser.Scene
 	is_lagging: boolean = true;
 	lag_count: number = 0;
 
+//test
+frame_count: number = 0;
+
+
+
 	preload ()
 	{
 		this.load.image('lag_icon', 'assets/lag_icon.png');
@@ -186,7 +191,7 @@ export default class Pong extends Phaser.Scene
 		this.socketmanager?.game_get_round_setup(this.game_id!);
 
 
-		this.place_assets();
+	//	this.place_assets();
 
 		clearInterval(this.update_interval);
 		this.update_interval = setInterval(
@@ -218,6 +223,35 @@ export default class Pong extends Phaser.Scene
 
 	frame_advance()
 	{
+
+
+		if (this.frame_count === 0)
+		{
+			this.frame_count++;
+			this.place_assets();
+			return;
+		}
+		else if (this.frame_count === 1)
+		{
+			this.asset_Player_A_Back!.x = this.game_state.Player_A_Back.x;
+			this.asset_Player_A_Back!.y = this.game_state.Player_A_Back.y;
+			this.asset_Player_B_Back!.x = this.game_state.Player_B_Back.x;
+			this.asset_Player_B_Back!.y = this.game_state.Player_B_Back.y;
+			this.asset_ball!.x = this.game_state.balldata.position.x;
+			this.asset_ball!.y = this.game_state.balldata.position.y;
+
+			if (this.game_type === GameType.Doubles)
+			{
+				this.asset_Player_A_Front!.x = this.game_state.Player_A_Front.x;
+				this.asset_Player_A_Front!.y = this.game_state.Player_A_Front.y;
+				this.asset_Player_B_Front!.x = this.game_state.Player_B_Front.x;
+				this.asset_Player_B_Front!.y = this.game_state.Player_B_Front.y;
+			}
+			this.frame_count++;
+			return;
+		}
+
+
 		if (this.next_round_setup === undefined)
 		{
 			this.socketmanager?.game_get_round_setup(this.game_id!);
