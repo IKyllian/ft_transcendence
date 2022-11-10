@@ -4,7 +4,7 @@ import { UserInterface } from "./User-Types";
 export enum GameMode {
 	RANKED = 'Ranked',
 	PRIVATE_MATCH = 'Private Match',
-	BONUS_2v2 = '2v2',
+	RANKED_2v2 = '2v2',
 };
 
 export enum PlayerType {
@@ -32,7 +32,7 @@ export enum PlayerPosition {
 
 export type GameSettings =
 {
-    game_type: GameType,
+    game_type?: GameType,
     up_down_border: number,
     player_back_advance: number,
     player_front_advance: number,
@@ -65,4 +65,5 @@ export interface PartyInterface {
 	id: string,
 	players: Player[],
 	game_settings: GameSettings,
+    game_mode: GameMode,
 }

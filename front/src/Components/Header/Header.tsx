@@ -14,7 +14,7 @@ function NotifIcon(props: {notifications: NotificationInterface[] | undefined ,h
     const {handleNotifDropdownClick, notifications} = props;
     return (
         <div className='badge-wrapper'>
-            { notifications !== undefined && notifications.filter(elem => elem.type !== notificationType.CHANNEL_MESSAGE && elem.type !== notificationType.GAME_INVITE).length > 0 && <div className='badge badge-notif'> {notifications.filter(elem => elem.type !== notificationType.CHANNEL_MESSAGE && elem.type !== notificationType.GAME_INVITE).length} </div> }
+            { notifications !== undefined && notifications.filter(elem => elem.type !== notificationType.CHANNEL_MESSAGE && elem.type !== notificationType.PARTY_INVITE).length > 0 && <div className='badge badge-notif'> {notifications.filter(elem => elem.type !== notificationType.CHANNEL_MESSAGE && elem.type !== notificationType.PARTY_INVITE).length} </div> }
             <IconBell onClick={() => handleNotifDropdownClick()} />
         </div>
     );

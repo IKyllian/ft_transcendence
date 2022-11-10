@@ -16,7 +16,7 @@ function Game() {
         if (location && location.state) {
             const locationState = location.state as PlayersGameData;
             console.log("locationState", locationState);
-            const gameSocket = io(`${socketUrl}`, {extraHeaders: {
+            const gameSocket = io(`${socketUrl}/game`, {extraHeaders: {
                 "Authorization": `Bearer ${token}`,
             }});
             console.log("gameSocket", gameSocket);

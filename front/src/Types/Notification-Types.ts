@@ -2,10 +2,10 @@ import { Channel } from "./Chat-Types";
 import { UserInterface } from "./User-Types";
 
 export enum notificationType {
-	FRIEND_REQUEST = 'friend_request',
-	CHANNEL_INVITE = 'channel_invite',
-	GAME_INVITE = 'game_invite',
-    CHANNEL_MESSAGE = 'channel_message',
+	FRIEND_REQUEST ,
+	CHANNEL_INVITE,
+	PARTY_INVITE,
+    CHANNEL_MESSAGE,
 };
 
 export interface NotificationInterface {

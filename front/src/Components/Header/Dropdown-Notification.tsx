@@ -12,7 +12,7 @@ function NotifItem(props: {notification: NotificationInterface}){
     const dispatch = useAppDispatch();
     
     const handleClick = (response: string) => {
-        if (notification.type === "channel_invite")
+        if (notification.type === notificationType.CHANNEL_INVITE)
             socket?.emit("ChannelInviteResponse", {id: notification.id, chanId: notification.channel?.id, response: response});
         else
             socket?.emit("FriendRequestResponse", {id: notification.requester.id, response: response})
@@ -24,7 +24,7 @@ function NotifItem(props: {notification: NotificationInterface}){
             <div className="notif-content">
                 <Link to={`/profile/${notification.requester.username}`}> {notification.requester.username} </Link>
                 <p>
-                    {   notification.type === "channel_invite"
+                    {   notification.type === notificationType.CHANNEL_INVITE
                         ?`Invited you to ${notification.channel?.name}`
                         : "Sent you a friend request"
                     }
@@ -45,7 +45,7 @@ function DropdownNotification() {
         <div className="notif-dropdown-wrapper">
             {
                 notifications.map((elem) => {
-                    if (elem.type !== notificationType.GAME_INVITE && elem.type !== notificationType.CHANNEL_MESSAGE)
+                    if (elem.type !== notificationType.PARTY_INVITE && elem.type !== notificationType.CHANNEL_MESSAGE)
                         return <NotifItem key={elem.id} notification={elem} />
                 })
             }

@@ -42,8 +42,8 @@ export function useAppHook() {
 	useEffect(() => {
 		if (isAuthenticated && socket === undefined) {
 			connectSocket();
-			fetchNotifications(token, dispatch);
-			fetchFriendList(token, dispatch);
+			// fetchNotifications(token, dispatch);
+			// fetchFriendList(token, dispatch);
 		}
 	}, [isAuthenticated])
 

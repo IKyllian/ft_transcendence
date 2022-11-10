@@ -55,7 +55,7 @@ export function fetchNotifications(token: string, dispatch: Dispatch<AnyAction>)
         }
     })
     .then(response => {
-        console.log(response);
+        console.log("Notification", response);
         dispatch(copyNotificationArray(response.data));
     })
     .catch(err => {

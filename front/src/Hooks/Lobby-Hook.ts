@@ -18,7 +18,7 @@ const defaultGameModeState: GameModeState = {
             gameMode: GameMode.PRIVATE_MATCH,
             isLock: false,   
         }, {
-            gameMode: GameMode.BONUS_2v2,
+            gameMode: GameMode.RANKED_2v2,
             isLock: false,   
         }
     ],
@@ -41,16 +41,15 @@ export function useLobbyHook() {
     const {party, isInQueue} = useAppSelector(state => state.party);
     const {currentUser, token} = useAppSelector(state => state.auth)
     const [loggedUserIsLeader, setLoggedUserIsLeader] = useState<boolean>(false);
-    const { handleSubmit, control, watch, setValue, getValues, formState } = useForm<GameSettings>({defaultValues: !party ? defaultSettings : party.game_settings});
+    const { handleSubmit, control, watch, setValue, getValues, reset } = useForm<GameSettings>({defaultValues: !party ? defaultSettings : party.game_settings});
     const [gameMode, setGameMode] = useState<GameModeState>(defaultGameModeState);
     const [showDropdown, setShowDropdown] = useState<boolean>(false);
     const {socket} = useContext(SocketContext);
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
-    const partyReady: boolean = (!party || (party && partyIsReady(party?.players))) ? true : false;
-
-    console.log("party", party);
+    const partyReady: boolean = (!party || (party && partyIsReady(party?.players))) ? true : false; 
     
+    console.log("party", party);
 
     useEffect(() => {
         if (!party || (party && party.players.find(elem => elem.isLeader && elem.user.id === currentUser!.id)))
@@ -59,9 +58,10 @@ export function useLobbyHook() {
             setLoggedUserIsLeader(false);
     }, [party])
 
-    // useEffect(() => {
-    //     setValue
-    // }, [party?.game_settings])
+    useEffect(() => {
+        if (party)
+            reset(party.game_settings);
+    }, [party?.game_settings])
 
     const onReady = (isReady: boolean) => {
         socket?.emit("SetReadyState", {
@@ -69,18 +69,23 @@ export function useLobbyHook() {
         });
     }
 
-    const onGameModeChange = (index: number) => {
-        setGameMode((prev: GameModeState) => {
-            return { ...prev, indexSelected: index };
-        });
+    const onGameModeChange = (index: number, gameMode: GameMode) => {
+        if (party) {
+            if (gameMode !== party.game_mode) {
+                console.log("EMIT");
+                socket?.emit("SetGameMode", gameMode);
+            }
+        } else {
+            setGameMode((prev: GameModeState) => {
+                return { ...prev, indexSelected: index };
+            });
+        }
         setShowDropdown(false);
     }
 
     const settingsFormSubmit = handleSubmit((data: GameSettings, e) => {
         e?.preventDefault();
-        const gameSettings: GameSettings & {is_ranked :boolean} = {
-            ...data, game_type: selectGameMode(), is_ranked: gameMode.gameModes[gameMode.indexSelected].gameMode === GameMode.RANKED ? true : false,
-        }
+        const gameSettings: GameSettings = {...data};
         socket?.emit("SetSettings", gameSettings);
     })
 
@@ -116,11 +121,11 @@ export function useLobbyHook() {
         return false;
     }
 
-    const selectGameMode = (): GameType => {           
-        if (gameMode.gameModes[gameMode.indexSelected].gameMode === GameMode.BONUS_2v2)
+    const selectGameMode = (): GameType => {      
+        if ((party && party.game_mode === GameMode.RANKED_2v2) || (!party && gameMode.gameModes[gameMode.indexSelected].gameMode === GameMode.RANKED_2v2))
             return GameType.Doubles;
-        else if (gameMode.gameModes[gameMode.indexSelected].gameMode === GameMode.PRIVATE_MATCH) {
-            if (party && party.players.length === 2)
+        else if (party && party.game_mode === GameMode.PRIVATE_MATCH) {
+            if (party.players.length === 2)
                 return GameType.Singles;
             else
                 return GameType.Doubles;
@@ -165,20 +170,23 @@ export function useLobbyHook() {
         if (party && party.players.length > 1) {
             if (party.players.length > 2) {
                 setGameMode((prev: any) => {
+                    socket?.emit("SetGameMode", GameMode.PRIVATE_MATCH);
                     return {...prev, indexSelected: 1, gameModes: [...gameMode.gameModes.map(elem => {
                         if (elem.gameMode === GameMode.RANKED)
                             return  {...elem, isLock: true };
-                        else if (elem.gameMode === GameMode.BONUS_2v2)
+                        else if (elem.gameMode === GameMode.RANKED_2v2)
                             return {...elem, isLock: true };
                         return elem;
                     })]}
                 });
             } else if (party.players.length === 2){
                 setGameMode((prev: any) => {
+                    if (gameMode.indexSelected === 0)
+                        socket?.emit("SetGameMode", GameMode.PRIVATE_MATCH);
                     return {...prev, indexSelected: gameMode.indexSelected === 0 ? 1 : gameMode.indexSelected ,gameModes: [...gameMode.gameModes.map(elem => {
                         if (elem.gameMode === GameMode.RANKED)
                             return  {...elem, isLock: true };
-                        else if (elem.gameMode === GameMode.BONUS_2v2)
+                        else if (elem.gameMode === GameMode.RANKED_2v2)
                             return  {...elem, isLock: false };
                         return elem;
                     })]}
