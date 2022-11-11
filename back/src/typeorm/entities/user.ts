@@ -41,10 +41,10 @@ export class User {
 	blocked: User[];
 
 	@Column({ default: 1200 })
-	singlesElo: number;
+	singles_elo: number;
 
 	@Column({ default: 1200 })
-	doublesElo: number;
+	doubles_elo: number;
 
 	@Exclude()
 	@Column({ nullable: true, select: false })

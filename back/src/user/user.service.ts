@@ -147,6 +147,29 @@ export class UserService {
 		return isblocked ? true : false;
 	}
 
+	async userBlocked(requesterId: number, addresseeId: number) {
+		const blocked: User[] = await this.userRepo.find({
+			where: [
+				{
+					id: requesterId,
+					blocked: { id: addresseeId },
+				},
+				{
+					id: addresseeId,
+					blocked: { id: requesterId },
+				}
+			]
+		});
+
+		if (blocked.length > 0) {
+			if (blocked[0].id === requesterId) {
+				throw new BadRequestException('You blocked that user');
+			} else {
+				throw new BadRequestException('You are blocked by that user');
+			}
+		}
+	}
+
 	async getUserInfo(user: User, user2: User) {
 		const friendList: User[] = await this.friendshipService.getFriendlist(user2);
 		const relation = await this.friendshipService.getRelation(user, user2);

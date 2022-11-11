@@ -54,7 +54,7 @@ export class AuthService {
 			.leftJoinAndSelect("user.blocked", "Blocked")
 			.getOne();
 
-		if (!user) 
+		if (!user || user.id42 || !user.hash) 
 			throw new NotFoundException('invalid credentials')
 
 		const pwdMatches = await argon.verify(

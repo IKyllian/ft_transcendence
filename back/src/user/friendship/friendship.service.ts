@@ -4,7 +4,7 @@ import { ResponseDto } from "src/chat/gateway/dto/response.dto";
 import { UserIdDto } from "src/chat/gateway/dto/user-id.dto";
 import { Friendship, User } from "src/typeorm";
 import { RelationStatus } from "src/utils/types/types";
-import { In, Not, Repository } from "typeorm";
+import { Repository } from "typeorm";
 import { SearchDto } from "../dto/search.dto";
 import { UserService } from "../user.service";
 
@@ -72,10 +72,9 @@ export class FriendshipService {
 		});
 	}
 
-	//pas fou mais ca marche
 	/**
 	 * @param user 
-	 * @returns List of users who can receive friend request
+	 * @returns List of users with the relation to a user
 	 */
 	async searchUsersToAdd(user: User, dto: SearchDto) {
 		const userList = await this.userRepo

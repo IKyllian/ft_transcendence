@@ -74,10 +74,10 @@ export type EloRange = {
 	max: number;
 }
 
-export interface QueueLobbby {
-	id: string,
-	players: Player[],
-	range?: number,
-	timeInQueue?: number,
-	averageMmr?: number,
+export class QueueLobbby {
+	id: string;
+	players: Player[];
+	range?: number;
+	timeInQueue?: number;
+	averageMmr?: number;
 }
