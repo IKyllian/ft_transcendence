@@ -1,9 +1,9 @@
 import { GameSettings, GameType, PlayerPosition, TeamSide } from "src/utils/types/game.types";
-import { QueueLobbby } from "src/utils/types/types";
+import { QueueLobby } from "src/utils/types/types";
 import { Player } from "../player";
 
 export class MatchmakingLobby {
-	constructor(blueTeam: QueueLobbby, redTeam: QueueLobbby, public game_settings: GameSettings) {
+	constructor(blueTeam: QueueLobby, redTeam: QueueLobby, public game_settings: GameSettings) {
 		this.players = [];
 		let backTaken: boolean = false;
 		blueTeam.players.forEach((player) => {

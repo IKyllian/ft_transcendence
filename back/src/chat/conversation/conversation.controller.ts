@@ -1,7 +1,9 @@
-import { Controller, Get, Param, ParseIntPipe, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, Param, ParseIntPipe, Post, UseGuards } from "@nestjs/common";
 import { JwtGuard } from "src/auth/guard/jwt.guard";
 import { User } from "src/typeorm";
 import { GetUser } from "src/utils/decorators";
+import { InChannelGuard } from "../channel/guards";
+import { MessageToSkipDto } from "../channel/message/dto/channelMessage.dto";
 import { ConversationService } from "./conversation.service";
 
 @Controller('conversation')
@@ -32,5 +34,15 @@ export class ConversationController {
 		@GetUser() user: User,
 	) {
 		return await this.convService.getConversations(user);
+	}
+
+	@Post(':id/messages')
+	@UseGuards(JwtGuard)
+	async getMessages(
+	@Param('id') convId: number,
+	@Body() data: MessageToSkipDto,
+	@GetUser('id') userId: number,
+	) {
+		return await this.convService.getMessages(userId, convId, data.skip);
 	}
 }

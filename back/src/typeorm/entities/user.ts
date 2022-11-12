@@ -5,6 +5,7 @@ import { Avatar } from "./avatar";
 import { ChannelUser } from "./channelUser";
 import { Conversation } from "./conversation";
 import { Friendship } from "./friendship";
+import { MatchResult } from "./matchResult";
 import { Statistic } from "./statistic";
 
 export type userStatus = 'online' | 'offline' | 'in_game';
@@ -40,10 +41,10 @@ export class User {
 	@JoinTable({ name: 'blocked_users' })
 	blocked: User[];
 
-	@Column({ default: 1200 })
+	@Column({ default: 1000 })
 	singles_elo: number;
 
-	@Column({ default: 1200 })
+	@Column({ default: 1000 })
 	doubles_elo: number;
 
 	@Exclude()
@@ -53,4 +54,5 @@ export class User {
 	@Exclude()
 	@Column({ nullable: true, select: false })
 	refresh_hash?: string
+
 } 

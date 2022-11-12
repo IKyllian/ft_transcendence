@@ -100,4 +100,26 @@ export class ConversationService {
 			]
 		});
 	}
+
+	async getMessages(userId: number, convId: number, skip: number) {
+		const conv = await this.convRepo.findOne({
+			where: [
+				{ id: convId, user1: { id: userId } },
+				{ id: convId, user2: { id: userId } },
+			]
+		});
+		if (!conv)
+			throw new BadRequestException("Conversation not found");
+
+		const messages = await this.msgRepo.find({
+			relations: ['sender'],
+			where: {
+				conversation: { id: convId },
+			},
+			skip: skip,
+			take: 20,
+			order: { send_at: 'DESC' },
+		});
+		return messages.reverse();
+	}
 }

@@ -1,5 +1,7 @@
 import { MESSAGES } from "@nestjs/core/constants";
+import { generate } from "shortid";
 import { Player } from "src/game/player";
+import { GameType } from "./game.types";
 
 export type JwtPayload = {
 	sub: number,
@@ -74,10 +76,25 @@ export type EloRange = {
 	max: number;
 }
 
-export class QueueLobbby {
+export class QueueLobby {
+	constructor(game_type: GameType) {
+		this.id = generate();
+		this.range = 0;
+		this.timeInQueue = 0;
+		this.averageMmr = 0;	
+		this.players = new Array<Player>();
+		this.game_type = game_type;
+	}
 	id: string;
+	game_type: GameType;
 	players: Player[];
-	range?: number;
-	timeInQueue?: number;
-	averageMmr?: number;
+	range: number;
+	timeInQueue: number;
+	averageMmr: number;
+
+	addPlayer(player: Player) {
+		this.players.push(player);
+		this.averageMmr += this.game_type === GameType.Singles ? player.user.singles_elo : player.user.doubles_elo;
+		this.averageMmr /= this.players.length;
+	}
 }

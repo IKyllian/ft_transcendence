@@ -8,7 +8,7 @@ import { GlobalModule } from 'src/utils/global/global.module';
 import { GameService } from './game.service';
 import { GameController } from './game.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Statistic, User } from 'src/typeorm';
+import { MatchResult, Statistic, User } from 'src/typeorm';
 
 @Module({
 	imports: [
@@ -18,6 +18,7 @@ import { Statistic, User } from 'src/typeorm';
 		TypeOrmModule.forFeature([
 			User,
 			Statistic,
+			MatchResult,
 		])
 	],
 	providers: [

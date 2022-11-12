@@ -1,6 +1,7 @@
 import { forwardRef, Inject, Injectable } from "@nestjs/common";
 import { Interval, SchedulerRegistry, Timeout } from "@nestjs/schedule";
 import { InjectRepository } from "@nestjs/typeorm";
+import { SlowBuffer } from "buffer";
 import { LobbyFactory } from "src/game/lobby/lobby.factory";
 import { MatchmakingLobby } from "src/game/matchmaking/matchmakingLobby";
 import { QueueService } from "src/game/matchmaking/queue/queue.service";
@@ -8,7 +9,7 @@ import { SettingsFactory } from "src/game/settings.factory";
 import { ChannelUser, Notification, UserTimeout } from "src/typeorm";
 import { GlobalService } from "src/utils/global/global.service";
 import { GameType } from "src/utils/types/game.types";
-import { ChannelUpdateType, EloRange, notificationType, QueueLobbby, TimeoutType } from "src/utils/types/types";
+import { ChannelUpdateType, EloRange, notificationType, QueueLobby, TimeoutType } from "src/utils/types/types";
 import { Repository } from "typeorm";
 
 @Injectable()
@@ -32,9 +33,9 @@ export class TaskService {
 	setServerRange(nbQueueing: number): EloRange {
 		if (nbQueueing >= 0 && nbQueueing < 5) {
 			return {
-				low: 75,
-				mid: 125,
-				hight: 250,
+				low: 125,
+				mid: 175,
+				hight: 300,
 				max: 6666,
 			}
 		} else if (nbQueueing >= 5 && nbQueueing < 20) {
@@ -54,7 +55,7 @@ export class TaskService {
 		}
 	}
 
-	adjustLobbyEloRange(queue: QueueLobbby[], serverRange: EloRange) {
+	adjustLobbyEloRange(queue: QueueLobby[], serverRange: EloRange) {
 		queue.forEach((party) => {
 			const timeInQueue: number = (Date.now() - party.timeInQueue) / 1000;
 			// console.log(timeInQueue, this.queueService.queue1v1.length);
@@ -71,7 +72,7 @@ export class TaskService {
 
 	@Interval('singles-queue', 3000)
 	async handleSinglesQueue() {
-		// console.log("nb of players in 1v1 queue: " + this.queueService.queue1v1.length);
+		console.log("nb of players in 1v1 queue: " + this.queueService.queue1v1.length);
 		if (this.queueService.queue1v1.length < 2) { return; }
 		let matchFound: MatchmakingLobby[] = [];
 		this.queueService.queue1v1.sort((a, b) => a.averageMmr - b.averageMmr);
@@ -98,12 +99,18 @@ export class TaskService {
 	async handleDoublesQueue() {
 		if (this.queueService.queue2v2.length < 4) { return; }
 		let matchFound: MatchmakingLobby[] = [];
-		let potentialLobby: QueueLobbby[] = [];
+		let potentialLobby: QueueLobby[] = [];
 		this.queueService.queue2v2.sort((a, b) => a.averageMmr - b.averageMmr);
 		const range: EloRange = this.setServerRange(this.queueService.queue2v2.length);
 		this.adjustLobbyEloRange(this.queueService.queue2v2, range);
 		for (let i: number = 0; i < this.queueService.queue2v2.length; ++i) {
-			let lobby: QueueLobbby = JSON.parse(JSON.stringify(this.queueService.queue2v2[i]));
+			let lobby: QueueLobby;
+			if (this.queueService.queue2v2[i].players.length < 2) {
+				lobby = new QueueLobby(GameType.Doubles);
+				lobby.addPlayer(this.queueService.queue2v2[i].players[0])
+			} else {
+				lobby = this.queueService.queue2v2[i];
+			}
 			potentialLobby.push(lobby);
 			for (let j: number = 0; j < this.queueService.queue2v2.length; ++j) {
 				const mmrDiff = Math.abs(lobby.averageMmr - this.queueService.queue2v2[j].averageMmr);
@@ -113,13 +120,13 @@ export class TaskService {
 						let pair: boolean = false;
 						potentialLobby.forEach((solo) => {
 							if (solo.players.length === 1) {
-								solo.players.push(this.queueService.queue2v2[j].players[0]);
-								solo.averageMmr = (solo.averageMmr + this.queueService.queue2v2[j].averageMmr) / 2;
+								solo.addPlayer(this.queueService.queue2v2[j].players[0]);
 								pair = true;
 							}
 						});
 						if (!pair) {
-							let soloLobby: QueueLobbby = JSON.parse(JSON.stringify(this.queueService.queue2v2[j]));
+							let soloLobby = new QueueLobby(GameType.Doubles);
+							soloLobby.addPlayer(this.queueService.queue2v2[j].players[0]);
 							potentialLobby.push(soloLobby);
 						}
 					} else if (this.queueService.queue2v2[j].players.length > 1) {

@@ -29,7 +29,7 @@ export class UserService {
 		return this.userRepo.save(user);
 	}
 
-	findOne(options: FindOneOptions<User>, selectAll?: Boolean): Promise<User | null> {
+	findOne(options: FindOneOptions<User>, selectAll: Boolean = false): Promise<User | null> {
 		if (selectAll) {
 			options.select = [
 				'avatar',
