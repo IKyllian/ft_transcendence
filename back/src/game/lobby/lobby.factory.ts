@@ -2,13 +2,14 @@ import { Server } from 'socket.io';
 import { generate } from 'shortid'
 import { Lobby } from './lobby';
 import { Socket } from 'socket.io';
-import { GameState, GameType, GameSettings, NewGameData, PlayersGameData, PlayerType, TeamSide, PlayerPosition, EndResult } from 'src/utils/types/game.types';
+import { GameState, GameType, GameSettings, NewGameData, PlayersGameData, PlayerType, TeamSide, PlayerPosition, EndResult, ScoreBoard } from 'src/utils/types/game.types';
 import { AuthenticatedSocket } from 'src/utils/types/auth-socket';
 import { MatchmakingLobby } from '../matchmaking/matchmakingLobby';
 import { GlobalService } from 'src/utils/global/global.service';
 import { Injectable } from '@nestjs/common';
 import { Player } from '../player';
 import { GameService } from '../game.service';
+import { User } from 'src/typeorm';
 //import  * as Defaultgame_settings from '../game-settings';
 
 
@@ -248,7 +249,18 @@ export class LobbyFactory
 		}
 	}
 
-	endGameAttribution(players: Player[], result: EndResult, game_type: GameType, game_id: string) {
+	async endGameAttribution(players: Player[], result: EndResult, game_type: GameType, game_id: string, score: ScoreBoard) {
+		let blueTeam: User[] = [];
+		let redTeam: User[] = [];
+		players.forEach((player) => {
+			if (player.team === TeamSide.BLUE) {
+				blueTeam.push(player.user);
+			} else {
+				redTeam.push(player.user);
+			}
+		})
 		this.gameService.eloAttribution(players, result, game_type);
+		await this.gameService.saveMatch(blueTeam, redTeam, game_type, score);
+		this.lobby_delete(game_id);
 	}
 }

@@ -2,29 +2,30 @@ import { BadRequestException, Injectable, UnauthorizedException } from "@nestjs/
 import { User } from "src/typeorm";
 import { GlobalService } from "src/utils/global/global.service";
 import { GameType, PlayerPosition } from "src/utils/types/game.types";
-import { QueueLobbby } from "src/utils/types/types";
+import { QueueLobby } from "src/utils/types/types";
 import { Player } from "../../player";
 import { Party } from "../party/party";
 import { PartyService } from "../party/party.service";
+import { InQueueSessionManager } from "./in-queue.session";
 
 @Injectable()
 export class QueueService {
 	constructor(
 		private partyService: PartyService,
 		private globalService: GlobalService,
+		private inQueueSession: InQueueSessionManager,
 	) {}
 		
-	public queue1v1 = new Array<QueueLobbby>();
-	public queue2v2 = new Array<QueueLobbby>();
+	public queue1v1 = new Array<QueueLobby>();
+	public queue2v2 = new Array<QueueLobby>();
 
 	joinQueue(user: User, game_mode: GameType) {
-		let queueLobby: QueueLobbby = new QueueLobbby;
-		const queue: QueueLobbby[] = game_mode === GameType.Singles ? this.queue1v1 : this.queue2v2;
+		let queueLobby: QueueLobby = new QueueLobby(game_mode);
+		const queue: QueueLobby[] = game_mode === GameType.Singles ? this.queue1v1 : this.queue2v2;
 		const nbOfPayersRequired: number = game_mode === GameType.Singles ? 1 : 2;
 		const party = this.partyService.partyJoined.getParty(user.id);
 		if (!party) {
-			queueLobby.id = "queue-" + user.id;
-			queueLobby.players = [ new Player(user) ];
+			queueLobby.addPlayer(new Player(user));
 		} else {
 			this.partyService.partyIsReady(party);
 			if (party.players.length !== nbOfPayersRequired) {
@@ -38,17 +39,15 @@ export class QueueService {
 			if (!player.isLeader) {
 				throw new UnauthorizedException("You are not the leader of this party");
 			}
-			queueLobby = party;
+			party.players.forEach((player) => queueLobby.addPlayer(player));
 		}
 		if (queue.find((e) => e.id === queueLobby.id)) {
 			throw new BadRequestException("Already in queue");
 		}
-		queueLobby.averageMmr = 0;
 		queueLobby.players.forEach((player) => {
-			queueLobby.averageMmr += game_mode === GameType.Singles ? player.user.singles_elo : player.user.doubles_elo
 			this.globalService.server.to(`user-${player.user.id}`).emit('InQueue', true);
 		});
-		queueLobby.averageMmr /= queueLobby.players.length;
+		this.inQueueSession.setInQueue(user.id, queueLobby);
 		queueLobby.timeInQueue = Date.now();
 		queue.push(queueLobby);
 	}
@@ -56,14 +55,28 @@ export class QueueService {
 	leaveQueue(user: User) {
 		const party = this.partyService.partyJoined.getParty(user.id);
 		if (party) {
-			this.queue1v1 = this.queue1v1.filter((queueing) => queueing.id !== party.id);
-			this.queue2v2 = this.queue2v2.filter((queueing) => queueing.id !== party.id);
+			const inQueue: QueueLobby = this.inQueueSession.getInQueue(party.players[0].user.id);
+			if (inQueue) {
+				if (inQueue.game_type === GameType.Singles) {
+					this.queue1v1 = this.queue1v1.filter((queueing) => queueing.id !== inQueue.id);
+				} else {
+					this.queue2v2 = this.queue1v1.filter((queueing) => queueing.id !== inQueue.id);
+				}
+				this.inQueueSession.removeInQueue(party.players[0].user.id);
+			}
 			party.players.forEach(player => player.isReady = false);
 			this.partyService.emitPartyUpdate(party, true);
 		} else {
-			this.globalService.server.to('user-' + user.id).emit('InQueue', false);
-			this.queue1v1 = this.queue1v1.filter((queueing) => queueing.id !== "queue-" + user.id);
-			this.queue2v2 = this.queue2v2.filter((queueing) => queueing.id !== "queue-" + user.id)
+			const inQueue: QueueLobby = this.inQueueSession.getInQueue(user.id);
+			if (inQueue) {
+				if (inQueue.game_type === GameType.Singles) {
+					this.queue1v1 = this.queue1v1.filter((queueing) => queueing.id !== inQueue.id);
+				} else {
+					this.queue2v2 = this.queue1v1.filter((queueing) => queueing.id !== inQueue.id);
+				}
+				this.inQueueSession.removeInQueue(user.id);
+				this.globalService.server.to('user-' + user.id).emit('InQueue', false);
+			}
 		}
 	}
 }

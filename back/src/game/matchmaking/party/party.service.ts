@@ -8,6 +8,7 @@ import { GameMode, GameType, PlayerPosition, TeamSide } from "src/utils/types/ga
 import { SettingDto } from "../dto/game-settings.dto";
 import { LobbyFactory } from "src/game/lobby/lobby.factory";
 import { MatchmakingLobby } from "../matchmakingLobby";
+import { QueueLobby } from "src/utils/types/types";
 
 @Injectable()
 export class PartyService {
@@ -131,18 +132,26 @@ export class PartyService {
 		}
 		party.game_settings.is_ranked = false;
 		party.game_settings.game_type = game_type;
-		let redTeam: Player[] = party.players.filter((player) => player.team === TeamSide.RED);
-		let blueTeam: Player[] = party.players.filter((player) => player.team === TeamSide.BLUE);
-		if (redTeam.length !== blueTeam.length) {
+		let redTeam: QueueLobby = new QueueLobby(game_type);
+		let blueTeam: QueueLobby = new QueueLobby(game_type);
+		party.players.forEach((player) => {
+			if (player.team === TeamSide.BLUE) {
+				blueTeam.addPlayer(player);
+			} else {
+				redTeam.addPlayer(player);
+			}
+		})
+
+		if (redTeam.players.length !== blueTeam.players.length) {
 			throw new BadRequestException("You must balance the teams");
 		}
-		if (nbOfPayersRequired === 2 && (redTeam[0].pos !== PlayerPosition.BACK || blueTeam[0].pos !== PlayerPosition.BACK)) {
+		if (nbOfPayersRequired === 2 && (redTeam.players[0].pos !== PlayerPosition.BACK || blueTeam.players[0].pos !== PlayerPosition.BACK)) {
 			throw new BadRequestException("Players must be at Back position");
-		} else if (nbOfPayersRequired === 4 && (redTeam[0].pos === redTeam[1].pos || blueTeam[0].pos === blueTeam[1].pos)) {
+		} else if (nbOfPayersRequired === 4 && (redTeam.players[0].pos === redTeam.players[1].pos || blueTeam.players[0].pos === blueTeam.players[1].pos)) {
 			throw new BadRequestException("Team can't be at the same position");
 		}
-		const match = new MatchmakingLobby({ id: 'blue', players: blueTeam }, { id: 'red', players: redTeam }, party.game_settings);
-		console.log("match", match);
+		const match = new MatchmakingLobby(blueTeam, redTeam, party.game_settings);
+		// console.log("match", match);
 		this.lobbyFactory.lobby_create(match);
 	}
 

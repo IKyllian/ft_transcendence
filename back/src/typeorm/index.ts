@@ -9,6 +9,7 @@ import { Statistic } from "./entities/statistic"
 import { User } from "./entities/user"
 import { Notification } from "./entities/notification"
 import { UserTimeout } from "./entities/userTimeout"
+import { MatchResult } from "./entities/matchResult"
 
 const entities = [
 	User,
@@ -22,6 +23,7 @@ const entities = [
 	PrivateMessage,
 	Notification,
 	UserTimeout,
+	MatchResult,
 ];
 
 export default entities;
@@ -37,5 +39,6 @@ export {
 	Conversation,
 	PrivateMessage,
 	Notification,
-	UserTimeout
+	UserTimeout,
+	MatchResult,
 }

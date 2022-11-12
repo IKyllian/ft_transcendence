@@ -8,6 +8,7 @@ import { GameModule } from "../game.module";
 import { AuthModule } from "src/auth/auth.module";
 import { NotificationModule } from "src/notification/notification.module";
 import { TaskScheduler } from "src/task-scheduling/task.module";
+import { InQueueSessionManager } from "./queue/in-queue.session";
 
 @Module({
 	imports: [
@@ -20,6 +21,7 @@ import { TaskScheduler } from "src/task-scheduling/task.module";
 	providers: [
 		PartyService,
 		PartyJoinedSessionManager,
+		InQueueSessionManager,
 		QueueService,
 		MatchmakingGateway,
 	],

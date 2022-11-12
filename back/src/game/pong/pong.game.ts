@@ -69,12 +69,16 @@ export class PongGame
 				});
 				console.log("result", gamestate.result)
 				// BLUE = A / RED = B
-				this.lobby.factory.endGameAttribution(
-					this.lobby.lobby_data.players,
-					gamestate.result,
-					this.lobby.game_type,
-					this.lobby.game_id,
-				);
+				// await ?
+				if (this.game_settings.is_ranked) {
+					this.lobby.factory.endGameAttribution(
+						this.lobby.lobby_data.players,
+						gamestate.result,
+						this.lobby.game_type,
+						this.lobby.game_id,
+						gamestate.score
+					);
+				}
 				//save replay
 				this.lobby.factory.save_replay(this.lobby.game_id, this.saved_states);
 
@@ -85,7 +89,7 @@ export class PongGame
 				//destroy le lobby ?
 				// setTimeout(function (){
 
-					this.lobby.factory.lobby_delete(this.lobby.game_id);
+				// this.lobby.factory.lobby_delete(this.lobby.game_id);
 				// }, 5000);
 
 

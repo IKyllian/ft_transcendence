@@ -5,6 +5,7 @@ import { Avatar } from "./avatar";
 import { ChannelUser } from "./channelUser";
 import { Conversation } from "./conversation";
 import { Friendship } from "./friendship";
+import { MatchResult } from "./matchResult";
 import { Statistic } from "./statistic";
 
 export type userStatus = 'online' | 'offline' | 'in_game';
@@ -53,4 +54,5 @@ export class User {
 	@Exclude()
 	@Column({ nullable: true, select: false })
 	refresh_hash?: string
+
 } 
