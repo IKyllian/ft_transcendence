@@ -4,7 +4,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AppModule } from './app.module';
 import { ChannelService } from './chat/channel/channel.service';
-import { ChannelUser, Channel, User } from './typeorm';
+import { ChannelUser, Channel, User, Statistic } from './typeorm';
 import { UserService } from './user/user.service';
 import { channelOption } from './utils/types/types';
 
@@ -47,6 +47,27 @@ async function bootstrap() {
   // const channelUserRepo= await app.get<any, Repository<ChannelUser>>(getRepositoryToken(ChannelUser));
   // const channelRepo = await app.get<any, Repository<Channel>>(getRepositoryToken(Channel));
   // const user = { id: 18 }
+
+  // const blueEloWon: number = Math.round(50 / (1 + Math.pow(10, 110 / 400)));
+	// const blueEloLost: number = blueEloWon - 50;
+  // const redEloWon: number = Math.abs(blueEloLost)
+	// const redEloLost: number = redEloWon - 50;
+
+
+  // console.log("blue won: " + blueEloWon + " lost: " + blueEloLost);
+  // console.log("red won: " + redEloWon + " lost: " + redEloLost);
+  // let playersId: number[] = [];
+  // playersId.push(8);
+  // // playersId.push(24)
+  // // playersId.push(66656)
+  // console.log(playersId)
+  // const statRepo = app.get<any, Repository<Statistic>>(getRepositoryToken(Statistic));
+  // statRepo.createQueryBuilder("stat")
+	// 	.update()
+	// 	.where("userId IN (:...ids)", { ids: playersId})
+  //   // .where("userId = :ids", { ids: 8 })
+	// 	.set({ match_lost: () => "match_lost + 1" })
+	// 	.execute();
 
 }
 bootstrap();

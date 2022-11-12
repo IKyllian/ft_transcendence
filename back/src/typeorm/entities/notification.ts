@@ -12,13 +12,13 @@ export class Notification {
 	@Column()
 	type: notificationType;
 
-	@ManyToOne(() => User)
+	@ManyToOne(() => User, { orphanedRowAction: 'delete' })
 	addressee: User;
 
-	@ManyToOne(() => User)
+	@ManyToOne(() => User, { orphanedRowAction: 'delete' })
 	requester: User;
 
-	@ManyToOne(() => Channel)
+	@ManyToOne(() => Channel, { orphanedRowAction: 'delete' })
 	channel: Channel;
 
 	// @CreateDateColumn()

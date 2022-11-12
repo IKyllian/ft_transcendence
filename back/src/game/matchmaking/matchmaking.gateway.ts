@@ -10,7 +10,7 @@ import { User } from "src/typeorm";
 import { GetUser } from "src/utils/decorators";
 import { GatewayExceptionFilter } from "src/utils/exceptions/filter/Gateway.filter";
 import { AuthenticatedSocket } from "src/utils/types/auth-socket";
-import { GameType, PlayerPosition, TeamSide } from "src/utils/types/game.types";
+import { GameMode, GameType, PlayerPosition, TeamSide } from "src/utils/types/game.types";
 import { notificationType } from "src/utils/types/types";
 import { IsReadyDto } from "./dto/boolean.dto";
 import { SettingDto } from "./dto/game-settings.dto";
@@ -151,6 +151,15 @@ export class MatchmakingGateway implements OnGatewayDisconnect {
 		this.partyService.setSettings(user, settings)
 	}
 
+	@UseGuards(WsJwtGuard)
+	@SubscribeMessage('SetGameMode')
+	setGameMode(
+		@GetUser() user: User,
+		@MessageBody() game_mode: GameMode,
+	) {
+		this.partyService.setGameMode(user, game_mode)
+	}
+
 	/**
 	 *
 	 * QUEUE EVENTS
@@ -163,6 +172,7 @@ export class MatchmakingGateway implements OnGatewayDisconnect {
 		@GetUser() user: User,
 		@MessageBody() data: StartQueueDto,
 	) {
+		console.log(data)
 		if (data.isRanked) {
 			this.queueService.joinQueue(user, data.gameType);
 		} else {

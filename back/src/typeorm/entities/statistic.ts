@@ -7,12 +7,12 @@ export class Statistic extends BaseEntity {
 	id: number;
 
 	@OneToOne(() => User, (user) => user.statistic, { onDelete: 'CASCADE'})
-	@JoinColumn({ name: 'user_id' })
+	@JoinColumn()
 	user: User;
 
 	@Column({ default: 0 })
-	matchWon: number;
+	match_won: number;
 
 	@Column({ default: 0 })
-	matchLost: number;
+	match_lost: number;
 }

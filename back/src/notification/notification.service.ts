@@ -16,8 +16,6 @@ export class NotificationService {
 		private userService: UserService,
 		@Inject(forwardRef(() => ChannelService))
 		private channelService: ChannelService,
-		// @Inject(forwardRef(() => TaskService))
-		// private taskService: TaskService,
 
 		@InjectRepository(Notification)
 		private notifRepo: Repository<Notification>,

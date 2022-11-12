@@ -3,9 +3,9 @@ import { GameType } from "src/utils/types/game.types"
 
 export class SettingDto {
 
-	is_ranked: boolean;
+	// is_ranked: boolean;
 
-	game_type: GameType;
+	// game_type: GameType;
 
 	@Min(10)
 	@Max(200)

@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, UnauthorizedException } from "@nestjs/common";
 import { User } from "src/typeorm";
 import { GlobalService } from "src/utils/global/global.service";
-import { GameType } from "src/utils/types/game.types";
+import { GameType, PlayerPosition } from "src/utils/types/game.types";
 import { QueueLobbby } from "src/utils/types/types";
 import { Player } from "../../player";
 import { Party } from "../party/party";
@@ -18,16 +18,21 @@ export class QueueService {
 	public queue2v2 = new Array<QueueLobbby>();
 
 	joinQueue(user: User, game_mode: GameType) {
-		let queueLobby: QueueLobbby;
+		let queueLobby: QueueLobbby = new QueueLobbby;
 		const queue: QueueLobbby[] = game_mode === GameType.Singles ? this.queue1v1 : this.queue2v2;
-		const maxPlayers: number = game_mode === GameType.Singles ? 1 : 2;
+		const nbOfPayersRequired: number = game_mode === GameType.Singles ? 1 : 2;
 		const party = this.partyService.partyJoined.getParty(user.id);
 		if (!party) {
-			queueLobby = { id: "queue-" + user.id, players: [ new Player(user) ]};
+			queueLobby.id = "queue-" + user.id;
+			queueLobby.players = [ new Player(user) ];
 		} else {
 			this.partyService.partyIsReady(party);
-			if (party.players.length > maxPlayers) {
-				throw new BadRequestException("Too many players for this mode");
+			if (party.players.length !== nbOfPayersRequired) {
+				throw new BadRequestException("Number of players does not fit this mode");
+			} else if (nbOfPayersRequired === 2 && party.players[0].pos === party.players[1].pos) {
+				throw new BadRequestException("Team can't be at the same position");
+			} else if (nbOfPayersRequired === 1 && party.players[0].pos !== PlayerPosition.BACK) {
+				throw new BadRequestException("Player must be at Back position");
 			}
 			const player = this.partyService.getPlayerInParty(user.id, party.players)
 			if (!player.isLeader) {
@@ -40,7 +45,7 @@ export class QueueService {
 		}
 		queueLobby.averageMmr = 0;
 		queueLobby.players.forEach((player) => {
-			queueLobby.averageMmr += player.user.doublesElo
+			queueLobby.averageMmr += game_mode === GameType.Singles ? player.user.singles_elo : player.user.doubles_elo
 			this.globalService.server.to(`user-${player.user.id}`).emit('InQueue', true);
 		});
 		queueLobby.averageMmr /= queueLobby.players.length;

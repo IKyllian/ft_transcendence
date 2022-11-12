@@ -1,4 +1,6 @@
-import { GameState, GameSettings, RoundSetup, Goal, EndResult} from "src/utils/types/game.types";
+import { Injectable } from "@nestjs/common";
+import { GameState, GameSettings, RoundSetup, Goal, EndResult, TeamSide, GameType} from "src/utils/types/game.types";
+import { GameService } from "../game.service";
 import { Lobby } from "../lobby/lobby";
 import PongCore from "./pong.core"
 
@@ -14,7 +16,7 @@ export class PongGame
 	constructor(
 		public game_settings: GameSettings,
 		//public game_mode: GameMode,
-	private readonly lobby: Lobby
+		private readonly lobby: Lobby
 	)
 	{
 
@@ -65,7 +67,14 @@ export class PongGame
 					console.log("disconnecting: " + socket.id)
 					socket.disconnect()
 				});
-				
+				console.log("result", gamestate.result)
+				// BLUE = A / RED = B
+				this.lobby.factory.endGameAttribution(
+					this.lobby.lobby_data.players,
+					gamestate.result,
+					this.lobby.game_type,
+					this.lobby.game_id,
+				);
 				//save replay
 				this.lobby.factory.save_replay(this.lobby.game_id, this.saved_states);
 
