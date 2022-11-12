@@ -6,7 +6,7 @@ import { QueueLobby } from "src/utils/types/types";
 export class InQueueSessionManager {
 	private readonly sessions: Map<number, QueueLobby> = new Map();
 
-	getInQueue(id: number) {
+	getInQueue(id: number): QueueLobby {
 		return this.sessions.get(id);
 	}
 

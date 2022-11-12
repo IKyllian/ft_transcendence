@@ -88,9 +88,9 @@ export class QueueLobby {
 	id: string;
 	game_type: GameType;
 	players: Player[];
-	range?: number;
-	timeInQueue?: number;
-	averageMmr?: number;
+	range: number;
+	timeInQueue: number;
+	averageMmr: number;
 
 	addPlayer(player: Player) {
 		this.players.push(player);

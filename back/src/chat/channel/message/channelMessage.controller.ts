@@ -7,7 +7,7 @@ import { InChannelGuard } from "../guards";
 import { ChannelMessageService } from "./ChannelMessage.service";
 import { ChannelMessageDto, MessageToSkipDto } from "./dto/channelMessage.dto";
 
-@Controller('channel/:id/messages')
+@Controller('channel')
 export class ChannelMessageController {
 	constructor(
 		private messageService: ChannelMessageService,
@@ -22,13 +22,13 @@ export class ChannelMessageController {
 	// 	return await this.messageService.create(user, msg);
 	// }
 
-	@Post(':chanId')
+	@Post(":chanId/messages")
 	@UseGuards(JwtGuard, InChannelGuard)
 	async getMessages(
 	@Param('chanId') chanId: number,
-	@Body() skip: MessageToSkipDto,
+	@Body() data: MessageToSkipDto,
 	) {
-		const msg = await this.messageService.getMessages(chanId, skip);
+		const msg = await this.messageService.getMessages(chanId, data.skip);
 		// this.chatGateway.sendChannelMessages(data.socketId, msg);
 		return msg;
 	}

@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException, ParseFilePipeBuilder } from "@nestjs/common";
+import { BadRequestException, forwardRef, Inject, Injectable, NotFoundException, ParseFilePipeBuilder } from "@nestjs/common";
 import { User } from "src/typeorm";
 import { Player } from "../../player";
 import { PartyJoinedSessionManager } from "./party.session";
@@ -9,6 +9,7 @@ import { SettingDto } from "../dto/game-settings.dto";
 import { LobbyFactory } from "src/game/lobby/lobby.factory";
 import { MatchmakingLobby } from "../matchmakingLobby";
 import { QueueLobby } from "src/utils/types/types";
+import { QueueService } from "../queue/queue.service";
 
 @Injectable()
 export class PartyService {
@@ -16,6 +17,8 @@ export class PartyService {
 		public partyJoined: PartyJoinedSessionManager,
 		private globalService: GlobalService,
 		private lobbyFactory: LobbyFactory,
+		@Inject(forwardRef(() => QueueService))
+		private queueService: QueueService,
 	) {}
 
 	getPlayerInParty(id: number, player: Player[]) {
@@ -44,13 +47,13 @@ export class PartyService {
 	}
 
 	joinParty(user: User, requesterId: number) {
+		this.queueService.leaveQueue(user);
 		this.leaveParty(user);
 		const party = this.partyJoined.getParty(requesterId);
 		if (!party) { throw new NotFoundException('party not found'); }
 		party.join(user);
-		console.log('joining Party', user.username)
 		this.partyJoined.setParty(user.id, party);
-		this.emitPartyUpdate(party);
+		this.queueService.leaveQueue(user);
 	}
 
 	leaveParty(user: User) {
@@ -62,8 +65,8 @@ export class PartyService {
 				party.players.forEach((player) => player.isReady = false);
 			}
 			party.leave(user);
+			this.queueService.leaveQueue(user);
 			this.partyJoined.removeParty(user.id);
-			this.emitPartyUpdate(party);
 			this.globalService.server.to(`user-${user.id}`).emit('PartyLeave');
 		}
 	}

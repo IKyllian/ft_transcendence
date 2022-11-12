@@ -33,9 +33,9 @@ export class TaskService {
 	setServerRange(nbQueueing: number): EloRange {
 		if (nbQueueing >= 0 && nbQueueing < 5) {
 			return {
-				low: 75,
-				mid: 125,
-				hight: 250,
+				low: 125,
+				mid: 175,
+				hight: 300,
 				max: 6666,
 			}
 		} else if (nbQueueing >= 5 && nbQueueing < 20) {
@@ -72,7 +72,7 @@ export class TaskService {
 
 	@Interval('singles-queue', 3000)
 	async handleSinglesQueue() {
-		// console.log("nb of players in 1v1 queue: " + this.queueService.queue1v1.length);
+		console.log("nb of players in 1v1 queue: " + this.queueService.queue1v1.length);
 		if (this.queueService.queue1v1.length < 2) { return; }
 		let matchFound: MatchmakingLobby[] = [];
 		this.queueService.queue1v1.sort((a, b) => a.averageMmr - b.averageMmr);

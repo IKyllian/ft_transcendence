@@ -41,10 +41,10 @@ export class User {
 	@JoinTable({ name: 'blocked_users' })
 	blocked: User[];
 
-	@Column({ default: 1200 })
+	@Column({ default: 1000 })
 	singles_elo: number;
 
-	@Column({ default: 1200 })
+	@Column({ default: 1000 })
 	doubles_elo: number;
 
 	@Exclude()

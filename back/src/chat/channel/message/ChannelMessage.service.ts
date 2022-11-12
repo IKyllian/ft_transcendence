@@ -32,21 +32,18 @@ export class ChannelMessageService {
 		return this.messagesRepo.save(message);
 	}
 
-	async getMessages(chanId: number, data: MessageToSkipDto) {
-		const channel = await this.channelService.findOneBy({ id: chanId });
-		if (!channel)
-			throw new ChannelNotFoundException();
-
-		return await this.messagesRepo.find({
+	async getMessages(chanId: number, skip: number) {
+		const messages = await this.messagesRepo.find({
 			relations: ['sender'],
 			where: {
 				channel: {
 					id: chanId,
 				}
 			},
-			order: { send_at: 'DESC' },
-			skip: data.skip,
+			skip: skip,
 			take: 20,
+			order: { send_at: 'DESC' },
 		});
+		return messages.reverse();
 	}
 }

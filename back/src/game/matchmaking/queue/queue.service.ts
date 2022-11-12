@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, UnauthorizedException } from "@nestjs/common";
+import { BadRequestException, forwardRef, Inject, Injectable, UnauthorizedException } from "@nestjs/common";
 import { User } from "src/typeorm";
 import { GlobalService } from "src/utils/global/global.service";
 import { GameType, PlayerPosition } from "src/utils/types/game.types";
@@ -11,6 +11,7 @@ import { InQueueSessionManager } from "./in-queue.session";
 @Injectable()
 export class QueueService {
 	constructor(
+		@Inject(forwardRef(() => PartyService))
 		private partyService: PartyService,
 		private globalService: GlobalService,
 		private inQueueSession: InQueueSessionManager,
@@ -23,7 +24,7 @@ export class QueueService {
 		let queueLobby: QueueLobby = new QueueLobby(game_mode);
 		const queue: QueueLobby[] = game_mode === GameType.Singles ? this.queue1v1 : this.queue2v2;
 		const nbOfPayersRequired: number = game_mode === GameType.Singles ? 1 : 2;
-		const party = this.partyService.partyJoined.getParty(user.id);
+		const party: Party = this.partyService.partyJoined.getParty(user.id);
 		if (!party) {
 			queueLobby.addPlayer(new Player(user));
 		} else {
@@ -53,10 +54,11 @@ export class QueueService {
 	}
 
 	leaveQueue(user: User) {
-		const party = this.partyService.partyJoined.getParty(user.id);
+		const party: Party = this.partyService.partyJoined.getParty(user.id);
 		if (party) {
 			const inQueue: QueueLobby = this.inQueueSession.getInQueue(party.players[0].user.id);
 			if (inQueue) {
+				console.log("leaving queue")
 				if (inQueue.game_type === GameType.Singles) {
 					this.queue1v1 = this.queue1v1.filter((queueing) => queueing.id !== inQueue.id);
 				} else {
@@ -69,6 +71,7 @@ export class QueueService {
 		} else {
 			const inQueue: QueueLobby = this.inQueueSession.getInQueue(user.id);
 			if (inQueue) {
+				console.log("leaving queue")
 				if (inQueue.game_type === GameType.Singles) {
 					this.queue1v1 = this.queue1v1.filter((queueing) => queueing.id !== inQueue.id);
 				} else {
