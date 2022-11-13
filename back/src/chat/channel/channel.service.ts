@@ -1,6 +1,6 @@
 import { BadRequestException, ForbiddenException, forwardRef, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Channel, User, ChannelUser, UserTimeout } from 'src/typeorm';
+import { Channel, User, ChannelUser, UserTimeout, ChannelMessage } from 'src/typeorm';
 import { FindManyOptions, FindOneOptions, FindOptionsWhere, In, Like, Not, Repository } from 'typeorm';
 import { ChannelExistException, ChannelNotFoundException, NotInChannelException, UnauthorizedActionException } from 'src/utils/exceptions';
 import * as argon from 'argon2';
@@ -34,6 +34,8 @@ export class ChannelService {
 		private channelUserRepo: Repository<ChannelUser>,
 		@InjectRepository(UserTimeout)
 		private timeoutRepo: Repository<UserTimeout>,
+		@InjectRepository(ChannelMessage)
+		private messageRepo: Repository<ChannelMessage>,
 	) {}
 	/**
 	 * TODO C PAS FOU
@@ -163,17 +165,37 @@ export class ChannelService {
 		// return this.channelRepo.save(channel);
 	}
 
-	async getChannelById(userId: number, id: number) {
-		const channel = await this.channelRepo.findOne({
-			relations: {
-				channelUsers: { user: true },
-				messages: { sender: true },
-				usersTimeout: { user: true },
-			},
-			where: {
-				id: id,
-			}
-		});
+	async getChannelById(userId: number, id: number): Promise<Channel> {
+		/**
+		 * Return last N messages from a channel
+		 */
+		const subQuery = this.messageRepo.createQueryBuilder("msg")
+		.where((qb) => {
+			const subQuery = qb
+				.subQuery()
+				.from(ChannelMessage, "msg")
+				.select("msg.id")
+				.where("msg.channelId = :chanId")
+				.orderBy("msg.send_at", "DESC")
+				.skip(0)
+				.take(20)
+				.getQuery()
+			return "msg.id IN " + subQuery;
+		})
+		.setParameter("chanId", id)
+		.orderBy("msg.send_at", 'ASC')
+
+
+		const channel = await this.channelRepo.createQueryBuilder("channel")
+			.leftJoinAndSelect("channel.channelUsers", "chan_user")
+			.leftJoinAndSelect("chan_user.user", "user")
+			.leftJoinAndSelect("channel.messages", "messages", `messages.id IN (${subQuery.select('id').getQuery()})`)
+			.leftJoinAndSelect("messages.sender", "sender")
+			.leftJoinAndSelect("channel.usersTimeout", "timed_out")
+			.leftJoinAndSelect("timed_out.user", "userTimeout")
+			.where("channel.id = :chanId", { chanId: id })
+			.getOne()
+
 		if (!channel)
 			throw new ChannelNotFoundException();
 		

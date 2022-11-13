@@ -72,7 +72,7 @@ export class TaskService {
 
 	@Interval('singles-queue', 3000)
 	async handleSinglesQueue() {
-		console.log("nb of players in 1v1 queue: " + this.queueService.queue1v1.length);
+		// console.log("nb of players in 1v1 queue: " + this.queueService.queue1v1.length);
 		if (this.queueService.queue1v1.length < 2) { return; }
 		let matchFound: MatchmakingLobby[] = [];
 		this.queueService.queue1v1.sort((a, b) => a.averageMmr - b.averageMmr);

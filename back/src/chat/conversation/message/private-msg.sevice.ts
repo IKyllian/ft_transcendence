@@ -18,8 +18,9 @@ export class PrivateMessageService {
 
 	async create(user: User, dto: PrivateMessageDto) {
 		const conv = await this.convService.conversationExist(user.id, dto.adresseeId);
-		if (!conv)
-		throw new NotFoundException('Conversation not found');
+		if (!conv) {
+			throw new NotFoundException('Conversation not found');
+		}
 		await this.userService.userBlocked(user.id, dto.adresseeId);
 		const msg = this.privateMsgRepo.create({
 			sender: user,
