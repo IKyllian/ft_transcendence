@@ -130,7 +130,6 @@ export class NotificationService {
 					type: notificationType.CHANNEL_MESSAGE
 				});
 				const notifToSend = await this.notifRepo.save(notif);
-				console.log(notifToSend);
 				socket.to(`user-${user.id}`).emit('NewNotification', notifToSend);
 			}
 		})

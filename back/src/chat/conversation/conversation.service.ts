@@ -2,7 +2,7 @@ import { BadRequestException, Injectable, NotFoundException } from "@nestjs/comm
 import { InjectRepository } from "@nestjs/typeorm";
 import { Conversation, User } from "src/typeorm";
 import { UserService } from "src/user/user.service";
-import { Repository } from "typeorm";
+import { Brackets, Repository } from "typeorm";
 import { PrivateMessage } from "src/typeorm";
 
 @Injectable()
@@ -34,43 +34,37 @@ export class ConversationService {
 	}
 
 	async conversationExist(userId: number, user2Id: number) {
-		return await this.convRepo.findOne({
-			relations: {
-				user1: true,
-				user2: true,
-				messages: { sender: true },
-			},
-			where: [
-				{
-					user1: { id: userId},
-					user2: { id: user2Id },
-				},
-				{
-					user1: { id: user2Id },
-					user2: { id: userId },
-				}
-			]
-		});
+		return this.convRepo.createQueryBuilder('conv')
+			.where("conv.user1Id = :user1Id AND conv.user2Id = :user2Id", { user1Id: userId, user2Id: user2Id })
+			.orWhere("conv.user1Id = :user1Id AND conv.user2Id = :user2Id", { user1Id: user2Id, user2Id: userId })
+			.getOne();
 	}
 
 	async getConversation(user: User, id: number) {
-		return this.convRepo.findOne({
-			relations: {
-				user1: true,
-				user2: true,
-				messages: { sender: true },
-			},
-			where: [
-				{
-					id,
-					user1: { id: user.id }
-				},
-				{
-					id,
-					user2: { id: user.id }
-				}
-			]
-		});
+		const subQuery = this.msgRepo.createQueryBuilder("msg")
+		.where((qb) => {
+			const subQuery = qb
+				.subQuery()
+				.from(PrivateMessage, "msg")
+				.select("msg.id")
+				.where("msg.conversationId = :convId")
+				.orderBy("msg.send_at", "DESC")
+				.skip(0)
+				.take(20)
+				.getQuery()
+			return "msg.id IN " + subQuery;
+		})
+		.setParameter("convId", id)
+		.orderBy("msg.send_at", 'ASC')
+
+		return this.convRepo.createQueryBuilder('conv')
+			.where("conv.id = :convId AND conv.user1Id = :userId", { convId: id, userId: user.id })
+			.orWhere("conv.id = :convId AND conv.user2Id = :userId", { convId: id, userId: user.id })
+			.leftJoinAndSelect("conv.user1", "user1")
+			.leftJoinAndSelect("conv.user2", "user2")
+			.leftJoinAndSelect("conv.messages", "messages", `messages.id IN (${subQuery.select('id').getQuery()})`)
+			.leftJoinAndSelect("messages.sender", "sender")
+			.getOne();
 	}
 
 	async getConversationByUserId(user: User, userId: number) {
@@ -79,7 +73,7 @@ export class ConversationService {
 			throw new NotFoundException('User not found');
 		const convExist = await this.conversationExist(user.id, user2.id);
 		if (convExist)
-			return convExist;
+			return await this.getConversation(user, convExist.id);
 		else
 			return user2;
 	}
@@ -91,35 +85,36 @@ export class ConversationService {
 				user2: true,
 			},
 			where: [
-				{
-					user1: { id: user.id },
-				},
-				{
-					user2: { id: user.id },
-				},
+				{ user1: { id: user.id } },
+				{ user2: { id: user.id } },
 			]
 		});
 	}
 
 	async getMessages(userId: number, convId: number, skip: number) {
-		const conv = await this.convRepo.findOne({
-			where: [
-				{ id: convId, user1: { id: userId } },
-				{ id: convId, user2: { id: userId } },
-			]
-		});
-		if (!conv)
-			throw new BadRequestException("Conversation not found");
-
-		const messages = await this.msgRepo.find({
-			relations: ['sender'],
-			where: {
-				conversation: { id: convId },
-			},
-			skip: skip,
-			take: 20,
-			order: { send_at: 'DESC' },
-		});
-		return messages.reverse();
+		return await this.msgRepo.createQueryBuilder("msg")
+		.where((qb) => {
+			const subQuery = qb
+				.subQuery()
+				.from(PrivateMessage, "msg")
+				.select("msg.id")
+				.where("msg.conversationId = :convId")
+				.orderBy("msg.send_at", "DESC")
+				.skip(skip)
+				.take(20)
+				.getQuery()
+			return "msg.id IN " + subQuery;
+		})
+		.innerJoin("msg.conversation", "conv", "conv.id = :convId", { convId: convId })
+		.andWhere(
+			new Brackets((qb) => {
+				qb.where("conv.user1Id = :userId", { userId: userId })
+				qb.orWhere("conv.user2Id = :userId", { userId: userId })
+			}),
+		)
+		.setParameter("convId", convId)
+		.leftJoinAndSelect("msg.sender", "sender")
+		.orderBy("msg.send_at", 'ASC')
+		.getMany();
 	}
 }
