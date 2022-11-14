@@ -1,16 +1,20 @@
 import Avatar from "../../../Images-Icons/pp.jpg";
-import { BannedUser } from "../../../Types/Chat-Types";
-import { fetchUnbanUser } from "../../../Api/Chat/Chat-Action";
-import { Channel } from "../../../Types/Chat-Types";
+import { UserTimeout } from "../../../Types/Chat-Types";
+import { useContext } from "react";
+import { SocketContext } from "../../../App";
 
-function ChannelBanUser(props: {chanId: number, usersBan: BannedUser[], loggedUserToken: string, setChannelDatas: Function}) {
-    const { usersBan, chanId, loggedUserToken, setChannelDatas } = props;
+function ChannelBanUser(props: {chanId: number, usersBan: UserTimeout[] | undefined}) {
+    const { usersBan, chanId } = props;
+    const {socket} = useContext(SocketContext);
 
     const handleClick = (userBanId: number) => {
-        fetchUnbanUser(loggedUserToken, chanId, userBanId, setChannelDatas);
+        socket?.emit("Unban", {
+            userId: userBanId,
+            chanId: chanId,
+        });
     }
 
-    return usersBan.length > 0 ? (
+    return usersBan && usersBan.length > 0 ? (
         <div className="user-list-container">
             {
                 usersBan.map(elem => 

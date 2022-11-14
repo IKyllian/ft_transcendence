@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { Socket } from 'socket.io-client';
 import { AuthState } from '../Types/User-Types';
 import { LoginPayload } from '../Types/User-Types';
 import { UserInterface } from '../Types/User-Types';
@@ -56,7 +57,7 @@ export const authSlice = createSlice({
         },
         copyFriendListArray: (state, {payload}: PayloadAction<UserInterface[]>) => {
             state.friendList = [...payload];
-        }
+        },
     }
 });
 

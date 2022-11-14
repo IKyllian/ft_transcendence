@@ -10,7 +10,22 @@ export interface ConversationInterfaceFront {
     conversation: ConversationInfoSidebar,
 }
 
+export enum TimeoutType {
+    BAN,
+    MUTED
+}
+
+export enum ChannelUpdateType {
+    JOIN,
+    LEAVE,
+    BAN,
+    MUTE,
+    UNTIMEOUT,
+    CHANUSER,
+}
+
 export interface ChannelUser {
+    id: number,
     role: string,
     user: UserInterface,
     mutedTime?: string,
@@ -18,11 +33,12 @@ export interface ChannelUser {
     channelId: number,
 }
 
-export interface BannedUser {
+export interface UserTimeout {
     id: number,
     user: UserInterface,
     until?: number,
     channel: Channel,
+    type: TimeoutType,
 }
 
 export interface ChatMessage {
@@ -39,7 +55,7 @@ export interface Channel {
     option: string,
     channelUsers: ChannelUser[],
     messages: ChatMessage[],
-    bannedUsers: BannedUser[],
+    usersTimeout: UserTimeout[],
 }
 
 export interface ChannelInfoSidebar {

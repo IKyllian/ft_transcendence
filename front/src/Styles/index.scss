@@ -65,6 +65,11 @@ body {
 	background-size: cover;
 }
 
+input:-webkit-autofill {
+	transition: background-color 5000s ease-in-out 0s !important; 
+	-webkit-text-fill-color: rgb(255, 255, 255) !important;
+}
+
 a, button{
 	color: $WhitePalette;
 	text-decoration: none;
@@ -184,3 +189,23 @@ button {
 	font-size: 14px;
 	letter-spacing: 1px;
 }
+
+.invited-spin {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+  border-top: 3px solid #FFF;
+  border-right: 3px solid transparent;
+  box-sizing: border-box;
+  animation: rotation 1s linear infinite;
+}
+
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+} 

@@ -10,6 +10,7 @@ import { SocketContext } from "../../App";
 import { UserInterface } from "../../Types/User-Types";
 import { fetchSearchAllUsers } from "../../Api/User-Fetch";
 import { fetchSearchUsersToInvite } from "../../Api/Chat/Chat-Fetch";
+import { SearchBarFunctionality } from "../../Types/Utils-Types";
 
 type FormValues = {
     chanMode: string,
@@ -118,8 +119,8 @@ function ChatModal(props: {onCloseModal: Function, showModal: number}) {
                                 }
                             </>
                         }
-                        { showModal === 1 && <SearchBarPlayers functionality="chanInviteOnCreate" checkboxOnChange={checkboxOnChange} checkboxArray={usersInvited} fetchUserFunction={fetchSearchAllUsers} />}
-                        { showModal === 3 && <SearchBarPlayers functionality="chanInvite" checkboxOnChange={checkboxOnChange} checkboxArray={usersInvited} fetchUserFunction={fetchSearchUsersToInvite} />}
+                        { showModal === 1 && <SearchBarPlayers functionality={SearchBarFunctionality.CHAN_INVITE_ON_CREATE} checkboxOnChange={checkboxOnChange} checkboxArray={usersInvited} fetchUserFunction={fetchSearchAllUsers} />}
+                        { showModal === 3 && <SearchBarPlayers functionality={SearchBarFunctionality.CHAN_INVITE} checkboxOnChange={checkboxOnChange} checkboxArray={usersInvited} fetchUserFunction={fetchSearchUsersToInvite} />}
                         <div className="chat-modal-buttons">
                             <button onClick={() => onCloseModal() }> Cancel </button>
                             <input type="submit" name={showModal === 1 ? "Save" : "Envoyer"} />
@@ -132,7 +133,7 @@ function ChatModal(props: {onCloseModal: Function, showModal: number}) {
         return (
             <div className="chat-modal">
                 <IconX className="modal-exit" onClick={() => onCloseModal() } />
-                <SearchBarPlayers functionality="sendMessage" fetchUserFunction={fetchSearchAllUsers} />
+                <SearchBarPlayers functionality={SearchBarFunctionality.SEND_MESSAGE} fetchUserFunction={fetchSearchAllUsers} />
             </div>
         );
     } else {

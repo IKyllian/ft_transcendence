@@ -16,6 +16,7 @@ function BanButton(props: {senderId: number, chanId: number}) {
             socket?.emit("Ban", {
                 userId: senderId,
                 chanId: chanId,
+                time: number,
             });
         }
     })

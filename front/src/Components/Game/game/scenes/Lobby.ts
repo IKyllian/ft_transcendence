@@ -1,6 +1,5 @@
 import 'phaser';
 import { 
-		PlayersLobbyData,
 		PlayerStatus,
 		PlayerType,
 		LobbyStatus, 
@@ -160,13 +159,13 @@ export default class Lobby extends Phaser.Scene
 									.setInteractive();
 		}
 
-		let lobbydata: PlayersLobbyData = 
-		{
-			player_secret: this.game.registry.get('players_data').player_secret,
-			game_id: this.game.registry.get('players_data').game_id
-		};
+		// let lobbydata: PlayersLobbyData = 
+		// {
+		// 	player_secret: this.game.registry.get('players_data').player_secret,
+		// 	game_id: 
+		// };
 
-		this.socketmanager.lobby_send_join(lobbydata.game_id);
+		this.socketmanager.lobby_send_join(this.game.registry.get('players_data').game_id);
 
 		if (this.me !== PlayerType.Spectator)
 		{

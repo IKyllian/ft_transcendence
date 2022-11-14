@@ -1,10 +1,321 @@
 @use "./Variables.scss" as *;
 
+$GreyLobby: rgb(207, 203, 203);
+$TeamBlueColor: rgb(0, 98, 255);
+$TeamRedColor: rgb(247, 30, 6);
+
+#root {
+    $PaddleHeight: 150px;
+    $PlayerBackAdvance: 10px;
+    $PlayerFrontAdvance: 40px;
+}
+
 .lobby-container {
     background-color: $LightDarkPalette;
     @include page-wrapper();
 
-    button {
-        color: black;
-    }
+    .lobby-wrapper {
+        height: 100%;
+        padding: 10px 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        .lobby-player-list {
+            @include flex-row-alignCenter();
+            justify-content: center;
+            gap: 10px;
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            .empty-item {
+                justify-content: center;
+
+                svg {
+                    @include width-height(30px, 30px);
+                    cursor: pointer;
+                }
+            }
+            
+            .team-blue {
+                background-color: rgba(0, 98, 255, 0.57);
+                box-shadow: rgba(13, 110, 255, 0.25) 0px 12px 28px 0px, rgba(13, 110, 255, 0.25) 0px 2px 4px 0px, rgba(13, 110, 255, 0.25) 0px 0px 0px 1px inset;
+                border: 1.5px solid $TeamBlueColor
+            }
+            .team-red {
+                background-color: rgba(249, 25, 0, 0.72);
+                box-shadow: rgba(255, 13, 13, 0.25) 0px 12px 28px 0px, rgba(255, 13, 13, 0.25) 0px 2px 4px 0px, rgba(255, 13, 13, 0.25) 0px 0px 0px 1px inset;
+                border: 1.5px solid $TeamRedColor
+            }
+
+            li {
+                @include width-height(200px, 200px);
+                padding: 30px 10px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                background-color: #131d30;
+                border-radius: 15px;
+                position: relative;
+                .teams-wrapper {
+                    position: absolute;
+                    right: 10px;
+                    top: 10px;
+                    @include flex-row-alignCenter();
+                    gap: 5px;
+
+                    .team1 {
+                        background-color: $TeamBlueColor;
+                    }
+
+                    .team2 {
+                        background-color: $TeamRedColor;
+                    }
+
+                    .team-active {
+                        border: 1.5px solid white
+                    }
+
+                    .circle-item {
+                        @include width-height(17px, 17px);
+                        border-radius: 50%;
+                        cursor: pointer
+                    }
+                }
+                
+                .avatar-shadow {
+                    box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+                }
+                .player-avatar {
+                    @include avatar-player(80px);
+                }
+    
+                p {
+                    margin: 10px 0 0 0;
+                    font-size: 15px;
+                    font-weight: bold;
+                }
+                
+                .team-select {
+                    cursor: pointer;
+                    padding: 5px;
+                    background-color: #1B263B;
+                    border-radius: 5px;
+                    border: none;
+                    color: white;
+                    margin-top: 5px;
+                    font-size: 11px;
+                }
+                
+                .player-pos {
+                    margin-top: 10px;
+                    font-size: 10px;
+                }
+    
+                span {
+                    @include flex-row-alignCenter();
+                    gap: 5px;
+                    font-size: 12px;
+                    color: $GreyLobby;
+                    svg {
+                        @include width-height(12px, 12px);
+                        border: 1px solid $GreyLobby;
+                        border-radius: 50%;
+                    }
+                }
+            }
+        }
+
+        .lobby-settings {
+            @include flex-row-alignCenter();
+            gap: 20px;
+            .setting-wrapper {
+                background-color: $DarkPalette;
+                border-radius: 10px;
+            }
+
+            .game-settings {
+                @include width-height(350px, 350px);
+                padding: 10px;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-around;
+                position: relative;
+    
+                p {
+                    text-align: center;
+                    margin: 0;
+                }
+
+                .lock-icon {
+                    margin: auto;
+                    @include width-height(60px, 60px);
+                }
+    
+                form {
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: space-between;
+                    gap: 5px;
+
+                    label {
+                        @include flex-row-alignCenter();
+                        justify-content: space-between;
+                        font-size: 13px;
+                    }
+
+                    .setting-submit {
+                        all: unset;
+                        cursor: pointer;
+                        margin: 15px auto 0 auto;
+                        border: 1px solid white;
+                        padding: 5px;
+                        border-radius: 7px;
+                    }
+                }
+            }
+
+            .board-game-wrapper {
+                @include width-height(500px, 350px);
+
+                .game-board {
+                    height: 100%;
+                    display: flex;
+                    flex-direction: row;
+                    justify-content: space-between;
+                    align-items: center;
+                    overflow: hidden;
+                    position: relative;
+
+                    .left-wrapper {
+                        .paddle-front {
+                            left: var(--PlayerFrontAdvance);
+                        }
+
+                        .paddle-back {
+                            left: var(--PlayerBackAdvance);
+                        }
+                    }
+
+                    .right-wrapper {
+                        .paddle-front {
+                            right: var(--PlayerFrontAdvance);
+                        }
+
+                        .paddle-back {
+                            right: var(--PlayerBackAdvance);
+                        }
+                    }
+
+                    .paddle-wrapper {
+                        @include flex-row-alignCenter();
+                        position: relative;
+                        .paddle-left {
+                            background-color: $TeamBlueColor;
+                        }
+    
+                        .paddle-right {
+                            background-color: $TeamRedColor;
+                        }
+    
+                        .paddle {
+                            height: var(--PaddleHeight);
+                            width: 2px;
+                            position: absolute;
+                        }
+                    }
+
+                    .ball {
+                        @include width-height(20px, 20px);
+                        position: absolute;
+                        left: 0;
+                        right: 0;
+                        margin: 0 auto;
+                        border-radius: 50px;
+                        background-color: aqua;
+                    }
+                }
+               
+            }
+        }
+
+        .lobby-buttons-wrapper {
+            @include flex-row-alignCenter();
+            gap: 10px;
+            justify-content: center;
+            position: relative;
+
+            .start-button {
+                cursor: pointer;
+            }
+
+            .game-modes-dropdown {
+                position: absolute;
+                width: 32.5%;
+                border-top-left-radius: 10px;
+                border-top-right-radius: 10px;
+                background-color: $DarkPalette;
+                top: -94px;
+                right: 0;
+                text-align: center;
+
+                ul {
+                    list-style-type: none;
+                    padding: 0;
+                    margin: 0;
+                    .gameMode-lock {
+                        cursor: auto;
+                        color: grey;
+                        position: relative;
+                        background-color: rgb(0 0 0 / 24%);
+                        
+                        .lock-icon {
+                            position: absolute;
+                            right: 0;
+                            left: 0;
+                            top: 0;
+                            bottom: 0;
+                            margin: auto;
+                            color: rgba(255, 255, 255, 0.772);
+                        }
+                    }
+                    li {
+                        &:first-child {
+                            border-top-left-radius: 10px;
+                            border-top-right-radius: 10px;
+                        }
+                        padding: 6px;
+                        cursor: pointer;
+                        &:hover:not(.gameMode-lock) {
+                            background-color: #102031;
+                        }
+                    }
+                }
+            }
+
+            .bos {
+                border-top-left-radius: 0;
+                border-top-right-radius: 0;
+            }
+
+            .game-modes-button {
+                @include flex-row-alignCenter();
+                justify-content: center;
+                .chevron-icon {
+                    position: absolute;
+                    right: 10px;
+                }
+            }
+
+            button {
+                all: unset;
+                text-align: center;
+                border-radius: 10px;
+                background-color: $DarkPalette;
+                width: 250px;
+                height: 40px;
+                position: relative;
+            }
+        }   
+    }    
 }

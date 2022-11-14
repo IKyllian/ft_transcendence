@@ -10,9 +10,8 @@ function NotifGameInvite(props: {notif: NotificationInterface ,notifOnLeave: Fun
     const navigate = useNavigate();
     
     const handleAccept = () => {
-        socket!.emit("AcceptGameInvite", { id: notif.requester.id });
+        socket!.emit("JoinParty", { id: notif.requester.id });
         notifOnLeave();
-        navigate(`/lobby`, {state: notif.requester});
     }
 
     const handleDecline = () => {

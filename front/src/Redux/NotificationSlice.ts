@@ -15,7 +15,7 @@ export const notificationSlice = createSlice({
     name: 'notification',
     initialState: defaultState,
     reducers: {
-        copyChannelsArray: (state, {payload}: PayloadAction<NotificationInterface[]>) => {
+        copyNotificationArray: (state, {payload}: PayloadAction<NotificationInterface[]>) => {
             state.notifications = [...payload];
         },
         addNotification: (state, {payload}: PayloadAction<NotificationInterface>) => {
@@ -31,4 +31,4 @@ export const notificationSlice = createSlice({
     }
 });
 
-export const { copyChannelsArray, addNotification, deleteNotification } = notificationSlice.actions;
+export const { copyNotificationArray, addNotification, deleteNotification } = notificationSlice.actions;

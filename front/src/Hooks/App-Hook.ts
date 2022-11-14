@@ -10,6 +10,9 @@ import { addChannel, addPrivateConv, removeChannel, } from "../Redux/ChatSlice";
 import { Channel, Conversation } from "../Types/Chat-Types";
 import { UserInterface } from "../Types/User-Types";
 import { copyFriendListArray } from "../Redux/AuthSlice";
+import { GameMode, PartyInterface } from "../Types/Lobby-Types";
+import { copyNotificationArray } from "../Redux/NotificationSlice";
+import { addParty, cancelQueue, changePartyGameMode, changeQueueStatus, leaveParty } from "../Redux/PartySlice";
 
 export function useAppHook() {
     const [socket, setSocket] = useState<Socket | undefined>(undefined);
@@ -39,29 +42,53 @@ export function useAppHook() {
 	useEffect(() => {
 		if (isAuthenticated && socket === undefined) {
 			connectSocket();
-			fetchNotifications(token, dispatch);
-			fetchFriendList(token, dispatch);
-			// setTimeout(function() {
-			// 	setGameInvite(true);
-			// 	setTimeout(function() {
-			// 		gameNotificationLeave();
-			// 	}, 15000);
-			// }, 2000);
+			// fetchNotifications(token, dispatch);
+			// fetchFriendList(token, dispatch);
 		}
 	}, [isAuthenticated])
 
 	useEffect(() => {
 		if (socket !== undefined) {
 			console.log("SOCKET CONDITION");
+			
+			socket.on("Connection", (data: {friendList: UserInterface[], notification: NotificationInterface[], party: PartyInterface}) => {
+				console.log("data connection", data);
+				dispatch(copyNotificationArray(data.notification));
+				dispatch(copyFriendListArray(data.friendList));
+				if (data.party)
+					dispatch(addParty(data.party));
+			});
+
+			socket.on("PartyUpdate", (data: {party: PartyInterface, cancelQueue: boolean}) => {
+				console.log("PartyUpdate", data);
+				dispatch(addParty(data.party));
+				dispatch(cancelQueue(data.cancelQueue));
+			});
+
+			socket.on("GameModeUpdate", (data: GameMode) => {
+				dispatch(changePartyGameMode(data));
+			})
+
+			socket.on("PartyLeave", () => {
+				dispatch(leaveParty());
+			});
+
+			socket.on("InQueue", (data: boolean) => {
+				dispatch(changeQueueStatus(data));
+			})
+
 			socket.on("NewNotification", (data: NotificationInterface) => {
 				console.log("NewNotification", data);
 				dispatch(addNotification(data));
 			});
 
-			socket.on("NewGameInvite", (data: NotificationInterface) => {
-				console.log("NewGameInvite", data);
+			socket.on("NewPartyInvite", (data: NotificationInterface) => {
+				console.log("NewPartyInvite", data);
 				setGameInvite(data);
-			})
+				setTimeout(function() {
+					setGameInvite(undefined);
+				}, 15000);
+			});
 
 			socket.on("DeleteNotification", (data: number) => {
 				dispatch(deleteNotification(data));
@@ -75,7 +102,7 @@ export function useAppHook() {
 			socket.on("FriendListUpdate", (data: UserInterface[]) => {
 				console.log("FriendListUpdate", data);
 				dispatch(copyFriendListArray(data));
-			})
+			});
 
 			socket.on("NewConversation", (data : {conv: Conversation, socketId: string}) => {
 				console.log("NewConversation", data);
@@ -103,9 +130,13 @@ export function useAppHook() {
 		}
 
 		return () => {
+			socket?.off("Connection");
 			socket?.off("NewNotification");
 			socket?.off("NewConversation");
-			socket?.off("NewGameInvite");
+			socket?.off("PartyUpdate");
+			socket?.off("InQueue");
+			socket?.off("PartyLeave");
+			socket?.off("NewPartyInvite");
 			socket?.off("FriendListUpdate");
 			socket?.off("DeleteNotification");
 			socket?.off("exception");

@@ -39,6 +39,10 @@ export function useProfileHook() {
     }
 
     useEffect(() => {
+        handleClick(0);
+    }, [params])
+
+    useEffect(() => {
         if (params.username === currentUser?.username) {
             setUserState({
                 isLoggedUser: true,
