@@ -17,7 +17,7 @@
 	- status update
 	- SQL injection in search bars ?
 	- Private msg notifications
-	- private chan doesnt work
+	- private chan doesnt work + should not appear in search
 
 //ISSUE ?
 	- can create username with \n

@@ -31,9 +31,9 @@ export enum channelRole {
 };
 
 export enum channelOption {
-	PUBLIC = 'public',
-	PRIVATE = 'private',
-	PROTECTED = 'protected',
+	PUBLIC,
+	PRIVATE,
+	PROTECTED,
 };
 
 export enum notificationType {

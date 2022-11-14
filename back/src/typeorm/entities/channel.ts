@@ -1,6 +1,6 @@
 import { Exclude } from "class-transformer";
 import { channelOption } from "src/utils/types/types";
-import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { ChannelMessage } from "./channelMessage";
 import { ChannelUser } from "./channelUser";
 import { UserTimeout } from "./userTimeout";
@@ -13,7 +13,7 @@ export class Channel {
 	@Column({ unique: true })
 	name: string;
 
-	@Column({ default: 'public' })
+	@Column({ default: channelOption.PUBLIC })
 	option: channelOption;
 
 	@OneToMany(() => ChannelUser, (channelUser) => channelUser.channel, {
