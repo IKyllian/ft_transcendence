@@ -15,6 +15,8 @@ const defaultState: AuthState = {
     setUsersame: false,
 }
 
+const defaultLogout: AuthState = {...defaultState, loadingIsConnected: false};
+
 export const authSlice = createSlice({
     name: 'auth',
     initialState: defaultState,
@@ -48,7 +50,7 @@ export const authSlice = createSlice({
         logoutPending: (state) => {
             state.loading = true;
         },
-        logoutSuccess: () => defaultState,
+        logoutSuccess: () => defaultLogout,
         replaceUserObject: (state, {payload}: PayloadAction<UserInterface>) => {
             state.currentUser = {...payload};
         },
