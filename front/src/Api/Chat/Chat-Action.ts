@@ -5,16 +5,11 @@ import { NavigateFunction } from "react-router-dom";
 import { Socket } from "socket.io-client";
 import { baseUrl } from "../../env";
 import { addChannel } from "../../Redux/ChatSlice";
+import { ChatMessage, PreviousMessagesState, CreateChanBodyRequest } from "../../Types/Chat-Types";
 import { UserInterface } from "../../Types/User-Types";
 
-type BodyRequest = {
-    name: string,
-    option: string,
-    password?: string,
-}
-
 export function fetchCreateChannel(
-    body: BodyRequest,
+    body: CreateChanBodyRequest,
     usersInvited: UserInterface[] | undefined,
     token: string,
     dispatch: Dispatch<AnyAction>,
@@ -53,6 +48,30 @@ export function fetchLeaveChannel(channelId: number, token: string, navigate: Na
     })
     .then((response) => {
         navigate("/chat");
+    })
+    .catch((err) => {
+        console.log(err);
+    })
+}
+
+export function fetchLoadPrevMessages(channelId: number, token: string, setChatDatas: Function, currentMessages: ChatMessage[], setPreviousMessages: Function) {
+    axios.post(`${baseUrl}/channel/${channelId}/messages`, {skip: currentMessages.length}, {
+        headers: {
+            "Authorization": `Bearer ${token}`,
+        }
+    })
+    .then((response) => {
+        console.log("response", response.data);
+        if (response.data.length > 0) {
+            let newMessagesArray: ChatMessage[] = [...currentMessages];
+            let newDatas: ChatMessage[] = response.data;
+            newDatas.forEach((elem: ChatMessage) => elem.send_at = new Date(elem.send_at));
+            newMessagesArray = [...newDatas, ...newMessagesArray]
+            setChatDatas((prev: Channel) => {return {...prev, messages: newMessagesArray}});
+        } else {
+            setPreviousMessages({loadPreviousMessages: false, reachedMax: true});
+        }
+        
     })
     .catch((err) => {
         console.log(err);

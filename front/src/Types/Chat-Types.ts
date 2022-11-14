@@ -24,6 +24,23 @@ export enum ChannelUpdateType {
     CHANUSER,
 }
 
+export enum ChannelModes {
+    PUBLIC,
+    PRIVATE,
+    PROTECTED,
+}
+
+export interface CreateChanBodyRequest {
+    name: string,
+    option: ChannelModes,
+    password?: string,
+}
+
+export interface PreviousMessagesState {
+    loadPreviousMessages: boolean,
+    reachedMax: boolean,
+}
+
 export interface ChannelUser {
     id: number,
     role: string,

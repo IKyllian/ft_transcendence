@@ -1,21 +1,29 @@
-import { useEffect, useState, useRef, useContext, useCallback, useMemo } from "react";
+import { useEffect, useState, useRef, useContext, useCallback } from "react";
 import { useParams } from "react-router-dom";
-import { Channel, ChannelUser, ChannelUpdateType, UserTimeout } from "../../Types/Chat-Types";
+import { Channel, ChannelUser, ChannelUpdateType, UserTimeout, PreviousMessagesState } from "../../Types/Chat-Types";
 import { useAppDispatch, useAppSelector } from '../../Redux/Hooks'
 import { SocketContext } from "../../App";
 import { addChannel } from "../../Redux/ChatSlice";
 import { UserInterface } from "../../Types/User-Types";
 import { debounce } from "../../Utils/Utils-Chat";
 import { useForm } from "react-hook-form";
+import { fetchLoadPrevMessages } from "../../Api/Chat/Chat-Action";
+
+const defaultMessagesState: PreviousMessagesState = {
+    loadPreviousMessages: false,
+    reachedMax: false
+}
 
 export function useChannelHook() {
     const [chatDatas, setChatDatas] = useState<Channel | undefined>(undefined);
     const [showUsersSidebar, setShowUsersSidebar] = useState<boolean>(true);
     const [loggedUserIsOwner, setLoggedUserIsOwner] = useState<boolean>(false);
     const [hasSendTypingEvent, setHasTypingEvent] = useState<boolean>(false);
-    const [usersTyping, setUsersTyping] = useState<UserInterface[]>([]);
-
+    const [previousMessages, setPreviousMessages] = useState<PreviousMessagesState>(defaultMessagesState);
     const { register, handleSubmit, reset, formState: {errors} } = useForm<{inputMessage: string}>();
+    const [usersTyping, setUsersTyping] = useState<UserInterface[]>([]);
+    const [haveToLoad, setHaveToLoad] = useState<boolean>(false);
+    const [prevLength, setPrevLength] = useState<number>(0);
 
     const messagesEndRef = useRef<null | HTMLDivElement>(null);
     let authDatas = useAppSelector((state) => state.auth);
@@ -25,20 +33,12 @@ export function useChannelHook() {
     const channelId: number | undefined = params.channelId ? parseInt(params.channelId!, 10) : undefined;
     const dispatch = useAppDispatch();
 
-    console.log("Channel page render");
-
     const changeSidebarStatus = () => {
-        console.log("changeSidebarStatus");
         setShowUsersSidebar(!showUsersSidebar);
     };
 
-    const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView();
-    }
-
     const handleInputChange = () => {
         if (!hasSendTypingEvent) {
-            console.log("Send Emit is Typing True");
             socket?.emit("OnTypingChannel", {
                 chanId: channelId,
                 isTyping: true,
@@ -48,7 +48,6 @@ export function useChannelHook() {
     }
 
     const endOfTyping = () => {
-        console.log("Send Emit is Typing False", hasSendTypingEvent);
         socket?.emit("OnTypingChannel", {
             chanId: channelId,
             isTyping: false,
@@ -58,15 +57,52 @@ export function useChannelHook() {
 
     const optimizedFn = useCallback(debounce(endOfTyping, 6000), [hasSendTypingEvent, channelId]);
 
+    const handleOnScroll = (e: any) => {
+        if (channelId && chatDatas && e && e.target && e.target.scrollTop < 5 && !previousMessages.reachedMax && !previousMessages.loadPreviousMessages && !haveToLoad) {
+            setHaveToLoad(true);            
+        }
+    }
+
     useEffect(() => {
-        scrollToBottom();
+        if (haveToLoad && channelId && chatDatas && !previousMessages.loadPreviousMessages && !previousMessages.reachedMax) {
+            setPreviousMessages(prev => { return {...prev, loadPreviousMessages: true}});
+            fetchLoadPrevMessages(channelId, authDatas.token, setChatDatas, chatDatas?.messages, setPreviousMessages);
+        }
+    }, [haveToLoad])
+
+    const scrollToBottom = () => {
+        // Permet de check si la div du chat est scrollable. Si elle ne l'est pas, load des datas pour que la div devienne scrollable
+        var div = document.getElementsByClassName('chat-messages-wrapper');
+        if (div.length > 0){
+            var hasVerticalScrollbar = div[0].scrollHeight > div[0].clientHeight;
+            if (!hasVerticalScrollbar && channelId && chatDatas) {
+                fetchLoadPrevMessages(channelId, authDatas.token, setChatDatas, chatDatas?.messages, setPreviousMessages);
+            }
+        } 
+        messagesEndRef.current?.scrollIntoView();
+    }
+
+    useEffect(() => {
+        if (!previousMessages.loadPreviousMessages && chatDatas) {
+            scrollToBottom();
+            setPrevLength(chatDatas.messages.length);
+        } else if (chatDatas) {
+            const scrollToMessage = document.getElementById("chat-message-wrapper")?.getElementsByTagName('li');
+            if (scrollToMessage && scrollToMessage.length > 0)
+                scrollToMessage[chatDatas.messages.length - prevLength].scrollIntoView();
+            setPrevLength(chatDatas.messages.length);
+            setPreviousMessages((prev: PreviousMessagesState) => { return {...prev, loadPreviousMessages: false}});
+            setHaveToLoad(false);
+        }
     }, [chatDatas?.messages]);
 
     useEffect(() => {
-        console.log("UseEffect ChannelId");
         setChatDatas(undefined);
         setLoggedUserIsOwner(false);
         setUsersTyping([]);
+        setPreviousMessages(defaultMessagesState);
+        setHaveToLoad(false);
+        setPrevLength(0);
         const getDatas = () => {
             socket!.emit("JoinChannelRoom", {
                 id: channelId,
@@ -143,13 +179,12 @@ export function useChannelHook() {
                 id: channelId,
             });
             socket!.off("roomData");
-            socket!.off("ChannelUsersUpdate");
-            socket!.off("ChannelUserUpdate");
+            socket!.off("ChannelUpdate");
+            socket!.off("OnTypingChannel");
         }
     }, [channelId])
 
     useEffect(() => {
-        console.log("EseEffect no dependance");
         const listener = (data: any) => {
             setChatDatas((prev: any) => {
                 return {...prev, messages: [...prev!.messages, {...data, send_at: new Date(data.send_at)}]}
@@ -189,5 +224,7 @@ export function useChannelHook() {
         handleInputChange,
         usersTyping,
         register,
+        handleOnScroll,
+        previousMessages,
     };
 }

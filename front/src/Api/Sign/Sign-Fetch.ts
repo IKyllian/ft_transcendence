@@ -80,3 +80,17 @@ export function fetchSetUsername(username: string, token: string, dispatch: Disp
         // TODO Handle error: Display error message on login page
     });
 }
+
+export function fetchMe(token: string, dispatch: Dispatch<AnyAction>) {
+    axios.get(`${baseUrl}/users/me`, {
+        headers: {
+            "Authorization": `Bearer ${token}`,
+        }
+    })
+    .then((response) => {
+        console.log("Response Me", response);
+    })
+    .catch((err) => {
+        console.log(err);
+    })
+}

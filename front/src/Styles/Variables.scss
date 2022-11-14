@@ -63,14 +63,23 @@ $OfflineColor: rgb(194, 29, 29);
     margin: auto;
     border-radius: 10px;
     background-color: $bgColor;
+    @include overflowScroll("y");
     .modal-exit {
         position: absolute;
-        right: 0;
-        top: -55px;
-        width: 40px;
-        height: 40px;
+        right: 5px;
+        top: 5px;
+        width: 20px;
+        height: 20px;
         color: $WhitePalette;
         cursor: pointer;
+    }
+
+    @media screen and (max-height: 700px) {
+        height: 97%;
+    }
+
+    @media screen and (max-width: $BreakPoint_800) {
+        width: 90%;
     }
 }
 

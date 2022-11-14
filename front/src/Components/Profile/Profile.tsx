@@ -20,7 +20,7 @@ function Profile() {
             <div className="profile-header">
                 <div className='stats-infos'>
                     <StatsInfoItem label="Games Played" value={getMatchPlayed(userState.user).toString()} />
-                    <StatsInfoItem label="Win Rate" value={`${getWinRate(userState.user).toString()}%`} />
+                    <StatsInfoItem label="Win Rate" value={`${getWinRate(userState.user)}%`} />
                     <StatsInfoItem label="Rank" value="#3" />
                 </div>
                 <CardInfo userState={userState} />

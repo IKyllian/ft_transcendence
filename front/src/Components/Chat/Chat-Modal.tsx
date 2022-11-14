@@ -11,18 +11,13 @@ import { UserInterface } from "../../Types/User-Types";
 import { fetchSearchAllUsers } from "../../Api/User-Fetch";
 import { fetchSearchUsersToInvite } from "../../Api/Chat/Chat-Fetch";
 import { SearchBarFunctionality } from "../../Types/Utils-Types";
+import { ChannelModes, CreateChanBodyRequest } from "../../Types/Chat-Types"
 
 type FormValues = {
     chanMode: string,
     chanName: string,
     password?: string,
     usersIdInvited?: string[];
-}
-
-type BodyRequest = {
-    name: string,
-    option: string,
-    password?: string,
 }
 
 function ChatModal(props: {onCloseModal: Function, showModal: number}) {
@@ -44,14 +39,22 @@ function ChatModal(props: {onCloseModal: Function, showModal: number}) {
             setUsersInvited(prev => [...prev, val]);
     }
 
+    const selectChanMode = (modeString: string): ChannelModes => {
+        if (modeString === "public")
+            return ChannelModes.PUBLIC;
+        else if (modeString === "protected")
+            return ChannelModes.PROTECTED;
+        return ChannelModes.PRIVATE;
+    }
+
     const formSubmit = handleSubmit((data, e) => {
         e?.preventDefault();
         if (showModal === 1) {
-            let body: BodyRequest = {
+            let body: CreateChanBodyRequest = {
                 name: data.chanName,
-                option: data.chanMode,
+                option: selectChanMode(data.chanMode),
             }
-            if (data.chanMode === "protected")
+            if (body.option === ChannelModes.PROTECTED)
                 body = {...body, password: data.password}
             fetchCreateChannel(body, usersInvited, authDatas.token, dispatch, navigate, onCloseModal, socket!);
         } else {
