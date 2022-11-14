@@ -44,6 +44,8 @@ export function useAppHook() {
 		const localToken: string | null = localStorage.getItem("userToken");
 		if (localToken !== null) {
 			fetchVerifyToken(localToken, dispatch);
+		} else {
+			dispatch(stopIsConnectedLoading());
 		}
 	}, [])
 

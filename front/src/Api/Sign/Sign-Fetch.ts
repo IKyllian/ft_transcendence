@@ -2,7 +2,7 @@ import { Dispatch, AnyAction } from "@reduxjs/toolkit";
 import axios from "axios";
 import { baseUrl } from "../../env";
 import { LoginPayload } from "../../Types/User-Types";
-import { loginSuccess, loginError, setUsername } from "../../Redux/AuthSlice";
+import { loginSuccess, loginError, setUsername, stopIsConnectedLoading } from "../../Redux/AuthSlice";
 import { NavigateFunction } from "react-router-dom";
 
 interface SignParameter {
@@ -93,6 +93,7 @@ export function fetchVerifyToken(token: string, dispatch: Dispatch<AnyAction>) {
     })
     .catch((err) => {
         console.log(err);
+        dispatch(stopIsConnectedLoading());
     })
 }
 
