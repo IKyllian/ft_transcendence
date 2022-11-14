@@ -26,8 +26,6 @@ export function useLoadChatDatas() {
     const channelId: number | undefined = params.channelId ? parseInt(params.channelId!, 10) : undefined;
     const convId: number | undefined = params.convId ? parseInt(params.convId!, 10) : undefined;
 
-    console.log("Chat render");
-
     const sidebarOnChange = () => {
         setReponsiveSidebar(!responsiveSidebar);
     };

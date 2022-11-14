@@ -10,6 +10,7 @@ const defaultState: AuthState = {
     isAuthenticated: false,
     error: undefined,
     loading: false,
+    loadingIsConnected: true,
     token:'',
     setUsersame: false,
 }
@@ -27,31 +28,27 @@ export const authSlice = createSlice({
             state.token = payload.token;
             state.isAuthenticated = true;
             state.loading = false;
+            state.loadingIsConnected = false,
             console.log("state", state);
         },
         loginError: (state, {payload}: PayloadAction<string>) => {
             state.error = payload;
             state.isAuthenticated = false;
             state.loading = false;
+            state.loadingIsConnected = false;
         },
         setUsername: (state) => {
             state.setUsersame = true,
             state.loading = false;
+            state.loadingIsConnected = false;
+        },
+        stopIsConnectedLoading: (state) => {
+            state.loadingIsConnected = false;
         },
         logoutPending: (state) => {
             state.loading = true;
         },
-        logoutSuccess: (state) => {
-            state = {
-                currentUser: undefined,
-                friendList: [],
-                isAuthenticated: false,
-                error: undefined,
-                loading: false,
-                token:'',
-                setUsersame: false,
-            }
-        },
+        logoutSuccess: () => defaultState,
         replaceUserObject: (state, {payload}: PayloadAction<UserInterface>) => {
             state.currentUser = {...payload};
         },
@@ -61,4 +58,4 @@ export const authSlice = createSlice({
     }
 });
 
-export const { loginPending, loginSuccess, loginError, setUsername, logoutPending, logoutSuccess, replaceUserObject, copyFriendListArray } = authSlice.actions;
+export const { loginPending, loginSuccess, loginError, setUsername, stopIsConnectedLoading, logoutPending, logoutSuccess, replaceUserObject, copyFriendListArray } = authSlice.actions;

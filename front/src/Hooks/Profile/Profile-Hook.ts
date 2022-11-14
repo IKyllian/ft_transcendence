@@ -6,6 +6,7 @@ import { useParams } from "react-router-dom";
 
 import { SocketContext } from "../../App";
 import { fetchProfile } from "../../Api/Profile/Profile-Fetch";
+import { fetchMe } from "../../Api/Profile/Profile-Fetch";
 
 interface ProfileMenuButtons {
     title: string;
@@ -40,22 +41,19 @@ export function useProfileHook() {
 
     useEffect(() => {
         handleClick(0);
-    }, [params.username])
-
-    useEffect(() => {
         if (params.username === currentUser?.username) {
-            setUserState({
-                isLoggedUser: true,
-                user: currentUser!,
-                friendList: friendList,
-            });
+            fetchMe(token, setUserState, friendList);
         }
         else if (params.username) {
             fetchProfile(params.username, token, setUserState);
         }
+    }, [params.username])
 
-        
-    }, [params, friendList, notifications, friendRequestSent])
+    useEffect(() => {
+        if (params.username === currentUser?.username) {
+            setUserState((prev: any) => { return {...prev, friendList: friendList}});
+        }
+    }, [friendList, notifications, friendRequestSent])
 
     useEffect(() => {
         socket?.on("RequestValidation", (() => {

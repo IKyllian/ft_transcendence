@@ -4,7 +4,6 @@ import { replaceUserObject } from "../Redux/AuthSlice";
 import { AnyAction, Dispatch } from "@reduxjs/toolkit";
 import { copyNotificationArray } from "../Redux/NotificationSlice";
 import { copyFriendListArray } from "../Redux/AuthSlice";
-import { executionAsyncResource } from "async_hooks";
 import { UserInterface } from "../Types/User-Types";
 
 interface BlockParameters {

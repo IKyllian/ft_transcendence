@@ -26,7 +26,6 @@ import Lobby from "./Components/Game/Lobby";
 import ModalPartyInvite from "./Components/Modal-Party-Invite";
 import CodeVerification from "./Components/Sign/Code-Verification";
 
-
 interface RouteProps {
 	path: string,
 	element: JSX.Element,
@@ -110,17 +109,18 @@ function App() {
 		closeEventError,
 		gameInvite,
 		gameNotificationLeave,
+		isAuthenticated,
 	} = useAppHook();
 
   return (
 	<div className="app-container">
 		<SocketContext.Provider value={{socket: socket}} >
 			<ModalProvider>
-				{ eventError !== undefined && <NotifError error={eventError} closeError={closeEventError} />}
-				<AddFriendModal/>
-				<ModalPartyInvite />
-				{ gameInvite && <NotifGameInvite notif={gameInvite} notifOnLeave={gameNotificationLeave} /> }
-				<Header />
+				{ isAuthenticated && eventError !== undefined && <NotifError error={eventError} closeError={closeEventError} />}
+				{ isAuthenticated && <AddFriendModal/> }
+				{ isAuthenticated && <ModalPartyInvite /> }
+				{ isAuthenticated && gameInvite && <NotifGameInvite notif={gameInvite} notifOnLeave={gameNotificationLeave} /> }
+				{ isAuthenticated && <Header /> }
 				<main className="page-container">
 					<Routes>
 						{

@@ -33,7 +33,7 @@ function Profile() {
                         )
                     }
                 </div>
-                <RenderProfileBlock blockTitle={attributes.find(elem => elem.isActive === "true")!.title} userDatas={userState.user} friendList={userState.friendList} />
+                <RenderProfileBlock blockTitle={attributes.find(elem => elem.isActive === "true")!.title} userDatas={userState.user} friendList={userState.friendList} matchHistory={userState.match_history} />
             </div>
         </div>
     );

@@ -81,14 +81,26 @@ export function fetchSetUsername(username: string, token: string, dispatch: Disp
     });
 }
 
-export function fetchMe(token: string, dispatch: Dispatch<AnyAction>) {
-    axios.get(`${baseUrl}/users/me`, {
+export function fetchVerifyToken(token: string, dispatch: Dispatch<AnyAction>) {
+    axios.post(`${baseUrl}/auth/verify-token`, {}, {
         headers: {
             "Authorization": `Bearer ${token}`,
         }
     })
     .then((response) => {
-        console.log("Response Me", response);
+        console.log("Response VerifyToken", response);
+        dispatch(loginSuccess({user: response.data, token: token}));
+    })
+    .catch((err) => {
+        console.log(err);
+    })
+}
+
+export function fetchLogout(token: string) {
+    axios.post(`${baseUrl}/auth/logout`, {}, {
+        headers: {
+            "Authorization": `Bearer ${token}`,
+        }
     })
     .catch((err) => {
         console.log(err);

@@ -191,21 +191,63 @@ button {
 }
 
 .invited-spin {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  display: inline-block;
-  border-top: 3px solid #FFF;
-  border-right: 3px solid transparent;
-  box-sizing: border-box;
-  animation: rotation 1s linear infinite;
+	width: 12px;
+	height: 12px;
+	border-radius: 50%;
+	display: inline-block;
+	border-top: 3px solid #FFF;
+	border-right: 3px solid transparent;
+	box-sizing: border-box;
+	animation: rotation 1s linear infinite;
 }
 
 @keyframes rotation {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
+	0% {
+		transform: rotate(0deg);
+	}
+	100% {
+		transform: rotate(360deg);
+	}
 } 
+
+@keyframes bblFadInOut {
+	0%, 80%, 100% { box-shadow: 0 2.5em 0 -1.3em }
+	40% { box-shadow: 0 2.5em 0 0 }
+}
+	  
+.is-connected-loader-wrapper {
+	@include page-wrapper();
+	background-color: $DarkPalette;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	.is-connected-loader, .is-connected-loader:before, .is-connected-loader:after {
+		border-radius: 50%;
+		width: 2.5em;
+		height: 2.5em;
+		animation-fill-mode: both;
+		animation: bblFadInOut 1.8s infinite ease-in-out;
+	}
+	.is-connected-loader {
+		margin: auto;
+		color: #FFF;
+		font-size: 7px;
+		position: relative;
+		text-indent: -9999em;
+		transform: translateZ(0);
+		animation-delay: -0.16s;
+	}
+	.is-connected-loader:before,
+	.is-connected-loader:after {
+		content: '';
+		position: absolute;
+		top: 0;
+	}
+	.is-connected-loader:before {
+		left: -3.5em;
+		animation-delay: -0.32s;
+	}
+	.is-connected-loader:after {
+		left: 3.5em;
+	}
+}

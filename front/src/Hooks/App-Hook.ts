@@ -1,25 +1,24 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { io, Socket } from "socket.io-client";
 import { useAppDispatch, useAppSelector } from '../Redux/Hooks'
 import { socketUrl } from "../env";
-import { fetchNotifications, fetchFriendList } from "../Api/User-Fetch";
 import { NotificationInterface } from "../Types/Notification-Types";
 import { addNotification, deleteNotification } from "../Redux/NotificationSlice";
-import { addChannel, addPrivateConv, removeChannel, } from "../Redux/ChatSlice";
+import { addChannel, addPrivateConv, removeChannel } from "../Redux/ChatSlice";
 import { Channel, Conversation } from "../Types/Chat-Types";
 import { UserInterface } from "../Types/User-Types";
-import { copyFriendListArray } from "../Redux/AuthSlice";
+import { copyFriendListArray, stopIsConnectedLoading } from "../Redux/AuthSlice";
 import { GameMode, PartyInterface } from "../Types/Lobby-Types";
 import { copyNotificationArray } from "../Redux/NotificationSlice";
 import { addParty, cancelQueue, changePartyGameMode, changeQueueStatus, leaveParty } from "../Redux/PartySlice";
-import { fetchMe } from "../Api/Sign/Sign-Fetch";
+import { fetchVerifyToken } from "../Api/Sign/Sign-Fetch";
 
 export function useAppHook() {
     const [socket, setSocket] = useState<Socket | undefined>(undefined);
 	const [gameInvite, setGameInvite] = useState<NotificationInterface | undefined>(undefined);
-    const {token, isAuthenticated, currentUser} = useAppSelector((state) => state.auth);
 	const [eventError, setEventError] = useState<string | undefined>(undefined);
+    const { token, isAuthenticated } = useAppSelector((state) => state.auth);
 
 	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
@@ -40,27 +39,25 @@ export function useAppHook() {
 		setGameInvite(undefined);
 	}
 
-	// useEffect(() => {
-		// console.log("LocalStorage", localStorage.getItem("userToken"));
-		// const localToken: string | null = localStorage.getItem("userToken");
-		// if (localToken !== null) {
-		// 	fetchMe(token, dispatch);
-		// }
-	// }, [])
+	useEffect(() => {
+		console.log("GET ITEM");
+		const localToken: string | null = localStorage.getItem("userToken");
+		if (localToken !== null) {
+			fetchVerifyToken(localToken, dispatch);
+		}
+	}, [])
 
 	useEffect(() => {
 		if (isAuthenticated && socket === undefined) {
-			// localStorage.setItem("userToken", token);
+			console.log("SET SOCKET");
+			localStorage.setItem("userToken", token);
 			connectSocket();
-			// fetchNotifications(token, dispatch);
-			// fetchFriendList(token, dispatch);
 		}
 	}, [isAuthenticated])
 
 	useEffect(() => {
 		if (socket !== undefined) {
 			console.log("SOCKET CONDITION");
-			
 			socket.on("Connection", (data: {friendList: UserInterface[], notification: NotificationInterface[], party: PartyInterface}) => {
 				console.log("data connection", data);
 				dispatch(copyNotificationArray(data.notification));
@@ -160,6 +157,7 @@ export function useAppHook() {
         eventError,
         closeEventError,
         gameInvite,
-        gameNotificationLeave
+        gameNotificationLeave,
+		isAuthenticated,
     };
 }
