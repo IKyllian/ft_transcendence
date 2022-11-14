@@ -164,6 +164,11 @@ export default class MatchResult extends Phaser.Scene
 
 		this.result_text = this.add.text(400, 100, text, style);
 		this.input.on('gameobjectdown',this.click_event);
+
+		setTimeout(() => {
+			this.game.destroy(true, false);
+		}, 10000);
+
 	}
 
 	click_event = (pointer: Phaser.Input.Pointer ,gameobject :Phaser.GameObjects.GameObject) =>
