@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import {useForm} from "react-hook-form";
-import { Channel } from "../../../Types/Chat-Types";
+import { Channel, ChannelModesArray } from "../../../Types/Chat-Types";
 
 function GlobalSettings(props: {chanDatas: Channel}) {
     const { register, handleSubmit, watch, formState: {errors} } = useForm<{chanMode: string, password?: string}>();
@@ -16,14 +16,14 @@ function GlobalSettings(props: {chanDatas: Channel}) {
         <div>
             <form className="radio-form" onSubmit={formSubmit}>
                 {
-                    ["public", "protected", "privée"].map((elem, index) =>
+                    ChannelModesArray.map((elem, index) =>
                         <label key={index} >
                             <div>
                                 <input
                                     key={index}
                                     type="radio"
                                     value={elem}
-                                    defaultChecked={elem === chanDatas.option ? true : false}
+                                    defaultChecked={elem === ChannelModesArray[chanDatas.option] ? true : false}
                                     {...register("chanMode", {required: "This is required"})}
                                 />
                                 {elem}
@@ -50,7 +50,7 @@ function GlobalSettings(props: {chanDatas: Channel}) {
                     )
                 }
                 {
-                    channelMode !== chanDatas.option &&
+                    channelMode !== ChannelModesArray[chanDatas.option] &&
                     <input className="saveInput" type="submit" value="Save" />
                 }
             </form> 

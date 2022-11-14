@@ -52,13 +52,4 @@ export class ChannelController {
 	) {
 		return await this.channelService.delete(id);
 	}
-
-	//TODO delete
-	@UseGuards(JwtGuard)
-	@Get('get_channel')
-	unbanUser(
-	@GetUser() user: User
-	) {
-		return this.channelService.getChannelById(user.id, 3);
-	}
 }

@@ -191,7 +191,7 @@ export function useLobbyHook() {
                     })]}
                 });
             }          
-        } else if (party && party.players.length === 1) {
+        } else if ((party && party.players.length === 1) || !party) {
             setGameMode((prev: any) => {
                 return {...prev, gameModes: [...gameMode.gameModes.map(elem => {
                     if (elem.isLock)

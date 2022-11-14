@@ -17,7 +17,7 @@ function RenderProfileBlock(props: {blockTitle: string, userDatas: UserInterface
         );
     } else {
         return (
-           <BlockFriends friendList={friendList} />
+           <BlockFriends friendList={friendList} userProfileId={userDatas.id} />
         );
     }
 }

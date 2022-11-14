@@ -5,11 +5,13 @@ import { UserInterface } from "../../../Types/User-Types";
 import FriendListModal from "../Friend-Dropdown";
 import Avatar from "../../../Images-Icons/pp.jpg";
 import { Link } from "react-router-dom";
+import { useAppSelector } from "../../../Redux/Hooks";
 
-function FriendItem(props: {name: string, profilPic: string}) {
-    const {name, profilPic} = props;
+function FriendItem(props: {name: string, profilPic: string, userProfileId: number}) {
+    const {name, profilPic, userProfileId} = props;
 
     const [showModal, setShowModal] = useState<boolean>(false);
+    const {currentUser} = useAppSelector(state => state.auth);
 
     const handleClick = () => {
         setShowModal(!showModal);
@@ -23,21 +25,24 @@ function FriendItem(props: {name: string, profilPic: string}) {
                     { name }
                 </Link>
             </div>
-            <div className="friend-item-menu">
-                <IconDotsVertical onClick={() => handleClick()} />
-                <FriendListModal show={showModal} onClickOutside={() => {setShowModal(false)}}/>
-            </div>
+            {
+                currentUser?.id === userProfileId && 
+                <div className="friend-item-menu">
+                    <IconDotsVertical onClick={() => handleClick()} />
+                    <FriendListModal show={showModal} onClickOutside={() => {setShowModal(false)}}/>
+                </div>
+            }
         </div>
     );
 }
 
-function BlockFriends(props: {friendList: UserInterface[]}) {
-    const {friendList} = props;
+function BlockFriends(props: {friendList: UserInterface[], userProfileId: number}) {
+    const {friendList, userProfileId} = props;
     return friendList.length > 0 ? (
         <div className="profile-block-wrapper friends-list">
             {
                 friendList.map((elem, index) =>
-                    <FriendItem key={index} name={elem.username} profilPic={Avatar} />
+                    <FriendItem key={index} name={elem.username} profilPic={Avatar} userProfileId={userProfileId} />
                 )
             }
         </div>

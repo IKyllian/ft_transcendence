@@ -131,6 +131,7 @@ export class ChannelService {
 			}
 			throw new UnauthorizedException('You are perma banned from this channel');
 		}
+		console.log("isInvited " + channel.option, isInvited)
 		if (!isInvited) {
 			if (channel.option === channelOption.PRIVATE)
 				throw new UnauthorizedException('You need an invite to join this channel');

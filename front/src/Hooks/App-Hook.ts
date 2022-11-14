@@ -13,6 +13,7 @@ import { copyFriendListArray } from "../Redux/AuthSlice";
 import { GameMode, PartyInterface } from "../Types/Lobby-Types";
 import { copyNotificationArray } from "../Redux/NotificationSlice";
 import { addParty, cancelQueue, changePartyGameMode, changeQueueStatus, leaveParty } from "../Redux/PartySlice";
+import { fetchMe } from "../Api/Sign/Sign-Fetch";
 
 export function useAppHook() {
     const [socket, setSocket] = useState<Socket | undefined>(undefined);
@@ -39,8 +40,17 @@ export function useAppHook() {
 		setGameInvite(undefined);
 	}
 
+	// useEffect(() => {
+		// console.log("LocalStorage", localStorage.getItem("userToken"));
+		// const localToken: string | null = localStorage.getItem("userToken");
+		// if (localToken !== null) {
+		// 	fetchMe(token, dispatch);
+		// }
+	// }, [])
+
 	useEffect(() => {
 		if (isAuthenticated && socket === undefined) {
+			// localStorage.setItem("userToken", token);
 			connectSocket();
 			// fetchNotifications(token, dispatch);
 			// fetchFriendList(token, dispatch);

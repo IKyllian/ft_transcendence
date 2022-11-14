@@ -37,8 +37,8 @@ export interface UserInterface {
 }
 
 interface Statistic {
-    matchWon: number,
-    matchLost: number,
+    match_won: number,
+    match_lost: number,
 }
 
 export interface ProfileState {

@@ -1,13 +1,13 @@
 import { IconSend } from "@tabler/icons";
 import { useContext } from "react";
 import { SocketContext } from "../../App";
-import { Channel } from "../../Types/Chat-Types";
+import { Channel, UserTimeout } from "../../Types/Chat-Types";
 import { UserIsMute } from "../../Utils/Utils-Chat";
 import { useForm } from "react-hook-form";
 
-function MuteButton(props: {senderId: number, chan: Channel}) {
-    const { senderId, chan } = props;
-    const senderIsMute: boolean = UserIsMute(chan.usersTimeout, senderId);
+function MuteButton(props: {senderId: number, chanId: number, usersTimeout: UserTimeout[]}) {
+    const { senderId, chanId, usersTimeout } = props;
+    const senderIsMute: boolean = UserIsMute(usersTimeout, senderId);
     const { register, reset, handleSubmit, formState: {errors} } = useForm<{numberInput: string}>();
     
     const {socket} = useContext(SocketContext);
@@ -16,7 +16,7 @@ function MuteButton(props: {senderId: number, chan: Channel}) {
         if (senderIsMute) {
             socket?.emit("UnMute", {
                 userId: senderId,
-                chanId: chan.id,
+                chanId: chanId,
             });
         }
     }
@@ -26,7 +26,7 @@ function MuteButton(props: {senderId: number, chan: Channel}) {
         if (!senderIsMute) {
             socket?.emit("Mute", {
                 userId: senderId,
-                chanId: chan.id,
+                chanId: chanId,
                 time: time,
             });
         }

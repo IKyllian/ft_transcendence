@@ -40,7 +40,7 @@ export function useProfileHook() {
 
     useEffect(() => {
         handleClick(0);
-    }, [params])
+    }, [params.username])
 
     useEffect(() => {
         if (params.username === currentUser?.username) {
@@ -65,7 +65,7 @@ export function useProfileHook() {
         return () => {
             socket?.off("RequestValidation");
         }
-    })
+    }, [])
 
     return {
         userState,

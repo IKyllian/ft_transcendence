@@ -12,8 +12,8 @@ import MuteButton from "../../Buttons/Mute-Button";
 
 import { getMessageDateString, getMessageHour } from "../../../Utils/Utils-Chat";
 
-function MessageItem(props: {isFromChan: boolean, message: ChatMessage | PrivateMessage, loggedUserIsOwner: boolean, chanId?: Channel, isNewSender?: boolean, index?: number}) {
-    const {isFromChan, message, loggedUserIsOwner, chanId, isNewSender, index} = props;
+function MessageItem(props: {isFromChan: boolean, message: ChatMessage | PrivateMessage, loggedUserIsOwner: boolean, chan?: Channel, isNewSender?: boolean, index?: number}) {
+    const {isFromChan, message, loggedUserIsOwner, chan, isNewSender, index} = props;
     const [showDropdown, setShowDropdown] = useState<boolean>(false);
 
     let authDatas = useAppSelector((state) => state.auth);
@@ -22,12 +22,15 @@ function MessageItem(props: {isFromChan: boolean, message: ChatMessage | Private
     const handleClick = () => {
         setShowDropdown(!showDropdown);
     }
-    
+    // console.log("index", index);
+    // console.log("chan?.messages.length", chan?.messages.length);
+    // const putClass: boolean = chan && index === 1 ? true : false;
+    // console.log("putClass", putClass);
     return message.sender ? (
         <>
             {
                 isNewSender &&
-                <li style={isNewSender && index && index > 0 ? {marginTop: '20px'}: {}} className="message-item-container">
+                <li style={isNewSender && index && index > 0 ? {marginTop: '20px'}: {}} className={`message-item-container`}>
                     <img src={ProfilPic} alt="profil pic" />
                     <div className="message-content-wrapper">
                         <div className="message-info-wrapper">
@@ -48,10 +51,10 @@ function MessageItem(props: {isFromChan: boolean, message: ChatMessage | Private
                             </Link>
                             <BlockButton senderId={message.sender.id} />
                             {
-                                isFromChan && loggedUserIsOwner &&
+                                isFromChan && chan && loggedUserIsOwner &&
                                 <>
-                                    <MuteButton senderId={message.sender.id} chan={chanId!} />
-                                    <BanButton senderId={message.sender.id} chanId={chanId!.id} />
+                                    <MuteButton senderId={message.sender.id} chanId={chan?.id} usersTimeout={chan?.usersTimeout} />
+                                    <BanButton senderId={message.sender.id} chanId={chan!.id} />
                                 </>
                             }
                         </DropdownContainer>
