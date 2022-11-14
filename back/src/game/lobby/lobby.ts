@@ -413,7 +413,7 @@ export class Lobby
 		}
 		else
 		{
-			console.log("input incidend", this.game_id);
+			// console.log("input incidend", this.game_id);
 		}
 
 

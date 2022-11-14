@@ -1,13 +1,15 @@
-import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
+import { BadRequestException, forwardRef, Inject, Injectable, NotFoundException, ParseFilePipeBuilder } from "@nestjs/common";
 import { User } from "src/typeorm";
 import { Player } from "../../player";
 import { PartyJoinedSessionManager } from "./party.session";
 import { Party } from "./party";
 import { GlobalService } from "src/utils/global/global.service";
-import { GameType, PlayerPosition, TeamSide } from "src/utils/types/game.types";
+import { GameMode, GameType, PlayerPosition, TeamSide } from "src/utils/types/game.types";
 import { SettingDto } from "../dto/game-settings.dto";
 import { LobbyFactory } from "src/game/lobby/lobby.factory";
 import { MatchmakingLobby } from "../matchmakingLobby";
+import { QueueLobby } from "src/utils/types/types";
+import { QueueService } from "../queue/queue.service";
 
 @Injectable()
 export class PartyService {
@@ -15,6 +17,8 @@ export class PartyService {
 		public partyJoined: PartyJoinedSessionManager,
 		private globalService: GlobalService,
 		private lobbyFactory: LobbyFactory,
+		@Inject(forwardRef(() => QueueService))
+		private queueService: QueueService,
 	) {}
 
 	getPlayerInParty(id: number, player: Player[]) {
@@ -22,6 +26,7 @@ export class PartyService {
 	}
 
 	emitPartyUpdate(party: Party, cancelQueue = false) {
+		console.log("in Party update")
 		party.players.forEach((player) => {
 			this.globalService.server.to(`user-${player.user.id}`).emit('PartyUpdate', { party, cancelQueue });
 		})
@@ -42,12 +47,13 @@ export class PartyService {
 	}
 
 	joinParty(user: User, requesterId: number) {
+		this.queueService.leaveQueue(user);
 		this.leaveParty(user);
 		const party = this.partyJoined.getParty(requesterId);
 		if (!party) { throw new NotFoundException('party not found'); }
 		party.join(user);
 		this.partyJoined.setParty(user.id, party);
-		this.emitPartyUpdate(party);
+		this.queueService.leaveQueue(user);
 	}
 
 	leaveParty(user: User) {
@@ -59,8 +65,8 @@ export class PartyService {
 				party.players.forEach((player) => player.isReady = false);
 			}
 			party.leave(user);
+			this.queueService.leaveQueue(user);
 			this.partyJoined.removeParty(user.id);
-			this.emitPartyUpdate(party);
 			this.globalService.server.to(`user-${user.id}`).emit('PartyLeave');
 		}
 	}
@@ -107,27 +113,59 @@ export class PartyService {
 
 	setSettings(user: User, settings: SettingDto) {
 		const party = this.partyJoined.getParty(user.id);
-		if (party) {
+		if (party && this.getPlayerInParty(user.id, party.players).isLeader) {
 			party.game_settings = settings;
 			this.emitPartyUpdate(party);
 		}
 	}
 
-	setCustomGame(user: User, game_mode: GameType) {
+	setCustomGame(user: User, game_type: GameType) {
 		const party = this.partyJoined.getParty(user.id);
 		if (!party) {
-			throw new BadRequestException("You don't have friends :(");
+			throw new BadRequestException("You need a party to play custom games");
 		}
 		this.partyIsReady(party);
-		const maxPlayers: number = game_mode === GameType.Singles ? 2 : 4;
-		if (party.players.length > maxPlayers) {
-			throw new BadRequestException("Too many players for this mode");
+		if (!this.getPlayerInParty(user.id, party.players).isLeader) {
+			throw new BadRequestException('You are not leader');
+		}
+
+		const nbOfPayersRequired: number = game_type === GameType.Singles ? 2 : 4;
+		if (party.players.length != nbOfPayersRequired) {
+			throw new BadRequestException("Number of players does not fit this mode");
 		}
 		party.game_settings.is_ranked = false;
-		let redTeam: Player[] = party.players.filter((player) => player.team === TeamSide.RED);
-		let blueTeam: Player[] = party.players.filter((player) => player.team === TeamSide.BLUE);
-		const match = new MatchmakingLobby({ id: 'blue', players: blueTeam }, { id: 'red', players: redTeam }, party.game_settings);
+		party.game_settings.game_type = game_type;
+		let redTeam: QueueLobby = new QueueLobby(game_type);
+		let blueTeam: QueueLobby = new QueueLobby(game_type);
+		party.players.forEach((player) => {
+			if (player.team === TeamSide.BLUE) {
+				blueTeam.addPlayer(player);
+			} else {
+				redTeam.addPlayer(player);
+			}
+		})
+
+		if (redTeam.players.length !== blueTeam.players.length) {
+			throw new BadRequestException("You must balance the teams");
+		}
+		if (nbOfPayersRequired === 2 && (redTeam.players[0].pos !== PlayerPosition.BACK || blueTeam.players[0].pos !== PlayerPosition.BACK)) {
+			throw new BadRequestException("Players must be at Back position");
+		} else if (nbOfPayersRequired === 4 && (redTeam.players[0].pos === redTeam.players[1].pos || blueTeam.players[0].pos === blueTeam.players[1].pos)) {
+			throw new BadRequestException("Team can't be at the same position");
+		}
+		const match = new MatchmakingLobby(blueTeam, redTeam, party.game_settings);
+		// console.log("match", match);
 		this.lobbyFactory.lobby_create(match);
+	}
+
+	setGameMode(user: User, game_mode: GameMode) {
+		const party = this.partyJoined.getParty(user.id);
+		if (party) {
+			party.game_mode = game_mode;
+			party.players.forEach((player) => {
+				this.globalService.server.to(`user-${player.user.id}`).emit('GameModeUpdate', party.game_mode);
+			})
+		}
 	}
 
 }

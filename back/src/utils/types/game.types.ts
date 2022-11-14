@@ -173,8 +173,8 @@ export enum EndResult
 //game settings for the core
 export type GameSettings =
 {
-	is_ranked: boolean,
-	game_type: GameType,
+	is_ranked?: boolean,
+	game_type?: GameType,
 	up_down_border: number,
 	player_back_advance: number,
 	player_front_advance: number,
@@ -194,3 +194,9 @@ export enum PlayerPosition {
 	BACK,
 	FRONT,
 }
+
+export enum GameMode {
+    RANKED = 'Ranked',
+    RANKED_2v2 = '2v2',
+    PRIVATE_MATCH = 'Private Match',
+};

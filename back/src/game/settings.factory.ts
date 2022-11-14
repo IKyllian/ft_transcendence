@@ -13,7 +13,7 @@ export class SettingsFactory {
 				paddle_speed: 13,
 				ball_start_speed: 5,
 				ball_acceleration: 1,
-				point_for_victory: 5,
+				point_for_victory: 3,
 			}
 		} else {
 			return {

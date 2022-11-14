@@ -3,7 +3,7 @@ import { generate } from "shortid";
 import { Socket } from "socket.io";
 import { SettingsFactory } from "src/game/settings.factory";
 import { User } from "src/typeorm";
-import { GameSettings, GameType, PlayerType } from "src/utils/types/game.types";
+import { GameMode, GameSettings, GameType, PlayerType } from "src/utils/types/game.types";
 import { Player } from "../../player";
 
 export class Party {
@@ -14,6 +14,7 @@ export class Party {
 		this.players.push(new Player(leader));
 		this.players[0].isLeader = true;
 		this.game_settings = new SettingsFactory().defaultSetting(GameType.Singles);
+		this.game_mode = GameMode.RANKED;
 	}
 
 	id: string;
@@ -21,6 +22,8 @@ export class Party {
 	players: Player[] = new Array<Player>();
 
 	game_settings: GameSettings;
+
+	game_mode: GameMode;
 
 	join(user: User) {
 		if (this.players.find((p) => p.user.id === user.id)) {

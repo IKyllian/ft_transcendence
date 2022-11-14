@@ -16,8 +16,6 @@ export class NotificationService {
 		private userService: UserService,
 		@Inject(forwardRef(() => ChannelService))
 		private channelService: ChannelService,
-		// @Inject(forwardRef(() => TaskService))
-		// private taskService: TaskService,
 
 		@InjectRepository(Notification)
 		private notifRepo: Repository<Notification>,
@@ -132,7 +130,6 @@ export class NotificationService {
 					type: notificationType.CHANNEL_MESSAGE
 				});
 				const notifToSend = await this.notifRepo.save(notif);
-				console.log(notifToSend);
 				socket.to(`user-${user.id}`).emit('NewNotification', notifToSend);
 			}
 		})

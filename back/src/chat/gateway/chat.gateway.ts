@@ -102,8 +102,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			if (user) {
 				this.userService.setStatus(user, 'offline');
 				socket.emit('statusUpdate', { user, status: 'offline' });
+				console.log(payload?.username, 'disconnected');
 			}
-			// console.log(payload?.username, 'disconnected');
 			} else
 				console.log(socket.id, 'disconnected');
 			// TODO emit disconnected for front retry to reconnect ?
@@ -160,7 +160,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		@ConnectedSocket() socket: AuthenticatedSocket,
 		@MessageBody() data: PrivateMessageDto,
 		) {
-			const message = await this.privateMsgService.create(socket.user.id, data);
+			const message = await this.privateMsgService.create(socket.user, data);
 			this.server
 			.to(`user-${socket.user.id}`)
 			.to(`user-${data.adresseeId}`)
@@ -361,5 +361,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		@MessageBody() dto: OnTypingPrivateDto,
 	) {
 		socket.to(`user-${dto.userId}`).emit('OnTypingPrivate', { user, isTyping: dto.isTyping, convId: dto.convId });
+	}
+
+	@SubscribeMessage('testCloseGamesocket')
+	async test(@ConnectedSocket() socket:Socket) {
+		const chak = await this.server.in("user-8").fetchSockets();
+		console.log('in event')
+		chak.forEach((chaki) => chaki.disconnect(true))
 	}
 }

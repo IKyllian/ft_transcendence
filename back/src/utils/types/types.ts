@@ -1,5 +1,7 @@
 import { MESSAGES } from "@nestjs/core/constants";
+import { generate } from "shortid";
 import { Player } from "src/game/player";
+import { GameType } from "./game.types";
 
 export type JwtPayload = {
 	sub: number,
@@ -35,10 +37,10 @@ export enum channelOption {
 };
 
 export enum notificationType {
-	FRIEND_REQUEST = 'friend_request',
-	CHANNEL_INVITE = 'channel_invite',
-	PARTY_INVITE = 'party_invite',
-	CHANNEL_MESSAGE = 'channel_message',
+	FRIEND_REQUEST,
+	CHANNEL_INVITE,
+	PARTY_INVITE,
+	CHANNEL_MESSAGE,
 };
 
 export enum ResponseType {
@@ -74,10 +76,25 @@ export type EloRange = {
 	max: number;
 }
 
-export interface QueueLobbby {
-	id: string,
-	players: Player[],
-	range?: number,
-	timeInQueue?: number,
-	averageMmr?: number,
+export class QueueLobby {
+	constructor(game_type: GameType) {
+		this.id = generate();
+		this.range = 0;
+		this.timeInQueue = 0;
+		this.averageMmr = 0;	
+		this.players = new Array<Player>();
+		this.game_type = game_type;
+	}
+	id: string;
+	game_type: GameType;
+	players: Player[];
+	range: number;
+	timeInQueue: number;
+	averageMmr: number;
+
+	addPlayer(player: Player) {
+		this.players.push(player);
+		this.averageMmr += this.game_type === GameType.Singles ? player.user.singles_elo : player.user.doubles_elo;
+		this.averageMmr /= this.players.length;
+	}
 }

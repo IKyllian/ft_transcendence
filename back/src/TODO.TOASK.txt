@@ -13,22 +13,25 @@
 //TODO
 	- Route for editing user / Channels
 	- Check routes for delete entities
-	- error when trying to connect with a login 42 with a password
 	- on socket connection, add args if in channel room to rejoin it?
-	- USE GLOBAL SERVER
+	- status update
+	- SQL injection in search bars ?
+	- Private msg notifications
+	- private chan doesnt work
 
 //ISSUE ?
 	- can create username with \n
 	- in queue and then joining party ?
-	- sending hash to front ?
+	- leaving channel doesnt refresh client side: id instead of chanId
 
 
 // RANKING AND ELO
-LEGEND: 1450,
-CHAMPION: 1325,
-DIAMOND: 1200,
-GOLD: 1125,
-SILVER: 1000
+LEGEND: 1500,
+CHAMPION: 1375,
+DIAMOND: 1250,
+PLATINE: 1125
+GOLD: 1000,
+SILVER: 875
 
 Max elo to win/lose in one game = 50, if lobby is balanced Winner +25 / Looser -25, Elo between rank = 125 ~= 5 balanced game won/lost
 50/(1+10^(ELODIFF/400))

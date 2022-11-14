@@ -15,4 +15,12 @@ export class GameController {
 	) {
 		return this.gameService.isPlaying(userId);
 	}
+
+	@UseGuards(JwtGuard)
+	@Get('match_history')
+	async getMatchHistory(
+		@GetUser('id') userId: number,
+	) {
+		return await this.gameService.getMatchHistory(userId);
+	}
 }

@@ -29,7 +29,7 @@ export class UserService {
 		return this.userRepo.save(user);
 	}
 
-	findOne(options: FindOneOptions<User>, selectAll?: Boolean): Promise<User | null> {
+	findOne(options: FindOneOptions<User>, selectAll: Boolean = false): Promise<User | null> {
 		if (selectAll) {
 			options.select = [
 				'avatar',
@@ -145,6 +145,29 @@ export class UserService {
 	isBlocked(user: User, id: number): boolean {
 		const isblocked = user.blocked.find((blocked) => blocked.id === id);
 		return isblocked ? true : false;
+	}
+
+	async userBlocked(requesterId: number, addresseeId: number) {
+		const blocked: User[] = await this.userRepo.find({
+			where: [
+				{
+					id: requesterId,
+					blocked: { id: addresseeId },
+				},
+				{
+					id: addresseeId,
+					blocked: { id: requesterId },
+				}
+			]
+		});
+
+		if (blocked.length > 0) {
+			if (blocked[0].id === requesterId) {
+				throw new BadRequestException('You blocked that user');
+			} else {
+				throw new BadRequestException('You are blocked by that user');
+			}
+		}
 	}
 
 	async getUserInfo(user: User, user2: User) {

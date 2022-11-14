@@ -32,21 +32,23 @@ export class ChannelMessageService {
 		return this.messagesRepo.save(message);
 	}
 
-	async getMessages(chanId: number, data: MessageToSkipDto) {
-		const channel = await this.channelService.findOneBy({ id: chanId });
-		if (!channel)
-			throw new ChannelNotFoundException();
-
-		return await this.messagesRepo.find({
-			relations: ['sender'],
-			where: {
-				channel: {
-					id: chanId,
-				}
-			},
-			order: { send_at: 'DESC' },
-			skip: data.skip,
-			take: 20,
-		});
+	async getMessages(chanId: number, skip: number) {
+		return this.messagesRepo.createQueryBuilder("msg")
+		.where((qb) => {
+			const subQuery = qb
+				.subQuery()
+				.from(ChannelMessage, "msg")
+				.select("msg.id")
+				.where("msg.channelId = :chanId")
+				.orderBy("msg.send_at", "DESC")
+				.skip(skip)
+				.take(20)
+				.getQuery()
+			return "msg.id IN " + subQuery;
+		})
+		.setParameter("chanId", chanId)
+		.leftJoinAndSelect("msg.sender", "sender")
+		.orderBy("msg.send_at", 'ASC')
+		.getMany();
 	}
 }

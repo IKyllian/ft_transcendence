@@ -2,12 +2,14 @@ import { Server } from 'socket.io';
 import { generate } from 'shortid'
 import { Lobby } from './lobby';
 import { Socket } from 'socket.io';
-import { GameState, GameType, GameSettings, NewGameData, PlayersGameData, PlayerType, TeamSide, PlayerPosition } from 'src/utils/types/game.types';
+import { GameState, GameType, GameSettings, NewGameData, PlayersGameData, PlayerType, TeamSide, PlayerPosition, EndResult, ScoreBoard } from 'src/utils/types/game.types';
 import { AuthenticatedSocket } from 'src/utils/types/auth-socket';
 import { MatchmakingLobby } from '../matchmaking/matchmakingLobby';
 import { GlobalService } from 'src/utils/global/global.service';
 import { Injectable } from '@nestjs/common';
 import { Player } from '../player';
+import { GameService } from '../game.service';
+import { User } from 'src/typeorm';
 //import  * as Defaultgame_settings from '../game-settings';
 
 
@@ -17,7 +19,10 @@ import { Player } from '../player';
 export class LobbyFactory
 {
 	// server: Server;
-	constructor(private globalService: GlobalService) {}
+	constructor(
+		private globalService: GlobalService,
+		private gameService: GameService,
+	) {}
 
 	private lobby_list: Map<Lobby['game_id'], Lobby> = new Map<Lobby['game_id'], Lobby>();
 	private client_list: Map<Socket['id'], Lobby['game_id']> = new Map<Socket['id'], Lobby['game_id']>();
@@ -37,7 +42,6 @@ export class LobbyFactory
 			player_type: PlayerType.Spectator,
 			game_settings: lobby_request.game_settings,
 		}
-
 
 		lobby_request.players.forEach((player) => {
 			if (player.team === TeamSide.BLUE) {
@@ -243,5 +247,20 @@ export class LobbyFactory
 			});
 
 		}
+	}
+
+	async endGameAttribution(players: Player[], result: EndResult, game_type: GameType, game_id: string, score: ScoreBoard) {
+		let blueTeam: User[] = [];
+		let redTeam: User[] = [];
+		players.forEach((player) => {
+			if (player.team === TeamSide.BLUE) {
+				blueTeam.push(player.user);
+			} else {
+				redTeam.push(player.user);
+			}
+		})
+		this.gameService.eloAttribution(players, result, game_type);
+		await this.gameService.saveMatch(blueTeam, redTeam, game_type, score);
+		this.lobby_delete(game_id);
 	}
 }
