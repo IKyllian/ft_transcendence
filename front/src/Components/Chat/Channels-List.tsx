@@ -1,5 +1,5 @@
 import { useEffect, useState, useContext } from "react";
-import { Channel } from "../../Types/Chat-Types";
+import { Channel, ChannelModesArray, ChannelModes } from "../../Types/Chat-Types";
 import LoadingSpin from "../Utils/Loading-Spin";
 import { useAppSelector } from "../../Redux/Hooks";
 import { IconPlus, IconChevronRight } from "@tabler/icons";
@@ -29,13 +29,13 @@ function ChannelItem(props: {channelData: Channel, token: string}) {
         <div className="channels-card-wrapper">
             <div className="channel-banner"></div>
             <div className="card-content">
-                <p className="channel-name"> { channelData.name } <span>({ channelData.option })</span> </p>
+                <p className="channel-name"> { channelData.name } <span>({ ChannelModesArray[channelData.option] })</span> </p>
                 <p className="channel-description"> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec quis porta libero, vitae feugiat sem. Aenean porttitor diam non sem congue, vitae euismod diam venenatis. </p>
                 <div className="item-bottom">
                     <p> {channelData.channelUsers.length} members </p>
                     <div className="item-bottom-right">
                         {
-                            channelData.option === 'protected' &&
+                            channelData.option === ChannelModes.PROTECTED &&
                             <input type="password" placeholder="password" {...register("password")} />
                         }
                         

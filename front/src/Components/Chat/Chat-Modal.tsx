@@ -11,7 +11,7 @@ import { UserInterface } from "../../Types/User-Types";
 import { fetchSearchAllUsers } from "../../Api/User-Fetch";
 import { fetchSearchUsersToInvite } from "../../Api/Chat/Chat-Fetch";
 import { SearchBarFunctionality } from "../../Types/Utils-Types";
-import { ChannelModes, CreateChanBodyRequest } from "../../Types/Chat-Types"
+import { ChannelModes, CreateChanBodyRequest, ChannelModesArray } from "../../Types/Chat-Types"
 
 type FormValues = {
     chanMode: string,
@@ -84,7 +84,7 @@ function ChatModal(props: {onCloseModal: Function, showModal: number}) {
                             <>
                                 <div className="checkbox-container">
                                     {
-                                        ["public", "protected" ,"privée"].map((elem, index) => 
+                                        ChannelModesArray.map((elem, index) => 
                                             <label key={index}>
                                                 {elem}
                                                 <input

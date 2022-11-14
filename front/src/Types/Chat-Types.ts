@@ -30,6 +30,12 @@ export enum ChannelModes {
     PROTECTED,
 }
 
+export const ChannelModesArray: string[] = [
+    "public",
+    "private",
+    "protected"
+]
+
 export interface CreateChanBodyRequest {
     name: string,
     option: ChannelModes,
@@ -69,7 +75,7 @@ export interface ChatMessage {
 export interface Channel {
     id: number,
     name: string,
-    option: string,
+    option: ChannelModes,
     channelUsers: ChannelUser[],
     messages: ChatMessage[],
     usersTimeout: UserTimeout[],
@@ -78,7 +84,7 @@ export interface Channel {
 export interface ChannelInfoSidebar {
     id: number,
     name: string,
-    option: string,
+    option: ChannelModes,
 }
 
 export interface Conversation {
