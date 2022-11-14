@@ -3,7 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { FindManyOptions, FindOneOptions, FindOptionsWhere, IsNull, Like, Not, Repository } from "typeorm";
 import { AuthService } from "src/auth/auth.service";
 import { CreateUserDto } from "./dto/createUser.dto";
-import { Statistic, User } from "src/typeorm";
+import { MatchResult, Statistic, User } from "src/typeorm";
 import { userStatus } from "src/typeorm/entities/user";
 import { EditUserDto } from "./dto/editUser.dto";
 import * as argon from 'argon2';
@@ -15,11 +15,14 @@ export class UserService {
 	constructor(
 		@Inject(forwardRef(() => AuthService))
 		private authService: AuthService,
+		private friendshipService: FriendshipService,
+
 		@InjectRepository(User)
 		private userRepo: Repository<User>,
 		@InjectRepository(Statistic)
 		private statisticRepo: Repository<Statistic>,
-		private friendshipService: FriendshipService,
+		@InjectRepository(MatchResult)
+		private matchRepo: Repository<MatchResult>,
 	) {}
 
 	create(dto: CreateUserDto) {
@@ -170,10 +173,26 @@ export class UserService {
 		}
 	}
 
+	getMatchHistory(userId: number) {
+		return this.matchRepo.createQueryBuilder("match")
+		.leftJoinAndSelect("match.blue_team_player1", "bp1")
+		.leftJoinAndSelect("match.blue_team_player2", "bp2")
+		.leftJoinAndSelect("match.red_team_player1", "rp1")
+		.leftJoinAndSelect("match.red_team_player2", "rp2")
+		.where("match.blue_team_player1.id = :id")
+		.orWhere("match.blue_team_player2.id = :id")
+		.orWhere("match.red_team_player1.id = :id")
+		.orWhere("match.red_team_player2.id = :id")
+		.setParameter("id", userId)
+		.orderBy("match.created_at", 'DESC')
+		.getMany();
+	}
+
 	async getUserInfo(user: User, user2: User) {
 		const friendList: User[] = await this.friendshipService.getFriendlist(user2);
 		const relation = await this.friendshipService.getRelation(user, user2);
 		const relationStatus = this.friendshipService.getRelationStatus(user2, relation);
-		return { user: user2, friendList, relationStatus };
+		const match_history = await this.getMatchHistory(user2.id);
+		return { user: user2, friendList, relationStatus , match_history};
 	}
 }

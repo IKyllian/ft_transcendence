@@ -1,4 +1,5 @@
 import { Player } from "src/game/player"
+import { User } from "src/typeorm"
 
 export enum PlayerType {
 	Player_A_Back,
@@ -200,3 +201,8 @@ export enum GameMode {
     RANKED_2v2 = '2v2',
     PRIVATE_MATCH = 'Private Match',
 };
+
+export interface Leaderboard {
+	nb_of_users: number,
+	users: User[],
+}
