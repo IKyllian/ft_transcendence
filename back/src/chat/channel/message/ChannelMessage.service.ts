@@ -4,7 +4,7 @@ import { ChannelMessage, ChannelUser } from "src/typeorm";
 import { ChannelNotFoundException, NotInChannelException } from "src/utils/exceptions";
 import { Repository } from "typeorm";
 import { ChannelService } from "../channel.service";
-import { ChannelMessageDto, MessageToSkipDto } from "./dto/channelMessage.dto";
+import { ChannelMessageDto, SkipDto } from "./dto/channelMessage.dto";
 
 @Injectable()
 @UseInterceptors(ClassSerializerInterceptor)

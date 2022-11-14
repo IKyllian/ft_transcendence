@@ -11,7 +11,7 @@ export class ChannelMessageDto {
 	chanId: number;
 }
 
-export class MessageToSkipDto {
+export class SkipDto {
 	@IsNumber()
 	skip: number;
 }

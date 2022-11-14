@@ -1,5 +1,6 @@
-import { Controller, Get, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, Post, UseGuards } from "@nestjs/common";
 import { JwtGuard } from "src/auth/guard/jwt.guard";
+import { SkipDto } from "src/chat/channel/message/dto/channelMessage.dto";
 import { User } from "src/typeorm";
 import { GetUser } from "src/utils/decorators";
 import { GameService } from "./game.service";
@@ -16,11 +17,26 @@ export class GameController {
 		return this.gameService.isPlaying(userId);
 	}
 
+	// @UseGuards(JwtGuard)
+	// @Get('match_history')
+	// async getMatchHistory(
+	// 	@GetUser('id') userId: number,
+	// ) {
+	// 	return await this.gameService.getMatchHistory(userId);
+	// }
 	@UseGuards(JwtGuard)
-	@Get('match_history')
-	async getMatchHistory(
-		@GetUser('id') userId: number,
+	@Post('singles-leaderboard')
+	async getSinglesLeaderboard(
+		@Body() data: SkipDto,
 	) {
-		return await this.gameService.getMatchHistory(userId);
+		return await this.gameService.getSinglesLeaderboard(data.skip);
+	}
+
+	@UseGuards(JwtGuard)
+	@Post('doubles-leaderboard')
+	async getDoublesLeaderboard(
+		@Body() data: SkipDto,
+	) {
+		return await this.gameService.getDoublesLeaderboard(data.skip);
 	}
 }

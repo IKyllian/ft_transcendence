@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { MatchResult, Statistic, User } from "src/typeorm";
-import { EndResult, GameType, ScoreBoard, TeamSide } from "src/utils/types/game.types";
+import { EndResult, GameType, Leaderboard, ScoreBoard, TeamSide } from "src/utils/types/game.types";
 import { Repository } from "typeorm";
 import { Player } from "./player";
 import { UserSessionManager } from "./user.session";
@@ -122,18 +122,50 @@ export class GameService {
 		return this.matchRepo.save(match);
 	}
 
-	getMatchHistory(userId: number) {
-		return this.matchRepo.createQueryBuilder("match")
-		.leftJoinAndSelect("match.blue_team_player1", "bp1")
-		.leftJoinAndSelect("match.blue_team_player2", "bp2")
-		.leftJoinAndSelect("match.red_team_player1", "rp1")
-		.leftJoinAndSelect("match.red_team_player2", "rp2")
-		.where("match.blue_team_player1.id = :id")
-		.orWhere("match.blue_team_player2.id = :id")
-		.orWhere("match.red_team_player1.id = :id")
-		.orWhere("match.red_team_player2.id = :id")
-		.setParameter("id", userId)
-		.orderBy("match.created_at", 'DESC')
+	async getSinglesLeaderboard(page: number): Promise<Leaderboard> {
+		const nb_of_users: number = await this.userRepo.createQueryBuilder('user').getCount()
+		
+		const users: User[] = await this.userRepo.createQueryBuilder('user')
+		.leftJoinAndSelect('user.statistic', 'stats')
+		.orderBy("user.singles_elo", "DESC")
+		.skip(page * 10)
+		.take(10)
 		.getMany();
+
+		return {
+			nb_of_users,
+			users,
+		}
 	}
+
+	async getDoublesLeaderboard(page: number): Promise<Leaderboard> {
+		const nb_of_users: number = await this.userRepo.createQueryBuilder('user').getCount()
+		
+		const users: User[] = await this.userRepo.createQueryBuilder('user')
+		.leftJoinAndSelect('user.statistic', 'stats')
+		.orderBy("user.doubles_elo", "DESC")
+		.skip(page * 10)
+		.take(10)
+		.getMany();
+
+		return {
+			nb_of_users,
+			users,
+		}
+	}
+
+	// getMatchHistory(userId: number) {
+	// 	return this.matchRepo.createQueryBuilder("match")
+	// 	.leftJoinAndSelect("match.blue_team_player1", "bp1")
+	// 	.leftJoinAndSelect("match.blue_team_player2", "bp2")
+	// 	.leftJoinAndSelect("match.red_team_player1", "rp1")
+	// 	.leftJoinAndSelect("match.red_team_player2", "rp2")
+	// 	.where("match.blue_team_player1.id = :id")
+	// 	.orWhere("match.blue_team_player2.id = :id")
+	// 	.orWhere("match.red_team_player1.id = :id")
+	// 	.orWhere("match.red_team_player2.id = :id")
+	// 	.setParameter("id", userId)
+	// 	.orderBy("match.created_at", 'DESC')
+	// 	.getMany();
+	// }
 }

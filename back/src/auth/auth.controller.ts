@@ -1,5 +1,4 @@
-import { Body, Controller, HttpCode, HttpStatus, Post, Req, UseGuards } from "@nestjs/common";
-import { Request } from "express";
+import { Body, Controller, HttpCode, HttpStatus, Post, UseGuards } from "@nestjs/common";
 import { User } from "src/typeorm";
 import { GetUser } from "src/utils/decorators";
 import { AuthService } from "./auth.service";
@@ -42,5 +41,14 @@ export class AuthController {
 	@Post('refresh')
 	refresh(@GetUser() user: User) {
 		return this.authService.refreshTokens(user["id"], user["refreshToken"]);
+	}
+
+	@UseGuards(JwtGuard)
+	@HttpCode(HttpStatus.OK)
+	@Post('verify-token')
+	verifyToken(
+		@GetUser() user: User,
+	) {
+		return user;
 	}
 }

@@ -50,7 +50,7 @@ export class AuthService {
 			.where("LOWER(user.username) = :name", { name: dto.username.toLowerCase() })
 			.leftJoinAndSelect("user.channelUser", "ChannelUser")
 			.leftJoinAndSelect("ChannelUser.channel", "Channel")
-			.leftJoinAndSelect("user.statistic", "Statistic")
+			// .leftJoinAndSelect("user.statistic", "Statistic")
 			.leftJoinAndSelect("user.blocked", "Blocked")
 			.getOne();
 
@@ -68,6 +68,7 @@ export class AuthService {
 		this.updateRefreshHash(user, tokens.refresh_token);
 		return {
 			access_token: tokens.access_token,
+			//TODO not sure about refresh
 			refresh_token: tokens.refresh_token,
 			user: user,
 		}
@@ -100,7 +101,7 @@ export class AuthService {
 				channelUser: {
 					channel: true,
 				},
-				statistic: true,
+				// statistic: true,
 				blocked: true,
 			},
 			where: {
