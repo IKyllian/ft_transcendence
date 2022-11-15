@@ -47,7 +47,7 @@ function Lobby() {
                         : <PlayerListItem key={currentUser?.id} user={{isLeader: true, isReady: true, user: currentUser!, team: TeamSide.BLUE}} lobbyLength={1} />
                     }
                     {
-                        Array.from({length:  !party ? 3 : 4 - party.players.length}, (elem, index) => 
+                        Array.from({length: !party ? 3 : 4 - party.players.length}, (elem, index) => 
                             <PlayerListItem key={index} />
                         )
                     }

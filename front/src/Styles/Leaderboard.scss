@@ -3,6 +3,7 @@
 .leaderboard-page-container {
     background-color: $LightBluePalette;
     padding: 10px 0;
+    @include page-wrapper();
     h2 {
         margin: 0;
         font-size: 45px;
@@ -10,10 +11,24 @@
         font-family: Silkscreen;
     }
 
+    .mode-select {
+        margin: 0 auto;
+        display: flex;
+        justify-content: center;
+        padding: 5px 10px;
+        background: transparent;
+        border: none;
+        font-weight: bold;
+        font-size: 15px;
+        cursor: pointer;
+        border: 1px solid $DarkPalette;
+        border-radius: 10px;
+    } 
+
     table {
         border-collapse: collapse;
         text-align: left;
-        margin: 30px auto 0 auto;
+        margin: 10px auto 0 auto;
         width: 90%;
         background-color: $DarkPalette;
 
@@ -26,7 +41,7 @@
         }
 
         tbody {
-            tr {
+            .raw-top3 {
                 &:first-child {
                     td {
                         &:first-child {
@@ -48,7 +63,8 @@
                         }
                     }
                 }
-
+            }
+            tr {
                 &:hover td {
                     background-color: #202d45;
                 }
@@ -62,35 +78,50 @@
                     background: $LightDarkPalette;
                     font-size: 16px;
                     border-bottom: 5px solid $DarkPalette;
+
+                    // span {
+                        // width: 60%;
+                        // display: flex;
+                        // margin: 0 auto;
+                    // }
+
+                    .user-info {
+                        @include flex-row-alignCenter();
+                        gap: 10px;
+                        .user-avatar {
+                            @include avatar-player(30px);
+                        }
+                    }
                 }
             }
         }
     }
 }
 
-// .pagination {
-//     &-wrapper {
-//         display: flex;
-//         flex-direction: row;
-//         justify-content: center;
-//         gap: 10px;
-//         margin: 10px 0;
-//         min-width: 100px;
-//         .pagination-item {
-//             background-color: $LightDarkPalette;
-//             height: 35px;
-//             width: 35px;
-//             display: flex;
-//             align-items: center;
-//             justify-content: center;
-//             border-radius: 5px;
-//             p {
-//                 font-weight: bold;
-//                 margin: 0;
-//             }
-//         }
-//     }
-// }
+.pagination {
+    &-wrapper {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        gap: 7px;
+        margin: 10px 0;
+        min-width: 100px;
+        .pagination-item {
+            background-color: $LightDarkPalette;
+            height: 35px;
+            width: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 5px;
+            cursor: pointer;
+            p {
+                font-weight: bold;
+                margin: 0;
+            }
+        }
+    }
+}
 
 @media screen and (max-width: $BreakPoint_800) {
     .leaderboard-page-container {

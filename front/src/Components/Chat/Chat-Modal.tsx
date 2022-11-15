@@ -48,6 +48,7 @@ function ChatModal(props: {onCloseModal: Function, showModal: number}) {
     }
 
     const formSubmit = handleSubmit((data, e) => {
+        console.log("TESTAZEAZEAE");
         e?.preventDefault();
         if (showModal === 1) {
             let body: CreateChanBodyRequest = {

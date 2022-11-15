@@ -1,6 +1,12 @@
 import { Channel } from "./Chat-Types";
 import { GameType } from "./Lobby-Types";
 
+export enum UserStatus {
+    ONLINE,
+    OFFLINE,
+    IN_GAME
+}
+
 export interface ExampleUser {
     id: number,
     username: string;
@@ -32,9 +38,12 @@ export interface UserInterface {
     id: number,
     username: string,
     avatar: string,
+    status: UserStatus,
     statistic: Statistic,
     channelUser: Channel[],
     blocked: UserInterface[];
+    singles_elo: number;
+	doubles_elo: number;
 }
 
 interface Statistic {

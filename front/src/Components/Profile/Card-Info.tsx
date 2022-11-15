@@ -1,5 +1,5 @@
 import { IconEdit, IconMessage, IconBrandAppleArcade } from '@tabler/icons';
-import { ProfileState } from '../../Types/User-Types';
+import { ProfileState, UserStatus } from '../../Types/User-Types';
 
 import ProfilePic from "../../Images-Icons/pp.jpg"
 import { Link } from "react-router-dom";
@@ -19,7 +19,7 @@ function CardInfo(props: {userState: ProfileState}) {
     return (
         <div className="card-info">
             <img className='profile-avatar' src={ProfilePic} alt="profil pic" />
-            <div className="player-status player-status-online"> </div>
+            <div className={`player-status player-status-${userState.user.status === UserStatus.ONLINE ? "online" : "offline"}`}> </div>
             <p> {userState.user.username} </p>
             {
                 userState.isLoggedUser ? <IconEdit /> : 
