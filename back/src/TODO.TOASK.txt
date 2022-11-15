@@ -25,6 +25,7 @@
 	- can create username with \n
 	- in queue and then joining party ?
 	- infinite load when logout and token expired
+	- problem when switching account
 
 
 // RANKING AND ELO

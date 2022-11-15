@@ -81,7 +81,6 @@ export class NotificationService {
 			delete_at: new Date(Date.now() + 20 * 1000)
 		});
 		const notifToSend = await this.notifRepo.save(notif);
-		// this.taskService.handlePartyInviteNotif(notif);
 		return notifToSend;
 	}
 

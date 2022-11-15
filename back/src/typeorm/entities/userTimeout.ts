@@ -27,10 +27,6 @@ export class UserTimeout {
 	@Column()
 	type: TimeoutType;
 
-	@Column({ nullable: true })
+	@Column({ nullable: true, type: 'timestamptz' })
 	until?: Date;
-
-	// TODO why
-	@CreateDateColumn()
-	created_at: Date;
 }

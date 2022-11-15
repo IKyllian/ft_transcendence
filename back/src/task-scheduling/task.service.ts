@@ -91,7 +91,6 @@ export class TaskService {
 				}
 			}
 		}
-		// matchFound.forEach((match) => this.lobbyFactory.lobby_create(match));
 		matchFound.forEach((match) => this.lobbyFactory.lobby_create(match));
 	}
 
@@ -153,7 +152,7 @@ export class TaskService {
 			.where("timeout.until < :now", { now: new Date() })
 			.getMany();
 
-		if (users) {
+		if (users.length > 0) {
 			users.forEach(async (timeout) => {
 				await this.timeoutRepo.delete(timeout.id);
 				this.globalService.server.to(`channel-${timeout.channelId}`).emit('ChannelUpdate', { type: ChannelUpdateType.UNTIMEOUT, data: timeout.id });

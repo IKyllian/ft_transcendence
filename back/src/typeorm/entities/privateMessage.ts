@@ -13,7 +13,7 @@ export class PrivateMessage {
 	@Column()
 	content: string;
 
-	@CreateDateColumn()
+	@CreateDateColumn({ type: 'timestamptz' })
 	send_at: Date;
 
 	@ManyToOne(() => Conversation, (conv) => conv.messages, { onDelete: 'CASCADE' })

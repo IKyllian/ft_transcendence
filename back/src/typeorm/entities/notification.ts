@@ -22,6 +22,6 @@ export class Notification {
 	channel: Channel;
 
 	// @CreateDateColumn()
-	@Column({ nullable: true })
+	@Column({ nullable: true, type: 'timestamptz' })
 	delete_at?: Date;
 }

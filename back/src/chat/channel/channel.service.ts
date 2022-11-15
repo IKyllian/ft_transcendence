@@ -326,9 +326,6 @@ export class ChannelService {
 		if (dto.time) {
 			until = new Date(new Date().getTime() + dto.time * 1000);
 		}
-		console.log("until", until)
-		const timenow = new Date()
-		console.log("now", timenow)
 
 		const mutedUser = this.timeoutRepo.create({
 			user: userToMute.user,
