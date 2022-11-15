@@ -17,7 +17,6 @@
 	- status update
 	- SQL injection in search bars ?
 	- Private msg notifications
-	- private chan doesnt work + should not appear in search
 	- do some test with party, ex: joining/leaving party while in queue etc
 	- catch exception when creating channel
 	- figure out how date work with db/js...

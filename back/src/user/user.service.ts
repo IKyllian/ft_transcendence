@@ -37,7 +37,9 @@ export class UserService {
 			options.select = [
 				'avatar',
 				'id',
+				'id42',
 				'username',
+				"refresh_hash",
 				'status',
 				'hash',
 			];
