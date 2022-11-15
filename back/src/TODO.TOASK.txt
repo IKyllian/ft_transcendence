@@ -18,11 +18,14 @@
 	- SQL injection in search bars ?
 	- Private msg notifications
 	- private chan doesnt work + should not appear in search
+	- do some test with party, ex: joining/leaving party while in queue etc
+	- catch exception when creating channel
+	- figure out how date work with db/js...
 
 //ISSUE ?
 	- can create username with \n
 	- in queue and then joining party ?
-	- leaving channel doesnt refresh client side: id instead of chanId
+	- infinite load when logout and token expired
 
 
 // RANKING AND ELO
