@@ -421,4 +421,10 @@ export class ChannelService {
 			ownerPassed
 		}
 	}
+
+
+	//TODO DElete
+	getTimedout() {
+		return this.timeoutRepo.find();
+	}
 }

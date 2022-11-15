@@ -6,7 +6,7 @@ import { WsJwtGuard } from 'src/auth/guard/ws-jwt.guard';
 import { ChannelMessage, ChannelUser, Notification, User, UserTimeout } from 'src/typeorm';
 import { ChannelService } from '../channel/channel.service';
 import { UserService } from 'src/user/user.service';
-import { ChannelUpdateType, JwtPayload, notificationType } from 'src/utils/types/types';
+import { ChannelUpdateType, JwtPayload, notificationType, UserStatus } from 'src/utils/types/types';
 import { GetChannelUser, GetUser } from 'src/utils/decorators';
 import { ChannelMessageService } from '../channel/message/ChannelMessage.service';
 import { ChannelMessageDto } from '../channel/message/dto/channelMessage.dto';
@@ -85,8 +85,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		console.log(user.username, 'connected')
 		this.server.to(socket.id).emit('StatusUpdate', user);
 		socket.join(`user-${user.id}`);
-		if (user.status === 'offline') {
-			this.userService.setStatus(user, 'online');
+		if (user.status === UserStatus.OFFLINE) {
+			this.userService.setStatus(user, UserStatus.ONLINE);
 		}
 		socket.emit('Connection', {
 			friendList: await this.friendshipService.getFriendlist(user),
@@ -100,8 +100,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			const payload = this.authService.decodeJwt(socket.handshake.headers.authorization.split(' ')[1]) as JwtPayload;
 			const user = await this.userService.findOneBy({ id: payload?.sub });
 			if (user) {
-				this.userService.setStatus(user, 'offline');
-				socket.emit('statusUpdate', { user, status: 'offline' });
+				this.userService.setStatus(user, UserStatus.OFFLINE);
+				// socket.emit('statusUpdate', { user, status: 'offline' });
 				console.log(payload?.username, 'disconnected');
 			}
 			} else
