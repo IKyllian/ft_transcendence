@@ -98,3 +98,9 @@ export class QueueLobby {
 		this.averageMmr /= this.players.length;
 	}
 }
+
+export enum UserStatus {
+	ONLINE,
+	OFFLINE,
+	IN_GAME,
+}

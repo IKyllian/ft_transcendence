@@ -4,11 +4,11 @@ import { FindManyOptions, FindOneOptions, FindOptionsWhere, IsNull, Like, Not, R
 import { AuthService } from "src/auth/auth.service";
 import { CreateUserDto } from "./dto/createUser.dto";
 import { MatchResult, Statistic, User } from "src/typeorm";
-import { userStatus } from "src/typeorm/entities/user";
 import { EditUserDto } from "./dto/editUser.dto";
 import * as argon from 'argon2';
 import { SearchDto } from "./dto/search.dto";
 import { FriendshipService } from "./friendship/friendship.service";
+import { UserStatus } from "src/utils/types/types";
 
 @Injectable()
 export class UserService {
@@ -99,7 +99,7 @@ export class UserService {
 		}
 	}
 
-	setStatus(user: User, status: userStatus) {
+	setStatus(user: User, status: UserStatus) {
 		user.status = status;
 		this.userRepo.save(user)
 	}
