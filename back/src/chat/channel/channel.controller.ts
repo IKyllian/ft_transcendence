@@ -52,4 +52,10 @@ export class ChannelController {
 	) {
 		return await this.channelService.delete(id);
 	}
+
+	@Get('get_channel')
+	@UseGuards(JwtGuard)
+	async getchan(@GetUser() user: User) {
+		return await this.channelService.getChannelById(user.id, 10)
+	}
 }

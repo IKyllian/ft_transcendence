@@ -53,6 +53,7 @@ export class ChannelService {
 		.innerJoinAndSelect("channel.channelUsers", "channelUsers")
   		.where("channel.id NOT IN (" + channelsUserHasJoined.getQuery() + ")")
   		.setParameters(channelsUserHasJoined.getParameters())
+		.andWhere("channel.option != :private", { private: channelOption.PRIVATE })
   		.getMany()
 	}
 
@@ -131,7 +132,6 @@ export class ChannelService {
 			}
 			throw new UnauthorizedException('You are perma banned from this channel');
 		}
-		console.log("isInvited " + channel.option, isInvited)
 		if (!isInvited) {
 			if (channel.option === channelOption.PRIVATE)
 				throw new UnauthorizedException('You need an invite to join this channel');
@@ -306,7 +306,7 @@ export class ChannelService {
 		return false;
 	}
 
-	async muteUser(requester: ChannelUser, dto: MuteUserDto) {
+	async muteUser(requester: ChannelUser, dto: MuteUserDto): Promise<UserTimeout> {
 		const alreadyMuted = await this.timeoutRepo.findOne({
 			where: {
 				user: { id: dto.userId },
@@ -323,8 +323,12 @@ export class ChannelService {
 			throw new BadRequestException("You don't have permissions");
 
 		let until = null;
-		if (dto.time)
+		if (dto.time) {
 			until = new Date(new Date().getTime() + dto.time * 1000);
+		}
+		console.log("until", until)
+		const timenow = new Date()
+		console.log("now", timenow)
 
 		const mutedUser = this.timeoutRepo.create({
 			user: userToMute.user,

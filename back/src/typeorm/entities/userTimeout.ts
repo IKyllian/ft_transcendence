@@ -1,5 +1,5 @@
 import { TimeoutType } from "src/utils/types/types";
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn, RelationId } from "typeorm";
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, RelationId } from "typeorm";
 import { Channel } from "./channel";
 import { User } from "./user";
 
@@ -29,4 +29,8 @@ export class UserTimeout {
 
 	@Column({ nullable: true })
 	until?: Date;
+
+	// TODO why
+	@CreateDateColumn()
+	created_at: Date;
 }

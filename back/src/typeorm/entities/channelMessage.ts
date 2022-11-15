@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { BeforeInsert, Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Channel } from "./channel";
 import { User } from "./user";
 
@@ -13,6 +13,11 @@ export class ChannelMessage {
 	@Column()
 	content: string;
 
+	// @BeforeInsert()
+	// getDate() {
+		// 	this.send_at = new Date();
+		// }
+		// @Column()
 	@CreateDateColumn()
 	send_at: Date;
 

@@ -26,7 +26,6 @@ export class PartyService {
 	}
 
 	emitPartyUpdate(party: Party, cancelQueue = false) {
-		console.log("in Party update")
 		party.players.forEach((player) => {
 			this.globalService.server.to(`user-${player.user.id}`).emit('PartyUpdate', { party, cancelQueue });
 		})
@@ -58,6 +57,7 @@ export class PartyService {
 
 	leaveParty(user: User) {
 		const party = this.partyJoined.getParty(user.id);
+		this.queueService.leaveQueue(user);
 		if (party) {
 			const player = this.getPlayerInParty(user.id, party.players);
 			if (player && player.isLeader && party.players.length > 1) {
@@ -65,7 +65,6 @@ export class PartyService {
 				party.players.forEach((player) => player.isReady = false);
 			}
 			party.leave(user);
-			this.queueService.leaveQueue(user);
 			this.partyJoined.removeParty(user.id);
 			this.globalService.server.to(`user-${user.id}`).emit('PartyLeave');
 		}

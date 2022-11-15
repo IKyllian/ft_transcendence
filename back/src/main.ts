@@ -68,6 +68,7 @@ async function bootstrap() {
   //   // .where("userId = :ids", { ids: 8 })
 	// 	.set({ match_lost: () => "match_lost + 1" })
 	// 	.execute();
+    // console.log(new Date().toLocaleString())
 
 }
 bootstrap();
