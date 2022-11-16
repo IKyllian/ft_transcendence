@@ -26,6 +26,7 @@
 	- in queue and then joining party ?
 	- infinite load when logout and token expired
 	- problem when switching account
+	- Goes twice in event when joinning channel Room
 
 
 // RANKING AND ELO

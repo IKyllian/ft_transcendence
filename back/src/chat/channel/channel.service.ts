@@ -148,14 +148,15 @@ export class ChannelService {
 	}
 
 	// TODO Change getchannelinvite to find by id
-	async respondInvite(user: User, dto: ResponseDto) {
+	async respondInvite(user: User, dto: ResponseDto): Promise<ChannelUser | null> {
 		const invite = await this.notifService.getChannelInvite(user, dto.id);
 		if (!invite)
 			throw new BadRequestException('You are not invite to this channel');
 		await this.notifService.delete(invite.id);
 		if (dto.response === ResponseType.ACCEPTED) {
-			return await this.join(user, dto.chanId, {}, true);
+			return this.join(user, dto.chanId, {}, true);
 		}
+		return null;
 	}
 
 	async leave(chanUser: ChannelUser) {
