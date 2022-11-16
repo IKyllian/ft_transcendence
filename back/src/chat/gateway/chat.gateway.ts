@@ -329,7 +329,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			this.server
 			.to(`conversation-${message.conversation.id}`)
 			.emit('NewPrivateMessage', message);
-
 			this.notificationService.sendPrivateMessageNotif(message.conversation);
 	}
 

@@ -42,10 +42,9 @@ export class ConversationService {
 
 	async getConversationWithUsers(userId: number, user2Id: number) {
 		return this.convRepo.createQueryBuilder('conv')
-			.innerJoinAndSelect("conv.user1", "user1")
-			.innerJoinAndSelect("conv.user2", "user2")
-			.addSelect("user1.id")
-			.addSelect("user2.id")
+			.innerJoin("conv.user1", "user1")
+			.innerJoin("conv.user2", "user2")
+			.addSelect(["user1.id", "user2.id"])
 			.where("conv.user1Id = :user1Id AND conv.user2Id = :user2Id", { user1Id: userId, user2Id: user2Id })
 			.orWhere("conv.user1Id = :user2Id AND conv.user1Id = :user2Id", { user2Id: user2Id, user1Id: userId })
 			.getOne();
