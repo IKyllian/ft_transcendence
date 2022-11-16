@@ -1,4 +1,4 @@
-import { ArgumentsHost, Catch, forwardRef, Inject, NotFoundException, UseFilters, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import { ArgumentsHost, BadRequestException, Catch, forwardRef, Inject, NotFoundException, UseFilters, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { WebSocketGateway, MessageBody, WebSocketServer, ConnectedSocket, OnGatewayConnection, OnGatewayDisconnect, WsException, BaseWsExceptionFilter, SubscribeMessage } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { AuthService } from 'src/auth/auth.service';
@@ -33,6 +33,7 @@ import { AuthenticatedSocket } from 'src/utils/types/auth-socket';
 import { ChanIdDto } from '../channel/dto/chan-id.dto';
 import { TaskScheduler } from 'src/task-scheduling/task.module';
 import { GlobalService } from 'src/utils/global/global.service';
+import { UserModule } from 'src/user/user.module';
 
 @UseFilters(GatewayExceptionFilter)
 @UsePipes(new ValidationPipe())
@@ -66,11 +67,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	async handleConnection(socket: AuthenticatedSocket) {
 		let user: User = null;
 		if (socket.handshake.headers.authorization) {
-			// console.log(socket.handshake.headers)
 			const token = socket.handshake.headers.authorization.split(' ')[1];
 			user = await this.authService.verify(token);
 		}
-
 		
 		if (!user) {
 			// throw new WsException('invalid credential');
@@ -79,9 +78,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			// socket.emit('connection', 'failed');
 		}
 		socket.user = user;
-		// if (user.username === 'chak') {
-		// 	console.log(socket)
-		// }
 		console.log(user.username, 'connected')
 		this.server.to(socket.id).emit('StatusUpdate', user);
 		socket.join(`user-${user.id}`);
@@ -109,130 +105,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			// TODO emit disconnected for front retry to reconnect ?
 	}
 
-	@UseGuards(WsJwtGuard)
-	@SubscribeMessage('JoinChannelRoom')
-	async joinChannelRoom(
-		@ConnectedSocket() socket: AuthenticatedSocket,
-		@MessageBody() room: RoomDto,
-	) {
-		console.log(socket.user.username + ' joined room')
-		const chanInfo = await this.channelService.getChannelById(socket.user.id, room.id);
-		socket.emit('roomData', chanInfo);
-		socket.join(`channel-${ chanInfo.id }`);
-		const notif = await this.notificationService.findOne({
-			where: {
-				addressee: { id: socket.user.id },
-				channel: { id: chanInfo.id },
-				type: notificationType.CHANNEL_MESSAGE,
-			}
-		});
-		if (notif) {
-			await this.notificationService.delete(notif.id);
-			this.server.to(`user-${socket.user.id}`).emit('DeleteNotification', notif.id);
-		}
-	}
-
-	@UseGuards(WsJwtGuard)
-	@SubscribeMessage('LeaveChannelRoom')
-	leaveChannelRoom(
-		@ConnectedSocket() socket: AuthenticatedSocket,
-		@MessageBody() room: RoomDto) {
-		socket.leave(`channel-${ room.id }`);
-		console.log(socket.user.username + ' left room')
-	}
-
-	@UseGuards(WsJwtGuard, WsInChannelGuard)
-	@SubscribeMessage('ChannelMessage')
-	async sendChannelMessage(
-		@ConnectedSocket() socket: AuthenticatedSocket,
-		@MessageBody() data: ChannelMessageDto,
-		@GetChannelUser() chanUser: ChannelUser,
-		) {
-			await this.channelService.isMuted(chanUser);
-			const message = await this.channelMsgService.create(chanUser, data);
-			this.server.to(`channel-${ data.chanId }`).emit('NewChannelMessage', message);
-			this.notificationService.sendMessageNotif(socket, data.chanId);
-	}
-
-	@UseGuards(WsJwtGuard)
-	@SubscribeMessage('PrivateMessage')
-	async sendPrivateMessage(
-		@ConnectedSocket() socket: AuthenticatedSocket,
-		@MessageBody() data: PrivateMessageDto,
-		) {
-			const message = await this.privateMsgService.create(socket.user, data);
-			this.server
-			.to(`user-${socket.user.id}`)
-			.to(`user-${data.adresseeId}`)
-			.emit('NewPrivateMessage', message);
-	}
-
-	@UseGuards(WsJwtGuard)
-	@SubscribeMessage('CreateConversation')
-	async createConversation(
-		@ConnectedSocket() socket: AuthenticatedSocket,
-		@MessageBody() data: PrivateMessageDto,
-	) {
-		const conv = await this.convService.create(socket.user, data.adresseeId, data.content);
-		this.server
-		.to(`user-${socket.user.id}`)
-		.to(`user-${data.adresseeId}`)
-		.emit('NewConversation', { conv, socketId: socket.id });
-	}
-
-	@UseGuards(WsJwtGuard)
-	@SubscribeMessage('FriendRequest')
-	async sendFriendRequest(
-		@ConnectedSocket() socket: AuthenticatedSocket,
-		@MessageBody() dto: UserIdDto,
-	) {
-		const addressee = await this.userService.findOneBy({ id: dto.id });
-		if (!addressee)
-			throw new NotFoundException('User not found');
-		await this.friendshipService.sendFriendRequest(socket.user, addressee);
-		this.server.to(`user-${socket.user.id}`).emit("RequestValidation");
-		const notif = await this.notificationService.createFriendRequestNotif(addressee, socket.user);
-		socket.to(`user-${dto.id}`).emit('NewNotification', notif);
-	}
-
-	@UseGuards(WsJwtGuard)
-	@SubscribeMessage('FriendRequestResponse')
-	async friendRequestResponse(
-		@ConnectedSocket() socket: AuthenticatedSocket,
-		@MessageBody() dto: ResponseDto,
-	) {
-		const requester = await this.userService.findOneBy({ id: dto.id });
-		if (!requester)
-			throw new NotFoundException('User not found');
-		const friendship = await this.friendshipService.friendRequestResponse(socket.user, requester, dto);
-		const notif = await this.notificationService.findOne({
-			where: {
-				requester: { id: requester.id },
-				addressee: { id: socket.user.id },
-				type: notificationType.FRIEND_REQUEST,
-			}
-		});
-		this.server.to(`user-${socket.user.id}`).emit("RequestValidation");
-		if (notif) {
-			await this.notificationService.delete(notif.id);
-			this.server.to(`user-${socket.user.id}`).emit('DeleteNotification', notif.id);
-		}
-		if (friendship.status === 'accepted') {
-			this.server.to(`user-${socket.user.id}`).emit('FriendListUpdate', await this.friendshipService.getFriendlist(socket.user));
-			this.server.to(`user-${requester.id}`).emit('FriendListUpdate', await this.friendshipService.getFriendlist(requester));
-		}
-	}
-
-	@UseGuards(WsJwtGuard)
-	@SubscribeMessage('UnFriend')
-	async unFriend(
-		@GetUser() user: User,
-		@MessageBody() dto: UserIdDto,
-	) {
-		const user2 = await this.friendshipService.unFriend(user, dto);
-		this.server.to(`user-${user.id}`).emit('FriendListUpdate', await this.friendshipService.getFriendlist(user));
-		this.server.to(`user-${user2.id}`).emit('FriendListUpdate', await this.friendshipService.getFriendlist(user2));
-	}
+	/* ------------------------------------ */
+	/* ---------- CHANNEL SECTION --------- */
+	/* ------------------------------------ */
 
 	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('JoinChannel')
@@ -255,7 +130,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@SubscribeMessage('LeaveChannel')
 	async leaveChannel(
 		@GetChannelUser() chanUser: ChannelUser,
-		@MessageBody() channel: ChanIdDto,// TODO send "chanId" from front
+		@MessageBody() channel: ChanIdDto,
 	) {
 		await this.channelService.leave(chanUser);
 		this.server.to(`channel-${channel.chanId}`).emit('ChannelUpdate', { type: ChannelUpdateType.LEAVE, data: chanUser.id});
@@ -267,13 +142,58 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		this.server.to(`channel-${channel.chanId}`).emit('NewChannelMessage', servMsg);
 	}
 
+	/**
+	 * Make user socket join the channel room and send channel information
+	 * to him. If user got channel message notification, it get remove from database
+	 * and user client is notified with an emit
+	 * @param socket
+	 * @param room = channel id
+	 */
+	@UseGuards(WsJwtGuard)
+	@SubscribeMessage('JoinChannelRoom')
+	async joinChannelRoom(
+		@ConnectedSocket() socket: AuthenticatedSocket,
+		@GetUser() user: User,
+		@MessageBody() room: RoomDto,
+	) {
+		console.log(socket.user.username + ' joined room')
+		const chanInfo = await this.channelService.getChannelById(user.id, room.id);
+		socket.emit('roomData', chanInfo);
+		socket.join(`channel-${ chanInfo.id }`);
+		const deletedNotifId = await this.notificationService.deleteChannelMessageNotif(user.id, room.id);
+		if (deletedNotifId) {
+			this.server.to(`user-${user.id}`).emit('DeleteNotification', deletedNotifId);
+		}
+	}
+
+	@UseGuards(WsJwtGuard)
+	@SubscribeMessage('LeaveChannelRoom')
+	leaveChannelRoom(
+		@ConnectedSocket() socket: AuthenticatedSocket,
+		@MessageBody() room: RoomDto) {
+		socket.leave(`channel-${ room.id }`);
+		console.log(socket.user.username + ' left room')
+	}
+
+	@UseGuards(WsJwtGuard, WsInChannelGuard)
+	@SubscribeMessage('ChannelMessage')
+	async sendChannelMessage(
+		@MessageBody() data: ChannelMessageDto,
+		@GetChannelUser() chanUser: ChannelUser,
+		) {
+			await this.channelService.isMuted(chanUser);
+			const message = await this.channelMsgService.create(chanUser, data);
+			this.server.to(`channel-${ data.chanId }`).emit('NewChannelMessage', message);
+			this.notificationService.sendMessageNotif(data.chanId);
+	}
+
 	@UseGuards(WsJwtGuard, WsInChannelGuard)
 	@SubscribeMessage('ChannelInvite')
 	async channelInvite(
 		@GetUser() user: User,
 		@MessageBody() dto: ChannelInviteDto,
 	) {
-		const notif = await this.notificationService.createChanInviteNotif(user, dto);
+		const notif: Notification = await this.notificationService.createChanInviteNotif(user, dto);
 		this.server.to(`user-${dto.userId}`).emit('NewNotification', notif);
 	}
 
@@ -353,6 +273,66 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		socket.to(`channel-${dto.chanId}`).emit('OnTypingChannel', { user, isTyping: dto.isTyping });
 	}
 
+	/* -------------------------------------------- */
+	/* ---------- PRIVATE MESSAGE SECTION --------- */
+	/* -------------------------------------------- */
+
+	@UseGuards(WsJwtGuard)
+	@SubscribeMessage('CreateConversation')
+	async createConversation(
+		@ConnectedSocket() socket: AuthenticatedSocket,
+		@MessageBody() data: PrivateMessageDto,
+	) {
+		const conv = await this.convService.create(socket.user, data.adresseeId, data.content);
+		this.server
+		.to(`user-${socket.user.id}`)
+		.to(`user-${data.adresseeId}`)
+		.emit('NewConversation', { conv, socketId: socket.id });
+	}
+
+	@UseGuards(WsJwtGuard)
+	@SubscribeMessage('JoinConversationRoom')
+	async joinConvRoom(
+		@ConnectedSocket() socket: AuthenticatedSocket,
+		@MessageBody() room: RoomDto,
+	) {
+		console.log(socket.user.username + " joining conversation room");
+		const conv = await this.convService.getConversation(socket.user, room.id);
+		if (!conv) {
+			throw new BadRequestException('Conversation not found');
+		}
+		socket.join(`conversation-${room.id}`);
+		this.server.to(`user-${socket.user.id}`).emit('ConversationData', conv);
+		const deletedNotifId = await this.notificationService.deletePrivateMessageNotif(socket.user.id, room.id);
+		if (deletedNotifId) {
+			this.server.to(`user-${socket.user.id}`).emit('DeleteNotification', deletedNotifId);
+		}
+	}
+
+	@UseGuards(WsJwtGuard)
+	@SubscribeMessage('LeaveConversationRoom')
+	async leaveConvRoom(
+		@ConnectedSocket() socket: AuthenticatedSocket,
+		@MessageBody() room: RoomDto,
+	) {
+		console.log(socket.user.username + " leaving conversation room");
+		socket.leave(`conversation-${room.id}`);
+	}
+
+	@UseGuards(WsJwtGuard)
+	@SubscribeMessage('PrivateMessage')
+	async sendPrivateMessage(
+		@ConnectedSocket() socket: AuthenticatedSocket,
+		@MessageBody() data: PrivateMessageDto,
+		) {
+			const message = await this.privateMsgService.create(socket.user, data);
+			this.server
+			.to(`converstion-${message.conversation.id}`)
+			.emit('NewPrivateMessage', message);
+
+			this.notificationService.sendPrivateMessageNotif(socket.user.id, message.conversation.id);
+	}
+
 	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('OnTypingPrivate')
 	async onTypingPrivate(
@@ -363,10 +343,61 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		socket.to(`user-${dto.userId}`).emit('OnTypingPrivate', { user, isTyping: dto.isTyping, convId: dto.convId });
 	}
 
-	@SubscribeMessage('testCloseGamesocket')
-	async test(@ConnectedSocket() socket:Socket) {
-		const chak = await this.server.in("user-8").fetchSockets();
-		console.log('in event')
-		chak.forEach((chaki) => chaki.disconnect(true))
+	/* --------------------------------------- */
+	/* ---------- FRIENDSHIP SECTION --------- */
+	/* --------------------------------------- */
+
+	@UseGuards(WsJwtGuard)
+	@SubscribeMessage('FriendRequest')
+	async sendFriendRequest(
+		@ConnectedSocket() socket: AuthenticatedSocket,
+		@MessageBody() dto: UserIdDto,
+	) {
+		const addressee = await this.userService.findOneBy({ id: dto.id });
+		if (!addressee)
+			throw new NotFoundException('User not found');
+		await this.friendshipService.sendFriendRequest(socket.user, addressee);
+		this.server.to(`user-${socket.user.id}`).emit("RequestValidation");
+		const notif = await this.notificationService.createFriendRequestNotif(addressee, socket.user);
+		socket.to(`user-${dto.id}`).emit('NewNotification', notif);
+	}
+
+	@UseGuards(WsJwtGuard)
+	@SubscribeMessage('FriendRequestResponse')
+	async friendRequestResponse(
+		@ConnectedSocket() socket: AuthenticatedSocket,
+		@MessageBody() dto: ResponseDto,
+	) {
+		const requester = await this.userService.findOneBy({ id: dto.id });
+		if (!requester)
+			throw new NotFoundException('User not found');
+		const friendship = await this.friendshipService.friendRequestResponse(socket.user, requester, dto);
+		const notif = await this.notificationService.findOne({
+			where: {
+				requester: { id: requester.id },
+				addressee: { id: socket.user.id },
+				type: notificationType.FRIEND_REQUEST,
+			}
+		});
+		this.server.to(`user-${socket.user.id}`).emit("RequestValidation");
+		if (notif) {
+			await this.notificationService.delete(notif.id);
+			this.server.to(`user-${socket.user.id}`).emit('DeleteNotification', notif.id);
+		}
+		if (friendship.status === 'accepted') {
+			this.server.to(`user-${socket.user.id}`).emit('FriendListUpdate', await this.friendshipService.getFriendlist(socket.user));
+			this.server.to(`user-${requester.id}`).emit('FriendListUpdate', await this.friendshipService.getFriendlist(requester));
+		}
+	}
+
+	@UseGuards(WsJwtGuard)
+	@SubscribeMessage('UnFriend')
+	async unFriend(
+		@GetUser() user: User,
+		@MessageBody() dto: UserIdDto,
+	) {
+		const user2 = await this.friendshipService.unFriend(user, dto);
+		this.server.to(`user-${user.id}`).emit('FriendListUpdate', await this.friendshipService.getFriendlist(user));
+		this.server.to(`user-${user2.id}`).emit('FriendListUpdate', await this.friendshipService.getFriendlist(user2));
 	}
 }

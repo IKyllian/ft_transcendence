@@ -28,6 +28,6 @@ export class MatchResult {
 	@ManyToOne(() => User, { nullable: true })
 	red_team_player2?: User;
 
-	@CreateDateColumn()
+	@CreateDateColumn({ type: 'timestamptz' })
 	created_at: Date;
 }

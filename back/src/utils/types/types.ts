@@ -1,6 +1,7 @@
 import { MESSAGES } from "@nestjs/core/constants";
 import { generate } from "shortid";
 import { Player } from "src/game/player";
+import { ChannelUser, UserTimeout } from "src/typeorm";
 import { GameType } from "./game.types";
 
 export type JwtPayload = {
@@ -41,6 +42,7 @@ export enum notificationType {
 	CHANNEL_INVITE,
 	PARTY_INVITE,
 	CHANNEL_MESSAGE,
+	PRIVATE_MESSAGE,
 };
 
 export enum ResponseType {
