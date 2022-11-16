@@ -18,6 +18,6 @@ export class Friendship {
 	@Column({ nullable: true })
 	status: friendshipStatus;
 
-	@CreateDateColumn()
+	@CreateDateColumn({ type: 'timestamptz' })
 	created_at: Date;
 }

@@ -13,12 +13,7 @@ export class ChannelMessage {
 	@Column()
 	content: string;
 
-	// @BeforeInsert()
-	// getDate() {
-		// 	this.send_at = new Date();
-		// }
-		// @Column()
-	@CreateDateColumn()
+	@CreateDateColumn({type: 'timestamptz'})
 	send_at: Date;
 
 	@ManyToOne(() => Channel, (channel) => channel.messages, { onDelete: 'CASCADE' })
