@@ -327,10 +327,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		) {
 			const message = await this.privateMsgService.create(socket.user, data);
 			this.server
-			.to(`converstion-${message.conversation.id}`)
+			.to(`conversation-${message.conversation.id}`)
 			.emit('NewPrivateMessage', message);
 
-			this.notificationService.sendPrivateMessageNotif(socket.user.id, message.conversation.id);
+			this.notificationService.sendPrivateMessageNotif(message.conversation);
 	}
 
 	@UseGuards(WsJwtGuard)

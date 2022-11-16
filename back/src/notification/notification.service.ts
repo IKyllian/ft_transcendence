@@ -1,7 +1,7 @@
 import { BadRequestException, forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ChannelInviteDto } from 'src/chat/gateway/dto/channel-invite.dto';
-import { Channel, Friendship, Notification, User } from 'src/typeorm';
+import { Channel, Conversation, Friendship, Notification, User } from 'src/typeorm';
 import { UserService } from 'src/user/user.service';
 import { ChannelService } from 'src/chat/channel/channel.service';
 import { notificationType } from 'src/utils/types/types';
@@ -143,27 +143,27 @@ export class NotificationService {
 		})
 	}
 
-	async sendPrivateMessageNotif(senderId: number, convId: number) {
-		const socketsInRoom = await this.globalService.server.in(`conversation-${convId}`).fetchSockets() as unknown as AuthenticatedSocket[];
+	async sendPrivateMessageNotif(conv: Conversation) {
+		const socketsInRoom = await this.globalService.server.in(`conversation-${conv.id}`).fetchSockets() as unknown as AuthenticatedSocket[];
 		const usersInRoomId: number[] = socketsInRoom.map(socket => socket.user.id);
-
-		usersInRoomId.forEach(async userId => {
-			if (userId !== senderId) {
+		const users: User[] = [conv.user1, conv.user2]
+		users.forEach(async user => {
+			if (!usersInRoomId.find(id => id === user.id)) {
 				const notifExist = await this.notifRepo.findOne({
 					where: {
-						conversation: { id: convId },
-						addressee: { id: userId },
+						conversation: { id: conv.id },
+						addressee: { id: user.id },
 						type: notificationType.PRIVATE_MESSAGE
 					}
 				});
 				if (!notifExist) {
 					const notif = this.notifRepo.create({
-						conversation: { id: convId },
-						addressee: { id: userId },
+						conversation: { id: conv.id },
+						addressee: { id: user.id },
 						type: notificationType.PRIVATE_MESSAGE
 					});
 					const notifToSend = await this.notifRepo.save(notif);
-					this.globalService.server.to(`user-${userId}`).emit('NewNotification', notifToSend);
+					this.globalService.server.to(`user-${user.id}`).emit('NewNotification', notifToSend);
 				}
 			}
 		})
