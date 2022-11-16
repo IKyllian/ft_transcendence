@@ -330,8 +330,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			this.server
 			.to(`conversation-${message.conversation.id}`)
 			.emit('NewPrivateMessage', message);
-
-			this.notificationService.sendPrivateMessageNotif(socket.user.id, message.conversation.id);
+			this.notificationService.sendPrivateMessageNotif(message.conversation);
 	}
 
 	@UseGuards(WsJwtGuard)
