@@ -103,11 +103,20 @@ export function useChannelHook() {
         setPreviousMessages(defaultMessagesState);
         setHaveToLoad(false);
         setPrevLength(0);
+
+        const listener = (data: any) => {
+            setChatDatas((prev: any) => {
+                return {...prev, messages: [...prev!.messages, {...data, send_at: new Date(data.send_at)}]}
+            });
+        }
+
         const getDatas = () => {
             socket?.emit("JoinChannelRoom", {
                 id: channelId,
             });
 
+            socket?.on('NewChannelMessage', listener);
+    
             socket?.on("OnTypingChannel", (data: {user: UserInterface, isTyping: boolean}) => {
                 console.log("OnTypingChannel");
                 setUsersTyping(prev => [...prev.filter(elem => elem.id !== data.user.id)]);
@@ -184,25 +193,10 @@ export function useChannelHook() {
                 socket?.off("roomData");
                 socket?.off("ChannelUpdate");
                 socket?.off("OnTypingChannel");
+                socket?.off("NewChannelMessage");
             }
         }
     }, [socket, channelId, channels])
-
-    useEffect(() => {
-        const listener = (data: any) => {
-            setChatDatas((prev: any) => {
-                return {...prev, messages: [...prev!.messages, {...data, send_at: new Date(data.send_at)}]}
-            });
-        }
-        if (socket) {
-            socket?.on('NewChannelMessage', listener);
-        }
-
-        return () => {
-            if (socket)
-                socket?.off("NewChannelMessage");
-        }
-    }, [socket])
 
     const handleSubmitMessage = handleSubmit((data, e: any) => {
         e.preventDefault();

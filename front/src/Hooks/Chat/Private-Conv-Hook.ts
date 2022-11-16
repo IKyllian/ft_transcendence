@@ -90,6 +90,16 @@ export function usePrivateConvHook() {
         if (convId) {
             setConvDatas(undefined);
             setUserTyping(undefined);
+            
+            const listener = (data: PrivateMessage) => {
+                console.log("NewPrivateMessage", data);
+                setConvDatas((prev: any) => {
+                    return {...prev, conv: {...prev.conv, messages: [...prev!.conv.messages, {...data, send_at: new Date(data.send_at)}]}}
+                });
+            }
+            
+            socket?.on('NewPrivateMessage', listener);
+
             socket?.on("OnTypingPrivate", (data: {user: UserInterface, isTyping: boolean, convId: number}) => {
                 if (data.convId === convId) {
                     if (data.isTyping)
@@ -121,22 +131,10 @@ export function usePrivateConvHook() {
             });
             socket?.off("OnTypingPrivate");
             socket?.off("ConversationData");
-        }
-    }, [convId])
-
-    useEffect(() => {
-        const listener = (data: PrivateMessage) => {
-            console.log("NewPrivateMessage", data);
-            setConvDatas((prev: any) => {
-                return {...prev, conv: {...prev.conv, messages: [...prev!.conv.messages, {...data, send_at: new Date(data.send_at)}]}}
-            });
-        }
-        socket?.on('NewPrivateMessage', listener);
-        return () => {
             socket?.off("NewPrivateMessage");
         }
-    }, [])
-
+    }, [socket, convId])
+    
     return {
         convDatas,
         handleSubmit: handleSubmitMessage,
