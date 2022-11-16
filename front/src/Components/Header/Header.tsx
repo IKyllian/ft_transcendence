@@ -16,7 +16,7 @@ function NotifIcon(props: {notifications: NotificationInterface[] | undefined ,h
     const {handleNotifDropdownClick, notifications} = props;
     return (
         <div className='badge-wrapper'>
-            { notifications !== undefined && notifications.filter(elem => elem.type !== notificationType.CHANNEL_MESSAGE && elem.type !== notificationType.PARTY_INVITE).length > 0 && <div className='badge badge-notif'> {notifications.filter(elem => elem.type !== notificationType.CHANNEL_MESSAGE && elem.type !== notificationType.PARTY_INVITE).length} </div> }
+            { notifications !== undefined && notifications.filter(elem => elem.type !== notificationType.CHANNEL_MESSAGE && elem.type !== notificationType.PARTY_INVITE).length > 0 && <div className='badge badge-notif'> {notifications.filter(elem => elem.type !== notificationType.CHANNEL_MESSAGE && elem.type !== notificationType.PARTY_INVITE && elem.type !== notificationType.PRIVATE_MESSAGE).length} </div> }
             <IconBell onClick={() => handleNotifDropdownClick()} />
         </div>
     );
@@ -73,7 +73,7 @@ function Header() {
                     <IconUserPlus onClick={() => modalStatus.setStatus()} />
                     <Link to="/chat" aria-label="Link to the chat">
                         <div className='badge-wrapper'>
-                            { notifications !== undefined && notifications.filter(elem => elem.type === notificationType.CHANNEL_MESSAGE).length > 0 && <div className='badge badge-message'> </div> }
+                            { notifications !== undefined && notifications.filter(elem => elem.type === notificationType.CHANNEL_MESSAGE || elem.type === notificationType.PRIVATE_MESSAGE).length > 0 && <div className='badge badge-message'> </div> }
                             <IconMessages />
                         </div>
                     </Link>

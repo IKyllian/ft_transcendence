@@ -104,7 +104,7 @@ export function useChannelHook() {
         setHaveToLoad(false);
         setPrevLength(0);
         const getDatas = () => {
-            socket!.emit("JoinChannelRoom", {
+            socket?.emit("JoinChannelRoom", {
                 id: channelId,
             });
 
@@ -157,7 +157,7 @@ export function useChannelHook() {
                 }
             });
 
-            socket!.on('roomData', (data: Channel) => {
+            socket?.on('roomData', (data: Channel) => {
                 console.log("Getting datas roomData", data);
                 if (data.id === channelId && channels) {
                     let channel: Channel = data;
@@ -178,12 +178,12 @@ export function useChannelHook() {
 
         return () => {
             if (socket) {
-                socket!.emit("LeaveChannelRoom", {
+                socket?.emit("LeaveChannelRoom", {
                     id: channelId,
                 });
-                socket!.off("roomData");
-                socket!.off("ChannelUpdate");
-                socket!.off("OnTypingChannel");
+                socket?.off("roomData");
+                socket?.off("ChannelUpdate");
+                socket?.off("OnTypingChannel");
             }
         }
     }, [socket, channelId, channels])
@@ -195,19 +195,19 @@ export function useChannelHook() {
             });
         }
         if (socket) {
-            socket!.on('NewChannelMessage', listener);
+            socket?.on('NewChannelMessage', listener);
         }
 
         return () => {
             if (socket)
-                socket!.off("NewChannelMessage");
+                socket?.off("NewChannelMessage");
         }
     }, [socket])
 
     const handleSubmitMessage = handleSubmit((data, e: any) => {
         e.preventDefault();
         if (data.inputMessage.length > 0) {
-            socket!.emit("ChannelMessage", {
+            socket?.emit("ChannelMessage", {
                 content: data.inputMessage,
                 chanId: channelId,
             });

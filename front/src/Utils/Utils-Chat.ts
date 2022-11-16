@@ -19,17 +19,17 @@ export function getMessageDateString(date: Date): string {
     if (currentDate.getFullYear() === date.getFullYear()
         && currentDate.getMonth() === date.getMonth()
         && currentDate.getDate() === date.getDate())
-        return (`Aujourd'hui à ${date.getHours() + 2}:${date.getMinutes() >= 0 && date.getMinutes() <= 9 ? '0' : ''}${date.getMinutes()}`);
+        return (`Aujourd'hui à ${date.getHours()}:${date.getMinutes() >= 0 && date.getMinutes() <= 9 ? '0' : ''}${date.getMinutes()}`);
     else if (currentDate.getFullYear() === date.getFullYear()
         && currentDate.getMonth() === date.getMonth()
         && (currentDate.getDate() - 1) === date.getDate())
-        return (`Hier à ${date.getHours() + 2}:${date.getMinutes() >= 0 && date.getMinutes() <= 9 ? '0' : ''}${date.getMinutes()}`);
+        return (`Hier à ${date.getHours()}:${date.getMinutes() >= 0 && date.getMinutes() <= 9 ? '0' : ''}${date.getMinutes()}`);
     else
         return (`${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`);
 }
 
 export function getMessageHour(date: Date): string {
-    return (`${date.getHours() + 2}:${date.getMinutes() >= 0 && date.getMinutes() <= 9 ? '0' : ''}${date.getMinutes()}`)
+    return (`${date.getHours()}:${date.getMinutes() >= 0 && date.getMinutes() <= 9 ? '0' : ''}${date.getMinutes()}`)
 }
 
 export function UserIsMute(usersTimeout: UserTimeout[], userId: number): boolean {
