@@ -1,11 +1,10 @@
 import 'phaser';
 import Pong from './scenes/Pong';
 import Lobby from './scenes/Lobby';
+import ReplayPlayer from './scenes/ReplayPlayer';
 import { PlayersGameData } from './types/shared.types';
-import { io, Socket } from 'socket.io-client';
+import { Socket } from 'socket.io-client';
 import MatchResult from './scenes/MatchResult';
-import { useContext } from 'react';
-import { SocketContext } from '../../../App';
 //import ReplayPlayer from './scenes/ReplayPlayer';
 
 export function launch_game(players_data: PlayersGameData, socket: Socket): void
@@ -35,7 +34,7 @@ export function launch_game(players_data: PlayersGameData, socket: Socket): void
 	const game = new Phaser.Game(config);
 }
 
-// export function watch_replay(game_id: string): void
+// export function watch_replay(game_id: string, socket: Socket): void
 // {
 // 	const config = {
 // 		type: Phaser.AUTO,
@@ -51,9 +50,10 @@ export function launch_game(players_data: PlayersGameData, socket: Socket): void
 // 		width: 800,
 // 		height: 600,
 // 		callbacks: {
-// 			preBoot: function (game) {
+// 			preBoot: function (game: any) {
 // 				game.registry.set('game_id', game_id);
 // 				game.registry.set('is_replay', true);
+// 				game.registry.set('socket', socket);
 // 			}
 // 		  },
 // 		scene: [ ReplayPlayer, MatchResult ]

@@ -12,14 +12,6 @@ export enum GameType {
 	Singles,
 	Doubles
 }
-
-// export type Player = {
-// 	name: string,
-// 	win: number,
-// 	loss: number,
-// 	avatar: string
-// }
-
 //data sent to each player before the game
 export type PlayersGameData = {
 	Player_A_Back: Player,
@@ -27,52 +19,18 @@ export type PlayersGameData = {
 	Player_B_Front?: Player,
 	Player_B_Back: Player,
 	player_type: PlayerType,
-	// player_secret: string,
 	game_id: string,
 	game_settings: GameSettings
 }
 
-//data sent from player to join lobby
-// export type PlayersLobbyData = 
+// //data sent to lobby factory to request a new lobby
+// export type MatchmakingLobby =
 // {
-// 	player_secret: string,
-// 	game_id: string
-// }
-
-//data sent to lobby factory to request a new lobby
-// export type LobbyRequest =
-// {
-// 	Player_A_Back: string,
-// 	Player_A_Front: string,
-// 	Player_B_Front: string,
-// 	Player_B_Back: string,
-// 	game_settings: GameSettings
-// }
-
-//data sent to lobby factory to request a new lobby
-
-export type MatchmakingLobby =
-{
-	Player_A_Back: Player,
-	Player_A_Front?: Player,
-	Player_B_Back: Player,
-	Player_B_Front?: Player,
-	game_settings?: GameSettings
-}
-
-//data sent from back to front with data for the players
-// export type NewGameData =
-// {
-// 	Player_A_Back: string,
-// 	Player_A_Back_secret: string,
-// 	Player_A_Front: string,
-// 	Player_A_Front_secret: string,
-// 	Player_B_Front: string,
-// 	Player_B_Front_secret: string,
-// 	Player_B_Back: string,
-// 	Player_B_Back_secret: string,
-// 	game_id: string,
-// 	game_settings: GameSettings
+// 	Player_A_Back: Player,
+// 	Player_A_Front?: Player,
+// 	Player_B_Back: Player,
+// 	Player_B_Front?: Player,
+// 	game_settings?: GameSettings
 // }
 
 
@@ -83,12 +41,9 @@ export type NewGameData =
 	Player_A_Front?: Player,
 	Player_B_Back: Player,
 	Player_B_Front?: Player,
-//	player_type: PlayerType,
 	game_id: string,
 	game_settings: GameSettings
 }
-
-
 
 export enum PlayerStatus
 {
@@ -185,7 +140,7 @@ export enum EndResult
 //game settings for the core
 export type GameSettings =
 {
-	ranked: boolean,
+	is_ranked: boolean,
 	game_type: GameType,
 	up_down_border: number,
 	player_back_advance: number,
@@ -197,21 +152,12 @@ export type GameSettings =
 	point_for_victory: number
 }
 
-// export enum GameMode {
-// 	OneVsOne,
-// 	TwoVsTwo,
-// 	Custom
-
-// }
-
-// }
-
 export enum TeamSide {
 	BLUE,
 	RED,
 }
 
 export enum PlayerPosition {
-	FRONT,
 	BACK,
+	FRONT,
 }

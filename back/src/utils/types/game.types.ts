@@ -13,14 +13,6 @@ export enum GameType {
 	Singles,
 	Doubles
 }
-
-// export type Player = {
-// 	name: string,
-// 	win: number,
-// 	loss: number,
-// 	avatar: string
-// }
-
 //data sent to each player before the game
 export type PlayersGameData = {
 	Player_A_Back?: Player,
@@ -29,40 +21,12 @@ export type PlayersGameData = {
 	Player_B_Back?: Player,
 	player_type: PlayerType,
 	game_id: string,
-	game_settings: GameSettings,
+	game_settings: GameSettings
 }
 
-//data sent from player to join lobby
-// export type PlayersLobbyData = 
-// {
-// 	player_secret: string,
-// 	game_id: string
-// }
 
-//data sent to lobby factory to request a new lobby
-// export type LobbyRequest =
-// {
-// 	Player_A_Back: string,
-// 	Player_A_Front: string,
-// 	Player_B_Front: string,
-// 	Player_B_Back: string,
-// 	game_settings: game_settings
-// }
 
-//data sent from back to front with data for the players
-// export type NewGameData =
-// {
-// 	Player_A_Back: string,
-// 	Player_A_Back_secret: string,
-// 	Player_A_Front: string,
-// 	Player_A_Front_secret: string,
-// 	Player_B_Front: string,
-// 	Player_B_Front_secret: string,
-// 	Player_B_Back: string,
-// 	Player_B_Back_secret: string,
-// 	game_id: string,
-// 	game_settings: game_settings
-// }
+
 
 
 // data sent from back to front with data for the players
@@ -72,12 +36,9 @@ export type NewGameData =
 	Player_A_Front?: Player,
 	Player_B_Back: Player,
 	Player_B_Front?: Player,
-//	player_type: PlayerType,
 	game_id: string,
 	game_settings: GameSettings
 }
-
-
 
 export enum PlayerStatus
 {

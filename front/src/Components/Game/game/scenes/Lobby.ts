@@ -44,7 +44,7 @@ export default class Lobby extends Phaser.Scene
 	Player_B_Back_loss?: Phaser.GameObjects.Text;
 	
 
-	ready_button?: Phaser.GameObjects.Image;
+	// ready_button?: Phaser.GameObjects.Image;
 	countdown?: Phaser.GameObjects.Text;
 
 
@@ -73,10 +73,21 @@ export default class Lobby extends Phaser.Scene
 			'player_b_back_avatar',
 			this.game.registry.get('players_data').Player_B_Back.avatar
 			);
-		this.load.image(
-			'button',
-			'assets/button.png'
-			);
+
+		// 	this.load.image(
+		// 	'player_a_back_avatar',
+		// 	this.game.registry.get('players_data').Player_A_Back.user.avatar
+		// 	);
+		// this.load.image(
+		// 	'player_b_back_avatar',
+		// 	this.game.registry.get('players_data').Player_B_Back.user.avatar
+		// 	);
+
+
+		// this.load.image(
+		// 	'button',
+		// 	'assets/button.png'
+		// 	);
 
 		this.game_type = this.game.registry.get('players_data').game_settings.game_type;
 
@@ -91,6 +102,14 @@ export default class Lobby extends Phaser.Scene
 				this.game.registry.get('players_data').Player_B_Front.avatar
 				);
 
+			// this.load.image(
+			// 	'player_a_front_avatar',
+			// 	this.game.registry.get('players_data').user.Player_A_Front.avatar
+			// 	);
+			// this.load.image(
+			// 	'player_b_front_avatar',
+			// 	this.game.registry.get('players_data').user.Player_B_Front.avatar
+			// 	);
 
 		}
 	}
@@ -107,7 +126,6 @@ export default class Lobby extends Phaser.Scene
 			store_round_setup: this.store_round_setup.bind(this),
 			lobby_join: this.lobby_join.bind(this),
 			game_end: this.game_end.bind(this)
-
         });
 
 		this.Player_A_Back_avatar = this.add.image(130, 130, 'player_a_back_avatar')
@@ -151,19 +169,13 @@ export default class Lobby extends Phaser.Scene
 		
 		}
 
-		if (this.me !== PlayerType.Spectator)
-		{
-			this.ready_button = this.add.image(400, 400, 'button')
-									.setOrigin(0.5,0.5).setName('ready')
-									.setDisplaySize(200, 200)
-									.setInteractive();
-		}
-
-		// let lobbydata: PlayersLobbyData = 
+		// if (this.me !== PlayerType.Spectator)
 		// {
-		// 	player_secret: this.game.registry.get('players_data').player_secret,
-		// 	game_id: 
-		// };
+		// 	this.ready_button = this.add.image(400, 400, 'button')
+		// 							.setOrigin(0.5,0.5).setName('ready')
+		// 							.setDisplaySize(200, 200)
+		// 							.setInteractive();
+		// }
 
 		this.socketmanager.lobby_send_join(this.game.registry.get('players_data').game_id);
 
@@ -198,18 +210,18 @@ export default class Lobby extends Phaser.Scene
 	click_event = (pointer: Phaser.Input.Pointer ,gameobject :Phaser.GameObjects.GameObject) =>
 	{
 		pointer;
-		
-		console.log("click", gameobject);
-		if (gameobject.name === 'ready')
-		{
-			this.socketmanager!.lobby_send_ready(this.registry.get('players_data').game_id);
-			gameobject.destroy();
-		}
+		gameobject;
 
-		if (gameobject.name === 'exit')
-		{
-			this.game.destroy(true, false);
-		}
+		// if (gameobject.name === 'ready')
+		// {
+		// 	this.socketmanager!.lobby_send_ready(this.registry.get('players_data').game_id);
+		// 	gameobject.destroy();
+		// }
+
+		// if (gameobject.name === 'exit')
+		// {
+		// 	this.game.destroy(true, false);
+		// }
 	}
 
 	update_lobby_status = (new_status: LobbyStatus) =>
@@ -302,8 +314,7 @@ export default class Lobby extends Phaser.Scene
 			callback: () =>
 			{
 				timer -= 1;
-				console.log("countdown:", timer);
-				// this.countdown.setText(timer.toString());
+				this.countdown!.setText(timer.toString());
 				if (timer <= 0)
 				{
 					// this.countdown.destroy();
@@ -364,10 +375,10 @@ export default class Lobby extends Phaser.Scene
 	{
 		this.clear_all();
 		
-		this.ready_button = this.add.image(400, 400, 'button')
-		.setOrigin(0.5,0.5).setName('exit')
-		.setDisplaySize(200, 200)
-		.setInteractive();
+		// this.ready_button = this.add.image(400, 400, 'button')
+		// .setOrigin(0.5,0.5).setName('exit')
+		// .setDisplaySize(200, 200)
+		// .setInteractive();
 
 		let style: Phaser.Types.GameObjects.Text.TextStyle = 
 		{
@@ -386,10 +397,10 @@ export default class Lobby extends Phaser.Scene
 		{
 			this.clear_all();
 			
-			this.ready_button = this.add.image(400, 400, 'button')
-			.setOrigin(0.5,0.5).setName('exit')
-			.setDisplaySize(200, 200)
-			.setInteractive();
+			// this.ready_button = this.add.image(400, 400, 'button')
+			// .setOrigin(0.5,0.5).setName('exit')
+			// .setDisplaySize(200, 200)
+			// .setInteractive();
 	
 			let style: Phaser.Types.GameObjects.Text.TextStyle = 
 			{

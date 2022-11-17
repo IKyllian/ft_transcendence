@@ -10,15 +10,12 @@ import { Injectable } from '@nestjs/common';
 import { Player } from '../player';
 import { GameService } from '../game.service';
 import { User } from 'src/typeorm';
-//import  * as Defaultgame_settings from '../game-settings';
-
 
 //TODO
 //rework client handling
 @Injectable()
 export class LobbyFactory
 {
-	// server: Server;
 	constructor(
 		private globalService: GlobalService,
 		private gameService: GameService,
@@ -28,12 +25,10 @@ export class LobbyFactory
 	private client_list: Map<Socket['id'], Lobby['game_id']> = new Map<Socket['id'], Lobby['game_id']>();
 	replay_list: Map<string, Array<GameState>> = new Map <string, Array<GameState>>();
 
-
-	lobby_create(lobby_request: MatchmakingLobby): string
+	lobby_create(lobby_request: MatchmakingLobby)
 	{
 		const game_id: string = generate();
 
-		// const lobby = new Lobby(ret, lobby_request.game_settings,  this);
 		const lobby = new Lobby(lobby_request, game_id,  this);
 		this.lobby_list.set(lobby.game_id, lobby);
 
@@ -60,49 +55,11 @@ export class LobbyFactory
 		});
 
 		lobby_request.players.forEach((player) => {
-			if (player.team === TeamSide.BLUE) {
-				if (player.pos === PlayerPosition.BACK) {
-					dataToFront.player_type = PlayerType.Player_A_Back;
-				} else {
-					dataToFront.player_type = PlayerType.Player_A_Front;
-				}
-			} else {
-				if (player.pos === PlayerPosition.BACK) {
-					dataToFront.player_type = PlayerType.Player_B_Back;
-				} else {
-					dataToFront.player_type = PlayerType.Player_B_Front;
-				}
-			}
+			dataToFront.player_type = lobby.convert_player_enums(player.team, player.pos);
 			this.globalService.server.to('user-' + player.user.id).emit("newgame_data", dataToFront);
 		});
 		console.log(dataToFront.game_settings)
-
-		// if (lobby_request.game_settings.game_type === GameType.Doubles)
-		// {
-		// 	player_data.Player_A_Front = lobby_request.Player_A_Front;
-		// 	player_data.Player_B_Front = lobby_request.Player_B_Front;
-		// }
-
-		// player_data.player_type = PlayerType.Player_A_Back;
-		// this.globalService.server.to('user-' + lobby_request.Player_A_Back.user.id).emit("newgame_data", player_data);
-		// player_data.player_type = PlayerType.Player_B_Back;
-		// this.globalService.server.to('user-' + lobby_request.Player_B_Back.user.id).emit("newgame_data", player_data);
-
-		// if (lobby_request.game_settings.game_type === GameType.Doubles)
-		// {
-		// 	player_data.player_type = PlayerType.Player_A_Front;
-		// 	this.globalService.server.to('user-' + lobby_request.Player_A_Front.user.id).emit("newgame_data", player_data);
-	
-		// 	player_data.player_type = PlayerType.Player_B_Front;
-		// 	this.globalService.server.to('user-' + lobby_request.Player_B_Front.user.id).emit("newgame_data", player_data);
-		// }
-
-//ajouter une ref au lobby dans le return ? 
-//pour acces a this.already_started & this.already_finished
-		return game_id;
 	}
-
-
 
 	lobby_delete(game_id: string)
 	{
@@ -134,7 +91,6 @@ export class LobbyFactory
 
 	lobby_join(client: AuthenticatedSocket, game_id: string)
 	{
-
 		let lobby: Lobby | undefined =  this.lobby_list.get(game_id);
 		if (lobby !== undefined)
 		{
