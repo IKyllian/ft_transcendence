@@ -35,7 +35,7 @@ function Game() {
         
         </>
     ) : (
-        <div id="game_anchor">
+        <div>
 
         </div> 
     )

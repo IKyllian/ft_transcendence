@@ -81,9 +81,11 @@ const routes: RouteProps[] = [
 	}, {
 		path: '/game',
 		element:
-			<PrivateRoute>
-				<Game />
-			</PrivateRoute>,
+			<div id="game_anchor">
+				<PrivateRoute>
+					<Game />
+				</PrivateRoute>,
+			</div>
 	}, {
 		path: '/lobby',
 		element:
