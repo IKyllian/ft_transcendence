@@ -83,10 +83,10 @@ export async function fetchConvAndRedirect(
             console.log("CONV");
             if (!privateConvs?.find(elem => elem.conversation.id === response.data.id))
                 dispatch(addPrivateConv({isActive: 'false', conversation: {id: response.data.id, user1: response.data.user1, user2: response.data.user2}}));
-            let conv: Conversation = response.data;
-            conv.messages.forEach(elem => elem.send_at = new Date(elem.send_at));
-            console.log("new Conv", conv);
-            navigate(`/chat/private-message/${conv.id}`, {state: {isTemp: false, conv: conv}});
+            // let conv: Conversation = response.data;
+            // conv.messages.forEach(elem => elem.send_at = new Date(elem.send_at));
+            console.log("new Conv", response.data);
+            navigate(`/chat/private-message/${response.data.id}`, {state: {isTemp: false, conv: response.data}});
         } else {
             console.log("User");
 
@@ -124,9 +124,9 @@ export function fetchPrivateConvDatas(convId: number, token: string, setConvData
     })
     .then(response => {
         console.log(response);
-        let conv: Conversation = response.data;
-        conv.messages.forEach(elem => elem.send_at = new Date(elem.send_at));
-        setConvDatas({temporary: false, conv: conv});
+        // let conv: Conversation = response.data;
+        // conv.messages.forEach(elem => elem.send_at = new Date(elem.send_at));
+        setConvDatas({temporary: false, conv: response.data});
     })
     .catch(err => {
         console.log(err);

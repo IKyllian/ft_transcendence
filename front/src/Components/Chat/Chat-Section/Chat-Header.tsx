@@ -2,7 +2,7 @@ import { useContext, useState } from "react";
 import { Link } from "react-router-dom";
 import { IconSettings, IconMenu2, IconChevronLeft, IconChevronRight, IconUserPlus } from "@tabler/icons";
 import { SidebarContext } from "../Chat";
-import { UserInterface } from "../../../Types/User-Types";
+import { UserInterface, UserStatus } from "../../../Types/User-Types";
 import { Channel } from "../../../Types/Chat-Types"
 import DropdownContainer from "../../Utils/Dropdown-Container";
 import BlockButton from "../../Buttons/Block-Button";
@@ -51,7 +51,7 @@ function ChatHeader(props: Props) {
                 onClick={() => sidebarStatus.setSidebarStatus()}
             />
             <div className="player-container">
-                <div className={`player-status player-status-online`}> </div>
+                <div className={`player-status player-status-${privateConvUser?.status === UserStatus.ONLINE ? "online" : "offline"}`}> </div>
                 <p onClick={() => handleClick()}> {privateConvUser?.username} </p>
                 <DropdownContainer show={showDropdown} onClickOutside={handleClick}>
                     <Link to={`/profile/${privateConvUser?.username}`}>

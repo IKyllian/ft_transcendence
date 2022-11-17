@@ -1,5 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit'
 import { authSlice } from './AuthSlice'
+import { channelSlice } from './ChannelSlice'
 import { chatSlice } from './ChatSlice'
 import { notificationSlice } from './NotificationSlice'
 import { partySlice } from './PartySlice'
@@ -8,6 +9,7 @@ export const store = configureStore({
     reducer: {
         auth: authSlice.reducer,
         chat: chatSlice.reducer,
+        channel: channelSlice.reducer,
         notification: notificationSlice.reducer,
         party: partySlice.reducer,
     }

@@ -6,23 +6,24 @@ import { socketUrl } from "../env";
 import { NotificationInterface } from "../Types/Notification-Types";
 import { addNotification, deleteNotification } from "../Redux/NotificationSlice";
 import { addChannel, addPrivateConv, removeChannel } from "../Redux/ChatSlice";
-import { Channel, Conversation } from "../Types/Chat-Types";
+import { Channel, ChannelUpdateType, ChannelUser, Conversation, UserTimeout } from "../Types/Chat-Types";
 import { UserInterface } from "../Types/User-Types";
 import { copyFriendListArray, stopIsConnectedLoading } from "../Redux/AuthSlice";
 import { GameMode, PartyInterface } from "../Types/Lobby-Types";
 import { copyNotificationArray } from "../Redux/NotificationSlice";
 import { addParty, cancelQueue, changePartyGameMode, changeQueueStatus, leaveParty } from "../Redux/PartySlice";
 import { fetchVerifyToken } from "../Api/Sign/Sign-Fetch";
+import { addChannelUser, banChannelUser, muteChannelUser, removeTimeoutChannelUser, removeChannelUser, setChannelDatas, updateChannelUser } from "../Redux/ChannelSlice";
 
 export function useAppHook() {
     const [socket, setSocket] = useState<Socket | undefined>(undefined);
 	const [gameInvite, setGameInvite] = useState<NotificationInterface | undefined>(undefined);
 	const [eventError, setEventError] = useState<string | undefined>(undefined);
-    const { token, isAuthenticated } = useAppSelector((state) => state.auth);
+    const { token, isAuthenticated, currentUser } = useAppSelector((state) => state.auth);
+	const {currentChannelId} = useAppSelector((state) => state.channel);
 
 	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
-    const params = useParams();
 
 	const closeEventError = () => {
 		setEventError(undefined);
@@ -56,6 +57,43 @@ export function useAppHook() {
 			connectSocket();
 		}
 	}, [isAuthenticated])
+
+	useEffect(() => {
+		if (currentUser && currentChannelId !== undefined) {
+			socket?.emit("JoinChannelRoom", {
+                id: currentChannelId,
+            });
+
+			socket?.on('ChannelUpdate', (data: {type: ChannelUpdateType, data: ChannelUser | UserTimeout | number}) => {
+                console.log("ChannelUpdate", data);
+                if (data.type === ChannelUpdateType.JOIN) {
+                    const eventData = data.data as ChannelUser;
+                    dispatch(addChannelUser(eventData));
+                } else if (data.type === ChannelUpdateType.LEAVE) {
+                    const eventData = data.data as number;
+                    dispatch(removeChannelUser(eventData));
+                } else if (data.type === ChannelUpdateType.BAN) {
+                    const eventData = data.data as UserTimeout;
+                    dispatch(banChannelUser(eventData));
+                } else if (data.type === ChannelUpdateType.MUTE) {
+                    const eventData = data.data as UserTimeout;
+					dispatch(muteChannelUser(eventData));
+                } else if (data.type === ChannelUpdateType.UNTIMEOUT) {
+                    const eventData = data.data as number;
+					dispatch(removeTimeoutChannelUser(eventData));
+                } else if (data.type === ChannelUpdateType.CHANUSER) {
+                    const eventData = data.data as ChannelUser;
+                    dispatch(updateChannelUser(eventData));
+                }
+            });
+
+			socket?.on('roomData', (data: Channel) => {
+                if (data.id === currentChannelId) {
+                    dispatch(setChannelDatas({channel: data, loggedUserId: currentUser.id}));
+                }
+            });
+		}
+	}, [currentChannelId]);
 
 	useEffect(() => {
 		if (socket !== undefined) {

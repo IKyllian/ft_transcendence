@@ -31,7 +31,8 @@ function ChatPrivateMessage() {
                 <ul>
                     {
                         convDatas.conv.messages.map((elem, index) => {
-                            if (index === 0 || !elem.sender || convDatas.conv.messages[index - 1].sender?.id !== elem.sender?.id || (elem.send_at.getDate() !== convDatas.conv.messages[index - 1].send_at.getDate()))
+                            const dateMessage = new Date(elem.send_at);
+                            if (index === 0 || !elem.sender || convDatas.conv.messages[index - 1].sender?.id !== elem.sender?.id || (dateMessage.getDate() !== (new Date(convDatas.conv.messages[index - 1].send_at).getDate())))
                                 return <MessageItem key={index} isFromChan={false} message={elem} loggedUserIsOwner={true} isNewSender={true} index={index} />
                             else
                                 return <MessageItem key={index} isFromChan={false} message={elem} loggedUserIsOwner={true} isNewSender={false} index={index} />
