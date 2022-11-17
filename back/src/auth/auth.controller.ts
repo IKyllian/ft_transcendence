@@ -4,6 +4,7 @@ import { GetUser } from "src/utils/decorators";
 import { AuthService } from "./auth.service";
 import { AuthDto } from "./dto/auth.dto";
 import { Auth42Dto } from "./dto/auth42.dto";
+import { SignupDto } from "./dto/signup.dto";
 import { JwtGuard } from "./guard/jwt.guard";
 import { RefreshGuard } from "./guard/refresh.guard";
 
@@ -13,7 +14,7 @@ export class AuthController {
 
 	@HttpCode(HttpStatus.CREATED)
 	@Post('signup')
-	signup(@Body() dto: AuthDto) {
+	signup(@Body() dto: SignupDto) {
 		return this.authService.signup(dto);
 	}
 
