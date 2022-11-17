@@ -110,7 +110,6 @@ export default class MatchResult extends Phaser.Scene
 
 		let text: string;
 
-
 		if(this.game_type === GameType.Singles)
 		{
 			if(this.me === PlayerType.Spectator)
@@ -160,7 +159,6 @@ export default class MatchResult extends Phaser.Scene
 				text = "Your Team Lost";
 			}		
 		}
-
 
 		this.result_text = this.add.text(400, 100, text, style);
 		this.input.on('gameobjectdown',this.click_event);

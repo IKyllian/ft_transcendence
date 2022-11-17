@@ -103,7 +103,6 @@ export default class Pong extends Phaser.Scene
 		this.game_type = this.game.registry.get('players_data').game_settings.game_type;
 		this.me = this.game.registry.get('players_data').player_type;
 	
-
 		// this.sound_a = this.sound.add('sound_a');
 		// this.sound_b = this.sound.add('sound_b');
 		// this.sound_clapping = this.sound.add('clapping');
