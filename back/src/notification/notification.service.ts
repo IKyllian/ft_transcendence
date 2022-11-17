@@ -142,30 +142,28 @@ export class NotificationService {
 		})
 	}
 
-	async sendPrivateMessageNotif(conv: Conversation) {
+	async sendPrivateMessageNotif(senderId: number, conv: Conversation) {
 		const socketsInRoom = await this.globalService.server.in(`conversation-${conv.id}`).fetchSockets() as unknown as AuthenticatedSocket[];
 		const usersInRoomId: number[] = socketsInRoom.map(socket => socket.user.id);
-		const users: User[] = [conv.user1, conv.user2]
-		users.forEach(async user => {
-			if (!usersInRoomId.find(id => id === user.id)) {
-				const notifExist = await this.notifRepo.findOne({
-					where: {
-						conversation: { id: conv.id },
-						addressee: { id: user.id },
-						type: notificationType.PRIVATE_MESSAGE
-					}
-				});
-				if (!notifExist) {
-					const notif = this.notifRepo.create({
-						conversation: { id: conv.id },
-						addressee: { id: user.id },
-						type: notificationType.PRIVATE_MESSAGE
-					});
-					const notifToSend = await this.notifRepo.save(notif);
-					this.globalService.server.to(`user-${user.id}`).emit('NewNotification', notifToSend);
+		const userToSend = conv.user1.id === senderId ? conv.user2 : conv.user1;
+		if (!usersInRoomId.find(id => id === userToSend.id)) {
+			const notifExist = await this.notifRepo.findOne({
+				where: {
+					conversation: { id: conv.id },
+					addressee: { id: userToSend.id },
+					type: notificationType.PRIVATE_MESSAGE
 				}
+			});
+			if (!notifExist) {
+				const notif = this.notifRepo.create({
+					conversation: { id: conv.id },
+					addressee: { id: userToSend.id },
+					type: notificationType.PRIVATE_MESSAGE
+				});
+				const notifToSend = await this.notifRepo.save(notif);
+				this.globalService.server.to(`user-${userToSend.id}`).emit('NewNotification', notifToSend);
 			}
-		})
+		}
 	}
 
 	async deleteChannelMessageNotif(userId: number, chanId: number): Promise<number | null> {

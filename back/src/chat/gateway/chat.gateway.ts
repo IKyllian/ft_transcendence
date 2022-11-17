@@ -105,6 +105,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			// TODO emit disconnected for front retry to reconnect ?
 	}
 
+	@UseGuards(WsJwtGuard)
+	@SubscribeMessage('Logout')
+	async logout(@ConnectedSocket() socket: AuthenticatedSocket) {
+		await this.authService.logout(socket.user);
+		socket.disconnect();
+	}
+
 	/* ------------------------------------ */
 	/* ---------- CHANNEL SECTION --------- */
 	/* ------------------------------------ */
@@ -283,11 +290,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		@ConnectedSocket() socket: AuthenticatedSocket,
 		@MessageBody() data: PrivateMessageDto,
 	) {
+		console.log("create conv", data)
 		const conv = await this.convService.create(socket.user, data.adresseeId, data.content);
 		this.server
 		.to(`user-${socket.user.id}`)
 		.to(`user-${data.adresseeId}`)
 		.emit('NewConversation', { conv, socketId: socket.id });
+
+		this.notificationService.sendPrivateMessageNotif(socket.user.id, conv);
 	}
 
 	@UseGuards(WsJwtGuard)
@@ -329,7 +339,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			this.server
 			.to(`conversation-${message.conversation.id}`)
 			.emit('NewPrivateMessage', message);
-			this.notificationService.sendPrivateMessageNotif(message.conversation);
+			this.notificationService.sendPrivateMessageNotif(socket.user.id, message.conversation);
 	}
 
 	@UseGuards(WsJwtGuard)
@@ -340,7 +350,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		@MessageBody() dto: OnTypingPrivateDto,
 	) {
 		//check if in conv
-		socket.to(`conversation-${dto.convId}`).emit('OnTypingPrivate', { user, isTyping: dto.isTyping, convId: dto.convId });
+		socket.to(`conversation-${dto.convId}`).emit('OnTypingPrivate', { user: {id: user.id, username: user.username}, isTyping: dto.isTyping, convId: dto.convId });
 	}
 
 	/* --------------------------------------- */

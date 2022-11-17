@@ -115,9 +115,12 @@ export class UserService {
 		await this.userRepo.save(user);
 	}
 
-	async logout(user: User) {
-		user.refresh_hash = null;
-		this.userRepo.save(user);
+	logout(user: User) {
+		return this.userRepo.createQueryBuilder()
+		.update(User)
+		.set({ refresh_hash: null })
+		.where("user.id = :id", { id: user.id })
+		.execute();
 	}
 
 	async updateRefreshHash(user: User, hash: string) {

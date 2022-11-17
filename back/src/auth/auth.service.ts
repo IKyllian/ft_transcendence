@@ -190,9 +190,7 @@ export class AuthService {
 	}
 
 	async logout(user: User) {
-		if (user.refresh_hash == null) return;
-
-		this.userService.logout(user);
+		await this.userService.logout(user);
 		return { success: true, message: "logged out successfuly" };
 	}
 }
