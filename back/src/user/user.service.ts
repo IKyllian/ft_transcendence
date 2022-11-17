@@ -119,7 +119,7 @@ export class UserService {
 		return this.userRepo.createQueryBuilder()
 		.update(User)
 		.set({ refresh_hash: null })
-		.where("user.id = :id", { id: user.id })
+		.where("id = :id", { id: user.id })
 		.execute();
 	}
 
