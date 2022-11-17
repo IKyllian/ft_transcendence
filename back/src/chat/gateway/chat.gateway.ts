@@ -86,7 +86,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 		socket.emit('Connection', {
 			friendList: await this.friendshipService.getFriendlist(user),
-			notification: await this.notificationService.getNotification(user),
+			notification: await this.notificationService.getNotifications(user),
 			party: this.partyService.partyJoined.getParty(user.id),
 		});
 	}
@@ -339,7 +339,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		@ConnectedSocket() socket: Socket,
 		@MessageBody() dto: OnTypingPrivateDto,
 	) {
-		socket.to(`user-${dto.userId}`).emit('OnTypingPrivate', { user, isTyping: dto.isTyping, convId: dto.convId });
+		//check if in conv
+		socket.to(`conversation-${dto.convId}`).emit('OnTypingPrivate', { user, isTyping: dto.isTyping, convId: dto.convId });
 	}
 
 	/* --------------------------------------- */

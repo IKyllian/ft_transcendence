@@ -1,14 +1,13 @@
 import { BadRequestException, forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ChannelInviteDto } from 'src/chat/gateway/dto/channel-invite.dto';
-import { Channel, Conversation, Friendship, Notification, User } from 'src/typeorm';
+import { Channel, Conversation, Notification, User } from 'src/typeorm';
 import { UserService } from 'src/user/user.service';
 import { ChannelService } from 'src/chat/channel/channel.service';
 import { notificationType } from 'src/utils/types/types';
-import { DeleteResult, FindOneOptions, Repository } from 'typeorm';
+import { FindOneOptions, Repository } from 'typeorm';
 import { ChannelNotFoundException } from 'src/utils/exceptions';
 import { AuthenticatedSocket } from 'src/utils/types/auth-socket';
-import { TaskService } from 'src/task-scheduling/task.service';
 import { GlobalService } from 'src/utils/global/global.service';
 
 @Injectable()
@@ -90,16 +89,16 @@ export class NotificationService {
 		return this.notifRepo.findOne(options);
 	}
 
-	getNotification(user: User) {
-		return this.notifRepo.find({
-			relations: {
-				requester: true,
-				channel: true,
-			},
-			where: {
-				addressee: { id: user.id },
-			}
-		});
+	async getNotifications(user: User): Promise<Notification[]> {
+		return this.notifRepo.createQueryBuilder("notif")
+			.leftJoin("notif.requester", "requester")
+			.addSelect(["requester.id", "requester.username"])
+			.leftJoin("notif.channel", "channel")
+			.addSelect(["channel.id", "channel.name"])
+			.leftJoin("notif.conversation", "conv")
+			.addSelect("conv.id")
+			.where("notif.addresseeId = :userId", { userId: user.id })
+			.getMany();
 	}
 
 	getChannelInvite(user: User, id: number) {
