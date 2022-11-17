@@ -28,6 +28,7 @@
 	- problem when switching account
 	- Goes twice in event when joinning channel Room
 	- Change Role doesn't work anymore
+	- On ready, settings reset
 
 
 // RANKING AND ELO
