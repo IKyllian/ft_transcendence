@@ -103,11 +103,20 @@ export function useChannelHook() {
         setPreviousMessages(defaultMessagesState);
         setHaveToLoad(false);
         setPrevLength(0);
+
+        const listener = (data: any) => {
+            setChatDatas((prev: any) => {
+                return {...prev, messages: [...prev!.messages, {...data, send_at: new Date(data.send_at)}]}
+            });
+        }
+
         const getDatas = () => {
-            socket!.emit("JoinChannelRoom", {
+            socket?.emit("JoinChannelRoom", {
                 id: channelId,
             });
 
+            socket?.on('NewChannelMessage', listener);
+    
             socket?.on("OnTypingChannel", (data: {user: UserInterface, isTyping: boolean}) => {
                 console.log("OnTypingChannel");
                 setUsersTyping(prev => [...prev.filter(elem => elem.id !== data.user.id)]);
@@ -157,7 +166,7 @@ export function useChannelHook() {
                 }
             });
 
-            socket!.on('roomData', (data: Channel) => {
+            socket?.on('roomData', (data: Channel) => {
                 console.log("Getting datas roomData", data);
                 if (data.id === channelId && channels) {
                     let channel: Channel = data;
@@ -178,36 +187,21 @@ export function useChannelHook() {
 
         return () => {
             if (socket) {
-                socket!.emit("LeaveChannelRoom", {
+                socket?.emit("LeaveChannelRoom", {
                     id: channelId,
                 });
-                socket!.off("roomData");
-                socket!.off("ChannelUpdate");
-                socket!.off("OnTypingChannel");
+                socket?.off("roomData");
+                socket?.off("ChannelUpdate");
+                socket?.off("OnTypingChannel");
+                socket?.off("NewChannelMessage");
             }
         }
     }, [socket, channelId, channels])
 
-    useEffect(() => {
-        const listener = (data: any) => {
-            setChatDatas((prev: any) => {
-                return {...prev, messages: [...prev!.messages, {...data, send_at: new Date(data.send_at)}]}
-            });
-        }
-        if (socket) {
-            socket!.on('NewChannelMessage', listener);
-        }
-
-        return () => {
-            if (socket)
-                socket!.off("NewChannelMessage");
-        }
-    }, [socket])
-
     const handleSubmitMessage = handleSubmit((data, e: any) => {
         e.preventDefault();
         if (data.inputMessage.length > 0) {
-            socket!.emit("ChannelMessage", {
+            socket?.emit("ChannelMessage", {
                 content: data.inputMessage,
                 chanId: channelId,
             });

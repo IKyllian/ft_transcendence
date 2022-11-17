@@ -151,14 +151,14 @@ export class NotificationService {
 			if (userId !== senderId) {
 				const notifExist = await this.notifRepo.findOne({
 					where: {
-						conv: { id: convId },
+						conversation: { id: convId },
 						addressee: { id: userId },
 						type: notificationType.PRIVATE_MESSAGE
 					}
 				});
 				if (!notifExist) {
 					const notif = this.notifRepo.create({
-						conv: { id: convId },
+						conversation: { id: convId },
 						addressee: { id: userId },
 						type: notificationType.PRIVATE_MESSAGE
 					});
@@ -184,7 +184,7 @@ export class NotificationService {
 
 	async deletePrivateMessageNotif(userId: number, convId: number): Promise<number | null> {
 		const notif = await this.notifRepo.createQueryBuilder("notif")
-			.where('notif.addresseeId = :userId AND notif.convId = :convId', { userId: userId, convId: convId })
+			.where('notif.addresseeId = :userId AND notif.conversationId = :convId', { userId: userId, convId: convId })
 			.andWhere('notif.type = :convMsg', { convMsg: notificationType.PRIVATE_MESSAGE })
 			.getOne()
 		

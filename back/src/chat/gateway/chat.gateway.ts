@@ -78,6 +78,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			// socket.emit('connection', 'failed');
 		}
 		socket.user = user;
+		// console.log("USER", user);
 		console.log(user.username, 'connected')
 		this.server.to(socket.id).emit('StatusUpdate', user);
 		socket.join(`user-${user.id}`);
@@ -327,7 +328,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		) {
 			const message = await this.privateMsgService.create(socket.user, data);
 			this.server
-			.to(`converstion-${message.conversation.id}`)
+			.to(`conversation-${message.conversation.id}`)
 			.emit('NewPrivateMessage', message);
 
 			this.notificationService.sendPrivateMessageNotif(socket.user.id, message.conversation.id);

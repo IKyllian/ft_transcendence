@@ -23,7 +23,7 @@ export class Notification {
 	channel: Channel;
 
 	@ManyToOne(() => Conversation, { orphanedRowAction: 'delete' })
-	conv: Conversation;
+	conversation: Conversation;
 
 	// @CreateDateColumn()
 	@Column({ nullable: true, type: 'timestamptz' })

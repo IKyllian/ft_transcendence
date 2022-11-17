@@ -5,7 +5,6 @@ import { SocketContext } from "../../App";
 import { useLocation, useParams } from "react-router-dom";
 import { useAppSelector } from '../../Redux/Hooks'
 import { getSecondUserIdOfPM } from "../../Utils/Utils-Chat";
-import { fetchPrivateConvDatas } from "../../Api/Chat/Chat-Fetch";
 import { UserInterface } from "../../Types/User-Types";
 import { debounce } from "../../Utils/Utils-Chat";
 import { useForm } from "react-hook-form";
@@ -60,14 +59,13 @@ export function usePrivateConvHook() {
         e.preventDefault();
         const submitMessage = () => {
             const secondUserId: number = getSecondUserIdOfPM(convDatas?.conv!, authDatas.currentUser!.id);
-            console.log();
             if (convDatas?.temporary) {
-                socket!.emit("CreateConversation", {
+                socket?.emit("CreateConversation", {
                     content: data.inputMessage,
                     adresseeId: secondUserId,
                 });
             } else {
-                socket!.emit("PrivateMessage", {
+                socket?.emit("PrivateMessage", {
                     content: data.inputMessage,
                     adresseeId: secondUserId,
                 });
@@ -92,9 +90,17 @@ export function usePrivateConvHook() {
         if (convId) {
             setConvDatas(undefined);
             setUserTyping(undefined);
+            
+            const listener = (data: PrivateMessage) => {
+                console.log("NewPrivateMessage", data);
+                setConvDatas((prev: any) => {
+                    return {...prev, conv: {...prev.conv, messages: [...prev!.conv.messages, {...data, send_at: new Date(data.send_at)}]}}
+                });
+            }
+            
+            socket?.on('NewPrivateMessage', listener);
+
             socket?.on("OnTypingPrivate", (data: {user: UserInterface, isTyping: boolean, convId: number}) => {
-                console.log("data", data);
-                console.log("convId", convId);
                 if (data.convId === convId) {
                     if (data.isTyping)
                         setUserTyping(data.user);
@@ -103,35 +109,32 @@ export function usePrivateConvHook() {
                 }
             });
 
+            socket?.on("ConversationData", (data: Conversation) => {
+                let conv: Conversation = data;
+                conv.messages.forEach(elem => elem.send_at = new Date(elem.send_at));
+                setConvDatas({temporary: false, conv: conv});
+            });
+
             if (location && location.state) {
                 const locationState = location.state as {isTemp: boolean, conv: Conversation};
-                if (locationState.isTemp)
-                    setConvDatas({temporary: true, conv: {...locationState.conv}});
-                else
-                    setConvDatas({temporary: true, conv: {...locationState.conv}});
+                setConvDatas({temporary: true, conv: {...locationState.conv}});
             } else {
-                fetchPrivateConvDatas(convId, authDatas.token, setConvDatas);
+                socket?.emit('JoinConversationRoom', {
+                    id: convId,
+                });
             }
         }
 
         return () => {
-            socket?.off("OnTypingPrivate");
-        }
-    }, [convId])
-
-    useEffect(() => {
-        const listener = (data: PrivateMessage) => {
-            console.log("NewPrivateMessage", data);
-            setConvDatas((prev: any) => {
-                return {...prev, conv: {...prev.conv, messages: [...prev!.conv.messages, {...data, send_at: new Date(data.send_at)}]}}
+            socket?.emit("LeaveConversationRoom", {
+                id: convId,
             });
+            socket?.off("OnTypingPrivate");
+            socket?.off("ConversationData");
+            socket?.off("NewPrivateMessage");
         }
-        socket!.on('NewPrivateMessage', listener);
-        return () => {
-            socket!.off("NewPrivateMessage");
-        }
-    }, [])
-
+    }, [socket, convId])
+    
     return {
         convDatas,
         handleSubmit: handleSubmitMessage,

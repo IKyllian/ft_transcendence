@@ -45,7 +45,7 @@ function DropdownNotification() {
         <div className="notif-dropdown-wrapper">
             {
                 notifications.map((elem) => {
-                    if (elem.type !== notificationType.PARTY_INVITE && elem.type !== notificationType.CHANNEL_MESSAGE)
+                    if (elem.type !== notificationType.PARTY_INVITE && elem.type !== notificationType.CHANNEL_MESSAGE && elem.type !== notificationType.PRIVATE_MESSAGE)
                         return <NotifItem key={elem.id} notification={elem} />
                 })
             }
