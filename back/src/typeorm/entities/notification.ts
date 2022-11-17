@@ -25,7 +25,6 @@ export class Notification {
 	@ManyToOne(() => Conversation, { orphanedRowAction: 'delete' })
 	conversation: Conversation;
 
-	// @CreateDateColumn()
 	@Column({ nullable: true, type: 'timestamptz' })
 	delete_at?: Date;
 }

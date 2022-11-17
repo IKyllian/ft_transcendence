@@ -1,14 +1,13 @@
 import { BadRequestException, forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ChannelInviteDto } from 'src/chat/gateway/dto/channel-invite.dto';
-import { Channel, Friendship, Notification, User } from 'src/typeorm';
+import { Channel, Conversation, Notification, User } from 'src/typeorm';
 import { UserService } from 'src/user/user.service';
 import { ChannelService } from 'src/chat/channel/channel.service';
 import { notificationType } from 'src/utils/types/types';
-import { DeleteResult, FindOneOptions, Repository } from 'typeorm';
+import { FindOneOptions, Repository } from 'typeorm';
 import { ChannelNotFoundException } from 'src/utils/exceptions';
 import { AuthenticatedSocket } from 'src/utils/types/auth-socket';
-import { TaskService } from 'src/task-scheduling/task.service';
 import { GlobalService } from 'src/utils/global/global.service';
 
 @Injectable()
@@ -90,16 +89,16 @@ export class NotificationService {
 		return this.notifRepo.findOne(options);
 	}
 
-	getNotification(user: User) {
-		return this.notifRepo.find({
-			relations: {
-				requester: true,
-				channel: true,
-			},
-			where: {
-				addressee: { id: user.id },
-			}
-		});
+	async getNotifications(user: User): Promise<Notification[]> {
+		return this.notifRepo.createQueryBuilder("notif")
+			.leftJoin("notif.requester", "requester")
+			.addSelect(["requester.id", "requester.username"])
+			.leftJoin("notif.channel", "channel")
+			.addSelect(["channel.id", "channel.name"])
+			.leftJoin("notif.conversation", "conv")
+			.addSelect("conv.id")
+			.where("notif.addresseeId = :userId", { userId: user.id })
+			.getMany();
 	}
 
 	getChannelInvite(user: User, id: number) {
@@ -143,30 +142,28 @@ export class NotificationService {
 		})
 	}
 
-	async sendPrivateMessageNotif(senderId: number, convId: number) {
-		const socketsInRoom = await this.globalService.server.in(`conversation-${convId}`).fetchSockets() as unknown as AuthenticatedSocket[];
+	async sendPrivateMessageNotif(senderId: number, conv: Conversation) {
+		const socketsInRoom = await this.globalService.server.in(`conversation-${conv.id}`).fetchSockets() as unknown as AuthenticatedSocket[];
 		const usersInRoomId: number[] = socketsInRoom.map(socket => socket.user.id);
-
-		usersInRoomId.forEach(async userId => {
-			if (userId !== senderId) {
-				const notifExist = await this.notifRepo.findOne({
-					where: {
-						conversation: { id: convId },
-						addressee: { id: userId },
-						type: notificationType.PRIVATE_MESSAGE
-					}
-				});
-				if (!notifExist) {
-					const notif = this.notifRepo.create({
-						conversation: { id: convId },
-						addressee: { id: userId },
-						type: notificationType.PRIVATE_MESSAGE
-					});
-					const notifToSend = await this.notifRepo.save(notif);
-					this.globalService.server.to(`user-${userId}`).emit('NewNotification', notifToSend);
+		const userToSend = conv.user1.id === senderId ? conv.user2 : conv.user1;
+		if (!usersInRoomId.find(id => id === userToSend.id)) {
+			const notifExist = await this.notifRepo.findOne({
+				where: {
+					conversation: { id: conv.id },
+					addressee: { id: userToSend.id },
+					type: notificationType.PRIVATE_MESSAGE
 				}
+			});
+			if (!notifExist) {
+				const notif = this.notifRepo.create({
+					conversation: { id: conv.id },
+					addressee: { id: userToSend.id },
+					type: notificationType.PRIVATE_MESSAGE
+				});
+				const notifToSend = await this.notifRepo.save(notif);
+				this.globalService.server.to(`user-${userToSend.id}`).emit('NewNotification', notifToSend);
 			}
-		})
+		}
 	}
 
 	async deleteChannelMessageNotif(userId: number, chanId: number): Promise<number | null> {
