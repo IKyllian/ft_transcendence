@@ -95,6 +95,7 @@ export class AuthService {
 			.createQueryBuilder("user")
 			.addSelect('user.hash')
 			.where("LOWER(user.username) = :name", { name: dto.username.toLowerCase() })
+			.orWhere("LOWER(user.email) = :email", { email: dto.username.toLowerCase() })
 			.leftJoinAndSelect("user.channelUser", "ChannelUser")
 			.leftJoinAndSelect("ChannelUser.channel", "Channel")
 			// .leftJoinAndSelect("user.statistic", "Statistic")

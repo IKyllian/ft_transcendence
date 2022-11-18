@@ -24,7 +24,6 @@ export const avatarStorage = {
 
 @Controller('users')
 export class UserController {
-
 	constructor(private userService: UserService) {}
 
 	@UseGuards(JwtGuard)

@@ -26,7 +26,7 @@ export class User {
 	status: UserStatus;
 
 	@Column({ unique: true })
-  email: string;
+  	email: string;
 
 	@Column({ nullable: true })
 	avatar?: string;
