@@ -16,7 +16,6 @@
 	- on socket connection, add args if in channel room to rejoin it?
 	- status update
 	- SQL injection in search bars ?
-	- Private msg notifications
 	- do some test with party, ex: joining/leaving party while in queue etc
 	- catch exception when creating channel
 	- order get Conversation by last msg sent
@@ -26,8 +25,6 @@
 	- in queue and then joining party ?
 	- infinite load when logout and token expired
 	- problem when switching account
-	- Goes twice in event when joinning channel Room
-	- Change Role doesn't work anymore
 	- On ready, settings reset
 
 

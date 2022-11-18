@@ -122,8 +122,15 @@ export class GameService {
 		return this.matchRepo.save(match);
 	}
 
-	async getSinglesLeaderboard(page: number): Promise<Leaderboard> {
+	async getSinglesLeaderboard(user: User, page: number): Promise<Leaderboard> {
 		const nb_of_users: number = await this.userRepo.createQueryBuilder('user').getCount()
+		// TODO user placement
+		// const user1 = await this.userRepo.createQueryBuilder('user')
+		// 	.orderBy("user.singles_elo", "DESC")
+		// 	.where("user.singles_elo >= :elo", {elo: user.singles_elo})
+		// 	.getCount()
+
+		// console.log(user1)
 		
 		const users: User[] = await this.userRepo.createQueryBuilder('user')
 		.leftJoinAndSelect('user.statistic', 'stats')

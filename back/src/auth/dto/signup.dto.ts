@@ -1,5 +1,6 @@
 import {
 	IsAlphanumeric,
+	IsAscii,
 	IsNotEmpty,
 	IsString,
 	MaxLength,
@@ -9,8 +10,8 @@ import {
 export class SignupDto {
 	@IsString()
 	@IsNotEmpty()
-	@MinLength(3)
-	@MaxLength(15)
+	@MinLength(1)
+	@MaxLength(25)
 	@IsAlphanumeric()
 	username: string;
 

@@ -27,9 +27,10 @@ export class GameController {
 	@UseGuards(JwtGuard)
 	@Post('singles-leaderboard')
 	async getSinglesLeaderboard(
+		@GetUser() user: User, //TODO delete
 		@Body() data: SkipDto,
 	) {
-		return await this.gameService.getSinglesLeaderboard(data.skip);
+		return await this.gameService.getSinglesLeaderboard(user, data.skip);
 	}
 
 	@UseGuards(JwtGuard)
