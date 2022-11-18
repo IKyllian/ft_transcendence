@@ -3,7 +3,6 @@ import { APP_INTERCEPTOR } from "@nestjs/core";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { AuthModule } from "src/auth/auth.module";
 import { Avatar, Friendship, MatchResult, Statistic, User } from "src/typeorm";
-import { Avatar, Friendship, Statistic, User } from "src/typeorm";
 import { PendingUser } from "src/typeorm/entities/pendingUser";
 import { friendshipController } from "./friendship/friendship.controller";
 import { FriendshipService } from "./friendship/friendship.service";

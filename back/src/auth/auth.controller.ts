@@ -7,7 +7,6 @@ import { Auth42Dto } from "./dto/auth42.dto";
 import { SignupDto } from "./dto/signup.dto";
 import { JwtGuard } from "./guard/jwt.guard";
 import { RefreshGuard } from "./guard/refresh.guard";
-import { SignupDto } from "./dto/signup.dto";
 import { ActivateDto } from "./dto/activate.dto";
 import { ForgotPasswordDto } from "./dto/forgot-password.dto";
 import { ResetPasswordDto } from "./dto/reset-password.dto";
@@ -61,8 +60,9 @@ export class AuthController {
 		@GetUser() user: User,
 	) {
 		return user;
+	}
 
-  @HttpCode(HttpStatus.OK)
+  	@HttpCode(HttpStatus.OK)
 	@Post('forgot-password')
 	forgotPassword(@Body() dto: ForgotPasswordDto) {
 		return this.authService.forgotPassword(dto);

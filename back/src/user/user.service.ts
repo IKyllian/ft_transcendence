@@ -26,7 +26,6 @@ export class UserService {
 		private statisticRepo: Repository<Statistic>,
 		@InjectRepository(MatchResult)
 		private matchRepo: Repository<MatchResult>,
-		private friendshipService: FriendshipService,
 		@InjectRepository(PendingUser)
 		private pendingUserRepo: Repository<PendingUser>,
 	) {}
@@ -157,8 +156,9 @@ export class UserService {
 		.set({ refresh_hash: null })
 		.where("id = :id", { id: user.id })
 		.execute();
+	}
 
-  async updateForgotCode(user: User, code: string) {
+	async updateForgotCode(user: User, code: string) {
 		user.forgot_code = code;
 		await this.userRepo.save(user);
 	}
