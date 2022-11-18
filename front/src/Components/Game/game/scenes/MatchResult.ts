@@ -1,5 +1,6 @@
 import 'phaser';
 import { EndResult, GameType, PlayerType } from '../types/shared.types';
+import AssetButton from '../../../../Assets/images/button.png';
 
 
 
@@ -42,7 +43,7 @@ export default class MatchResult extends Phaser.Scene
 			);
 		this.load.image(
 			'button',
-			'assets/button.png'
+			AssetButton
 			);
 
 		this.game_type = this.game.registry.get('players_data').game_settings.game_type;
@@ -95,11 +96,6 @@ export default class MatchResult extends Phaser.Scene
 								.setDisplaySize(200, 200)
 								.setName('close')
 								.setInteractive();
-		// this.replay_button = this.add.image(500, 400, 'button')
-		// 						.setOrigin(0.5,0.5)
-		// 						.setDisplaySize(200, 200)
-		// 						.setName('replay')
-		// 						.setInteractive();
 
 		let style: Phaser.Types.GameObjects.Text.TextStyle = 
 		{
@@ -177,16 +173,8 @@ export default class MatchResult extends Phaser.Scene
 		if (gameobject.name === 'close')
 		{
 			gameobject.destroy();
-			//close phaser
 			this.game.destroy(true, false);
 		}
-
-		// if (gameobject.name === 'replay')
-		// {
-		// 	gameobject.destroy();
-		// 	//close phaser
-		// 	this.game.destroy(true, false);
-		// }
 	}
 
 }

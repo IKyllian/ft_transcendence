@@ -3,6 +3,13 @@ import ClientSocketManager from '../client.socket.manager';
 import PongCore from '../pong.core';
 import { GameState, Goal, Movement, PlayerInput, PlayerType, EndResult, RoundSetup, GameType, GameSettings } from '../types/shared.types';
 
+import AssetSoundA from '../../../../Assets/sound/8bit_effect_a.ogg'
+import AssetSoundB from '../../../../Assets/sound/8bit_effect_b.ogg'
+import AssetSoundClapping from '../../../../Assets/sound/clapping.ogg'
+
+//lagicon not working
+import AssetImageLagIcon from '../../../../Assets/images/button.png'
+
 export default class Pong extends Phaser.Scene
 {
 	constructor ()
@@ -16,16 +23,16 @@ export default class Pong extends Phaser.Scene
 	game_settings: GameSettings | undefined = undefined;
 	game_type: GameType = GameType.Singles;
 
-	// sound_a?: any;
-	// sound_b?: any;
-	// sound_clapping?: any;
+	sound_a?: any;
+	sound_b?: any;
+	sound_clapping?: any;
 
 	core?: PongCore;
 	game_id?: string;
 
 	//Displayed elements
 	//Images
-	//asset_lag_icon?: Phaser.GameObjects.Image;
+	asset_lag_icon?: Phaser.GameObjects.Image;
 	//Texts
 	asset_scoreboard?: Phaser.GameObjects.Text;
 	//Shapes
@@ -77,7 +84,6 @@ export default class Pong extends Phaser.Scene
 		send_date: new Date()
 	};
 
-
 	update_interval: any;
 	is_lagging: boolean = true;
 	lag_count: number = 0;
@@ -87,11 +93,10 @@ export default class Pong extends Phaser.Scene
 
 	preload ()
 	{
-	//	this.load.image('lag_icon', 'assets/lag_icon.png');
-
-		// this.load.audio('sound_a', 'assets/sound/8bit_effect_a.ogg');
-		// this.load.audio('sound_b', 'assets/sound/8bit_effect_b.ogg');
-		// this.load.audio('clapping', 'assets/sound/clapping.ogg');
+		this.load.image('lag_icon', AssetImageLagIcon);
+		this.load.audio('sound_a', AssetSoundA);
+		this.load.audio('sound_b', AssetSoundB);
+		this.load.audio('clapping', AssetSoundClapping);
 	}
 
 	create ()
@@ -103,9 +108,9 @@ export default class Pong extends Phaser.Scene
 		this.game_type = this.game.registry.get('players_data').game_settings.game_type;
 		this.me = this.game.registry.get('players_data').player_type;
 	
-		// this.sound_a = this.sound.add('sound_a');
-		// this.sound_b = this.sound.add('sound_b');
-		// this.sound_clapping = this.sound.add('clapping');
+		this.sound_a = this.sound.add('sound_a');
+		this.sound_b = this.sound.add('sound_b');
+		this.sound_clapping = this.sound.add('clapping');
 	
 		if (this.socketmanager !== undefined)
 		{
@@ -119,8 +124,8 @@ export default class Pong extends Phaser.Scene
 		}
 
 		//placing visual elements outside of board for their first instanciation to prevent ghosted visuals
-		// this.asset_lag_icon = this.add.image(10400, 300, 'lag_icon');
-		// this.asset_lag_icon.setAlpha(1);
+		this.asset_lag_icon = this.add.image(10400, 300, 'lag_icon');
+		this.asset_lag_icon.setAlpha(1);
 
 		if (this.game_settings)
 		{
@@ -169,11 +174,11 @@ export default class Pong extends Phaser.Scene
 
 		if (this.core !== undefined)
 		{
-			// this.core.set_pong_triggers({
-			// 	sound_event_wall: this.sound_event_wall.bind(this),
-			// 	sound_event_paddle: this.sound_event_paddle.bind(this),
-			// 	sound_event_goal: this.sound_event_goal.bind(this)
-			// });
+			this.core.set_pong_triggers({
+				sound_event_wall: this.sound_event_wall.bind(this),
+				sound_event_paddle: this.sound_event_paddle.bind(this),
+				sound_event_goal: this.sound_event_goal.bind(this)
+			});
 		}
 
 		this.place_assets();
@@ -290,7 +295,7 @@ export default class Pong extends Phaser.Scene
 		{
 			if (this.core) {
 				if (this.me !== PlayerType.Spectator)
-				this.core.apply_input(this.input_stock[(this.input_stock.length - 1)]);
+					this.core.apply_input(this.input_stock[(this.input_stock.length - 1)]);
 
 				this.core.move_ball();
 				this.core.client_check_goal();
@@ -349,7 +354,7 @@ export default class Pong extends Phaser.Scene
 		{
 			//no response from server
 			this.lag_count++;
-			if (this.lag_count >= 15)
+			if (this.lag_count >= 20)
 			{
 				this.is_lagging = true;
 			}
@@ -378,7 +383,7 @@ export default class Pong extends Phaser.Scene
 			this.asset_scoreboard?.setText(text);
 		}
 
-//		this.lag_check();
+		this.lag_check();
 	}
 
 
@@ -392,13 +397,13 @@ export default class Pong extends Phaser.Scene
 		this.server_stock.push(gamestate);
 	}
 
-	// lag_check = () =>
-	// {
-	// 	if (this.is_lagging && this.game_state.result === EndResult.Undecided)
-	// 		this.asset_lag_icon!.setAlpha(1);
-	// 	else
-	// 		this.asset_lag_icon!.setAlpha(0);
-	// }
+	lag_check = () =>
+	{
+		if (this.is_lagging && this.game_state.result === EndResult.Undecided)
+			this.asset_lag_icon!.setAlpha(1);
+		else
+			this.asset_lag_icon!.setAlpha(0);
+	}
 
 	game_end = (winner: EndResult) =>
 	{
@@ -590,21 +595,22 @@ export default class Pong extends Phaser.Scene
 
 	}
 
-	// sound_event_wall = () =>
-	// {
-	// 	this.sound.stopAll();
-	// 	this.sound_a.play();
-	// }
+	sound_event_wall = () =>
+	{
+		this.sound.stopAll();
+		this.sound_a.play();
+	}
 
-	// sound_event_paddle = () =>
-	// {
-	// 	this.sound.stopAll();
-	// 	this.sound_b.play();
-	// }
+	sound_event_paddle = () =>
+	{
+		this.sound.stopAll();
+		this.sound_b.play();
+	}
 
-	// sound_event_goal = () =>
-	// {
-	// 	this.sound.stopAll();
-	// 	this.sound_clapping.play();
-	// }
+	sound_event_goal = () =>
+	{
+		this.sound.stopAll();
+		this.sound_clapping.play();
+		this.cameras.main.flash(250, 0 , 0, 0);
+	}
 }

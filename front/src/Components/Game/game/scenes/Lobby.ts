@@ -8,6 +8,7 @@ import {
 		GameType} from '../types/shared.types';
 import { io, Socket } from "socket.io-client";
 import ClientSocketManager from '../client.socket.manager';
+//import AssetButton from '../../../../Assets/images/button.png';
 
 
 export default class Lobby extends Phaser.Scene
@@ -61,6 +62,7 @@ export default class Lobby extends Phaser.Scene
 	anti_spam_count :number = 0;
 	wait_delay: number = 0;
 	connected: boolean = false;
+	launching_game: boolean = false;
 
 
 	preload ()
@@ -86,7 +88,7 @@ export default class Lobby extends Phaser.Scene
 
 		// this.load.image(
 		// 	'button',
-		// 	'assets/button.png'
+		// 	AssetButton
 		// 	);
 
 		this.game_type = this.game.registry.get('players_data').game_settings.game_type;
@@ -286,9 +288,12 @@ export default class Lobby extends Phaser.Scene
 
 	}
 
-	ready_to_go = () =>
+	ready_to_go = (/*express: boolean = false*/) =>
 	{
-		console.log('ready to start');
+		if (this.launching_game)
+			return;
+		
+		this.launching_game = true;
 
 		this.update_lobby_status(
 			{
@@ -298,33 +303,49 @@ export default class Lobby extends Phaser.Scene
 				Player_B_Back: PlayerStatus.Ready,
 			});
 
-		let timer: number = 1;
-		let style: Phaser.Types.GameObjects.Text.TextStyle = 
-		{
-			fontSize: '40px',
-			color: '#000000',
-			fontFamily: 'Arial'
-		}
 
 		this.socketmanager!.game_get_round_setup(this.game.registry.get('players_data').game_id);
-		this.countdown = this.add.text(400, 100, timer.toString(), style);
-
-		this.time.addEvent({
-			delay: 1000,
-			callback: () =>
-			{
-				timer -= 1;
-				this.countdown!.setText(timer.toString());
-				if (timer <= 0)
-				{
-					// this.countdown.destroy();
-					this.launch_pong();
-				}
-			},
-			callbackScope: this,
-			loop: true });
 
 
+		// let timer: number;
+		// if(express)
+		// 	timer = 1;
+		// else
+		// 	timer = 5;
+
+		// let style: Phaser.Types.GameObjects.Text.TextStyle = 
+		// {
+		// 	fontSize: '40px',
+		// 	color: '#000000',
+		// 	fontFamily: 'Arial'
+		// }
+
+		// this.countdown = this.add.text(400, 100, timer.toString(), style);
+
+		// this.time.addEvent({
+		// 	delay: 1000,
+		// 	callback: () =>
+		// 	{
+		// 		timer -= 1;
+		// 		this.countdown!.setText(timer.toString());
+		// 		if (timer <= 0)
+		// 		{
+		// 			// this.countdown.destroy();
+		// 			this.launch_pong();
+		// 		}
+		// 	},
+		// 	callbackScope: this,
+		// 	loop: true });
+
+
+		setTimeout(() => { 
+			this.cameras.main.fadeOut(1000, 0, 0, 0);
+
+		}, 1500);
+
+		setTimeout(() => { 
+			this.scene.start('Pong');
+		}, 2500);
 	}
 
 	store_round_setup = (round_setup: RoundSetup) =>

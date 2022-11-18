@@ -126,11 +126,6 @@ export class LobbyFactory
 		this.lobby_list.get(game_id)?.lobby_send_lobby_status(client);
 	}
 
-	// lobby_player_ready(client: Socket, game_id: string)
-	// {
-	// 	this.lobby_list.get(game_id)?.player_ready(client);
-	// }
-
 	lobby_game_input(client: AuthenticatedSocket, data: any)
 	{
 		this.lobby_list.get(data[0])?.game_receive_input(client, data[1]);
@@ -141,28 +136,23 @@ export class LobbyFactory
 		this.lobby_list.get(game_id)?.game_send_round_setup(client);
 	}
 
-
 	save_replay(game_id: string, save: Array<GameState>)
 	{
 		this.replay_list.set(game_id, save);
 	}
 
-
 	send_replay(client: Socket, game_id: string)
 	{
 		let replay :Array<GameState> | undefined = this.replay_list.get(game_id);
 	
+		//this.replay_debug(game_id);
 		if (replay !== undefined)
 		{
 			console.log('starting replay send', game_id, 'frame count', replay.length);
 		
 			replay.forEach((gamestate, index) => {
 				setTimeout(() => {
-
-					//TODO investigate date stuff
-					//gamestate.last_processed_time_A = new Date();;
 					client.emit('replay_state', gamestate);
-			
 				}, index * (1000 / 60));
 			  });
 		}
@@ -175,16 +165,10 @@ export class LobbyFactory
 
 	replay_debug(game_id: string)
 	{
-		console.log('@@@@@@@@@@@@@@@ replay data in factory @@@@@@@@@@@@@@@@@');
-
-
 		let replay :Array<GameState> | undefined = this.replay_list.get(game_id);
 		if (replay !== undefined)
 		{
-
 			console.log('replay debug', game_id);
-
-
 			replay.forEach((gamestate, index) => {
 
 				// if (!(index % 10))
