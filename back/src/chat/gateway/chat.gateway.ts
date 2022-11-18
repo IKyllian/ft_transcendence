@@ -1,9 +1,9 @@
-import { ArgumentsHost, BadRequestException, Catch, forwardRef, Inject, NotFoundException, UseFilters, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
-import { WebSocketGateway, MessageBody, WebSocketServer, ConnectedSocket, OnGatewayConnection, OnGatewayDisconnect, WsException, BaseWsExceptionFilter, SubscribeMessage } from '@nestjs/websockets';
+import { BadRequestException, NotFoundException, UseFilters, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import { WebSocketGateway, MessageBody, WebSocketServer, ConnectedSocket, OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { AuthService } from 'src/auth/auth.service';
 import { WsJwtGuard } from 'src/auth/guard/ws-jwt.guard';
-import { ChannelMessage, ChannelUser, Notification, User, UserTimeout } from 'src/typeorm';
+import { ChannelUser, Notification, User, UserTimeout } from 'src/typeorm';
 import { ChannelService } from '../channel/channel.service';
 import { UserService } from 'src/user/user.service';
 import { ChannelUpdateType, JwtPayload, notificationType, UserStatus } from 'src/utils/types/types';
@@ -31,9 +31,7 @@ import { GatewayExceptionFilter } from 'src/utils/exceptions/filter/Gateway.filt
 import { PartyService } from 'src/game/matchmaking/party/party.service';
 import { AuthenticatedSocket } from 'src/utils/types/auth-socket';
 import { ChanIdDto } from '../channel/dto/chan-id.dto';
-import { TaskScheduler } from 'src/task-scheduling/task.module';
 import { GlobalService } from 'src/utils/global/global.service';
-import { UserModule } from 'src/user/user.module';
 
 @UseFilters(GatewayExceptionFilter)
 @UsePipes(new ValidationPipe())
@@ -108,9 +106,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('Logout')
-	async logout(@ConnectedSocket() socket: AuthenticatedSocket) {
-		await this.authService.logout(socket.user);
-		socket.disconnect();
+	async logout(@GetUser() user: User) {
+		console.log("logout")
+		await this.authService.logout(user);
+		this.server.to(`user-${user.id}`).emit('Logout');
 	}
 
 	/* ------------------------------------ */
@@ -246,6 +245,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		@GetChannelUser() chanUser: ChannelUser,
 		@MessageBody() dto: MuteUserDto,
 	) {
+		console.log("in mute", dto)
 		const user = await this.channelService.muteUser(chanUser, dto);
 		this.server.to(`channel-${dto.chanId}`).emit('ChannelUpdate', { type: ChannelUpdateType.MUTE, data: user });
 	}
