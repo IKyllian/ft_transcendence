@@ -93,7 +93,7 @@ export function usePrivateConvHook() {
             const listener = (data: PrivateMessage) => {
                 console.log("NewPrivateMessage", data);
                 setConvDatas((prev: any) => {
-                    return {...prev, conv: {...prev.conv, messages: [...prev!.conv.messages, {...data, send_at: new Date(data.send_at)}]}}
+                    return {...prev, conv: {...prev.conv, messages: [...prev!.conv.messages, {...data}]}}
                 });
             }
             

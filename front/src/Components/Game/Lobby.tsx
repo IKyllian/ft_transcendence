@@ -1,10 +1,10 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useAppDispatch } from "../../Redux/Hooks";
 import Avatar from "../../Images-Icons/pp.jpg";
 import { IconCheck, IconPlus, IconChevronUp, IconChevronDown, IconLock } from "@tabler/icons";
 import { GameModeState, GameMode, Player, TeamSide, PlayerPosition, GameSettings, PartyInterface } from "../../Types/Lobby-Types";
 import { Controller, UseFormGetValues } from "react-hook-form";
-import { changeModalStatus } from "../../Redux/PartySlice";
+import { changeModalStatus, changeSidebarChatStatus } from "../../Redux/PartySlice";
 import { useLobbyHook } from "../../Hooks/Lobby-Hook";
 
 function Lobby() {
@@ -14,11 +14,9 @@ function Lobby() {
         party,
         gameMode,
         loggedUserIsLeader,
-        showDropdown,
         partyReady,
         formHook,
         onInputChange,
-        setShowDropdown,
         onReady,
         onGameModeChange,
         settingsFormSubmit,
@@ -38,10 +36,10 @@ function Lobby() {
                                 key={elem.user.id}
                                 user={elem}
                                 lobbyLength={party.players.length}
-                                gameMode={gameMode.gameModes[gameMode.indexSelected].gameMode}
+                                gameMode={party.game_mode}
                                 onChangeTeam={onChangeTeam}
                                 loggedUserId={currentUser?.id}
-                                onChangePos={onChangePos} 
+                                onChangePos={onChangePos}
                             />
                         )
                         : <PlayerListItem key={currentUser?.id} user={{isLeader: true, isReady: true, user: currentUser!, team: TeamSide.BLUE}} lobbyLength={1} />
@@ -65,8 +63,6 @@ function Lobby() {
                     onGameModeChange={onGameModeChange}
                     user={!party ? {isLeader: true, isReady: true, user: currentUser!, team: TeamSide.BLUE} : party?.players.find(elem => elem.user.id === currentUser!.id)}
                     onReady={onReady}
-                    showDropdown={showDropdown}
-                    setShowDropdown={setShowDropdown}
                     partyReady={partyReady}
                     loggedUserIsLeader={loggedUserIsLeader}
                     startQueue={startQueue}
@@ -88,9 +84,9 @@ function BoardGame(props: {hookForm: {watch: any}}) {
     const playerFrontAdvance = hookForm.watch("player_front_advance");
 
 
-    console.log("paddleSize", paddleSize);
-    console.log("playerBackAdvance", playerBackAdvance);
-    console.log("playerFrontAdvance", playerFrontAdvance);
+    // console.log("paddleSize", paddleSize);
+    // console.log("playerBackAdvance", playerBackAdvance);
+    // console.log("playerFrontAdvance", playerFrontAdvance);
     
     useEffect(() => {
         const root = document.documentElement;
@@ -242,6 +238,8 @@ function PlayerListItem(props: {user?: Player, lobbyLength?: number, gameMode?: 
     const { user, lobbyLength, gameMode, onChangeTeam, loggedUserId, onChangePos } = props;
     const dispatch = useAppDispatch();
     const displayTeam: boolean = lobbyLength && (gameMode === GameMode.PRIVATE_MATCH || lobbyLength > 2) ? true : false;
+    console.log("GAME MODE", gameMode);
+    console.log("lobbyLength", lobbyLength);
     const displaySelectPos: boolean = (lobbyLength && (gameMode === GameMode.PRIVATE_MATCH && lobbyLength > 2) || (gameMode === GameMode.RANKED_2v2 && lobbyLength == 2));
 
     return user ? (
@@ -272,34 +270,37 @@ function PlayerListItem(props: {user?: Player, lobbyLength?: number, gameMode?: 
     );
 }
 
-function LobbyButtonsContainer(props: {party: PartyInterface | undefined, gameMode: GameModeState, onGameModeChange: Function, user: Player | undefined, onReady: Function, showDropdown: boolean, setShowDropdown: Function, partyReady: boolean, loggedUserIsLeader: boolean, startQueue: Function }) {
-    const { party, gameMode, onGameModeChange, user, onReady, showDropdown, setShowDropdown, partyReady, loggedUserIsLeader, startQueue } = props;
+function LobbyButtonsContainer(props: {party: PartyInterface | undefined, gameMode: GameModeState, onGameModeChange: Function, user: Player | undefined, onReady: Function, partyReady: boolean, loggedUserIsLeader: boolean, startQueue: Function }) {
+    const { party, gameMode, onGameModeChange, user, onReady, partyReady, loggedUserIsLeader, startQueue } = props;
+    const dispatch = useAppDispatch();
+    const [displayDrop, setDisplayDrop] = useState<boolean>(false);
+    
     const gameModeOnclick = () => {
         if (loggedUserIsLeader)
-            setShowDropdown(!showDropdown)
+            setDisplayDrop(!displayDrop)
     }
     return user ? (
         <div className="lobby-buttons-wrapper">
-            <button style={{cursor: "pointer"}}> Party Chat </button>
+            <button style={{cursor: "pointer"}} onClick={() => dispatch(changeSidebarChatStatus())}> Party Chat </button>
             { user.isLeader && partyReady && <button className="start-button" onClick={() => startQueue()}> Start Game </button> }
             { user.isLeader && !partyReady && <button> Waiting for players </button> }
             { !user.isLeader && user.isReady && <button className="start-button" onClick={() => onReady(false)}> Not Ready </button> }
             { !user.isLeader && !user.isReady && <button className="start-button" onClick={() => onReady(true)}> Ready </button> }
-            <button style={loggedUserIsLeader ? {cursor: "pointer"} : {}} className={`game-modes-button ${showDropdown ? "bos" : ""}`} onClick={() => gameModeOnclick()}>
+            <button style={loggedUserIsLeader ? {cursor: "pointer"} : {}} className={`game-modes-button ${displayDrop ? "bos" : ""}`} onClick={() => gameModeOnclick()}>
                 { !party && gameMode.gameModes[gameMode.indexSelected].gameMode }
                 { party && party.game_mode }
-                { showDropdown && loggedUserIsLeader && <IconChevronDown className="chevron-icon" /> }
-                { !showDropdown && loggedUserIsLeader && <IconChevronUp className="chevron-icon" /> }
+                { displayDrop && loggedUserIsLeader && <IconChevronDown className="chevron-icon" /> }
+                { !displayDrop && loggedUserIsLeader && <IconChevronUp className="chevron-icon" /> }
             </button>
-            { loggedUserIsLeader && <DropdownGameModes show={showDropdown} gameMode={gameMode} onGameModeChange={onGameModeChange} /> }
+            { loggedUserIsLeader && <DropdownGameModes show={displayDrop} gameMode={gameMode} onGameModeChange={onGameModeChange} setDisplayDrop={setDisplayDrop} /> }
         </div>
     ) : (
         <> </>
     );
 }
 
-function DropdownGameModes(props: {show: boolean, gameMode: GameModeState, onGameModeChange: Function}) {
-    const { show, gameMode, onGameModeChange } = props;
+function DropdownGameModes(props: {show: boolean, gameMode: GameModeState, onGameModeChange: Function, setDisplayDrop: Function}) {
+    const { show, gameMode, onGameModeChange, setDisplayDrop } = props;
     return show ? (
         <div className="game-modes-dropdown">
             <ul>
@@ -308,7 +309,7 @@ function DropdownGameModes(props: {show: boolean, gameMode: GameModeState, onGam
                         if (elem.isLock)
                             return <li className="gameMode-lock" key={index}> <IconLock className="lock-icon" /> {elem.gameMode} </li>
                         else
-                            return <li key={index} onClick={() => onGameModeChange(index, elem.gameMode)}> {elem.gameMode} </li>
+                            return <li key={index} onClick={() => {onGameModeChange(index, elem.gameMode); setDisplayDrop(false)}}> {elem.gameMode} </li>
                     })
                 }
             </ul>

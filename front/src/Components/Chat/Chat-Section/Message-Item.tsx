@@ -22,10 +22,7 @@ function MessageItem(props: {isFromChan: boolean, message: ChatMessage | Private
     const handleClick = () => {
         setShowDropdown(!showDropdown);
     }
-    // console.log("index", index);
-    // console.log("chan?.messages.length", chan?.messages.length);
-    // const putClass: boolean = chan && index === 1 ? true : false;
-    // console.log("putClass", putClass);
+    
     return message.sender ? (
         <>
             {

@@ -1,12 +1,10 @@
-import { useContext, useState } from "react";
-import { IconUsers, IconSettings, IconX, IconPlus } from "@tabler/icons";
+import { useContext } from "react";
+import { IconUsers, IconX, IconPlus, IconMessage } from "@tabler/icons";
 import Avatar from "../../Images-Icons/pp.jpg";
-import { UserInterface } from "../../Types/User-Types";
 import { useAppDispatch, useAppSelector } from "../../Redux/Hooks";
-import { Link } from "react-router-dom";
 import { SocketContext } from "../../App";
 import { loggedUserIsLeader } from "../../Utils/Utils-Party";
-import { changeModalStatus } from "../../Redux/PartySlice";
+import { changeModalStatus, changeSidebarChatStatus } from "../../Redux/PartySlice";
 
 function PartyButton() {
     const { currentUser } = useAppSelector(state => state.auth);
@@ -33,7 +31,7 @@ function PartyButton() {
         <div className="header-party-container">
             <div className="header-party-wrapper">
                 {
-                    party.players.map((elem, index) => 
+                    party.players.map((elem) => 
                         <div key={elem.user.id} className="fill-item">
                             { elem.isLeader &&
                                 <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" height="16" width="16" className="crown-svg">
@@ -54,9 +52,7 @@ function PartyButton() {
                     )
                 }
                 <div className="party-separtor"> </div>
-                <Link to="/lobby">
-                    <div className="party-item"> <IconSettings /> </div>
-                </Link>
+                <div className="party-item"> <IconMessage onClick={() => dispatch(changeSidebarChatStatus())} /> </div>
                 <div className="party-item" onClick={() => onLeaveParty()}> <IconX /> </div>
             </div>
         </div>

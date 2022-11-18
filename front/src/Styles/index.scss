@@ -12,6 +12,7 @@
 @use "./Notif-Game-Invite.scss";
 @use "./Notif-Error.scss";
 @use "./Lobby.scss";
+@use "./Chat-Party.scss";
 @use "./Variables.scss" as *;
 
 body {
@@ -139,23 +140,36 @@ button {
 				}
 				.input-dropdown-wrapper {
 					width: 100%;
-					@include flex-row-alignCenter();
-					justify-content: space-between;
+					display: flex;
+					flex-direction: column;
 					padding: 5px;
 					margin: 0 auto;
+
+					.timeout-error {
+						font-size: 10px;
+						color: red;
+					}
+
+					.input-container {
+						@include flex-row-alignCenter();
+						justify-content: space-between;
+						width: 100%;
+
+						input {
+							all: unset;
+							width: 80%;
+						}
+						
+						button {
+							all: unset;
+							display: flex;
+							svg {
+								@include width-height(15px, 15px);
+							}
+						}
+					}
 					&:hover {
 						background-color: $LightDarkPalette;
-						}
-					input {
-						all: unset;
-						width: 80%;
-					}
-					button {
-						all: unset;
-						display: flex;
-						svg {
-							@include width-height(15px, 15px);
-						}
 					}
 				}
 			}

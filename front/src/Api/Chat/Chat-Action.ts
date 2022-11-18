@@ -1,6 +1,7 @@
 import { AnyAction, Dispatch } from "@reduxjs/toolkit";
 import axios from "axios";
 import { Channel } from "diagnostics_channel";
+import { UseFormSetError } from "react-hook-form";
 import { NavigateFunction } from "react-router-dom";
 import { Socket } from "socket.io-client";
 import { baseUrl } from "../../env";
@@ -9,6 +10,13 @@ import { addChannel } from "../../Redux/ChatSlice";
 import { ChatMessage, PreviousMessagesState, CreateChanBodyRequest } from "../../Types/Chat-Types";
 import { UserInterface } from "../../Types/User-Types";
 
+type FormValues = {
+    chanMode: string,
+    chanName: string,
+    password?: string,
+    usersIdInvited?: string[];
+}
+
 export function fetchCreateChannel(
     body: CreateChanBodyRequest,
     usersInvited: UserInterface[] | undefined,
@@ -16,7 +24,8 @@ export function fetchCreateChannel(
     dispatch: Dispatch<AnyAction>,
     navigate: NavigateFunction,
     onCloseModal: Function,
-    socket: Socket) {
+    socket: Socket,
+    setError: UseFormSetError<FormValues>) {
     
     axios.post(`${baseUrl}/channel`, body, {
         headers: {
@@ -38,6 +47,7 @@ export function fetchCreateChannel(
         navigate(`/chat/channel/${response.data.id}`);
     }).catch(err => {
         console.log(err);
+        setError("chanName", {message: "Channel name already exist"});
     })
 }
 
@@ -64,8 +74,6 @@ export function fetchLoadPrevMessages(channelId: number, token: string, dispatch
     .then((response) => {
         console.log("response", response.data);
         if (response.data.length > 0) {
-            // let newDatas: ChatMessage[] = response.data;
-            // newDatas.forEach((elem: ChatMessage) => elem.send_at = new Date(elem.send_at));
             dispatch(replaceChannelMessages([...response.data, ...currentMessages]));
         } else {
             setPreviousMessages({loadPreviousMessages: false, reachedMax: true});

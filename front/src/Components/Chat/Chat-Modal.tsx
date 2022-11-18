@@ -21,7 +21,7 @@ type FormValues = {
 }
 
 function ChatModal(props: {onCloseModal: Function, showModal: number}) {
-    const { register, handleSubmit, watch, reset, formState: {errors} } = useForm<FormValues>();
+    const { register, handleSubmit, watch, reset, formState: {errors}, setError } = useForm<FormValues>();
     const [usersInvited, setUsersInvited] = useState<UserInterface[]>([]);
     const { onCloseModal, showModal } = props;
 
@@ -48,7 +48,6 @@ function ChatModal(props: {onCloseModal: Function, showModal: number}) {
     }
 
     const formSubmit = handleSubmit((data, e) => {
-        console.log("TESTAZEAZEAE");
         e?.preventDefault();
         if (showModal === 1) {
             let body: CreateChanBodyRequest = {
@@ -57,7 +56,7 @@ function ChatModal(props: {onCloseModal: Function, showModal: number}) {
             }
             if (body.option === ChannelModes.PROTECTED)
                 body = {...body, password: data.password}
-            fetchCreateChannel(body, usersInvited, authDatas.token, dispatch, navigate, onCloseModal, socket!);
+            fetchCreateChannel(body, usersInvited, authDatas.token, dispatch, navigate, onCloseModal, socket!, setError);
         } else {
             if (usersInvited.length > 0 && params.channelId) {
                 usersInvited.forEach(element => {
@@ -72,7 +71,6 @@ function ChatModal(props: {onCloseModal: Function, showModal: number}) {
         reset();
         setUsersInvited([]);
     })
-    
 
     if (showModal === 1 || showModal === 3) {
         return (

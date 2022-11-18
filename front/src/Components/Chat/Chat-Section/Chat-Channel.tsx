@@ -48,20 +48,20 @@ function ChatChannel() {
                         )
                     }
                     <div ref={messagesEndRef} />
-                </ul>
-                {
-                    usersTyping.length > 0 &&
-                    usersTyping.length < 4 && 
-                    <p> {usersTyping.map((user: UserInterface) => {
-                        return `${user.username} `
-                    })} is typing...</p>
-                }
-                {
-                    usersTyping.length > 3 &&
-                    <p> Many users are typing... </p>
-                }
+                </ul>               
                 <div className="message-input-container">
-                    <form onSubmit={handleSubmit}>
+                    <form style={usersTyping.length > 0 ? {marginTop: "25px"}: {}} onSubmit={handleSubmit}>
+                        {
+                            usersTyping.length > 0 &&
+                            usersTyping.length < 4 && 
+                            <p> {usersTyping.map((user: UserInterface) => {
+                                return `${user.username} `
+                            })} is typing...</p>
+                        }
+                        {
+                            usersTyping.length > 3 &&
+                            <p> Many users are typing... </p>
+                        }
                         <input type="text" placeholder="Type Your Message..." {...register('inputMessage', {minLength: 1, onChange: (e) => {optimizedFn(e.target.value); handleInputChange()}})} />
                         <button type="submit"> <IconSend /> </button>
                     </form>

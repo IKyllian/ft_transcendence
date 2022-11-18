@@ -39,6 +39,8 @@ function MuteButton(props: {senderId: number, chanId: number, usersTimeout: User
             onMute(number);
     });
 
+    console.log("Errors", errors);
+
     return (
         <>
             <div className="dropdown-button">
@@ -49,8 +51,11 @@ function MuteButton(props: {senderId: number, chanId: number, usersTimeout: User
                         <p onClick={() => onMute()}> Perma mute </p>
                         <span className="right-menu-dropdown-separator"> OR </span>
                         <form className="input-dropdown-wrapper" onSubmit={handleClick}>
-                            <input type="number" min="10" max="3600" {...register("numberInput")} placeholder='in second' />
-                            <button type="submit"> <IconSend /> </button>
+                            {errors.numberInput && <p className="timeout-error"> {errors.numberInput.message} </p>}
+                            <div className="input-container">
+                                <input type="number" max="3600" {...register("numberInput", { required: "Time is required", minLength: {value: 10, message: "Must be minimum 10sec"}})} placeholder='in second' />
+                                <button type="submit"> <IconSend /> </button>
+                            </div>
                         </form>
                     </div>
                 }

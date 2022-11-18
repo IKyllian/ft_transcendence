@@ -7,6 +7,7 @@ function PublicRoute({ children }: { children: JSX.Element }) {
 	console.log("PUBLIC ROUTE");
     const auth = IsLog();
     const {loadingIsConnected} = useAppSelector(state => state.auth);
+    
     if (!loadingIsConnected) {
         return !auth ? children : <Navigate to="/" />;
     } else {
