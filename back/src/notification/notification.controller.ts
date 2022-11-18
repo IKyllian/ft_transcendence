@@ -13,7 +13,7 @@ export class NotificationController {
 	async getNotification(
 		@GetUser() user: User,
 	) {
-		return await this.notifService.getNotification(user);
+		return await this.notifService.getNotifications(user);
 	}
 
 	@UseGuards(JwtGuard)

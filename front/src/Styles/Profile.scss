@@ -364,8 +364,8 @@ $FontSizeTextResponsive: 15px;
                 .history-item {
                     gap: 0;
                     .player-container {
-                        font-size: 13px;
-                        overflow-x: scroll;
+                        font-size: 13px;   
+                        @include overflowScroll("x");
                         .avatar-player {  
                             @include avatar-player(30px);
                         }

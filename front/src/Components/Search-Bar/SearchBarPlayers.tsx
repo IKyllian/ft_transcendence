@@ -3,8 +3,9 @@ import UserFindItem from "./User-Find-Item";
 import { UserInterface } from "../../Types/User-Types";
 import Avatar from "../../Images-Icons/pp.jpg"
 import { useSearchBarHook } from "../../Hooks/SearchBar-Hook";
+import { SearchBarFunctionality } from "../../Types/Utils-Types";
 
-function SearchBarPlayers(props: {functionality: string, checkboxOnChange?: Function, checkboxArray?: UserInterface[], fetchUserFunction: Function}) {
+function SearchBarPlayers(props: {functionality: SearchBarFunctionality, checkboxOnChange?: Function, checkboxArray?: UserInterface[], fetchUserFunction: Function}) {
     const {functionality, checkboxOnChange, checkboxArray, fetchUserFunction} = props;
     const {
         formHook,

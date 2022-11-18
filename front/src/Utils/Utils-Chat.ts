@@ -1,4 +1,4 @@
-import { Conversation, ConversationInfoSidebar, ChannelUser } from "../Types/Chat-Types";
+import { Conversation, ConversationInfoSidebar, TimeoutType, UserTimeout } from "../Types/Chat-Types";
 import { UserInterface } from "../Types/User-Types";
 
 export function getSecondUserIdOfPM(conversation: Conversation | ConversationInfoSidebar, userConnectedId: number): number {
@@ -32,8 +32,8 @@ export function getMessageHour(date: Date): string {
     return (`${date.getHours() + 2}:${date.getMinutes() >= 0 && date.getMinutes() <= 9 ? '0' : ''}${date.getMinutes()}`)
 }
 
-export function UserIsMute(channelUsers: ChannelUser[], userId: number): boolean {
-    return channelUsers.find(elem => (elem.user.id === userId && elem.is_muted)) ? true : false;
+export function UserIsMute(usersTimeout: UserTimeout[], userId: number): boolean {
+    return usersTimeout.find(elem => (elem.user.id === userId && elem.type === TimeoutType.MUTED)) ? true : false;
 }
 
 export const debounce = (func: Function, debouneTime: number) => {

@@ -3,12 +3,12 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { FindManyOptions, FindOneOptions, FindOptionsWhere, IsNull, Like, Not, Repository } from "typeorm";
 import { AuthService } from "src/auth/auth.service";
 import { CreateUserDto } from "./dto/createUser.dto";
-import { Statistic, User } from "src/typeorm";
-import { userStatus } from "src/typeorm/entities/user";
+import { MatchResult, Statistic, User } from "src/typeorm";
 import { EditUserDto } from "./dto/editUser.dto";
 import * as argon from 'argon2';
 import { SearchDto } from "./dto/search.dto";
 import { FriendshipService } from "./friendship/friendship.service";
+import { UserStatus } from "src/utils/types/types";
 import { PendingUser } from "src/typeorm/entities/pendingUser";
 import { CreatePendingDto } from "./dto/createPending.dto";
 import { v4 as uuidv4 } from "uuid";
@@ -18,10 +18,14 @@ export class UserService {
 	constructor(
 		@Inject(forwardRef(() => AuthService))
 		private authService: AuthService,
+		private friendshipService: FriendshipService,
+
 		@InjectRepository(User)
 		private userRepo: Repository<User>,
 		@InjectRepository(Statistic)
 		private statisticRepo: Repository<Statistic>,
+		@InjectRepository(MatchResult)
+		private matchRepo: Repository<MatchResult>,
 		private friendshipService: FriendshipService,
 		@InjectRepository(PendingUser)
 		private pendingUserRepo: Repository<PendingUser>,
@@ -34,17 +38,20 @@ export class UserService {
 		return this.userRepo.save(user);
 	}
 
+
 	createPending(dto: CreatePendingDto) {
 		const user = this.pendingUserRepo.create({...dto});
 		return this.pendingUserRepo.save(user);
 	}
 
-	findOne(options: FindOneOptions<User>, selectAll?: Boolean): Promise<User | null> {
+	findOne(options: FindOneOptions<User>, selectAll: Boolean = false): Promise<User | null> {
 		if (selectAll) {
 			options.select = [
 				'avatar',
 				'id',
+				'id42',
 				'username',
+				"refresh_hash",
 				'status',
 				'hash',
 				'refresh_hash',
@@ -130,7 +137,7 @@ export class UserService {
 		}
 	}
 
-	setStatus(user: User, status: userStatus) {
+	setStatus(user: User, status: UserStatus) {
 		user.status = status;
 		this.userRepo.save(user)
 	}
@@ -144,7 +151,14 @@ export class UserService {
 		await this.userRepo.save(user);
 	}
 
-	async updateForgotCode(user: User, code: string) {
+	logout(user: User) {
+		return this.userRepo.createQueryBuilder()
+		.update(User)
+		.set({ refresh_hash: null })
+		.where("id = :id", { id: user.id })
+		.execute();
+
+  async updateForgotCode(user: User, code: string) {
 		user.forgot_code = code;
 		await this.userRepo.save(user);
 	}
@@ -158,11 +172,6 @@ export class UserService {
 		user.hash = hash;
 		user.forgot_code = null;
 		await this.userRepo.save(user);
-	}
-
-	async logout(user: User) {
-		user.refresh_hash = null;
-		this.userRepo.save(user);
 	}
 
 	async deleteUser(id: number) {
@@ -199,11 +208,50 @@ export class UserService {
 		return isblocked ? true : false;
 	}
 
+	async userBlocked(requesterId: number, addresseeId: number) {
+		const blocked: User[] = await this.userRepo.find({
+			where: [
+				{
+					id: requesterId,
+					blocked: { id: addresseeId },
+				},
+				{
+					id: addresseeId,
+					blocked: { id: requesterId },
+				}
+			]
+		});
+
+		if (blocked.length > 0) {
+			if (blocked[0].id === requesterId) {
+				throw new BadRequestException('You blocked that user');
+			} else {
+				throw new BadRequestException('You are blocked by that user');
+			}
+		}
+	}
+
+	getMatchHistory(userId: number) {
+		return this.matchRepo.createQueryBuilder("match")
+		.leftJoinAndSelect("match.blue_team_player1", "bp1")
+		.leftJoinAndSelect("match.blue_team_player2", "bp2")
+		.leftJoinAndSelect("match.red_team_player1", "rp1")
+		.leftJoinAndSelect("match.red_team_player2", "rp2")
+		.where("match.blue_team_player1.id = :id")
+		.orWhere("match.blue_team_player2.id = :id")
+		.orWhere("match.red_team_player1.id = :id")
+		.orWhere("match.red_team_player2.id = :id")
+		.setParameter("id", userId)
+		.orderBy("match.created_at", 'DESC')
+		.getMany();
+	}
+
 	async getUserInfo(user: User, user2: User) {
 		const friendList: User[] = await this.friendshipService.getFriendlist(user2);
 		const relation = await this.friendshipService.getRelation(user, user2);
 		const relationStatus = this.friendshipService.getRelationStatus(user2, relation);
-		return { user: user2, friendList, relationStatus };
+		const match_history = await this.getMatchHistory(user2.id);
+		return { user: user2, friendList, relationStatus , match_history};
 	}
 
 	async setTwoFactorSecret(user: User, secret: string) {

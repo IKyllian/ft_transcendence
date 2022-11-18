@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { debugPort } from "process";
 import { PrivateMessage, User } from "src/typeorm";
+import { FriendshipService } from "src/user/friendship/friendship.service";
 import { UserService } from "src/user/user.service";
 import { Repository } from "typeorm";
 import { ConversationService } from "../conversation.service";
@@ -17,17 +17,11 @@ export class PrivateMessageService {
 	) {}
 
 	async create(user: User, dto: PrivateMessageDto) {
-		const conv = await this.convService.conversationExist(user, dto.adresseeId);
-		if (!conv)
+		const conv = await this.convService.getConversationWithUsers(user.id, dto.adresseeId);
+		if (!conv) {
 			throw new NotFoundException('Conversation not found');
-		if (this.userService.isBlocked(user, dto.adresseeId))
-			throw new BadRequestException("You can't send message to a user you blocked");
-		const user2 = await this.userService.findOne({
-			relations: { blocked: true },
-			where: { id: dto.adresseeId }
-		});
-		if (this.userService.isBlocked(user2, user.id))
-			throw new BadRequestException("You are send blocked by this user");
+		}
+		await this.userService.userBlocked(user.id, dto.adresseeId);
 		const msg = this.privateMsgRepo.create({
 			sender: user,
 			content: dto.content,

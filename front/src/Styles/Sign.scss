@@ -14,6 +14,11 @@
     text-align: center;
     background: url('../Images-Icons//Backgrounds/background-42.jpg') no-repeat center fixed;
     background-size: cover;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    &::-webkit-scrollbar {
+        display: none;
+    }
 
     .auth-wrapper {
         display: flex;
@@ -62,16 +67,46 @@
             cursor: pointer;
         }
 
+        .validation-form-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            height: 320px;
+            justify-content: space-between;
+            .txt-verification {
+                margin: 0;
+            }
+            .code-input {
+                all: unset;
+                border: 0.5px solid white;
+                margin-top: 20px;
+                letter-spacing: 15px;
+                padding: 15px;
+            }
+
+            button {
+                all: unset;
+                border: none;
+                cursor: pointer;
+                margin-top: 10px;
+                border-radius: 3px;
+                height: 35px;
+                background-color: $LightBluePalette;
+            }
+        }
+
         .form-wrapper {
             display: flex;
             flex-direction: column;
             gap: 6px;
+
             input {
                 all: unset;
                 border: 1px solid white;
                 border-radius: 5px;
                 padding: 4px;
             }
+
             button {
                 all: unset;
                 border: none;

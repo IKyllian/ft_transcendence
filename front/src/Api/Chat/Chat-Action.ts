@@ -58,20 +58,3 @@ export function fetchLeaveChannel(channelId: number, token: string, navigate: Na
         console.log(err);
     })
 }
-
-export function fetchUnbanUser(token: string, chanId: number, userId: number, setChannelDatas: Function) {
-    axios.post(`${baseUrl}/channel/unban/`, {chanId: chanId, userId: userId}, {
-        headers: {
-            "Authorization": `Bearer ${token}`,
-        }
-    })
-    .then(response => {
-        console.log(response);
-        setChannelDatas((prev: Channel) => {
-            return {...prev, bannedUsers: [...response.data.bannedUsers]};
-        });
-    })
-    .catch(err => {
-        console.log(err);
-    })
-}

@@ -7,7 +7,7 @@ import { useForm } from "react-hook-form";
 
 function MuteButton(props: {senderId: number, chan: Channel}) {
     const { senderId, chan } = props;
-    const senderIsMute: boolean = UserIsMute(chan.channelUsers, senderId);
+    const senderIsMute: boolean = UserIsMute(chan.usersTimeout, senderId);
     const { register, reset, handleSubmit, formState: {errors} } = useForm<{numberInput: string}>();
     
     const {socket} = useContext(SocketContext);
@@ -22,6 +22,7 @@ function MuteButton(props: {senderId: number, chan: Channel}) {
     }
 
     const onMute = (time?: number) => {
+        console.log("time", time);
         if (!senderIsMute) {
             socket?.emit("Mute", {
                 userId: senderId,

@@ -8,8 +8,9 @@ import { debounce } from "../Utils/Utils-Chat";
 import { SocketContext } from "../App";
 import SearchBarButtons from "../Components/Search-Bar/SearchBar-Buttons";
 import { SearchBarButtonsProps } from "../Types/Utils-Types";
+import { SearchBarFunctionality } from "../Types/Utils-Types";
 
-export function useSearchBarHook(props: {functionality: string, fetchUserFunction: Function}) {
+export function useSearchBarHook(props: {functionality: SearchBarFunctionality, fetchUserFunction: Function}) {
     const {functionality, fetchUserFunction} = props;
     const { register, formState: {errors}, getValues } = useForm<{textInput: string}>();
     const [usersList, setUsersList] = useState<UsersListInterface[] | undefined>(undefined);
@@ -37,7 +38,7 @@ export function useSearchBarHook(props: {functionality: string, fetchUserFunctio
 
     const endOfTyping = () => {
         if (getValues('textInput') && getValues('textInput').length > 0) {
-            if (functionality !== "chanInvite")
+            if (functionality !== SearchBarFunctionality.CHAN_INVITE)
                 fetchUserFunction(getValues('textInput'), token, setUsersList);
             else {
                 if (params.channelId)
@@ -52,10 +53,12 @@ export function useSearchBarHook(props: {functionality: string, fetchUserFunctio
 
     const renderSearchBarButton = (parameters: SearchBarButtonsProps): ReactNode => {
         const { functionality, user, checkboxOnChange, checkboxArray, handleSendMessage, userFromList } = parameters;
-        if (functionality === "chanInviteOnCreate" || functionality === "chanInvite")
+        if (functionality === SearchBarFunctionality.CHAN_INVITE_ON_CREATE || functionality === SearchBarFunctionality.CHAN_INVITE)
             return <SearchBarButtons functionality={functionality} user={user} checkboxOnChange={checkboxOnChange} checkboxArray={checkboxArray} />
-        else if (functionality === "addFriend")
+        else if (functionality === SearchBarFunctionality.ADD_FRIEND)
             return <SearchBarButtons functionality={functionality} userFromList={userFromList}  />
+        else if (functionality === SearchBarFunctionality.PARTY_INVITE)
+            return <SearchBarButtons functionality={functionality} user={user}  />
         else
             return <SearchBarButtons functionality={functionality} handleSendMessage={() => handleSendMessage!(user?.id)} />
     }

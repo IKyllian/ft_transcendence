@@ -4,6 +4,7 @@ import { GetUser } from "src/utils/decorators";
 import { AuthService } from "./auth.service";
 import { LoginDto } from "./dto/login.dto";
 import { Auth42Dto } from "./dto/auth42.dto";
+import { SignupDto } from "./dto/signup.dto";
 import { JwtGuard } from "./guard/jwt.guard";
 import { RefreshGuard } from "./guard/refresh.guard";
 import { SignupDto } from "./dto/signup.dto";
@@ -53,7 +54,15 @@ export class AuthController {
 		return this.authService.refreshTokens(user["id"], user["refreshToken"]);
 	}
 
+	@UseGuards(JwtGuard)
 	@HttpCode(HttpStatus.OK)
+	@Post('verify-token')
+	verifyToken(
+		@GetUser() user: User,
+	) {
+		return user;
+
+  @HttpCode(HttpStatus.OK)
 	@Post('forgot-password')
 	forgotPassword(@Body() dto: ForgotPasswordDto) {
 		return this.authService.forgotPassword(dto);

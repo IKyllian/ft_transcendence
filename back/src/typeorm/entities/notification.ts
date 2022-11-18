@@ -1,5 +1,7 @@
+import { networkInterfaces } from "os";
 import { notificationType } from "src/utils/types/types";
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Conversation } from "..";
 import { Channel } from "./channel";
 import { User } from "./user";
 
@@ -11,12 +13,18 @@ export class Notification {
 	@Column()
 	type: notificationType;
 
-	@ManyToOne(() => User)
+	@ManyToOne(() => User, { orphanedRowAction: 'delete' })
 	addressee: User;
 
-	@ManyToOne(() => User)
+	@ManyToOne(() => User, { orphanedRowAction: 'delete' })
 	requester: User;
 
-	@ManyToOne(() => Channel)
+	@ManyToOne(() => Channel, { orphanedRowAction: 'delete' })
 	channel: Channel;
+
+	@ManyToOne(() => Conversation, { orphanedRowAction: 'delete' })
+	conversation: Conversation;
+
+	@Column({ nullable: true, type: 'timestamptz' })
+	delete_at?: Date;
 }

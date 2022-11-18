@@ -33,8 +33,92 @@
             align-items: center;
             gap: 10px;
 
-            svg {
-                @include width-height(25px, 25px);
+            .header-party-container {
+                .header-party-wrapper {
+                    padding: 4px;
+                    background-color: $HeaderPartyBackground;
+                    @include flex-row-alignCenter();
+                    gap: 8px;
+                    border-radius: 99999px;
+                    .fill-item {
+                        @include width-height(30px, 30px);
+                        position: relative;
+                        .crown-svg {
+                            position: absolute;
+                            top: -13px;
+                            left: 5.5px;
+                            @include width-height(18px, 18px);
+                            color: gold;
+                        }
+                        &:hover {
+                            .party-kick {
+                                opacity: 1;
+                                @include width-height(100%, 100%);
+                                top: 0;
+                                bottom: 0;
+                                right: 0;
+                                left: 0;
+                                margin: auto;
+                                cursor: pointer;
+                                background-color: rgba(0, 0, 0, 0.24);
+                                border-radius: 50%;
+                            }
+                        }
+                        .party-kick {
+                            position: absolute;
+                            opacity: 0;
+                        }
+                        
+                        .player-avatar {
+                            @include avatar-player(30px);
+                        }
+                    }
+
+                    .party-item {
+                        @include width-height(30px, 30px);
+                        cursor: pointer;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        background-color: $HeaderPartyGrey;
+                        border-radius: 50%;
+
+                        &:hover {
+                            background-color: $HeaderPartyGreyHover;
+                        }
+
+                        svg {
+                            @include width-height(20px, 20px);
+                        }
+                    }
+
+                    .party-separtor {
+                        @include width-height(1px, 25px);
+                        background-color: $HeaderPartyGrey;
+                    }
+                    
+                }
+            }
+            
+
+            .party-button {
+                all: unset;
+                cursor: pointer;
+                @include flex-row-alignCenter();
+                gap: 3px;
+                font-size: 11px;
+                background-color: $HeaderPartyGrey;
+                padding: 6px;
+                border-radius: 3px;
+                font-weight: bold;
+                text-transform: uppercase;
+
+                svg {
+                    @include width-height(20px, 20px);
+                    padding: 2px;
+                    border: 1.5px solid white;
+                    border-radius: 50%;
+                } 
             }
         }
 
@@ -98,7 +182,7 @@
         display: flex;
         flex-direction: column;
         gap: 5px;
-        overflow-y: scroll;
+        @include overflowScroll("y");
         .no-notif {
             margin: auto;
         }
@@ -114,7 +198,7 @@
             .notif-content {
                 width: 100%;
                 margin: 0 5px 0 10px;
-                overflow: scroll;
+                @include overflowScroll("");
                 p {
                     margin: 0;
                     &:first-child {
@@ -152,16 +236,25 @@
     display: flex;
     position: relative;
     cursor: pointer;
-    .badge-notif {
+    .badge {
         position: absolute;
         border-radius: 50%;
-        @include width-height(15px, 15px);
         background-color: red;
-        right: -3px;
-        top: -4px;
         text-align: center;
         font-size: 10px;
         font-weight: bold;
+    }
+
+    .badge-notif {
+        @include width-height(15px, 15px);
+        right: -3px;
+        top: -4px;
+    }
+
+    .badge-message {
+        @include width-height(10px, 10px);
+        right: -3px;
+        top: -3px;
     }
 }
 

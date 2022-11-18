@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsString } from "class-validator";
+import { IsNotEmpty, isNumber, IsNumber, IsString } from "class-validator";
 
 export class ChannelMessageDto {
 
@@ -9,4 +9,9 @@ export class ChannelMessageDto {
 	@IsNotEmpty()
 	@IsNumber()
 	chanId: number;
+}
+
+export class SkipDto {
+	@IsNumber()
+	skip: number;
 }

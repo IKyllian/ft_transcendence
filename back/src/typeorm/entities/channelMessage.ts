@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { BeforeInsert, Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Channel } from "./channel";
 import { User } from "./user";
 
@@ -13,7 +13,7 @@ export class ChannelMessage {
 	@Column()
 	content: string;
 
-	@CreateDateColumn()
+	@CreateDateColumn({type: 'timestamptz'})
 	send_at: Date;
 
 	@ManyToOne(() => Channel, (channel) => channel.messages, { onDelete: 'CASCADE' })

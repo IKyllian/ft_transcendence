@@ -1,13 +1,13 @@
 
 import { Exclude } from "class-transformer";
+import { UserStatus } from "src/utils/types/types";
 import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn, Unique, ManyToMany, JoinTable, ManyToOne, BaseEntity } from "typeorm";
 import { Avatar } from "./avatar";
 import { ChannelUser } from "./channelUser";
 import { Conversation } from "./conversation";
 import { Friendship } from "./friendship";
+import { MatchResult } from "./matchResult";
 import { Statistic } from "./statistic";
-
-export type userStatus = 'online' | 'offline' | 'in_game';
 
 @Entity()
 export class User {
@@ -22,11 +22,11 @@ export class User {
 	@Column({ unique: true, nullable: true })
 	username: string;
 
-	@Column({ unique: true })
-    email: string;
+	@Column({ default: UserStatus.OFFLINE })
+	status: UserStatus;
 
-	@Column({ default: 'offline' })
-	status: userStatus;
+	@Column({ unique: true })
+  email: string;
 
 	@Column({ nullable: true })
 	avatar?: string;
@@ -42,6 +42,12 @@ export class User {
 	@ManyToMany(() => User)
 	@JoinTable({ name: 'blocked_users' })
 	blocked: User[];
+
+	@Column({ default: 1000 })
+	singles_elo: number;
+
+	@Column({ default: 1000 })
+	doubles_elo: number;
 
 	@Exclude()
 	@Column({ nullable: true, select: false })

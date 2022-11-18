@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef, useContext, useCallback, useMemo } from "react";
 import { useParams } from "react-router-dom";
-import { Channel, ChannelUser } from "../../Types/Chat-Types";
+import { Channel, ChannelUser, ChannelUpdateType, UserTimeout } from "../../Types/Chat-Types";
 import { useAppDispatch, useAppSelector } from '../../Redux/Hooks'
 import { SocketContext } from "../../App";
 import { addChannel } from "../../Redux/ChatSlice";
@@ -79,23 +79,47 @@ export function useChannelHook() {
                     setUsersTyping(prev => [...prev, data.user]);
             });
 
-            socket!.on('ChannelUsersUpdate', (data: Channel) => {
-                console.log("ChannelUsersUpdate");
-                setChatDatas((prev: any) => {
-                    return {...prev, channelUsers: [...data.channelUsers]}
-                });
+            socket?.on('ChannelUpdate', (data: {type: ChannelUpdateType, data: ChannelUser | UserTimeout | number}) => {
+                console.log("ChannelUpdate", data);
+                if (data.type === ChannelUpdateType.JOIN) {
+                    const eventData = data.data as ChannelUser;
+                    setChatDatas((prev: any) => {
+                        return {...prev, channelUsers: [...prev.channelUsers, eventData]}
+                    });
+                } else if (data.type === ChannelUpdateType.LEAVE) {
+                    const eventData = data.data as number;
+                    setChatDatas((prev: any) => {
+                        return {...prev, channelUsers: [...prev.channelUsers.filter((elem: ChannelUser) => elem.id !== eventData)]}
+                    });
+                } else if (data.type === ChannelUpdateType.BAN) {
+                    const eventData = data.data as UserTimeout;
+                    setChatDatas((prev: any) => {
+                        return {...prev, usersTimeout: [...prev.usersTimeout, eventData]}
+                    });
+                    setChatDatas((prev: any) => {
+                        return {...prev, channelUsers: [...prev.channelUsers.filter((elem: ChannelUser) => elem.user.id !== eventData.user.id)]}
+                    });
+                } else if (data.type === ChannelUpdateType.MUTE) {
+                    const eventData = data.data as UserTimeout;
+                    setChatDatas((prev: any) => {
+                        return {...prev, usersTimeout: [...prev.usersTimeout, eventData]}
+                    });
+                } else if (data.type === ChannelUpdateType.UNTIMEOUT) {
+                    const eventData = data.data as number;
+                    setChatDatas((prev: any) => {
+                        return {...prev, usersTimeout: [...prev.channelUsers.filter((elem: UserTimeout) => elem.id !== eventData)]}
+                    });
+                } else if (data.type === ChannelUpdateType.CHANUSER) {
+                    const eventData = data.data as ChannelUser;
+                    setChatDatas((prev: any) => {
+                        return {...prev, channelUsers: [...prev.channelUsers.map((elem: any) => {
+                            if (elem.user.id === eventData.user.id)
+                                return elem = eventData;
+                            return elem
+                        })] }
+                    });
+                }
             });
-
-            socket!.on("ChannelUserUpdate", (data: ChannelUser) => {
-                console.log("ChannelUserUpdate");
-                setChatDatas((prev: any) => {
-                    return {...prev, channelUsers: [...prev.channelUsers.map((elem: any) => {
-                        if (elem.user.id === data.user.id)
-                            return elem = data;
-                        return elem
-                    })] }
-                });
-            })
 
             socket!.on('roomData', (data: Channel) => {
                 console.log("Getting datas roomData", data);
