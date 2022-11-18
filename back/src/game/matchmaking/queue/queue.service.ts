@@ -65,9 +65,9 @@ export class QueueService {
 					this.queue2v2 = this.queue1v1.filter((queueing) => queueing.id !== inQueue.id);
 				}
 				this.inQueueSession.removeInQueue(party.players[0].user.id);
+				party.players.forEach(player => player.isReady = false);
+				this.partyService.emitPartyUpdate(party, true);
 			}
-			party.players.forEach(player => player.isReady = false);
-			this.partyService.emitPartyUpdate(party, true);
 		} else {
 			const inQueue: QueueLobby = this.inQueueSession.getInQueue(user.id);
 			if (inQueue) {

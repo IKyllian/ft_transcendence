@@ -10,6 +10,7 @@ import { LobbyFactory } from "src/game/lobby/lobby.factory";
 import { MatchmakingLobby } from "../matchmakingLobby";
 import { QueueLobby } from "src/utils/types/types";
 import { QueueService } from "../queue/queue.service";
+import { PartyMessageDto } from "../dto/party-message.dto";
 
 @Injectable()
 export class PartyService {
@@ -46,13 +47,14 @@ export class PartyService {
 	}
 
 	joinParty(user: User, requesterId: number) {
-		this.queueService.leaveQueue(user);
+		// this.queueService.leaveQueue(user);
 		this.leaveParty(user);
 		const party = this.partyJoined.getParty(requesterId);
 		if (!party) { throw new NotFoundException('party not found'); }
 		party.join(user);
 		this.partyJoined.setParty(user.id, party);
 		this.queueService.leaveQueue(user);
+		this.emitPartyUpdate(party);
 	}
 
 	leaveParty(user: User) {
@@ -65,6 +67,7 @@ export class PartyService {
 				party.players.forEach((player) => player.isReady = false);
 			}
 			party.leave(user);
+			this.emitPartyUpdate(party);
 			this.partyJoined.removeParty(user.id);
 			this.globalService.server.to(`user-${user.id}`).emit('PartyLeave');
 		}
@@ -74,6 +77,16 @@ export class PartyService {
 		const party = this.partyJoined.getParty(user.id);
 		if (party && this.getPlayerInParty(user.id, party.players).isLeader) {
 			this.leaveParty(this.getPlayerInParty(id, party.players).user);
+		}
+	}
+
+	partyMessage(user: User, content: string) {
+		const party = this.partyJoined.getParty(user.id);
+		if (party) {
+			const message = party.createMessage(user, content);
+			party.players.forEach((player) => {
+				this.globalService.server.to(`user-${player.user.id}`).emit('NewPartyMessage', message);
+			})
 		}
 	}
 
