@@ -12,49 +12,31 @@ import { ChannelUser } from "../../../Types/Chat-Types";
 
 function ChannelSettings() {
     const [sidebarItem, setSidebarItem] = useState<string>("Users");
-    const [channelDatas, setChannelDatas] = useState<Channel | undefined>(undefined);
-    const [loggedUserIsOwner, setLoggedUserIsOwner] = useState<boolean>(false);
+    // const [channelDatas, setChannelDatas] = useState<Channel | undefined>(undefined);
+    // const [loggedUserIsOwner, setLoggedUserIsOwner] = useState<boolean>(false);
     
-    const location = useLocation();
+    // const location = useLocation();
     const navigate = useNavigate();
-    const authDatas = useAppSelector((state) => state.auth);
-    const {socket} = useContext(SocketContext);
-    const params = useParams();
-    const channelId: number | undefined = params.channelId ? parseInt(params.channelId!, 10) : undefined;
+    // const authDatas = useAppSelector((state) => state.auth);
+    const {channelDatas, loggedUserIsOwner} = useAppSelector((state) => state.channel);
+    // const {socket} = useContext(SocketContext);
+    // const params = useParams();
+    // const channelId: number | undefined = params.channelId ? parseInt(params.channelId!, 10) : undefined;
 
-    useEffect(() => {
-        if (channelId) {
-            socket!.emit("JoinChannelRoom", {
-                id: channelId,
-            });
-        }
+    // useEffect(() => {
+    //     if (channelId) {
+    //         socket!.emit("JoinChannelRoom", {
+    //             id: channelId,
+    //         });
+    //     }
         
-        socket!.on("ChannelUserUpdate", (data: ChannelUser) => {
-            console.log("ChannelUserUpdate", data);
-            setChannelDatas((prev: any) => {
-                return {...prev, channelUsers: [...prev.channelUsers.map((elem: any) => {
-                    if (elem.user.id === data.user.id)
-                        return elem = data;
-                    return elem
-                })] }
-            });
-        })
-        if (location && location.state) {
-            const locationState = location.state as Channel;
-            if (locationState.channelUsers.find((elem) => elem.user.id === authDatas.currentUser?.id && (elem.role === "owner" || elem.role === "moderator"))) {
-                setLoggedUserIsOwner(true);
-                setSidebarItem("Settings");
-            }
-            setChannelDatas(locationState);
-        }
-
-        return () => {
-            socket!.emit("LeaveChannelRoom", {
-                id: channelId,
-            });
-            socket?.off("ChannelUserUpdate");
-        }
-    }, [location])
+    //     return () => {
+    //         socket!.emit("LeaveChannelRoom", {
+    //             id: channelId,
+    //         });
+    //         socket?.off("ChannelUserUpdate");
+    //     }
+    // }, [location])
 
     if (!channelDatas) {
         return (

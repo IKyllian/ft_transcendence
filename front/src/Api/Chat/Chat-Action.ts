@@ -4,6 +4,7 @@ import { Channel } from "diagnostics_channel";
 import { NavigateFunction } from "react-router-dom";
 import { Socket } from "socket.io-client";
 import { baseUrl } from "../../env";
+import { replaceChannelMessages } from "../../Redux/ChannelSlice";
 import { addChannel } from "../../Redux/ChatSlice";
 import { ChatMessage, PreviousMessagesState, CreateChanBodyRequest } from "../../Types/Chat-Types";
 import { UserInterface } from "../../Types/User-Types";
@@ -24,7 +25,7 @@ export function fetchCreateChannel(
     })
     .then((response) => {
         console.log(response);
-        dispatch(addChannel({channel: response.data, isActive: "false"}));
+        dispatch(addChannel({channel: response.data, isActive: "true"}));
         if (usersInvited) {
             usersInvited.forEach(element => {
                 socket?.emit("ChannelInvite", {
@@ -54,7 +55,7 @@ export function fetchLeaveChannel(channelId: number, token: string, navigate: Na
     })
 }
 
-export function fetchLoadPrevMessages(channelId: number, token: string, setChatDatas: Function, currentMessages: ChatMessage[], setPreviousMessages: Function) {
+export function fetchLoadPrevMessages(channelId: number, token: string, dispatch: Dispatch<AnyAction>, currentMessages: ChatMessage[], setPreviousMessages: Function) {
     axios.post(`${baseUrl}/channel/${channelId}/messages`, {skip: currentMessages.length}, {
         headers: {
             "Authorization": `Bearer ${token}`,
@@ -63,11 +64,9 @@ export function fetchLoadPrevMessages(channelId: number, token: string, setChatD
     .then((response) => {
         console.log("response", response.data);
         if (response.data.length > 0) {
-            let newMessagesArray: ChatMessage[] = [...currentMessages];
-            let newDatas: ChatMessage[] = response.data;
-            newDatas.forEach((elem: ChatMessage) => elem.send_at = new Date(elem.send_at));
-            newMessagesArray = [...newDatas, ...newMessagesArray]
-            setChatDatas((prev: Channel) => {return {...prev, messages: newMessagesArray}});
+            // let newDatas: ChatMessage[] = response.data;
+            // newDatas.forEach((elem: ChatMessage) => elem.send_at = new Date(elem.send_at));
+            dispatch(replaceChannelMessages([...response.data, ...currentMessages]));
         } else {
             setPreviousMessages({loadPreviousMessages: false, reachedMax: true});
         }

@@ -10,7 +10,8 @@ import ResponsiveMenu from './Responsive-Menu';
 import PartyButton from './Party-Button';
 import { NotificationInterface, notificationType } from '../../Types/Notification-Types';
 import { logoutSuccess } from '../../Redux/AuthSlice';
-import { fetchLogout } from '../../Api/Sign/Sign-Fetch';
+// import { fetchLogout } from '../../Api/Sign/Sign-Fetch';
+import { SocketContext } from '../../App';
 
 function NotifIcon(props: {notifications: NotificationInterface[] | undefined ,handleNotifDropdownClick: Function}) {
     const {handleNotifDropdownClick, notifications} = props;
@@ -32,6 +33,7 @@ function Header() {
     const {notifications} = useAppSelector(state => state.notification);
     const modalStatus = useContext(ModalContext);
     const dispatch = useAppDispatch();
+    const {socket} = useContext(SocketContext);
 
     console.log("notifications", notifications);
 
@@ -49,10 +51,8 @@ function Header() {
 
     const handleLogout = () => {
         localStorage.removeItem("userToken");
-        fetchLogout(token);
-        console.log("TEst");
+        socket?.emit("Logout");
         dispatch(logoutSuccess());
-        console.log("TEst2");
     }
 
     useEffect(() => {

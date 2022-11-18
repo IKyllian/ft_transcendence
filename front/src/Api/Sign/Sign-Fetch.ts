@@ -97,13 +97,13 @@ export function fetchVerifyToken(token: string, dispatch: Dispatch<AnyAction>) {
     })
 }
 
-export function fetchLogout(token: string) {
-    axios.post(`${baseUrl}/auth/logout`, {}, {
-        headers: {
-            "Authorization": `Bearer ${token}`,
-        }
-    })
-    .catch((err) => {
-        console.log(err);
-    })
-}
+// export function fetchLogout(token: string) {
+//     axios.post(`${baseUrl}/auth/logout`, {}, {
+//         headers: {
+//             "Authorization": `Bearer ${token}`,
+//         }
+//     })
+//     .catch((err) => {
+//         console.log(err);
+//     })
+// }

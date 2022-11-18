@@ -8,6 +8,7 @@ import BlockButton from "../../Buttons/Block-Button";
 import MuteButton from "../../Buttons/Mute-Button";
 import BanButton from "../../Buttons/Ban-Button";
 import { useAppSelector } from "../../../Redux/Hooks";
+import { UserStatus } from "../../../Types/User-Types";
 
 function UserSidebarItem(props: {user: ChannelUser, usersTimeout: UserTimeout[], loggedUserIsOwner: boolean}) {
     const { user, usersTimeout, loggedUserIsOwner } = props;
@@ -23,8 +24,7 @@ function UserSidebarItem(props: {user: ChannelUser, usersTimeout: UserTimeout[],
             <div className="avatar-container">
                 <img className='user-avatar' src={ProfilPic} alt="profil pic" />
                 <div className="user-status">
-                    <div className="online"> </div>
-                    {/* <div className={`${user.isOnline ? "online" : "offline"}`}> </div> */}
+                    <div className={`${user.user.status === UserStatus.ONLINE ? "online" : "offline"}`}> </div>
                 </div>
             </div>
             <div className={`${currentUser?.id !== user.user.id ? "username-wrapper" : ""}`} onClick={() => handleClick()}>

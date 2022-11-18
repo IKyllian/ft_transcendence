@@ -43,8 +43,6 @@ export function usePrivateConvHook() {
     }
 
     const endOfTyping = () => {
-        console.log("OnTypingPrivate", getSecondUserIdOfPM(convDatas?.conv!, authDatas.currentUser!.id));
-        console.log("convId", convId);
         socket?.emit("OnTypingPrivate", {
             userId: getSecondUserIdOfPM(convDatas?.conv!, authDatas.currentUser!.id),
             isTyping: false,
@@ -73,6 +71,7 @@ export function usePrivateConvHook() {
             socket?.emit("OnTypingPrivate", {
                 userId: secondUserId,
                 isTyping: false,
+                convId: convId,
             })
             setHasTypingEvent(false);
         }
@@ -110,9 +109,7 @@ export function usePrivateConvHook() {
             });
 
             socket?.on("ConversationData", (data: Conversation) => {
-                let conv: Conversation = data;
-                conv.messages.forEach(elem => elem.send_at = new Date(elem.send_at));
-                setConvDatas({temporary: false, conv: conv});
+                setConvDatas({temporary: false, conv: data});
             });
 
             if (location && location.state) {
@@ -126,15 +123,17 @@ export function usePrivateConvHook() {
         }
 
         return () => {
-            socket?.emit("LeaveConversationRoom", {
-                id: convId,
-            });
+            if (convId) {
+                socket?.emit("LeaveConversationRoom", {
+                    id: convId,
+                });
+            }
             socket?.off("OnTypingPrivate");
             socket?.off("ConversationData");
             socket?.off("NewPrivateMessage");
         }
     }, [socket, convId])
-    
+
     return {
         convDatas,
         handleSubmit: handleSubmitMessage,
