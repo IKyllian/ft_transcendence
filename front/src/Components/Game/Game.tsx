@@ -25,9 +25,7 @@ function Game() {
             });
             gameSocket.on("Connected", () => {
                 setGameDatas(locationState);
-                // setTimeout(() => {
                     launch_game(locationState, gameSocket);
-                // }, 500);
             })
         }
     }, [])
