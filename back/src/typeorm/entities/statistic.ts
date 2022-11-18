@@ -11,8 +11,14 @@ export class Statistic extends BaseEntity {
 	user: User;
 
 	@Column({ default: 0 })
-	match_won: number;
+	singles_match_won: number;
 
 	@Column({ default: 0 })
-	match_lost: number;
+	singles_match_lost: number;
+
+	@Column({ default: 0 })
+	doubles_match_won: number;
+
+	@Column({ default: 0 })
+	doubles_match_lost: number;
 }

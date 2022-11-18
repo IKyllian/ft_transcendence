@@ -308,7 +308,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	) {
 		console.log(socket.user.username + " joining conversation room");
 		const conv = await this.convService.getConversation(socket.user, room.id);
-		console.log("conv", conv)
 		if (!conv) {
 			throw new BadRequestException('Conversation not found');
 		}
