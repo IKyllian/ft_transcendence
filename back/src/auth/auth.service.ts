@@ -40,15 +40,23 @@ export class AuthService {
 		);
 	};
 
+	private validateUsername = (username) => {
+		// username can only have A-Z, a-z, 0-9, _ . and -
+		return username.match(/^[A-Za-z0-9_.-—]+$/)
+	}
+
 
 	async signup(dto: SignupDto) {
 		if (await this.userService.nameTaken(dto.username))
 			throw new ForbiddenException('Username already in use');
+		if (!this.validateUsername(dto.username))
+			throw new ForbiddenException('Invalid username format');
 		if (await this.userService.mailTaken(dto.email))
 			throw new ForbiddenException('Email already in use');
 		if (!this.validateEmail(dto.email))
 			throw new ForbiddenException('Invalid email format');
 
+		return {};
 		const hash = await argon.hash(dto.password);
 		const validation_code: string = uuidv4();	
 		const params = {
