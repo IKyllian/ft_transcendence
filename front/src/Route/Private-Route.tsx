@@ -7,6 +7,7 @@ function PrivateRoute({ children }: { children: JSX.Element }) {
 	console.log("PRIVATE ROUTE");
     const auth = IsLog();
     const {loadingIsConnected} = useAppSelector(state => state.auth);
+    
     if (!loadingIsConnected) {
         return auth ? children : <Navigate to="/sign" />;
     } else {

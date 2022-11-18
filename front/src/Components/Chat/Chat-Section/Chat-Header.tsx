@@ -7,17 +7,21 @@ import { Channel } from "../../../Types/Chat-Types"
 import DropdownContainer from "../../Utils/Dropdown-Container";
 import BlockButton from "../../Buttons/Block-Button";
 import { SetModalContext } from "../Chat";
+import { useAppDispatch } from "../../../Redux/Hooks";
+import { closeSidebarChatStatus } from "../../../Redux/PartySlice";
 
 interface Props {
     chatItem?: Channel | undefined,
     privateConvUser?: UserInterface,
     showUsersSidebar?: boolean,
     changeSidebarStatus?: Function,
+    isPartyChat?: boolean,
 }
 
 function ChatHeader(props: Props) {
-    const { chatItem, privateConvUser, showUsersSidebar, changeSidebarStatus } = props;
+    const { chatItem, privateConvUser, showUsersSidebar, changeSidebarStatus, isPartyChat } = props;
     const [showDropdown, setShowDropdown] = useState<boolean>(false);
+    const dispatch = useAppDispatch();
 
     const handleClick = () => {
         setShowDropdown(!showDropdown);
@@ -25,6 +29,15 @@ function ChatHeader(props: Props) {
 
     const sidebarStatus = useContext(SidebarContext);
     const modalStatus = useContext(SetModalContext);
+
+    if (isPartyChat) {
+        return (
+            <div className="header-user-info">
+                <IconChevronRight className="close-party-chat" onClick={() => dispatch(closeSidebarChatStatus())} />
+                <p className="p-party-chat"> Party Chat </p>
+            </div>
+        );
+    }
 
     return (chatItem && changeSidebarStatus) ? (
         <div className="message-header">

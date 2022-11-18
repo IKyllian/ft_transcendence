@@ -6,7 +6,7 @@
     text-align: center;
 }
 
-.chat-page-container {
+.chat-page-container, .chat-party-sidebar {
     @include page-wrapper();
     background-color: $LightDarkPalette;
     display: flex;
@@ -171,6 +171,17 @@
                 background-color: $LightDarkPalette;
                 border-bottom: 1px solid $WhitePalette;
                 @include flex-row-alignCenter;
+                position: relative;
+
+                .close-party-chat {
+                    position: absolute;
+                    cursor: pointer;
+                }
+
+                .p-party-chat {
+                    margin-left: auto;
+                    margin-right: auto;
+                }
 
                 .burger-icon-responsive {
                     display: none;
@@ -285,6 +296,15 @@
                 width: 90%;
                 @include flex-row-alignCenter();
                 margin: auto;
+                position: relative;
+
+                p {
+                    position: absolute;
+                    margin: 0;
+                    top: -20px;
+                    font-size: 13px;
+                }
+                
                 input {
                     all: unset;
                     width: 95%;
@@ -338,9 +358,9 @@
                                 position: absolute;
                                 right: -3px;
                                 top: 25px;
-                                padding: 2px 0 0 2px;
+                                padding: 2.5px 0 0 2.5px;
                                 div {
-                                    @include width-height(15px, 15px);
+                                    @include width-height(14px, 14px);
                                     border-radius: 50%;
                                 }
                                 .online {

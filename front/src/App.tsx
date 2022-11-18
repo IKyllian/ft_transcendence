@@ -25,6 +25,7 @@ import Game from "./Components/Game/Game";
 import Lobby from "./Components/Game/Lobby";
 import ModalPartyInvite from "./Components/Modal-Party-Invite";
 import CodeVerification from "./Components/Sign/Code-Verification";
+import ChatParty from "./Components/Chat-Party";
 
 interface RouteProps {
 	path: string,
@@ -112,6 +113,7 @@ function App() {
 		gameInvite,
 		gameNotificationLeave,
 		isAuthenticated,
+		partyState,
 	} = useAppHook();
 
   return (
@@ -124,6 +126,7 @@ function App() {
 				{ isAuthenticated && gameInvite && <NotifGameInvite notif={gameInvite} notifOnLeave={gameNotificationLeave} /> }
 				{ isAuthenticated && <Header /> }
 				<main className="page-container">
+				{ isAuthenticated && partyState.party && partyState.chatIsOpen && <ChatParty />}
 					<Routes>
 						{
 							routes.map((elem, index) => 

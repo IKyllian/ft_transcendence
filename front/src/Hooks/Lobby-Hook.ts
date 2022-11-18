@@ -43,13 +43,12 @@ export function useLobbyHook() {
     const [loggedUserIsLeader, setLoggedUserIsLeader] = useState<boolean>(false);
     const { handleSubmit, control, watch, setValue, getValues, reset } = useForm<GameSettings>({defaultValues: !party ? defaultSettings : party.game_settings});
     const [gameMode, setGameMode] = useState<GameModeState>(defaultGameModeState);
-    const [showDropdown, setShowDropdown] = useState<boolean>(false);
     const {socket} = useContext(SocketContext);
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
     const partyReady: boolean = (!party || (party && partyIsReady(party?.players))) ? true : false; 
     
-    console.log("party", party);
+    console.log("Render Lobby", "party", party);
 
     useEffect(() => {
         if (!party || (party && party.players.find(elem => elem.isLeader && elem.user.id === currentUser!.id)))
@@ -80,7 +79,6 @@ export function useLobbyHook() {
                 return { ...prev, indexSelected: index };
             });
         }
-        setShowDropdown(false);
     }
 
     const settingsFormSubmit = handleSubmit((data: GameSettings, e) => {
@@ -228,7 +226,6 @@ export function useLobbyHook() {
         party,
         gameMode,
         loggedUserIsLeader,
-        showDropdown,
         partyReady,
         formHook : {
             watch,
@@ -237,7 +234,6 @@ export function useLobbyHook() {
             getValues,
         },
         onInputChange,
-        setShowDropdown,
         onReady,
         onGameModeChange,
         settingsFormSubmit,

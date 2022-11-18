@@ -8,7 +8,7 @@ import { addNotification, deleteNotification } from "../Redux/NotificationSlice"
 import { addChannel, addPrivateConv, removeChannel } from "../Redux/ChatSlice";
 import { Channel, ChannelUpdateType, ChannelUser, Conversation, UserTimeout } from "../Types/Chat-Types";
 import { UserInterface } from "../Types/User-Types";
-import { copyFriendListArray, stopIsConnectedLoading } from "../Redux/AuthSlice";
+import { copyFriendListArray, logoutSuccess, stopIsConnectedLoading } from "../Redux/AuthSlice";
 import { GameMode, PartyInterface } from "../Types/Lobby-Types";
 import { copyNotificationArray } from "../Redux/NotificationSlice";
 import { addParty, cancelQueue, changePartyGameMode, changeQueueStatus, leaveParty } from "../Redux/PartySlice";
@@ -20,6 +20,7 @@ export function useAppHook() {
 	const [gameInvite, setGameInvite] = useState<NotificationInterface | undefined>(undefined);
 	const [eventError, setEventError] = useState<string | undefined>(undefined);
     const { token, isAuthenticated, currentUser } = useAppSelector((state) => state.auth);
+	const { party, chatIsOpen } = useAppSelector(state => state.party);
 	const {currentChannelId} = useAppSelector((state) => state.channel);
 
 	const dispatch = useAppDispatch();
@@ -117,6 +118,7 @@ export function useAppHook() {
 			})
 
 			socket.on("PartyLeave", () => {
+				console.log("PartyLeave");
 				dispatch(leaveParty());
 			});
 
@@ -174,6 +176,12 @@ export function useAppHook() {
                 // }
                 dispatch(removeChannel(data.id));
             });
+
+			socket.on("Logout", () => {
+				socket.disconnect();
+				localStorage.removeItem("userToken");
+				dispatch(logoutSuccess());
+			});
 		}
 
 		return () => {
@@ -199,5 +207,9 @@ export function useAppHook() {
         gameInvite,
         gameNotificationLeave,
 		isAuthenticated,
+		partyState: {
+			party,
+			chatIsOpen,
+		}
     };
 }

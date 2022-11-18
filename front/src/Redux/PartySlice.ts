@@ -4,6 +4,7 @@ import { PartyInterface, TeamSide, Player, GameMode } from '../Types/Lobby-Types
 interface PartyState {
     party?: PartyInterface,
     modalIsOpen: boolean,
+    chatIsOpen: boolean,
     isInQueue: boolean,
 }
 
@@ -11,6 +12,7 @@ const defaultState: PartyState = {
     party: undefined,
     modalIsOpen: false,
     isInQueue: false,
+    chatIsOpen: false,
 }
 
 export const partySlice = createSlice({
@@ -22,9 +24,23 @@ export const partySlice = createSlice({
         },
         leaveParty: (state) => {
             state.party = undefined;
+            state.chatIsOpen =  false;
+            state.modalIsOpen = false;
+            state.isInQueue = false;
         },
         changeModalStatus: (state, { payload }: PayloadAction<boolean>) => {
             state.modalIsOpen = payload;
+        },
+        changeSidebarChatStatus: (state) => {
+            console.log("changeSidebarChatStatus", state.chatIsOpen);
+            if (state.party)
+                state.chatIsOpen = !state.chatIsOpen;
+            console.log("AFTER changeSidebarChatStatus", state.chatIsOpen);
+        },
+        closeSidebarChatStatus: (state) => {
+            console.log("closeSidebarChatStatus");
+            if (state.party && state.chatIsOpen)
+                state.chatIsOpen = false;
         },
         changeQueueStatus: (state, { payload }: PayloadAction<boolean>) => {
             if (payload !== state.isInQueue)
@@ -42,4 +58,4 @@ export const partySlice = createSlice({
     }
 });
 
-export const { addParty, leaveParty, changeModalStatus, changeQueueStatus, cancelQueue, changePartyGameMode} = partySlice.actions;
+export const { addParty, leaveParty, changeModalStatus, changeSidebarChatStatus, closeSidebarChatStatus, changeQueueStatus, cancelQueue, changePartyGameMode} = partySlice.actions;
