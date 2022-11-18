@@ -1,9 +1,12 @@
-import { Channel } from "./Chat-Types";
+import { Channel, Conversation } from "./Chat-Types";
 import { UserInterface } from "./User-Types";
 
-enum notificationType {
-	FRIEND_REQUEST = 'friend_request',
-	CHANNEL_INVITE = 'channel_invite'
+export enum notificationType {
+	FRIEND_REQUEST ,
+	CHANNEL_INVITE,
+	PARTY_INVITE,
+    CHANNEL_MESSAGE,
+	PRIVATE_MESSAGE,
 };
 
 export interface NotificationInterface {
@@ -12,4 +15,5 @@ export interface NotificationInterface {
     addressee: UserInterface,
     requester: UserInterface,
     channel?: Channel,
+    conversation?: Conversation
 }

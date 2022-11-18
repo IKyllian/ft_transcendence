@@ -6,6 +6,8 @@ import { useParams } from "react-router-dom";
 
 import { SocketContext } from "../../App";
 import { fetchProfile } from "../../Api/Profile/Profile-Fetch";
+import { fetchMe } from "../../Api/Profile/Profile-Fetch";
+import { Modes } from "../../Types/Utils-Types";
 
 interface ProfileMenuButtons {
     title: string;
@@ -20,6 +22,7 @@ export function useProfileHook() {
     ]);
     const [userState, setUserState] = useState<ProfileState | undefined>(undefined);
     const [friendRequestSent, setFriendRequestSent] = useState<number>(0);
+    const [statsMode, setStatsMode] = useState<Modes>(Modes.Singles); 
 
     const params = useParams();
     const modalStatus = useContext(ModalContext);
@@ -38,20 +41,26 @@ export function useProfileHook() {
         setAttributes(newArray);
     }
 
+    const changeMode = (e: any) => {
+        const mode: Modes = e.target.value;
+        setStatsMode(mode);
+    }
+
     useEffect(() => {
+        handleClick(0);
         if (params.username === currentUser?.username) {
-            setUserState({
-                isLoggedUser: true,
-                user: currentUser!,
-                friendList: friendList,
-            });
+            fetchMe(token, setUserState, friendList);
         }
         else if (params.username) {
             fetchProfile(params.username, token, setUserState);
         }
+    }, [params.username])
 
-        
-    }, [params, friendList, notifications, friendRequestSent])
+    useEffect(() => {
+        if (params.username === currentUser?.username) {
+            setUserState((prev: any) => { return {...prev, friendList: friendList}});
+        }
+    }, [friendList, notifications, friendRequestSent])
 
     useEffect(() => {
         socket?.on("RequestValidation", (() => {
@@ -61,12 +70,14 @@ export function useProfileHook() {
         return () => {
             socket?.off("RequestValidation");
         }
-    })
+    }, [])
 
     return {
         userState,
         handleClick,
         modalStatus,
         attributes,
+        statsMode,
+        changeMode,
     }
 }

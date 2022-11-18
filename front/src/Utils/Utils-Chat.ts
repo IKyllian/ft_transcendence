@@ -1,4 +1,4 @@
-import { Conversation, ConversationInfoSidebar, ChannelUser } from "../Types/Chat-Types";
+import { Conversation, ConversationInfoSidebar, TimeoutType, UserTimeout } from "../Types/Chat-Types";
 import { UserInterface } from "../Types/User-Types";
 
 export function getSecondUserIdOfPM(conversation: Conversation | ConversationInfoSidebar, userConnectedId: number): number {
@@ -13,27 +13,29 @@ export function getSecondUsernameOfPM(conversation: Conversation, userConnectedI
     return conversation?.user1.id !== userConnectedId ? conversation?.user1.username : conversation?.user2.username;
 }
 
-export function getMessageDateString(date: Date): string {
+export function getMessageDateString(date: string): string {
     const currentDate = new Date();
+    const dateMessage = new Date(date);
 
-    if (currentDate.getFullYear() === date.getFullYear()
-        && currentDate.getMonth() === date.getMonth()
-        && currentDate.getDate() === date.getDate())
-        return (`Aujourd'hui à ${date.getHours() + 2}:${date.getMinutes() >= 0 && date.getMinutes() <= 9 ? '0' : ''}${date.getMinutes()}`);
-    else if (currentDate.getFullYear() === date.getFullYear()
-        && currentDate.getMonth() === date.getMonth()
-        && (currentDate.getDate() - 1) === date.getDate())
-        return (`Hier à ${date.getHours() + 2}:${date.getMinutes() >= 0 && date.getMinutes() <= 9 ? '0' : ''}${date.getMinutes()}`);
+    if (currentDate.getFullYear() === dateMessage.getFullYear()
+        && currentDate.getMonth() === dateMessage.getMonth()
+        && currentDate.getDate() === dateMessage.getDate())
+        return (`Aujourd'hui à ${dateMessage.getHours()}:${dateMessage.getMinutes() >= 0 && dateMessage.getMinutes() <= 9 ? '0' : ''}${dateMessage.getMinutes()}`);
+    else if (currentDate.getFullYear() === dateMessage.getFullYear()
+        && currentDate.getMonth() === dateMessage.getMonth()
+        && (currentDate.getDate() - 1) === dateMessage.getDate())
+        return (`Hier à ${dateMessage.getHours()}:${dateMessage.getMinutes() >= 0 && dateMessage.getMinutes() <= 9 ? '0' : ''}${dateMessage.getMinutes()}`);
     else
-        return (`${date.getDate()}/${date.getMonth()}/${date.getFullYear()}`);
+        return (`${dateMessage.getDate()}/${dateMessage.getMonth()}/${dateMessage.getFullYear()}`);
 }
 
-export function getMessageHour(date: Date): string {
-    return (`${date.getHours() + 2}:${date.getMinutes() >= 0 && date.getMinutes() <= 9 ? '0' : ''}${date.getMinutes()}`)
+export function getMessageHour(date: string): string {
+    const dateMessage = new Date(date);
+    return (`${dateMessage.getHours()}:${dateMessage.getMinutes() >= 0 && dateMessage.getMinutes() <= 9 ? '0' : ''}${dateMessage.getMinutes()}`)
 }
 
-export function UserIsMute(channelUsers: ChannelUser[], userId: number): boolean {
-    return channelUsers.find(elem => (elem.user.id === userId && elem.is_muted)) ? true : false;
+export function UserIsMute(usersTimeout: UserTimeout[], userId: number): boolean {
+    return usersTimeout.find(elem => (elem.user.id === userId && elem.type === TimeoutType.MUTED)) ? true : false;
 }
 
 export const debounce = (func: Function, debouneTime: number) => {

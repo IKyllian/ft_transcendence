@@ -2,7 +2,7 @@ import { Dispatch, AnyAction } from "@reduxjs/toolkit";
 import axios from "axios";
 import { baseUrl } from "../../env";
 import { LoginPayload } from "../../Types/User-Types";
-import { loginSuccess, loginError, setUsername } from "../../Redux/AuthSlice";
+import { loginSuccess, loginError, setUsername, stopIsConnectedLoading } from "../../Redux/AuthSlice";
 import { NavigateFunction } from "react-router-dom";
 
 interface SignParameter {
@@ -80,3 +80,30 @@ export function fetchSetUsername(username: string, token: string, dispatch: Disp
         // TODO Handle error: Display error message on login page
     });
 }
+
+export function fetchVerifyToken(token: string, dispatch: Dispatch<AnyAction>) {
+    axios.post(`${baseUrl}/auth/verify-token`, {}, {
+        headers: {
+            "Authorization": `Bearer ${token}`,
+        }
+    })
+    .then((response) => {
+        console.log("Response VerifyToken", response);
+        dispatch(loginSuccess({user: response.data, token: token}));
+    })
+    .catch((err) => {
+        console.log(err);
+        dispatch(stopIsConnectedLoading());
+    })
+}
+
+// export function fetchLogout(token: string) {
+//     axios.post(`${baseUrl}/auth/logout`, {}, {
+//         headers: {
+//             "Authorization": `Bearer ${token}`,
+//         }
+//     })
+//     .catch((err) => {
+//         console.log(err);
+//     })
+// }

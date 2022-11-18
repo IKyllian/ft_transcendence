@@ -14,9 +14,11 @@ function SidebarSettings(props: {setSidebarItem: Function, channelDatas: Channel
     const {socket} = useContext(SocketContext);
 
     const leaveChannel = () => {
+        console.log("params", params);
         if (params.channelId) {
             const chanId: number = parseInt(params.channelId);
-            socket?.emit("LeaveChannel", {id: chanId});
+            console.log("chanId", chanId);
+            socket?.emit("LeaveChannel", {chanId: chanId});
             dispatch(removeChannel(chanId));
         }
     }

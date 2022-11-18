@@ -1,34 +1,29 @@
 import { Link } from "react-router-dom";
 
 import ProfilPic from "../../../Images-Icons/pp.jpg"
-import { ExampleUser } from "../../../Types/User-Types";
+import { MatchResult } from "../../../Types/User-Types";
 import { UserInterface } from "../../../Types/User-Types";
 
-interface historyItemProps {
-    player: ExampleUser,
-    enemyPlayer: ExampleUser,
-    playerScore: number,
-    enemyScore: number,
-}
-
-function MatchHistoryItem(props: historyItemProps) {
-    const {player, enemyPlayer, playerScore, enemyScore} = props;
+function MatchHistoryItem(props: {match: MatchResult}) {
+    const {match} = props;
 
     return (
         <div className="history-item">
             <div className="player-container">
-                <p> {player.username } </p>
+                <Link to={`/profile/${match.blue_team_player1.username}`}>
+                    { match.blue_team_player1.username }
+                </Link>
                 <img className='avatar-player' src={ProfilPic} alt="profil pic" />
             </div>
             <p className="history-score">
-                <span className={`${playerScore > enemyScore ? "higher-score" : ""}`}> {playerScore} </span>
+                <span className={`${match.blue_team_goals > match.red_team_goals ? "higher-score" : ""}`}> {match.blue_team_goals} </span>
                 <span> VS </span>
-                <span className={`${enemyScore > playerScore ? "higher-score" : ""}`}> {enemyScore} </span>
+                <span className={`${match.red_team_goals > match.blue_team_goals ? "higher-score" : ""}`}> {match.red_team_goals} </span>
             </p>
             <div className="player-container">
                 <img className='avatar-player' src={ProfilPic} alt="profil pic" />
-                <Link to="/profile">
-                    {enemyPlayer.username}
+                <Link to={`/profile/${match.red_team_player1.username}`}>
+                    { match.red_team_player1.username }
                 </Link>
             </div>
             
@@ -36,16 +31,17 @@ function MatchHistoryItem(props: historyItemProps) {
     );
 }
 
-function BlockMatchHistory(props: {userDatas: UserInterface}) {
-    const {userDatas} = props;
-    return (
-        // <div className="profile-block-wrapper history-list">
-        //     {
-        //         matchHistory.map((elem, index) =>   
-        //             <MatchHistoryItem key={index} player={elem.player} enemyPlayer={elem.enemyPlayer} playerScore={elem.playerScore} enemyScore={elem.enemyScore} />
-        //         )
-        //     }
-        // </div>
+function BlockMatchHistory(props: {userDatas: UserInterface, matchHistory: MatchResult[]}) {
+    const {userDatas, matchHistory} = props;
+    return matchHistory.length > 0 ? (
+        <div className="profile-block-wrapper history-list">
+            {
+                matchHistory.map((elem) =>   
+                    <MatchHistoryItem key={elem.id} match={elem} />
+                )
+            }
+        </div>
+    ) : (
         <p className="err-no-datas"> No games played yet </p>
     );
 }

@@ -10,6 +10,8 @@ import { SocketContext } from "../../App";
 import { UserInterface } from "../../Types/User-Types";
 import { fetchSearchAllUsers } from "../../Api/User-Fetch";
 import { fetchSearchUsersToInvite } from "../../Api/Chat/Chat-Fetch";
+import { SearchBarFunctionality } from "../../Types/Utils-Types";
+import { ChannelModes, CreateChanBodyRequest, ChannelModesArray } from "../../Types/Chat-Types"
 
 type FormValues = {
     chanMode: string,
@@ -18,14 +20,8 @@ type FormValues = {
     usersIdInvited?: string[];
 }
 
-type BodyRequest = {
-    name: string,
-    option: string,
-    password?: string,
-}
-
 function ChatModal(props: {onCloseModal: Function, showModal: number}) {
-    const { register, handleSubmit, watch, reset, formState: {errors} } = useForm<FormValues>();
+    const { register, handleSubmit, watch, reset, formState: {errors}, setError } = useForm<FormValues>();
     const [usersInvited, setUsersInvited] = useState<UserInterface[]>([]);
     const { onCloseModal, showModal } = props;
 
@@ -43,16 +39,24 @@ function ChatModal(props: {onCloseModal: Function, showModal: number}) {
             setUsersInvited(prev => [...prev, val]);
     }
 
+    const selectChanMode = (modeString: string): ChannelModes => {
+        if (modeString === "public")
+            return ChannelModes.PUBLIC;
+        else if (modeString === "protected")
+            return ChannelModes.PROTECTED;
+        return ChannelModes.PRIVATE;
+    }
+
     const formSubmit = handleSubmit((data, e) => {
         e?.preventDefault();
         if (showModal === 1) {
-            let body: BodyRequest = {
+            let body: CreateChanBodyRequest = {
                 name: data.chanName,
-                option: data.chanMode,
+                option: selectChanMode(data.chanMode),
             }
-            if (data.chanMode === "protected")
+            if (body.option === ChannelModes.PROTECTED)
                 body = {...body, password: data.password}
-            fetchCreateChannel(body, usersInvited, authDatas.token, dispatch, navigate, onCloseModal, socket!);
+            fetchCreateChannel(body, usersInvited, authDatas.token, dispatch, navigate, onCloseModal, socket!, setError);
         } else {
             if (usersInvited.length > 0 && params.channelId) {
                 usersInvited.forEach(element => {
@@ -67,7 +71,6 @@ function ChatModal(props: {onCloseModal: Function, showModal: number}) {
         reset();
         setUsersInvited([]);
     })
-    
 
     if (showModal === 1 || showModal === 3) {
         return (
@@ -80,7 +83,7 @@ function ChatModal(props: {onCloseModal: Function, showModal: number}) {
                             <>
                                 <div className="checkbox-container">
                                     {
-                                        ["public", "protected" ,"privée"].map((elem, index) => 
+                                        ChannelModesArray.map((elem, index) => 
                                             <label key={index}>
                                                 {elem}
                                                 <input
@@ -118,8 +121,8 @@ function ChatModal(props: {onCloseModal: Function, showModal: number}) {
                                 }
                             </>
                         }
-                        { showModal === 1 && <SearchBarPlayers functionality="chanInviteOnCreate" checkboxOnChange={checkboxOnChange} checkboxArray={usersInvited} fetchUserFunction={fetchSearchAllUsers} />}
-                        { showModal === 3 && <SearchBarPlayers functionality="chanInvite" checkboxOnChange={checkboxOnChange} checkboxArray={usersInvited} fetchUserFunction={fetchSearchUsersToInvite} />}
+                        { showModal === 1 && <SearchBarPlayers functionality={SearchBarFunctionality.CHAN_INVITE_ON_CREATE} checkboxOnChange={checkboxOnChange} checkboxArray={usersInvited} fetchUserFunction={fetchSearchAllUsers} />}
+                        { showModal === 3 && <SearchBarPlayers functionality={SearchBarFunctionality.CHAN_INVITE} checkboxOnChange={checkboxOnChange} checkboxArray={usersInvited} fetchUserFunction={fetchSearchUsersToInvite} />}
                         <div className="chat-modal-buttons">
                             <button onClick={() => onCloseModal() }> Cancel </button>
                             <input type="submit" name={showModal === 1 ? "Save" : "Envoyer"} />
@@ -132,7 +135,7 @@ function ChatModal(props: {onCloseModal: Function, showModal: number}) {
         return (
             <div className="chat-modal">
                 <IconX className="modal-exit" onClick={() => onCloseModal() } />
-                <SearchBarPlayers functionality="sendMessage" fetchUserFunction={fetchSearchAllUsers} />
+                <SearchBarPlayers functionality={SearchBarFunctionality.SEND_MESSAGE} fetchUserFunction={fetchSearchAllUsers} />
             </div>
         );
     } else {

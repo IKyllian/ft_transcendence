@@ -13,55 +13,62 @@ function ChatChannel() {
         handleSubmit,
         messagesEndRef,
         showUsersSidebar,
-        chatDatas,
+        channelDatas,
         optimizedFn,
         handleInputChange,
         usersTyping,
         register,
+        handleOnScroll,
+        previousMessages,
     } = useChannelHook();
 
-    return (chatDatas === undefined) ? (
+    return (channelDatas === undefined) ? (
         <div style={{width: "100%"}}>
             <LoadingSpin classContainer="chat-page-container"/>
         </div>
     ) : (
         <div className="message-container">
             <div className="message-container-main">
-                <ChatHeader chatItem={chatDatas} showUsersSidebar={showUsersSidebar} changeSidebarStatus={changeSidebarStatus} />
-                <ul>
+                <ChatHeader chatItem={channelDatas} showUsersSidebar={showUsersSidebar} changeSidebarStatus={changeSidebarStatus} />
+                <ul id="chat-message-wrapper" className="chat-messages-wrapper" onScroll={(e) => handleOnScroll(e)}>
                     {
-                        chatDatas.messages.map((elem, index) => {
-                            if (index === 0)
-                                console.log("Messages Render");
-                            if (index === 0 || !elem.sender || chatDatas.messages[index - 1].sender?.id !== elem.sender?.id || (elem.send_at.getDate() !== chatDatas.messages[index - 1].send_at.getDate()))
-                                return <MessageItem key={index} isFromChan={true} message={elem} loggedUserIsOwner={loggedUserIsOwner} chanId={chatDatas} isNewSender={true} index={index} />
+                        previousMessages.loadPreviousMessages && 
+                        <li className="loader-wrapper">
+                            <span className="prev-messages-loader"></span>
+                        </li>
+                    }
+                    {
+                        channelDatas.messages.map((elem, index) => {
+                            const dateMessage = new Date(elem.send_at);
+                            if (index === 0 || !elem.sender || channelDatas.messages[index - 1].sender?.id !== elem.sender?.id || (dateMessage.getDate() !== (new Date(channelDatas.messages[index - 1].send_at).getDate())))
+                                return <MessageItem key={index} isFromChan={true} message={elem} loggedUserIsOwner={loggedUserIsOwner} chan={channelDatas} isNewSender={true} index={index} />
                             else
-                                return <MessageItem key={index} isFromChan={true} message={elem} loggedUserIsOwner={loggedUserIsOwner} chanId={chatDatas} isNewSender={false} index={index} />
+                                return <MessageItem key={index} isFromChan={true} message={elem} loggedUserIsOwner={loggedUserIsOwner} chan={channelDatas} isNewSender={false} index={index} />
                         }
                         )
                     }
                     <div ref={messagesEndRef} />
-                </ul>
-                {
-                    usersTyping.length > 0 &&
-                    usersTyping.length < 4 && 
-                    <p> {usersTyping.map((user: UserInterface) => {
-                        return `${user.username} `
-                    })} is typing...</p>
-                }
-                {
-                    usersTyping.length > 3 &&
-                    <p> Many users are typing... </p>
-                }
+                </ul>               
                 <div className="message-input-container">
-                    <form onSubmit={handleSubmit}>
+                    <form style={usersTyping.length > 0 ? {marginTop: "25px"}: {}} onSubmit={handleSubmit}>
+                        {
+                            usersTyping.length > 0 &&
+                            usersTyping.length < 4 && 
+                            <p> {usersTyping.map((user: UserInterface) => {
+                                return `${user.username} `
+                            })} is typing...</p>
+                        }
+                        {
+                            usersTyping.length > 3 &&
+                            <p> Many users are typing... </p>
+                        }
                         <input type="text" placeholder="Type Your Message..." {...register('inputMessage', {minLength: 1, onChange: (e) => {optimizedFn(e.target.value); handleInputChange()}})} />
                         <button type="submit"> <IconSend /> </button>
                     </form>
                     
                 </div>
             </div>
-            { showUsersSidebar && <UsersSidebar usersList={chatDatas.channelUsers} /> }
+            { showUsersSidebar && <UsersSidebar usersList={channelDatas.channelUsers} usersTimeout={channelDatas.usersTimeout} loggedUserIsOwner={loggedUserIsOwner} /> }
         </div>
     );
 }

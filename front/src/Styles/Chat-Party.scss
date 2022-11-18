@@ -1,0 +1,15 @@
+@use "./Variables.scss" as *;
+
+.chat-party-sidebar {
+    position: absolute;
+    background-color: $LightDarkPalette;
+    width: 400px;
+    right: 0;
+    height: 100%;
+    // border-left: 1px solid white;
+    z-index: 10000;
+    box-shadow: rgb(0, 0, 0) 0px 5px 15px;
+    &-wrapper {
+
+    }
+}

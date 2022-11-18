@@ -2,9 +2,8 @@ import axios from "axios";
 import { baseUrl } from "../env";
 import { replaceUserObject } from "../Redux/AuthSlice";
 import { AnyAction, Dispatch } from "@reduxjs/toolkit";
-import { copyChannelsArray } from "../Redux/NotificationSlice";
+import { copyNotificationArray } from "../Redux/NotificationSlice";
 import { copyFriendListArray } from "../Redux/AuthSlice";
-import { executionAsyncResource } from "async_hooks";
 import { UserInterface } from "../Types/User-Types";
 
 interface BlockParameters {
@@ -55,8 +54,8 @@ export function fetchNotifications(token: string, dispatch: Dispatch<AnyAction>)
         }
     })
     .then(response => {
-        console.log(response);
-        dispatch(copyChannelsArray(response.data));
+        console.log("Notification", response);
+        dispatch(copyNotificationArray(response.data));
     })
     .catch(err => {
         console.log(err);

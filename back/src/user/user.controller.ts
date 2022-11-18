@@ -29,17 +29,13 @@ export class UserController {
 
 	@UseGuards(JwtGuard)
 	@Get('me')
-	getMe(@GetUser() user: User) {
+	async getMe(@GetUser() user: User) {
 		console.log('me')
-		return this.userService.findOne({
-			relations: {
-				// friendshipReceived: {requester: true},
-				// friendshipSend: {addressee : true},
-			},
-			where: {
-				id: user.id,
-			}
-		});
+		const match_history = await this.userService.getMatchHistory(user.id);
+		return {
+			user,
+			match_history,
+		}
 	}
 
 	@UseGuards(JwtGuard)
@@ -57,6 +53,7 @@ export class UserController {
 
 	@UseGuards(JwtGuard)
 	@Patch('edit-username')
+	//TODO validation body
 	async editUser(@GetUser() user: User, @Body() body) {
 		return await this.userService.editUsername(user, body.username);
 	}

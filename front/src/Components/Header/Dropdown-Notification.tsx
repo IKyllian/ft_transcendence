@@ -1,6 +1,6 @@
 import Avatar from "../../Images-Icons/pp.jpg";
 import { useAppDispatch, useAppSelector } from "../../Redux/Hooks";
-import { NotificationInterface } from "../../Types/Notification-Types";
+import { NotificationInterface, notificationType } from "../../Types/Notification-Types";
 import { SocketContext } from "../../App";
 import { useContext } from "react";
 import { Link } from "react-router-dom";
@@ -12,7 +12,7 @@ function NotifItem(props: {notification: NotificationInterface}){
     const dispatch = useAppDispatch();
     
     const handleClick = (response: string) => {
-        if (notification.type === "channel_invite")
+        if (notification.type === notificationType.CHANNEL_INVITE)
             socket?.emit("ChannelInviteResponse", {id: notification.id, chanId: notification.channel?.id, response: response});
         else
             socket?.emit("FriendRequestResponse", {id: notification.requester.id, response: response})
@@ -24,7 +24,7 @@ function NotifItem(props: {notification: NotificationInterface}){
             <div className="notif-content">
                 <Link to={`/profile/${notification.requester.username}`}> {notification.requester.username} </Link>
                 <p>
-                    {   notification.type === "channel_invite"
+                    {   notification.type === notificationType.CHANNEL_INVITE
                         ?`Invited you to ${notification.channel?.name}`
                         : "Sent you a friend request"
                     }
@@ -44,9 +44,10 @@ function DropdownNotification() {
     return notifications && notifications.length > 0 ? (
         <div className="notif-dropdown-wrapper">
             {
-                notifications.map((elem) => 
-                    <NotifItem key={elem.id} notification={elem}  />
-                )
+                notifications.map((elem) => {
+                    if (elem.type !== notificationType.PARTY_INVITE && elem.type !== notificationType.CHANNEL_MESSAGE && elem.type !== notificationType.PRIVATE_MESSAGE)
+                        return <NotifItem key={elem.id} notification={elem} />
+                })
             }
         </div>
     ) : (

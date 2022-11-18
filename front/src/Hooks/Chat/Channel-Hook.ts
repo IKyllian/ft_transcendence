@@ -1,44 +1,44 @@
-import { useEffect, useState, useRef, useContext, useCallback, useMemo } from "react";
+import { useEffect, useState, useRef, useContext, useCallback } from "react";
 import { useParams } from "react-router-dom";
-import { Channel, ChannelUser } from "../../Types/Chat-Types";
+import { PreviousMessagesState, ChatMessage } from "../../Types/Chat-Types";
 import { useAppDispatch, useAppSelector } from '../../Redux/Hooks'
 import { SocketContext } from "../../App";
-import { addChannel } from "../../Redux/ChatSlice";
 import { UserInterface } from "../../Types/User-Types";
 import { debounce } from "../../Utils/Utils-Chat";
 import { useForm } from "react-hook-form";
+import { fetchLoadPrevMessages } from "../../Api/Chat/Chat-Action";
+import { addChannelMessage } from "../../Redux/ChannelSlice";
+
+const defaultMessagesState: PreviousMessagesState = {
+    loadPreviousMessages: false,
+    reachedMax: false
+}
 
 export function useChannelHook() {
-    const [chatDatas, setChatDatas] = useState<Channel | undefined>(undefined);
     const [showUsersSidebar, setShowUsersSidebar] = useState<boolean>(true);
-    const [loggedUserIsOwner, setLoggedUserIsOwner] = useState<boolean>(false);
     const [hasSendTypingEvent, setHasTypingEvent] = useState<boolean>(false);
-    const [usersTyping, setUsersTyping] = useState<UserInterface[]>([]);
-
+    const [previousMessages, setPreviousMessages] = useState<PreviousMessagesState>(defaultMessagesState);
     const { register, handleSubmit, reset, formState: {errors} } = useForm<{inputMessage: string}>();
+    const [usersTyping, setUsersTyping] = useState<UserInterface[]>([]);
+    const [haveToLoad, setHaveToLoad] = useState<boolean>(false);
+    const [prevLength, setPrevLength] = useState<number>(0);
 
     const messagesEndRef = useRef<null | HTMLDivElement>(null);
-    let authDatas = useAppSelector((state) => state.auth);
-    let {channels} = useAppSelector((state) => state.chat);
+    const authDatas = useAppSelector((state) => state.auth);
+    const {channelDatas, loggedUserIsOwner} = useAppSelector((state) => state.channel);
     const params = useParams();
     const {socket} = useContext(SocketContext);
     const channelId: number | undefined = params.channelId ? parseInt(params.channelId!, 10) : undefined;
     const dispatch = useAppDispatch();
 
-    console.log("Channel page render");
+    console.log("Chan Component", params.channelId);
 
     const changeSidebarStatus = () => {
-        console.log("changeSidebarStatus");
         setShowUsersSidebar(!showUsersSidebar);
     };
 
-    const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView();
-    }
-
     const handleInputChange = () => {
         if (!hasSendTypingEvent) {
-            console.log("Send Emit is Typing True");
             socket?.emit("OnTypingChannel", {
                 chanId: channelId,
                 isTyping: true,
@@ -48,7 +48,6 @@ export function useChannelHook() {
     }
 
     const endOfTyping = () => {
-        console.log("Send Emit is Typing False", hasSendTypingEvent);
         socket?.emit("OnTypingChannel", {
             chanId: channelId,
             isTyping: false,
@@ -58,90 +57,83 @@ export function useChannelHook() {
 
     const optimizedFn = useCallback(debounce(endOfTyping, 6000), [hasSendTypingEvent, channelId]);
 
-    useEffect(() => {
-        scrollToBottom();
-    }, [chatDatas?.messages]);
+    const handleOnScroll = (e: any) => {
+        if (channelId && channelDatas && e && e.target && e.target.scrollTop < 5 && !previousMessages.reachedMax && !previousMessages.loadPreviousMessages && !haveToLoad) {
+            setHaveToLoad(true);            
+        }
+    }
 
     useEffect(() => {
-        console.log("UseEffect ChannelId");
-        setChatDatas(undefined);
-        setLoggedUserIsOwner(false);
+        if (haveToLoad && channelId && channelDatas && !previousMessages.loadPreviousMessages && !previousMessages.reachedMax) {
+            setPreviousMessages(prev => { return {...prev, loadPreviousMessages: true}});
+            fetchLoadPrevMessages(channelId, authDatas.token, dispatch, channelDatas?.messages, setPreviousMessages);
+        }
+    }, [haveToLoad])
+
+    const scrollToBottom = () => {
+        // Permet de check si la div du chat est scrollable. Si elle ne l'est pas, load des datas pour que la div devienne scrollable
+        var div = document.getElementsByClassName('chat-messages-wrapper');
+        if (div.length > 0){
+            var hasVerticalScrollbar = div[0].scrollHeight > div[0].clientHeight;
+            if (!hasVerticalScrollbar && channelId && channelDatas) {
+                fetchLoadPrevMessages(channelId, authDatas.token, dispatch, channelDatas?.messages, setPreviousMessages);
+            }
+        } 
+        messagesEndRef.current?.scrollIntoView();
+    }
+
+    useEffect(() => {
+        if (!previousMessages.loadPreviousMessages && channelDatas) {
+            scrollToBottom();
+            setPrevLength(channelDatas.messages.length);
+        } else if (channelDatas) {
+            const scrollToMessage = document.getElementById("chat-message-wrapper")?.getElementsByTagName('li');
+            if (scrollToMessage && scrollToMessage.length > 0)
+                scrollToMessage[channelDatas.messages.length - prevLength].scrollIntoView();
+            setPrevLength(channelDatas.messages.length);
+            setPreviousMessages((prev: PreviousMessagesState) => { return {...prev, loadPreviousMessages: false}});
+            setHaveToLoad(false);
+        }
+    }, [channelDatas?.messages]);
+
+    useEffect(() => {
         setUsersTyping([]);
-        const getDatas = () => {
-            socket!.emit("JoinChannelRoom", {
-                id: channelId,
-            });
+        setPreviousMessages(defaultMessagesState);
+        setHaveToLoad(false);
+        setPrevLength(0);
 
+        const listener = (data: ChatMessage) => {
+            dispatch(addChannelMessage(data));
+        }
+
+        const getDatas = () => {
+            socket?.on('NewChannelMessage', listener);
+    
             socket?.on("OnTypingChannel", (data: {user: UserInterface, isTyping: boolean}) => {
-                console.log("OnTypingChannel");
+                console.log("!!!!!!!!!!!!!!! OnTypingChannel !!!!!!!!!!!!!!!", data);
                 setUsersTyping(prev => [...prev.filter(elem => elem.id !== data.user.id)]);
                 if (data.isTyping)
                     setUsersTyping(prev => [...prev, data.user]);
             });
 
-            socket!.on('ChannelUsersUpdate', (data: Channel) => {
-                console.log("ChannelUsersUpdate");
-                setChatDatas((prev: any) => {
-                    return {...prev, channelUsers: [...data.channelUsers]}
-                });
-            });
-
-            socket!.on("ChannelUserUpdate", (data: ChannelUser) => {
-                console.log("ChannelUserUpdate");
-                setChatDatas((prev: any) => {
-                    return {...prev, channelUsers: [...prev.channelUsers.map((elem: any) => {
-                        if (elem.user.id === data.user.id)
-                            return elem = data;
-                        return elem
-                    })] }
-                });
-            })
-
-            socket!.on('roomData', (data: Channel) => {
-                console.log("Getting datas roomData", data);
-                if (data.id === channelId) {
-                    let channel: Channel = data;
-                    channel.messages.forEach(elem => elem.send_at = new Date(elem.send_at));
-                    setChatDatas(channel);
-                    if (!channels?.find(elem => elem.channel.id === channel.id))
-                        dispatch(addChannel({isActive: 'true', channel: {id: data.id, name: data.name, option: data.option}}));
-                    if (data.channelUsers.find((elem) => elem.user.id === authDatas.currentUser?.id && (elem.role === "owner" || elem.role === "moderator")))
-                        setLoggedUserIsOwner(true);
-                }
-            });
         }
-        if (channelId) {
+
+        if (channelId && socket) {
             getDatas();
         }
 
         return () => {
-            socket!.emit("LeaveChannelRoom", {
-                id: channelId,
-            });
-            socket!.off("roomData");
-            socket!.off("ChannelUsersUpdate");
-            socket!.off("ChannelUserUpdate");
+            if (channelId && socket) {
+                socket?.off("OnTypingChannel");
+                socket?.off("NewChannelMessage");
+            }
         }
-    }, [channelId])
-
-    useEffect(() => {
-        console.log("EseEffect no dependance");
-        const listener = (data: any) => {
-            setChatDatas((prev: any) => {
-                return {...prev, messages: [...prev!.messages, {...data, send_at: new Date(data.send_at)}]}
-            });
-        }
-        socket!.on('NewChannelMessage', listener);
-
-        return () => {
-            socket!.off("NewChannelMessage");
-        }
-    }, [])
+    }, [socket, channelId])
 
     const handleSubmitMessage = handleSubmit((data, e: any) => {
         e.preventDefault();
         if (data.inputMessage.length > 0) {
-            socket!.emit("ChannelMessage", {
+            socket?.emit("ChannelMessage", {
                 content: data.inputMessage,
                 chanId: channelId,
             });
@@ -160,10 +152,12 @@ export function useChannelHook() {
         handleSubmit: handleSubmitMessage,
         messagesEndRef,
         showUsersSidebar,
-        chatDatas,
+        channelDatas,
         optimizedFn,
         handleInputChange,
         usersTyping,
         register,
+        handleOnScroll,
+        previousMessages,
     };
 }

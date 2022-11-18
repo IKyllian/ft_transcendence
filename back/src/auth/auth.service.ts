@@ -1,13 +1,16 @@
 import { ForbiddenException, Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { AuthDto } from "./dto/auth.dto";
 import * as argon from 'argon2';
-import { JwtService } from "@nestjs/jwt";
+import { JwtService, JwtVerifyOptions } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
 import { HttpService } from "@nestjs/axios";
 import { lastValueFrom } from "rxjs";
 import { UserService } from "src/user/user.service";
 import { Auth42Dto } from "./dto/auth42.dto";
 import { User } from "src/typeorm";
+import { SignupDto } from "./dto/signup.dto";
+import { InjectRepository } from "@nestjs/typeorm";
+import { Repository } from "typeorm";
 
 @Injectable()
 export class AuthService {
@@ -17,9 +20,12 @@ export class AuthService {
 		private config: ConfigService,
 		private userService: UserService,
 		private readonly httpService: HttpService,
+		
+		@InjectRepository(User)
+		private userRepo: Repository<User>,
 	) {}
 
-	async signup(dto: AuthDto) {
+	async signup(dto: SignupDto) {
 		if (await this.userService.nameTaken(dto.username))
 			throw new ForbiddenException('Username taken');
 		const hash = await argon.hash(dto.password);
@@ -38,19 +44,17 @@ export class AuthService {
 	}
 
 	async login(dto: AuthDto) {
-		const user = await this.userService.findOne({
-			relations: {
-				channelUser: {
-					channel: true,
-				},
-				statistic: true,
-				blocked: true,
-			},
-			where: {
-				username: dto.username,
-			}
-		}, true);
-		if (!user) 
+		const user = await this.userRepo
+			.createQueryBuilder("user")
+			.addSelect('user.hash')
+			.where("LOWER(user.username) = :name", { name: dto.username.toLowerCase() })
+			.leftJoinAndSelect("user.channelUser", "ChannelUser")
+			.leftJoinAndSelect("ChannelUser.channel", "Channel")
+			// .leftJoinAndSelect("user.statistic", "Statistic")
+			.leftJoinAndSelect("user.blocked", "Blocked")
+			.getOne();
+
+		if (!user || user.id42 || !user.hash) 
 			throw new NotFoundException('invalid credentials')
 
 		const pwdMatches = await argon.verify(
@@ -64,6 +68,7 @@ export class AuthService {
 		this.updateRefreshHash(user, tokens.refresh_token);
 		return {
 			access_token: tokens.access_token,
+			//TODO not sure about refresh
 			refresh_token: tokens.refresh_token,
 			user: user,
 		}
@@ -96,7 +101,7 @@ export class AuthService {
 				channelUser: {
 					channel: true,
 				},
-				statistic: true,
+				// statistic: true,
 				blocked: true,
 			},
 			where: {
@@ -147,17 +152,24 @@ export class AuthService {
 		return tokens;
 	}
 
+	verifyToken(token: string, options?: JwtVerifyOptions) {
+		// if (!options)
+		// 	options: JwtVerifyOptions;
+		// options.secret = this.config.get('ACCESS_SECRET')
+		return this.jwt.verify(token, { secret: this.config.get('ACCESS_SECRET') });
+	}
+
 	async verify(token: string) {
 		try {
 			const decoded = this.jwt.verify(token, {
 				secret: this.config.get('ACCESS_SECRET')
 			});
 			return await this.userService.findOne({
-				relations: {
-					statistic: true,
-					channelUser: true,
-					blocked: true,
-				},
+				// relations: {
+				// 	statistic: true,
+				// 	channelUser: true,
+				// 	blocked: true,
+				// },
 				where: {
 					id: decoded.sub,
 				}
@@ -178,9 +190,7 @@ export class AuthService {
 	}
 
 	async logout(user: User) {
-		if (user.refresh_hash == null) return;
-
-		this.userService.logout(user);
+		await this.userService.logout(user);
 		return { success: true, message: "logged out successfuly" };
 	}
 }

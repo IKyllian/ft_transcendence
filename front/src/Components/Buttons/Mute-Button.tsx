@@ -1,13 +1,13 @@
 import { IconSend } from "@tabler/icons";
 import { useContext } from "react";
 import { SocketContext } from "../../App";
-import { Channel } from "../../Types/Chat-Types";
+import { Channel, UserTimeout } from "../../Types/Chat-Types";
 import { UserIsMute } from "../../Utils/Utils-Chat";
 import { useForm } from "react-hook-form";
 
-function MuteButton(props: {senderId: number, chan: Channel}) {
-    const { senderId, chan } = props;
-    const senderIsMute: boolean = UserIsMute(chan.channelUsers, senderId);
+function MuteButton(props: {senderId: number, chanId: number, usersTimeout: UserTimeout[]}) {
+    const { senderId, chanId, usersTimeout } = props;
+    const senderIsMute: boolean = UserIsMute(usersTimeout, senderId);
     const { register, reset, handleSubmit, formState: {errors} } = useForm<{numberInput: string}>();
     
     const {socket} = useContext(SocketContext);
@@ -16,16 +16,17 @@ function MuteButton(props: {senderId: number, chan: Channel}) {
         if (senderIsMute) {
             socket?.emit("UnMute", {
                 userId: senderId,
-                chanId: chan.id,
+                chanId: chanId,
             });
         }
     }
 
     const onMute = (time?: number) => {
+        console.log("time", time);
         if (!senderIsMute) {
             socket?.emit("Mute", {
                 userId: senderId,
-                chanId: chan.id,
+                chanId: chanId,
                 time: time,
             });
         }
@@ -38,6 +39,8 @@ function MuteButton(props: {senderId: number, chan: Channel}) {
             onMute(number);
     });
 
+    console.log("Errors", errors);
+
     return (
         <>
             <div className="dropdown-button">
@@ -48,8 +51,11 @@ function MuteButton(props: {senderId: number, chan: Channel}) {
                         <p onClick={() => onMute()}> Perma mute </p>
                         <span className="right-menu-dropdown-separator"> OR </span>
                         <form className="input-dropdown-wrapper" onSubmit={handleClick}>
-                            <input type="number" min="10" max="3600" {...register("numberInput")} placeholder='in second' />
-                            <button type="submit"> <IconSend /> </button>
+                            {errors.numberInput && <p className="timeout-error"> {errors.numberInput.message} </p>}
+                            <div className="input-container">
+                                <input type="number" max="3600" {...register("numberInput", { required: "Time is required", minLength: {value: 10, message: "Must be minimum 10sec"}})} placeholder='in second' />
+                                <button type="submit"> <IconSend /> </button>
+                            </div>
                         </form>
                     </div>
                 }

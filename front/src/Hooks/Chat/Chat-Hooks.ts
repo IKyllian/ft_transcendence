@@ -7,6 +7,7 @@ import { SocketContext } from "../../App";
 import { ModalContext } from "../../Components/Utils/ModalProvider";
 import { ConversationInterfaceFront, ChannelsInterfaceFront } from "../../Types/Chat-Types";
 import { copyChannelsAndConvs } from "../../Redux/ChatSlice";
+import { setChannelId, unsetChannelDatas, unsetChannelId } from "../../Redux/ChannelSlice";
 
 export function useLoadChatDatas() {
     //States
@@ -16,17 +17,16 @@ export function useLoadChatDatas() {
     // Appels aux hooks
     const authDatas = useAppSelector((state) => state.auth);
     const chatDatas = useAppSelector((state) => state.chat);
+    const {currentChannelId} = useAppSelector((state) => state.channel);
     const params = useParams();
     const location = useLocation();
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
     const {socket} = useContext(SocketContext);
     const modalStatus = useContext(ModalContext);
-    
+
     const channelId: number | undefined = params.channelId ? parseInt(params.channelId!, 10) : undefined;
     const convId: number | undefined = params.convId ? parseInt(params.convId!, 10) : undefined;
-
-    console.log("Chat render");
 
     const sidebarOnChange = () => {
         setReponsiveSidebar(!responsiveSidebar);
@@ -39,6 +39,30 @@ export function useLoadChatDatas() {
     const changeModalStatus = useCallback((index: number) => {
         setShowModal(index);
     }, [setShowModal]);
+
+    useEffect(() => {
+        if (socket && currentChannelId !== channelId) {
+            if (currentChannelId !== undefined) {
+                socket?.emit("LeaveChannelRoom", {
+                    id: currentChannelId,
+                });
+                socket?.off("roomData");
+                socket?.off("ChannelUpdate");
+                dispatch(unsetChannelDatas());
+            }
+            if (channelId !== undefined)
+                dispatch(setChannelId(channelId));
+            else
+                dispatch(unsetChannelId());
+        } else if (socket && currentChannelId !== undefined && location.pathname !== `/chat/channel/${currentChannelId}` && location.pathname !== `/chat/channel/${currentChannelId}/settings`) {
+            socket?.emit("LeaveChannelRoom", {
+                id: currentChannelId,
+            });
+            socket?.off("roomData");
+            socket?.off("ChannelUpdate");
+            dispatch(unsetChannelDatas());
+        }
+    }, [channelId, socket, location.pathname])
 
     // Les useEffect pour les call api etc..
     useEffect(() => {

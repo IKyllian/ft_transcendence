@@ -5,30 +5,21 @@ import { User } from "src/typeorm";
 import { GetUser } from "src/utils/decorators";
 import { InChannelGuard } from "../guards";
 import { ChannelMessageService } from "./ChannelMessage.service";
-import { ChannelMessageDto } from "./dto/channelMessage.dto";
+import { ChannelMessageDto, SkipDto } from "./dto/channelMessage.dto";
 
-@Controller('channel/:id/messages')
+@Controller('channel')
 export class ChannelMessageController {
 	constructor(
 		private messageService: ChannelMessageService,
 	) {}
 
-	// @Post()
-	// @UseGuards(JwtGuard)
-	// async createMessage(
-	// @Param('id') chanId: number,
-	// @GetUser() user: User,
-	// @Body() msg: ChannelMessageDto) {
-	// 	return await this.messageService.create(user, msg);
-	// }
-
-	@Get('chanId')
+	@Post(":chanId/messages")
 	@UseGuards(JwtGuard, InChannelGuard)
 	async getMessages(
-	@Param('chanId') chanId: number) {
-		const msg = await this.messageService.getMessages(chanId);
-		// this.chatGateway.sendChannelMessages(data.socketId, msg);
-		return msg;
+	@Param('chanId') chanId: number,
+	@Body() data: SkipDto,
+	) {
+		return await this.messageService.getMessages(chanId, data.skip);
 	}
 }
 

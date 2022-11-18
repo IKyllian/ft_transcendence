@@ -21,7 +21,11 @@ import UsernameForm from "./Components/Sign/Username-Form";
 import ChannelsList from "./Components/Chat/Channels-List";
 import NotifGameInvite from "./Components/Notif-Game-Invite";
 import NotifError from "./Components/Notif-Error";
-
+import Game from "./Components/Game/Game";
+import Lobby from "./Components/Game/Lobby";
+import ModalPartyInvite from "./Components/Modal-Party-Invite";
+import CodeVerification from "./Components/Sign/Code-Verification";
+import ChatParty from "./Components/Chat-Party";
 
 interface RouteProps {
 	path: string,
@@ -43,6 +47,12 @@ const routes: RouteProps[] = [
 		element:
 			<PublicRoute>
 				<Sign />
+			</PublicRoute>,
+	}, {
+		path: '/account-verification',
+		element:
+			<PublicRoute>
+				<CodeVerification />
 			</PublicRoute>,
 	}, {
 		path: '/set-username',
@@ -69,6 +79,20 @@ const routes: RouteProps[] = [
 			<PrivateRoute>
 				<ChannelSettings />
 			</PrivateRoute>,
+	}, {
+		path: '/game',
+		element:
+			<div id="game_anchor">
+				<PrivateRoute>
+					<Game />
+				</PrivateRoute>,
+			</div>
+	}, {
+		path: '/lobby',
+		element:
+			<PrivateRoute>
+				<Lobby />
+			</PrivateRoute>,
 	},
 	{
 		path: '*',
@@ -88,17 +112,21 @@ function App() {
 		closeEventError,
 		gameInvite,
 		gameNotificationLeave,
+		isAuthenticated,
+		partyState,
 	} = useAppHook();
 
   return (
 	<div className="app-container">
 		<SocketContext.Provider value={{socket: socket}} >
 			<ModalProvider>
-				{ eventError !== undefined && <NotifError error={eventError} closeError={closeEventError} />}
-				<AddFriendModal/>
-				{ gameInvite && <NotifGameInvite notifOnLeave={gameNotificationLeave} /> }
-				<Header />
+				{ isAuthenticated && eventError !== undefined && <NotifError error={eventError} closeError={closeEventError} />}
+				{ isAuthenticated && <AddFriendModal/> }
+				{ isAuthenticated && <ModalPartyInvite /> }
+				{ isAuthenticated && gameInvite && <NotifGameInvite notif={gameInvite} notifOnLeave={gameNotificationLeave} /> }
+				{ isAuthenticated && <Header /> }
 				<main className="page-container">
+				{ isAuthenticated && partyState.party && partyState.chatIsOpen && <ChatParty />}
 					<Routes>
 						{
 							routes.map((elem, index) => 

@@ -6,6 +6,10 @@ $WhitePalette: #E0E1DD;
 
 $OrangeProfile: orange;
 
+$HeaderPartyBackground: #303030;
+$HeaderPartyGrey: #565555;
+$HeaderPartyGreyHover: #676767;
+
 $HeaderMarge: 80px;
 $HeaderResponsive800Marge: 40px;
 $HeaderResponsive500Marge: 10px;
@@ -59,14 +63,23 @@ $OfflineColor: rgb(194, 29, 29);
     margin: auto;
     border-radius: 10px;
     background-color: $bgColor;
+    @include overflowScroll("y");
     .modal-exit {
         position: absolute;
-        right: 0;
-        top: -55px;
-        width: 40px;
-        height: 40px;
+        right: 5px;
+        top: 5px;
+        width: 20px;
+        height: 20px;
         color: $WhitePalette;
         cursor: pointer;
+    }
+
+    @media screen and (max-height: 700px) {
+        height: 97%;
+    }
+
+    @media screen and (max-width: $BreakPoint_800) {
+        width: 90%;
     }
 }
 
@@ -79,6 +92,21 @@ $OfflineColor: rgb(194, 29, 29);
 @mixin width-height($width, $height) {
     width: $width;
     height: $height;
+}
+
+@mixin overflowScroll($typeOverflow) {
+    @if $typeOverflow == "x" {
+        overflow-x: scroll;
+    } @else if $typeOverflow == "y" {
+        overflow-y: scroll;
+    } @else {
+        overflow: scroll;
+    }
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    &::-webkit-scrollbar {
+        display: none;
+    }
 }
 
 @font-face {

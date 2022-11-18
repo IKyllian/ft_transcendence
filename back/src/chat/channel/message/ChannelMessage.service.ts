@@ -1,10 +1,10 @@
 import { ClassSerializerInterceptor, ForbiddenException, Injectable, UseInterceptors } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { ChannelMessage, ChannelUser } from "src/typeorm";
-import { ChannelNotFoundException } from "src/utils/exceptions";
+import { ChannelNotFoundException, NotInChannelException } from "src/utils/exceptions";
 import { Repository } from "typeorm";
 import { ChannelService } from "../channel.service";
-import { ChannelMessageDto } from "./dto/channelMessage.dto";
+import { ChannelMessageDto, SkipDto } from "./dto/channelMessage.dto";
 
 @Injectable()
 @UseInterceptors(ClassSerializerInterceptor)
@@ -16,42 +16,39 @@ export class ChannelMessageService {
 	) {}
 
 	async create(chanUser: ChannelUser, messageDto: ChannelMessageDto) {
-		const channel = await this.channelService.findOneBy({ id: messageDto.chanId });
-		if (!channel)
-			throw new ChannelNotFoundException();
-		this.channelService.isMuted(chanUser);
 		const message = this.messagesRepo.create({
 			content: messageDto.content,
-			channel,
+			channel: { id: chanUser.channelId },
 			sender: chanUser.user,
 		});
 		return this.messagesRepo.save(message);
 	}
 
 	async createServer(messageDto: ChannelMessageDto) {
-		const channel = await this.channelService.findOneBy({ id: messageDto.chanId });
-		if (!channel)
-			throw new ChannelNotFoundException();
 		const message = this.messagesRepo.create({
 			content: messageDto.content,
-			channel,
+			channel: { id: messageDto.chanId },
 		});
 		return this.messagesRepo.save(message);
 	}
 
-	async getMessages(chanId: number) {
-		const channel = await this.channelService.findOneBy({ id: chanId });
-		if (!channel)
-			throw new ChannelNotFoundException();
-
-		return await this.messagesRepo.find({
-			relations: ['sender'],
-			where: {
-				channel: {
-					id: chanId,
-				}
-			},
-			order: { send_at: 'DESC' },
-		});
+	async getMessages(chanId: number, skip: number) {
+		return this.messagesRepo.createQueryBuilder("msg")
+		.where((qb) => {
+			const subQuery = qb
+				.subQuery()
+				.from(ChannelMessage, "msg")
+				.select("msg.id")
+				.where("msg.channelId = :chanId")
+				.orderBy("msg.send_at", "DESC")
+				.skip(skip)
+				.take(20)
+				.getQuery()
+			return "msg.id IN " + subQuery;
+		})
+		.setParameter("chanId", chanId)
+		.leftJoinAndSelect("msg.sender", "sender")
+		.orderBy("msg.send_at", 'ASC')
+		.getMany();
 	}
 }

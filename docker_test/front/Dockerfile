@@ -1,0 +1,12 @@
+FROM node:19
+
+
+WORKDIR /tmp/front
+COPY ./data .
+
+ARG  BASE_URL=$BASE_URL
+ARG  SOCKET_URL=$SOCKET_URL
+ARG  API42_CLIENT_ID=$API42_CLIENT_ID
+
+# RUN sed
+# ENTRYPOINT ["sleep", "infinity"]
