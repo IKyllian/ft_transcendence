@@ -9,6 +9,7 @@ import { UserModule } from "src/user/user.module";
 import { AuthController } from "./auth.controller";
 import { AuthService } from "./auth.service";
 import { JwtStrategy } from "./strategy/jwt.strategy";
+import { Jwt1faStrategy } from "./strategy/jwt1fa.strategy";
 import { RtStrategy } from "./strategy/rt.strategy";
 
 @Module({
@@ -24,7 +25,7 @@ import { RtStrategy } from "./strategy/rt.strategy";
 		])
 	],
 	controllers: [AuthController],
-	providers: [AuthService, RtStrategy, JwtStrategy,
+	providers: [AuthService, RtStrategy, JwtStrategy, Jwt1faStrategy,
 	{
 		provide: APP_INTERCEPTOR,
 		useClass: ClassSerializerInterceptor,

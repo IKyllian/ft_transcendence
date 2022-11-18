@@ -10,6 +10,7 @@ import { User } from "./entities/user"
 import { Notification } from "./entities/notification"
 import { UserTimeout } from "./entities/userTimeout"
 import { MatchResult } from "./entities/matchResult"
+import { PendingUser } from "./entities/pendingUser"
 
 const entities = [
 	User,
@@ -24,6 +25,7 @@ const entities = [
 	Notification,
 	UserTimeout,
 	MatchResult,
+	PendingUser,
 ];
 
 export default entities;

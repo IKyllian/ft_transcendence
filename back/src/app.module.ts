@@ -13,6 +13,7 @@ import entities from './typeorm';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TaskScheduler } from './task-scheduling/task.module';
 import { GlobalModule } from './utils/global/global.module';
+import { TwoFactorModule } from './2fa/twoFactor.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { GlobalModule } from './utils/global/global.module';
 	  GameModule,
 	  GlobalModule,
     MatchmakingModule,
+	TwoFactorModule,
     ConfigModule.forRoot({ envFilePath: '.env', isGlobal: true }),
     NotificationModule,
     TaskScheduler,

@@ -1,5 +1,5 @@
 import { ForbiddenException, Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
-import { AuthDto } from "./dto/auth.dto";
+import { LoginDto } from "./dto/login.dto";
 import * as argon from 'argon2';
 import { JwtService, JwtVerifyOptions } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
@@ -11,6 +11,11 @@ import { User } from "src/typeorm";
 import { SignupDto } from "./dto/signup.dto";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
+import * as nodemailer from 'nodemailer';
+import { ActivateDto } from "./dto/activate.dto";
+import { ForgotPasswordDto } from "./dto/forgot-password.dto";
+import { v4 as uuidv4 } from "uuid";
+import { ResetPasswordDto } from "./dto/reset-password.dto";
 
 @Injectable()
 export class AuthService {
@@ -25,15 +30,56 @@ export class AuthService {
 		private userRepo: Repository<User>,
 	) {}
 
+
+	private transporter : nodemailer.Transporter = nodemailer.createTransport({
+		service: 'gmail',
+		auth: {
+			user: process.env.MAIL_USER,
+			pass: process.env.MAIL_PASSWORD
+		}
+	})
+
 	async signup(dto: SignupDto) {
 		if (await this.userService.nameTaken(dto.username))
-			throw new ForbiddenException('Username taken');
+			throw new ForbiddenException('Username already in use');
+		if (await this.userService.mailTaken(dto.email))
+			throw new ForbiddenException('Email already in use');
+
 		const hash = await argon.hash(dto.password);
+		const validation_code: string = uuidv4();	
 		const params = {
+			validation_code,
 			username: dto.username,
+			email: dto.email,
 			hash,
 		}
+
+		const mailResult = await this.sendValidationMail(dto.email, validation_code);
+		if (mailResult?.error)
+			return { error: mailResult.error };
+		
+		await this.userService.createPending(params);
+		
+		return { success: true, email: params.email }
+	}
+
+	async activate(dto: ActivateDto) {
+		const pendingUser = await this.userService.findOnePending({
+			where: { validation_code: dto.code }
+		});
+			
+		if (!pendingUser)
+			throw new ForbiddenException('Validation code not found');
+		
+		const params = {
+			username: pendingUser.username,
+			email: pendingUser.email,
+			hash: pendingUser.hash,
+		}
+
+		// Create final user and delete pending user
 		const user = await this.userService.create(params);
+		await this.userService.deletePending(pendingUser.id);
 		const tokens = await this.signTokens(user.id, user.username);
 		this.updateRefreshHash(user, tokens.refresh_token);
 		return {
@@ -43,8 +89,9 @@ export class AuthService {
 		}
 	}
 
-	async login(dto: AuthDto) {
-		const user = await this.userRepo
+	async login(dto: LoginDto) {
+  
+		const user = await this.userRepo // TODO select username OR email
 			.createQueryBuilder("user")
 			.addSelect('user.hash')
 			.where("LOWER(user.username) = :name", { name: dto.username.toLowerCase() })
@@ -54,8 +101,20 @@ export class AuthService {
 			.leftJoinAndSelect("user.blocked", "Blocked")
 			.getOne();
 
+
+		const pending = await this.userService.findOnePending({
+			where: [
+				{ username: dto.username },
+				{ email: dto.username }
+			]
+		});
+
+		if (pending)
+			throw new UnauthorizedException("Email not validated");
 		if (!user || user.id42 || !user.hash) 
 			throw new NotFoundException('invalid credentials')
+
+		this.userService.setTwoFactorAuthenticated(user, false);
 
 		const pwdMatches = await argon.verify(
 			user.hash,
@@ -192,5 +251,70 @@ export class AuthService {
 	async logout(user: User) {
 		await this.userService.logout(user);
 		return { success: true, message: "logged out successfuly" };
+	}
+
+	private async sendValidationMail(email: string, code: string) {		
+        const message = {
+            from: process.env.MAIL_USER,
+            to: email,
+            subject: 'Pong Game - Account verification',
+            html: `
+            <h3>Account Verification</h3>
+			<p>Hi, you have recently created an account on <b>Pong Game</b></p>
+			<p>To validate your email, please <a href=http://localhost:5000/api/auth/activate?code=${code}>Click here</a></p>
+            `,
+        }
+
+		try {
+        	return await this.transporter.sendMail(message);
+		} catch(err) {
+			return { error: err };
+		}
+    }
+
+	async forgotPassword(dto: ForgotPasswordDto) {		
+		const user = await this.userService.findOne({
+			where: { email: dto.email }
+		})
+
+		if (!user)
+			throw new NotFoundException("Email not found");
+
+		const validation_code: string = uuidv4();
+		this.userService.updateForgotCode(user, validation_code);
+
+		const message = {
+            from: process.env.MAIL_USER,
+            to: user.email,
+            subject: 'Pong Game - Password reset request',
+            html: `
+            <h3>Password Reset</h3>
+			<p>Hi, you have submitted a password reset request on <b>Pong Game</b></p>
+			<p>To set your new password, <a href=http://localhost:5000/api/auth/reset-password?code=${validation_code}>Click here</a></p>
+            `,
+        }
+
+        this.transporter.sendMail(message, function(err, info) {
+            if (err)
+                console.log(err);
+            else
+                console.log(info);
+        });
+
+		return { success: true }
+	}
+
+	async resetPassword(dto: ResetPasswordDto) {
+		const user = await this.userService.findOne({
+			where: { forgot_code: dto.code }
+		})
+
+		if (!user)
+			throw new NotFoundException("Invalid code");
+
+		const hash = await argon.hash(dto.newPassword);
+
+		this.userService.updatePassword(user, hash);
+		return { success: true }
 	}
 }

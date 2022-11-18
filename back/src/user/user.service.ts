@@ -9,6 +9,9 @@ import * as argon from 'argon2';
 import { SearchDto } from "./dto/search.dto";
 import { FriendshipService } from "./friendship/friendship.service";
 import { UserStatus } from "src/utils/types/types";
+import { PendingUser } from "src/typeorm/entities/pendingUser";
+import { CreatePendingDto } from "./dto/createPending.dto";
+import { v4 as uuidv4 } from "uuid";
 
 @Injectable()
 export class UserService {
@@ -23,6 +26,9 @@ export class UserService {
 		private statisticRepo: Repository<Statistic>,
 		@InjectRepository(MatchResult)
 		private matchRepo: Repository<MatchResult>,
+		private friendshipService: FriendshipService,
+		@InjectRepository(PendingUser)
+		private pendingUserRepo: Repository<PendingUser>,
 	) {}
 
 	create(dto: CreateUserDto) {
@@ -30,6 +36,12 @@ export class UserService {
 		const params = {...dto, statistic};
 		const user = this.userRepo.create(params);
 		return this.userRepo.save(user);
+	}
+
+
+	createPending(dto: CreatePendingDto) {
+		const user = this.pendingUserRepo.create({...dto});
+		return this.pendingUserRepo.save(user);
 	}
 
 	findOne(options: FindOneOptions<User>, selectAll: Boolean = false): Promise<User | null> {
@@ -42,9 +54,17 @@ export class UserService {
 				"refresh_hash",
 				'status',
 				'hash',
+				'refresh_hash',
+				'two_factor_enabled',
+				'two_factor_secret',
+				'two_factor_authenticated'
 			];
 		}
 		return this.userRepo.findOne(options);
+	}
+
+	findOnePending(options: FindOneOptions<PendingUser>): Promise<PendingUser | null> {
+		return this.pendingUserRepo.findOne(options);
 	}
 
 	findOneBy(where: FindOptionsWhere<User> | FindOptionsWhere<User>[]): Promise<User | null> {
@@ -69,7 +89,23 @@ export class UserService {
 			.createQueryBuilder("user")
 			.where("LOWER(user.username) = :name", { name: name.toLowerCase() })
 			.getOne();
-		return nameTaken ? true : false;
+		const pendingNameTaken = await this.pendingUserRepo
+			.createQueryBuilder("user")
+			.where("LOWER(user.username) = :name", { name: name.toLowerCase() })
+			.getOne();
+		return nameTaken || pendingNameTaken;
+	}
+
+	async mailTaken(email: string) {
+		const mailTaken = await this.userRepo
+			.createQueryBuilder("user")
+			.where("LOWER(user.email) = :email", { email: email.toLowerCase() })
+			.getOne();
+		const pendingMailTaken = await this.pendingUserRepo
+			.createQueryBuilder("user")
+			.where("LOWER(user.email) = :email", { email: email.toLowerCase() })
+			.getOne();
+		return mailTaken || pendingMailTaken;
 	}
 
 	// TODO ask if usefull
@@ -121,10 +157,20 @@ export class UserService {
 		.set({ refresh_hash: null })
 		.where("id = :id", { id: user.id })
 		.execute();
+
+  async updateForgotCode(user: User, code: string) {
+		user.forgot_code = code;
+		await this.userRepo.save(user);
 	}
 
 	async updateRefreshHash(user: User, hash: string) {
 		user.refresh_hash = hash;
+		await this.userRepo.save(user);
+	}
+
+	async updatePassword(user: User, hash: string) {
+		user.hash = hash;
+		user.forgot_code = null;
 		await this.userRepo.save(user);
 	}
 
@@ -133,6 +179,13 @@ export class UserService {
 		if (!user)
 			throw new NotFoundException('User not found');
 		await this.userRepo.delete(user.id)
+	}
+
+	async deletePending(id: number) {
+		const user = await this.findOnePending({ where: {id} });
+		if (!user)
+			throw new NotFoundException('Pending user not found');
+		await this.pendingUserRepo.delete(user.id)
 	}
 
 	async blockUser(user: User, id: number) {
@@ -199,5 +252,22 @@ export class UserService {
 		const relationStatus = this.friendshipService.getRelationStatus(user2, relation);
 		const match_history = await this.getMatchHistory(user2.id);
 		return { user: user2, friendList, relationStatus , match_history};
+	}
+
+	async setTwoFactorSecret(user: User, secret: string) {
+		user.two_factor_secret = secret;
+		this.userRepo.save(user);
+	}
+
+	async setTwoFactorEnabled(user: User, status: boolean) {
+		user.two_factor_enabled = status;
+		if (status)
+			user.two_factor_authenticated = true;
+		this.userRepo.save(user);
+	}
+
+	async setTwoFactorAuthenticated(user: User, status: boolean) {
+		user.two_factor_authenticated = status;
+		this.userRepo.save(user);
 	}
 }

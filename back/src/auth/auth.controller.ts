@@ -2,11 +2,15 @@ import { Body, Controller, HttpCode, HttpStatus, Post, UseGuards } from "@nestjs
 import { User } from "src/typeorm";
 import { GetUser } from "src/utils/decorators";
 import { AuthService } from "./auth.service";
-import { AuthDto } from "./dto/auth.dto";
+import { LoginDto } from "./dto/login.dto";
 import { Auth42Dto } from "./dto/auth42.dto";
 import { SignupDto } from "./dto/signup.dto";
 import { JwtGuard } from "./guard/jwt.guard";
 import { RefreshGuard } from "./guard/refresh.guard";
+import { SignupDto } from "./dto/signup.dto";
+import { ActivateDto } from "./dto/activate.dto";
+import { ForgotPasswordDto } from "./dto/forgot-password.dto";
+import { ResetPasswordDto } from "./dto/reset-password.dto";
 
 @Controller('auth')
 export class AuthController {
@@ -18,9 +22,15 @@ export class AuthController {
 		return this.authService.signup(dto);
 	}
 
+	@HttpCode(HttpStatus.CREATED)
+	@Post('activate')
+	activate(@Body() dto: ActivateDto) {
+		return this.authService.activate(dto);
+	}
+
 	@HttpCode(HttpStatus.OK)
 	@Post('login')
-	signin(@Body() dto: AuthDto) {
+	signin(@Body() dto: LoginDto) {
 		return this.authService.login(dto);
 	}
 
@@ -51,5 +61,16 @@ export class AuthController {
 		@GetUser() user: User,
 	) {
 		return user;
+
+  @HttpCode(HttpStatus.OK)
+	@Post('forgot-password')
+	forgotPassword(@Body() dto: ForgotPasswordDto) {
+		return this.authService.forgotPassword(dto);
+	}
+
+	@HttpCode(HttpStatus.OK)
+	@Post('reset-password')
+	resetPassword(@Body() dto: ResetPasswordDto) {
+		return this.authService.resetPassword(dto);
 	}
 }
