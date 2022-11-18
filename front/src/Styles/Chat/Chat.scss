@@ -206,7 +206,21 @@
                 display: flex;
                 flex-direction: column;
                 // @include overflowScroll("y");
-                overflow-y: scroll;
+                // overflow-y: scroll;
+                overflow: hidden;
+
+                &:hover {
+                    overflow-y: scroll;
+                    // &::-webkit-scrollbar {
+                        // color: $LightDarkPalette;
+                    // }
+
+                    // &::-webkit-scrollbar-thumb {
+                    //     background: $DarkPalette;
+                    // }
+                }
+
+
                 .message-server {
                     margin: 0 auto;
                 }

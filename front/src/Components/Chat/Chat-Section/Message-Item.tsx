@@ -11,8 +11,9 @@ import BanButton from "../../Buttons/Ban-Button";
 import MuteButton from "../../Buttons/Mute-Button";
 
 import { getMessageDateString, getMessageHour } from "../../../Utils/Utils-Chat";
+import { PartyMessage } from "../../../Types/Lobby-Types";
 
-function MessageItem(props: {isFromChan: boolean, message: ChatMessage | PrivateMessage, loggedUserIsOwner: boolean, chan?: Channel, isNewSender?: boolean, index?: number}) {
+function MessageItem(props: {isFromChan: boolean, message: ChatMessage | PrivateMessage | PartyMessage, loggedUserIsOwner: boolean, chan?: Channel, isNewSender?: boolean, index?: number}) {
     const {isFromChan, message, loggedUserIsOwner, chan, isNewSender, index} = props;
     const [showDropdown, setShowDropdown] = useState<boolean>(false);
 

@@ -7,6 +7,7 @@ import { useParams } from "react-router-dom";
 import { SocketContext } from "../../App";
 import { fetchProfile } from "../../Api/Profile/Profile-Fetch";
 import { fetchMe } from "../../Api/Profile/Profile-Fetch";
+import { Modes } from "../../Types/Utils-Types";
 
 interface ProfileMenuButtons {
     title: string;
@@ -21,6 +22,7 @@ export function useProfileHook() {
     ]);
     const [userState, setUserState] = useState<ProfileState | undefined>(undefined);
     const [friendRequestSent, setFriendRequestSent] = useState<number>(0);
+    const [statsMode, setStatsMode] = useState<Modes>(Modes.Singles); 
 
     const params = useParams();
     const modalStatus = useContext(ModalContext);
@@ -37,6 +39,11 @@ export function useProfileHook() {
        })
         newArray[index].isActive = "true";
         setAttributes(newArray);
+    }
+
+    const changeMode = (e: any) => {
+        const mode: Modes = e.target.value;
+        setStatsMode(mode);
     }
 
     useEffect(() => {
@@ -70,5 +77,7 @@ export function useProfileHook() {
         handleClick,
         modalStatus,
         attributes,
+        statsMode,
+        changeMode,
     }
 }

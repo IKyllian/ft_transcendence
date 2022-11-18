@@ -19,6 +19,24 @@ $FontSizeTextResponsive: 15px;
             flex-wrap: wrap;
             justify-content: center;
             gap: 4em;
+            position: relative;
+
+            .mode-select {
+                position: absolute;
+                left: $HeaderMarge;
+                top: 10px;
+                padding: 5px;
+                background: transparent;
+                border: none;
+                cursor: pointer;
+                font-size: 15px;
+                border: 1px solid $LightDarkPalette;
+                border-radius: 5px;
+
+                &:focus-visible {
+                    outline: none;
+                }
+            }
         
             .stat-elem {
                 margin: auto;
@@ -308,6 +326,9 @@ $FontSizeTextResponsive: 15px;
         .profile-header {
             .stats-infos {
                 height: 70%;
+                .mode-select {
+                    left: $HeaderResponsive800Marge;
+                }
                 .stat-elem {
                     p {        
                         &:first-child {
@@ -425,6 +446,11 @@ $FontSizeTextResponsive: 15px;
 @media screen and (max-width: $BreakPoint_500) {
     .profile-container {
         .profile-header {
+            .stats-infos {
+                .mode-select {
+                    left: $HeaderResponsive500Marge;
+                }
+            }
             .card-info {
                 margin-left: $HeaderResponsive500Marge;
             }
