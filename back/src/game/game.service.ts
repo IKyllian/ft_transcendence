@@ -41,20 +41,35 @@ export class GameService {
 		}
 	}
 
-	addWin(playersId: number[]) {
-		this.statRepo.createQueryBuilder("stat")
-		.update()
-		.where("userId IN (:...ids)", { ids: playersId })
-		.set({ match_won: () => "match_won + 1" })
-		.execute();
+	addWin(playersId: number[], game_type: GameType) {
+		if (game_type === GameType.Singles) {
+			this.statRepo.createQueryBuilder("stat")
+			.update()
+			.where("userId IN (:...ids)", { ids: playersId })
+			.set({ singles_match_won: () => "singles_match_won + 1" })
+			.execute();
+		} else {
+			this.statRepo.createQueryBuilder("stat")
+			.update()
+			.where("userId IN (:...ids)", { ids: playersId })
+			.set({ doubles_match_won: () => "doubles_match_won + 1" })
+			.execute();
+		}
 	}
 
-	addLose(playersId: number[]) {
-		this.statRepo.createQueryBuilder("stat")
-		.update()
-		.where("userId IN (:...ids)", { ids: playersId })
-		.set({ match_lost: () => "match_lost + 1" })
-		.execute();
+	addLose(playersId: number[], game_type: GameType) {
+		if (game_type === GameType.Singles) {
+			this.statRepo.createQueryBuilder("stat")
+			.update()
+			.where("userId IN (:...ids)", { ids: playersId })
+			.set({ singles_match_lost: () => "singles_match_lost + 1" })
+			.execute();
+		} else {
+			this.statRepo.createQueryBuilder("stat")
+			.update()
+			.where("userId IN (:...ids)", { ids: playersId })
+			.set({ doubles_match_lost: () => "doubles_match_lost + 1" })
+		}
 	}
 
 	eloAttribution(players: Player[], result: EndResult, game_type: GameType) {
@@ -93,14 +108,14 @@ export class GameService {
 			console.log("elo result blue: " + blueEloWon);
 			console.log("elo result red: " + redEloLost);
 			this.saveNewElo(blueTeamIds, blueEloWon, game_type);
-			this.addWin(blueTeamIds);
+			this.addWin(blueTeamIds, game_type);
 			this.saveNewElo(redTeamIds, redEloLost, game_type);
-			this.addLose(redTeamIds);
+			this.addLose(redTeamIds, game_type);
 		} else {
 			this.saveNewElo(redTeamIds, redEloWon, game_type);
-			this.addWin(redTeamIds);
+			this.addWin(redTeamIds, game_type);
 			this.saveNewElo(blueTeamIds, blueEloLost, game_type);
-			this.addLose(blueTeamIds);
+			this.addLose(blueTeamIds, game_type);
 			console.log("elo result red: " + redEloWon);
 			console.log("elo result blue: " + blueEloLost);
 		}
@@ -160,19 +175,4 @@ export class GameService {
 			users,
 		}
 	}
-
-	// getMatchHistory(userId: number) {
-	// 	return this.matchRepo.createQueryBuilder("match")
-	// 	.leftJoinAndSelect("match.blue_team_player1", "bp1")
-	// 	.leftJoinAndSelect("match.blue_team_player2", "bp2")
-	// 	.leftJoinAndSelect("match.red_team_player1", "rp1")
-	// 	.leftJoinAndSelect("match.red_team_player2", "rp2")
-	// 	.where("match.blue_team_player1.id = :id")
-	// 	.orWhere("match.blue_team_player2.id = :id")
-	// 	.orWhere("match.red_team_player1.id = :id")
-	// 	.orWhere("match.red_team_player2.id = :id")
-	// 	.setParameter("id", userId)
-	// 	.orderBy("match.created_at", 'DESC')
-	// 	.getMany();
-	// }
 }

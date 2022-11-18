@@ -4,6 +4,7 @@ import { Socket } from "socket.io";
 import { SettingsFactory } from "src/game/settings.factory";
 import { User } from "src/typeorm";
 import { GameMode, GameSettings, GameType, PlayerType } from "src/utils/types/game.types";
+import { PartyMessage } from "src/utils/types/types";
 import { Player } from "../../player";
 
 export class Party {
@@ -21,6 +22,8 @@ export class Party {
 
 	players: Player[] = new Array<Player>();
 
+	messages: PartyMessage[] = new Array<PartyMessage>();
+
 	game_settings: GameSettings;
 
 	game_mode: GameMode;
@@ -36,5 +39,16 @@ export class Party {
 
 	leave(user: User) {
 		this.players = this.players.filter((player) => player.user.id != user.id);
+	}
+
+	createMessage(sender: User, content: string): PartyMessage {
+		let message: PartyMessage = {
+			sender: sender,
+			content: content,
+			send_at: new Date(),
+		};
+
+		this.messages.push(message);
+		return message;
 	}
 }

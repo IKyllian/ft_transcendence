@@ -1,7 +1,7 @@
 import { MESSAGES } from "@nestjs/core/constants";
 import { generate } from "shortid";
 import { Player } from "src/game/player";
-import { ChannelUser, UserTimeout } from "src/typeorm";
+import { ChannelUser, User, UserTimeout } from "src/typeorm";
 import { GameType } from "./game.types";
 
 export type JwtPayload = {
@@ -105,4 +105,10 @@ export enum UserStatus {
 	ONLINE,
 	OFFLINE,
 	IN_GAME,
+}
+
+export type PartyMessage = {
+	sender: User;
+	content: string;
+	send_at: Date;
 }
