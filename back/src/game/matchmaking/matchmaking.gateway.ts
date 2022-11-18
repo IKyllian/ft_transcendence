@@ -1,5 +1,6 @@
 import { ForbiddenException, UnauthorizedException, UseFilters, UseGuards, UsePipes, ValidationPipe } from "@nestjs/common";
 import { ConnectedSocket, MessageBody, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
+import { userInfo } from "os";
 import { Server, Socket } from "socket.io";
 import { WsJwtGuard } from "src/auth/guard/ws-jwt.guard";
 import { UserIdDto } from "src/chat/gateway/dto/user-id.dto";
@@ -14,6 +15,7 @@ import { GameMode, GameType, PlayerPosition, TeamSide } from "src/utils/types/ga
 import { notificationType } from "src/utils/types/types";
 import { IsReadyDto } from "./dto/boolean.dto";
 import { SettingDto } from "./dto/game-settings.dto";
+import { PartyMessageDto } from "./dto/party-message.dto";
 import { StartQueueDto } from "./dto/start-queue.dto";
 import { PartyService } from "./party/party.service";
 import { QueueService } from "./queue/queue.service";
@@ -105,6 +107,15 @@ export class MatchmakingGateway implements OnGatewayDisconnect {
 		@MessageBody() data: UserIdDto,
 	) {
 		this.partyService.kickFromParty(user, data.id);
+	}
+
+	@UseGuards(WsJwtGuard)
+	@SubscribeMessage('NewPartyMessage')
+	newPartyMessage(
+		@GetUser() user: User,
+		@MessageBody() data: PartyMessageDto,
+	) {
+		this.partyService.partyMessage(user, data.content);
 	}
 
 
