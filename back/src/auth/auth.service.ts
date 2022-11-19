@@ -50,16 +50,16 @@ export class AuthService {
 
 		const hash = await argon.hash(dto.password);
 		const validation_code: string = uuidv4();	
+		const user_account_create = this.accountRepo.create({ hash, validation_code });
 		const params = {
 			username: dto.username,
 			email: dto.email,
+			register: false,
+			account: user_account_create,
 		}
 
-		const user = await this.userService.create(params);
-		console.log('user', user)
-		const user_account_create = this.accountRepo.create({user, hash, validation_code});
-		const account = await this.accountRepo.save(user_account_create);
-		const mailResult = await this.sendValidationMail(dto.email, account.validation_code);
+		await this.userService.create(params);
+		const mailResult = await this.sendValidationMail(dto.email, validation_code);
 		if (mailResult?.error)
 			return { error: mailResult.error };
 		return { success: true, email: params.email }
@@ -74,7 +74,7 @@ export class AuthService {
 		if (!user_account)
 			throw new ForbiddenException('Validation code not found');
 
-			user_account.user.register = true;
+		user_account.user.register = true;
 		await this.userRepo.save(user_account.user);
 		
 		const tokens = await this.signTokens(user_account.user.id, user_account.user.username);
@@ -161,9 +161,14 @@ export class AuthService {
 		});
 		if (!user) {
 			console.log('user 42 not found, creating a new one');
-			user = await this.userService.create({ id42 : response.data.id, email: response.data.email });
-			const user_account_create = this.accountRepo.create({user});
-			await this.accountRepo.save(user_account_create);
+			const account = this.accountRepo.create();
+			const params = {
+				register: true,
+				account: account,
+				id42: response.data.id,
+				email: response.data.email,
+			}
+			user = await this.userService.create(params);
 		}
 
 		const tokens = await this.signTokens(user.id, user.username);

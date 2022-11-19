@@ -22,8 +22,8 @@ export class UserAccount {
 	refresh_hash?: string
 
     @Exclude()
-    @Column({ unique: true })
-	validation_code: string;
+    @Column({ unique: true, nullable: true })
+	validation_code?: string;
 
 	@Exclude()
 	@Column({ nullable: true })

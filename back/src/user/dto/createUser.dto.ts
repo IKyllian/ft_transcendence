@@ -4,7 +4,9 @@ import {
 	IsNumber,
 	IsOptional,
 	IsEmail,
+	IsBoolean,
 } from 'class-validator'
+import { UserAccount } from 'src/typeorm';
 
 export class CreateUserDto {
 
@@ -13,10 +15,10 @@ export class CreateUserDto {
 	@IsOptional()
 	username?: string;
 
-	// @IsNotEmpty()
-	// @IsOptional()
-	// @IsString()
-	// hash?: string;
+	@IsBoolean()
+	register?: boolean;
+
+	account: UserAccount;
 
 	@IsOptional()
 	@IsNumber()
