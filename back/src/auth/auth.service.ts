@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { LoginDto } from "./dto/login.dto";
 import * as argon from 'argon2';
 import { JwtService, JwtVerifyOptions } from "@nestjs/jwt";
@@ -76,18 +76,18 @@ export class AuthService {
 
 		user_account.user.register = true;
 		await this.userRepo.save(user_account.user);
+		//TODO redirect to login page?
 		
-		const tokens = await this.signTokens(user_account.user.id, user_account.user.username);
-		this.updateRefreshHash(user_account, tokens.refresh_token);
-		return {
-			access_token: tokens.access_token,
-			refresh_token: tokens.refresh_token,
-			user: user_account.user,
-		}
+		// const tokens = await this.signTokens(user_account.user.id, user_account.user.username);
+		// this.updateRefreshHash(user_account, tokens.refresh_token);
+		// return {
+		// 	access_token: tokens.access_token,
+		// 	refresh_token: tokens.refresh_token,
+		// 	user: user_account.user,
+		// }
 	}
 
 	async login(dto: LoginDto) {
-  
 		const user: User = await this.userRepo
 			.createQueryBuilder("user")
 			.where("LOWER(user.username) = :name", { name: dto.username.toLowerCase() })
@@ -100,10 +100,10 @@ export class AuthService {
 			.getOne();
 
 		console.log('user', user)
-		// if (!user.register)
-		// 	throw new UnauthorizedException("Email not validated");
 		if (!user || user.id42 || !user.account.hash) 
-			throw new NotFoundException('invalid credentials')
+		throw new NotFoundException('invalid credentials')
+		// else if (!user.register)
+		// 	throw new UnauthorizedException("Email not validated");
 
 		this.userService.setTwoFactorAuthenticated(user, false);
 
@@ -161,6 +161,10 @@ export class AuthService {
 		});
 		if (!user) {
 			console.log('user 42 not found, creating a new one');
+			if (await this.userService.mailTaken(response.data.email)) {
+				console.log("mail taken")
+				throw new BadRequestException("Mail is already taken");
+			}
 			const account = this.accountRepo.create();
 			const params = {
 				register: true,

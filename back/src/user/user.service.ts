@@ -146,9 +146,6 @@ export class UserService {
 		.set({ forgot_code: () => ":code"})
 		.setParameter('code', code)
 		.execute()
-
-		// account.forgot_code = code;
-		// await this.accountRepo.save(account);
 	}
 
 	async updateRefreshHash(account: UserAccount, hash: string) {
