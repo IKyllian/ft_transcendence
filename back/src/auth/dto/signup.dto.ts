@@ -16,7 +16,7 @@ export class SignupDto {
 	@Matches(/^[A-Za-z0-9_.-—]+$/)
 	username: string;
   
-  @IsEmail()
+  	@IsEmail()
 	@IsNotEmpty()
 	email: string;
 

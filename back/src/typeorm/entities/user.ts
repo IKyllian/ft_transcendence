@@ -8,6 +8,7 @@ import { Conversation } from "./conversation";
 import { Friendship } from "./friendship";
 import { MatchResult } from "./matchResult";
 import { Statistic } from "./statistic";
+import { UserAccount } from "./userAccount";
 
 @Entity()
 export class User {
@@ -49,17 +50,23 @@ export class User {
 	@Column({ default: 1000 })
 	doubles_elo: number;
 
-	@Exclude()
-	@Column({ nullable: true, select: false })
-	hash?: string
+	@OneToOne(() => UserAccount, (account) => account.user, { cascade: true })
+	account: UserAccount;
 
-	@Exclude()
-	@Column({ nullable: true, select: false })
-	refresh_hash?: string
+	// @Exclude()
+	// @Column({ nullable: true, select: false })
+	// hash?: string
 
-	@Exclude()
-	@Column({ nullable: true, select: false })
-	two_factor_secret?: string
+	// @Exclude()
+	// @Column({ nullable: true, select: false })
+	// refresh_hash?: string
+
+	// @Exclude()
+	// @Column({ nullable: true, select: false })
+	// two_factor_secret?: string
+
+	@Column({ default: false })
+	register: boolean;
 
 	@Column({ default: false })
 	two_factor_enabled: boolean;
@@ -68,7 +75,7 @@ export class User {
 	@Column({ default: false, select: false })
 	two_factor_authenticated: boolean;
 
-	@Exclude()
-	@Column({ nullable: true, select: false })
-	forgot_code?: string
+	// @Exclude()
+	// @Column({ nullable: true, select: false })
+	// forgot_code?: string
 } 

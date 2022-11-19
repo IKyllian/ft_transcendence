@@ -5,6 +5,7 @@ import { JwtModule } from "@nestjs/jwt";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { ChatModule } from "src/chat/chat.module";
 import { Statistic, User } from "src/typeorm";
+import { UserAccount } from "src/typeorm/entities/userAccount";
 import { UserModule } from "src/user/user.module";
 import { AuthController } from "./auth.controller";
 import { AuthService } from "./auth.service";
@@ -22,6 +23,7 @@ import { RtStrategy } from "./strategy/rt.strategy";
 		TypeOrmModule.forFeature([
 			User,
 			Statistic,
+			UserAccount,
 		])
 	],
 	controllers: [AuthController],

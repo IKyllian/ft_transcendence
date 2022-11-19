@@ -26,9 +26,6 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
 				"id42",
 				"username",
 				"avatar",
-				"refresh_hash",
-				"two_factor_enabled",
-				"two_factor_authenticated"
 			],
 			relations: {
 				channelUser: true,
@@ -39,6 +36,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
 				id: payload.sub,
 			}
 		});
+		if (!user) return null;//TODO clean, what happen if two_factor_enabled = true ?
 		if (!user.two_factor_enabled) return user;
 		else if (user.two_factor_authenticated) return user;
 	}

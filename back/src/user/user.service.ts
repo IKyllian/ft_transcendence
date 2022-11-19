@@ -9,8 +9,7 @@ import * as argon from 'argon2';
 import { SearchDto } from "./dto/search.dto";
 import { FriendshipService } from "./friendship/friendship.service";
 import { UserStatus } from "src/utils/types/types";
-import { PendingUser } from "src/typeorm/entities/pendingUser";
-import { CreatePendingDto } from "./dto/createPending.dto";
+import { UserAccount } from "src/typeorm/entities/userAccount";
 import { v4 as uuidv4 } from "uuid";
 
 @Injectable()
@@ -26,8 +25,8 @@ export class UserService {
 		private statisticRepo: Repository<Statistic>,
 		@InjectRepository(MatchResult)
 		private matchRepo: Repository<MatchResult>,
-		@InjectRepository(PendingUser)
-		private pendingUserRepo: Repository<PendingUser>,
+		@InjectRepository(UserAccount)
+		private accountRepo: Repository<UserAccount>,
 	) {}
 
 	create(dto: CreateUserDto) {
@@ -37,12 +36,6 @@ export class UserService {
 		return this.userRepo.save(user);
 	}
 
-
-	createPending(dto: CreatePendingDto) {
-		const user = this.pendingUserRepo.create({...dto});
-		return this.pendingUserRepo.save(user);
-	}
-
 	findOne(options: FindOneOptions<User>, selectAll: Boolean = false): Promise<User | null> {
 		if (selectAll) {
 			options.select = [
@@ -50,21 +43,17 @@ export class UserService {
 				'id',
 				'id42',
 				'username',
-				"refresh_hash",
 				'status',
-				'hash',
-				'refresh_hash',
 				'two_factor_enabled',
-				'two_factor_secret',
 				'two_factor_authenticated'
 			];
 		}
 		return this.userRepo.findOne(options);
 	}
 
-	findOnePending(options: FindOneOptions<PendingUser>): Promise<PendingUser | null> {
-		return this.pendingUserRepo.findOne(options);
-	}
+	// findOnePending(options: FindOneOptions<PendingUser>): Promise<PendingUser | null> {
+	// 	return this.pendingUserRepo.findOne(options);
+	// }
 
 	findOneBy(where: FindOptionsWhere<User> | FindOptionsWhere<User>[]): Promise<User | null> {
 		return this.userRepo.findOneBy(where);
@@ -88,11 +77,7 @@ export class UserService {
 			.createQueryBuilder("user")
 			.where("LOWER(user.username) = :name", { name: name.toLowerCase() })
 			.getOne();
-		const pendingNameTaken = await this.pendingUserRepo
-			.createQueryBuilder("user")
-			.where("LOWER(user.username) = :name", { name: name.toLowerCase() })
-			.getOne();
-		return nameTaken || pendingNameTaken;
+		return nameTaken;
 	}
 
 	async mailTaken(email: string) {
@@ -100,11 +85,7 @@ export class UserService {
 			.createQueryBuilder("user")
 			.where("LOWER(user.email) = :email", { email: email.toLowerCase() })
 			.getOne();
-		const pendingMailTaken = await this.pendingUserRepo
-			.createQueryBuilder("user")
-			.where("LOWER(user.email) = :email", { email: email.toLowerCase() })
-			.getOne();
-		return mailTaken || pendingMailTaken;
+		return mailTaken;
 	}
 
 	// TODO ask if usefull
@@ -114,9 +95,9 @@ export class UserService {
 				if (await this.nameTaken(dto.username))
 					throw new ForbiddenException('Username taken');
 				user.username = dto.username;
-			case dto.password:
-				const hash = await argon.hash(dto.password);
-				user.hash = hash; // probably wont work cause hash is not selected
+			// case dto.password:
+			// 	const hash = await argon.hash(dto.password);
+			// 	user.hash = hash; // probably wont work cause hash is not selected
 			case dto.avatar:
 				user.avatar = dto.avatar;
 			default:
@@ -151,27 +132,37 @@ export class UserService {
 	}
 
 	logout(user: User) {
-		return this.userRepo.createQueryBuilder()
-		.update(User)
+		return this.accountRepo.createQueryBuilder()
+		.update(UserAccount)
 		.set({ refresh_hash: null })
-		.where("id = :id", { id: user.id })
+		.where("userId = :id", { id: user.id })
 		.execute();
 	}
 
 	async updateForgotCode(user: User, code: string) {
-		user.forgot_code = code;
-		await this.userRepo.save(user);
+		this.accountRepo.createQueryBuilder("account")
+		.update()
+		.where("account.userId = :userId", { userId: user.id })
+		.set({ forgot_code: () => ":code"})
+		.setParameter('code', code)
+		.execute()
+
+		// account.forgot_code = code;
+		// await this.accountRepo.save(account);
 	}
 
-	async updateRefreshHash(user: User, hash: string) {
-		user.refresh_hash = hash;
-		await this.userRepo.save(user);
+	async updateRefreshHash(account: UserAccount, hash: string) {
+		account.refresh_hash = hash;
+		await this.accountRepo.save(account);
 	}
 
-	async updatePassword(user: User, hash: string) {
-		user.hash = hash;
-		user.forgot_code = null;
-		await this.userRepo.save(user);
+	async updatePassword(account: UserAccount, hash: string) {
+		this.accountRepo.createQueryBuilder("account")
+		.update()
+		.where("account.userId = :userId", { userId: account.id })
+		.set({ hash: () => ":hash"})
+		.setParameter('hash', hash)
+		.execute()
 	}
 
 	async deleteUser(id: number) {
@@ -179,13 +170,6 @@ export class UserService {
 		if (!user)
 			throw new NotFoundException('User not found');
 		await this.userRepo.delete(user.id)
-	}
-
-	async deletePending(id: number) {
-		const user = await this.findOnePending({ where: {id} });
-		if (!user)
-			throw new NotFoundException('Pending user not found');
-		await this.pendingUserRepo.delete(user.id)
 	}
 
 	async blockUser(user: User, id: number) {
@@ -254,9 +238,9 @@ export class UserService {
 		return { user: user2, friendList, relationStatus , match_history};
 	}
 
-	async setTwoFactorSecret(user: User, secret: string) {
+	async setTwoFactorSecret(user: UserAccount, secret: string) {
 		user.two_factor_secret = secret;
-		this.userRepo.save(user);
+		this.accountRepo.save(user);
 	}
 
 	async setTwoFactorEnabled(user: User, status: boolean) {

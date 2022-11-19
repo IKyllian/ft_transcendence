@@ -21,7 +21,7 @@ export class AuthController {
 		return this.authService.signup(dto);
 	}
 
-	@HttpCode(HttpStatus.CREATED)
+	@HttpCode(HttpStatus.OK)
 	@Post('activate')
 	activate(@Body() dto: ActivateDto) {
 		return this.authService.activate(dto);

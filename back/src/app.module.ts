@@ -23,7 +23,7 @@ import { TwoFactorModule } from './2fa/twoFactor.module';
 	  GameModule,
 	  GlobalModule,
     MatchmakingModule,
-	TwoFactorModule,
+	  TwoFactorModule,
     ConfigModule.forRoot({ envFilePath: '.env', isGlobal: true }),
     NotificationModule,
     TaskScheduler,

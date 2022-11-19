@@ -16,6 +16,7 @@ import { ActivateDto } from "./dto/activate.dto";
 import { ForgotPasswordDto } from "./dto/forgot-password.dto";
 import { v4 as uuidv4 } from "uuid";
 import { ResetPasswordDto } from "./dto/reset-password.dto";
+import { UserAccount } from "src/typeorm/entities/userAccount";
 
 @Injectable()
 export class AuthService {
@@ -28,6 +29,8 @@ export class AuthService {
 		
 		@InjectRepository(User)
 		private userRepo: Repository<User>,
+		@InjectRepository(UserAccount)
+		private accountRepo: Repository<UserAccount>,
 	) {}
 
 
@@ -48,84 +51,71 @@ export class AuthService {
 		const hash = await argon.hash(dto.password);
 		const validation_code: string = uuidv4();	
 		const params = {
-			validation_code,
 			username: dto.username,
 			email: dto.email,
-			hash,
 		}
 
-		const mailResult = await this.sendValidationMail(dto.email, validation_code);
+		const user = await this.userService.create(params);
+		console.log('user', user)
+		const user_account_create = this.accountRepo.create({user, hash, validation_code});
+		const account = await this.accountRepo.save(user_account_create);
+		const mailResult = await this.sendValidationMail(dto.email, account.validation_code);
 		if (mailResult?.error)
 			return { error: mailResult.error };
-		
-		await this.userService.createPending(params);
-		
 		return { success: true, email: params.email }
 	}
 
 	async activate(dto: ActivateDto) {
-		const pendingUser = await this.userService.findOnePending({
+		const user_account = await this.accountRepo.findOne({
+			relations: { user : true },
 			where: { validation_code: dto.code }
 		});
-			
-		if (!pendingUser)
+		console.log(user_account)
+		if (!user_account)
 			throw new ForbiddenException('Validation code not found');
-		
-		const params = {
-			username: pendingUser.username,
-			email: pendingUser.email,
-			hash: pendingUser.hash,
-		}
 
-		// Create final user and delete pending user
-		const user = await this.userService.create(params);
-		await this.userService.deletePending(pendingUser.id);
-		const tokens = await this.signTokens(user.id, user.username);
-		this.updateRefreshHash(user, tokens.refresh_token);
+			user_account.user.register = true;
+		await this.userRepo.save(user_account.user);
+		
+		const tokens = await this.signTokens(user_account.user.id, user_account.user.username);
+		this.updateRefreshHash(user_account, tokens.refresh_token);
 		return {
 			access_token: tokens.access_token,
 			refresh_token: tokens.refresh_token,
-			user: user,
+			user: user_account.user,
 		}
 	}
 
 	async login(dto: LoginDto) {
   
-		const user = await this.userRepo // TODO select username OR email
+		const user: User = await this.userRepo
 			.createQueryBuilder("user")
-			.addSelect('user.hash')
 			.where("LOWER(user.username) = :name", { name: dto.username.toLowerCase() })
 			.orWhere("LOWER(user.email) = :email", { email: dto.username.toLowerCase() })
 			.leftJoinAndSelect("user.channelUser", "ChannelUser")
 			.leftJoinAndSelect("ChannelUser.channel", "Channel")
+			.leftJoinAndSelect("user.account", "account")
 			// .leftJoinAndSelect("user.statistic", "Statistic")
 			.leftJoinAndSelect("user.blocked", "Blocked")
 			.getOne();
 
-
-		const pending = await this.userService.findOnePending({
-			where: [
-				{ username: dto.username },
-				{ email: dto.username }
-			]
-		});
-
-		if (pending)
-			throw new UnauthorizedException("Email not validated");
-		if (!user || user.id42 || !user.hash) 
+		console.log('user', user)
+		// if (!user.register)
+		// 	throw new UnauthorizedException("Email not validated");
+		if (!user || user.id42 || !user.account.hash) 
 			throw new NotFoundException('invalid credentials')
 
 		this.userService.setTwoFactorAuthenticated(user, false);
 
 		const pwdMatches = await argon.verify(
-			user.hash,
+			user.account.hash,
 			dto.password,
 		);
 		if (!pwdMatches)
 			throw new UnauthorizedException('invalid credentials');
 
 		const tokens = await this.signTokens(user.id, user.username);
-		this.updateRefreshHash(user, tokens.refresh_token);
+		this.updateRefreshHash(user.account, tokens.refresh_token);
 		return {
 			access_token: tokens.access_token,
 			//TODO not sure about refresh
@@ -163,6 +153,7 @@ export class AuthService {
 				},
 				// statistic: true,
 				blocked: true,
+				account: true,
 			},
 			where: {
 				id42: response.data.id,
@@ -170,11 +161,13 @@ export class AuthService {
 		});
 		if (!user) {
 			console.log('user 42 not found, creating a new one');
-			user = await this.userService.create({ id42 : response.data.id });
+			user = await this.userService.create({ id42 : response.data.id, email: response.data.email });
+			const user_account_create = this.accountRepo.create({user});
+			await this.accountRepo.save(user_account_create);
 		}
 
 		const tokens = await this.signTokens(user.id, user.username);
-		this.updateRefreshHash(user, tokens.refresh_token);
+		this.updateRefreshHash(user.account, tokens.refresh_token);
 		return {
 			access_token: tokens.access_token,
 			refresh_token: tokens.refresh_token,
@@ -199,16 +192,20 @@ export class AuthService {
 	}
 
 	async refreshTokens(userId: number, refreshToken: string) {
-		const user = await this.userService.findOneBy({ id: userId })
-		if (!user || !user.refresh_hash) // user doesn't exists OR user is logged out
+		// const user = await this.userService.findOneBy({ id: userId })
+		const user_account = await this.accountRepo.findOne({
+			relations: { user: true },
+			where: { user: { id: userId } }
+		})
+		if (!user_account || !user_account.refresh_hash) // user doesn't exists OR user is logged out
 			throw new NotFoundException('user not found')
 
-		const tokensMatches = await argon.verify(user.refresh_hash, refreshToken);
+		const tokensMatches = await argon.verify(user_account.refresh_hash, refreshToken);
 		if (!tokensMatches)
 			throw new UnauthorizedException('invalid token')
 		
-		const tokens = await this.signTokens(user.id, user.username);
-		this.updateRefreshHash(user, tokens.refresh_token);
+		const tokens = await this.signTokens(user_account.user.id, user_account.user.username);
+		this.updateRefreshHash(user_account, tokens.refresh_token);
 		return tokens;
 	}
 
@@ -244,9 +241,9 @@ export class AuthService {
 		return this.jwt.decode(token);
 	}
 
-	async updateRefreshHash(user: User, refreshToken: string) {
+	async updateRefreshHash(account: UserAccount, refreshToken: string) {
 		const hash = await argon.hash(refreshToken);
-		this.userService.updateRefreshHash(user, hash);
+		this.userService.updateRefreshHash(account, hash);
 	}
 
 	async logout(user: User) {
@@ -306,16 +303,16 @@ export class AuthService {
 	}
 
 	async resetPassword(dto: ResetPasswordDto) {
-		const user = await this.userService.findOne({
+		const user_account = await this.accountRepo.findOne({
 			where: { forgot_code: dto.code }
 		})
 
-		if (!user)
+		if (!user_account)
 			throw new NotFoundException("Invalid code");
 
 		const hash = await argon.hash(dto.newPassword);
 
-		this.userService.updatePassword(user, hash);
+		this.userService.updatePassword(user_account, hash);
 		return { success: true }
 	}
 }
