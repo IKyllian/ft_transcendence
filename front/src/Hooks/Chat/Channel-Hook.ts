@@ -79,11 +79,9 @@ export function useChannelHook() {
 
     useEffect(() => {
         if (!previousMessages.loadPreviousMessages && channelDatas) {
-            console.log("FIRST COndition");
             scrollToBottom();
             setPrevLength(channelDatas.messages.length);
         } else if (channelDatas) {
-            console.log("SECOND COndition");
             const scrollToMessage = document.getElementById("chat-message-wrapper")?.getElementsByTagName('li');
             if (scrollToMessage && scrollToMessage.length > 0)
                 scrollToMessage[channelDatas.messages.length - prevLength].scrollIntoView();
