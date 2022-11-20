@@ -7,7 +7,7 @@ import { Socket } from "socket.io-client";
 import { baseUrl } from "../../env";
 import { replaceChannelMessages } from "../../Redux/ChannelSlice";
 import { addChannel } from "../../Redux/ChatSlice";
-import { ChatMessage, PreviousMessagesState, CreateChanBodyRequest } from "../../Types/Chat-Types";
+import { ChatMessage, PreviousMessagesState, CreateChanBodyRequest, PrivateMessage, Conversation, ConversationState } from "../../Types/Chat-Types";
 import { UserInterface } from "../../Types/User-Types";
 
 type FormValues = {
@@ -65,7 +65,7 @@ export function fetchLeaveChannel(channelId: number, token: string, navigate: Na
     })
 }
 
-export function fetchLoadPrevMessages(channelId: number, token: string, dispatch: Dispatch<AnyAction>, currentMessages: ChatMessage[], setPreviousMessages: Function) {
+export function fetchLoadPrevChatMessages(channelId: number, token: string, dispatch: Dispatch<AnyAction>, currentMessages: ChatMessage[], setPreviousMessages: Function) {
     axios.post(`${baseUrl}/channel/${channelId}/messages`, {skip: currentMessages.length}, {
         headers: {
             "Authorization": `Bearer ${token}`,
@@ -75,6 +75,26 @@ export function fetchLoadPrevMessages(channelId: number, token: string, dispatch
         console.log("response", response.data);
         if (response.data.length > 0) {
             dispatch(replaceChannelMessages([...response.data, ...currentMessages]));
+        } else {
+            setPreviousMessages({loadPreviousMessages: false, reachedMax: true});
+        }
+        
+    })
+    .catch((err) => {
+        console.log(err);
+    })
+}
+
+export function fetchLoadPrevConvMessages(convId: number, token: string, setConvDatas: Function, currentMessages: PrivateMessage[], setPreviousMessages: Function) {
+    axios.post(`${baseUrl}/conversation/${convId}/messages`, {skip: currentMessages.length}, {
+        headers: {
+            "Authorization": `Bearer ${token}`,
+        }
+    })
+    .then((response) => {
+        console.log("response", response.data);
+        if (response.data.length > 0) {
+            setConvDatas((prev: ConversationState) => { return {...prev, conv: {...prev.conv, messages: [...response.data, ...prev.conv.messages]}}});
         } else {
             setPreviousMessages({loadPreviousMessages: false, reachedMax: true});
         }

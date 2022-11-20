@@ -107,3 +107,13 @@ export interface PrivateMessage {
     send_at: string,
     conversation: Conversation;
 }
+
+export interface ConversationState {
+    temporary: boolean,
+    conv: Conversation
+}
+
+export const defaultMessagesState: PreviousMessagesState = {
+    loadPreviousMessages: false,
+    reachedMax: false
+}

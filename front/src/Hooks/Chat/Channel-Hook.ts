@@ -1,18 +1,13 @@
 import { useEffect, useState, useRef, useContext, useCallback } from "react";
 import { useParams } from "react-router-dom";
-import { PreviousMessagesState, ChatMessage } from "../../Types/Chat-Types";
+import { PreviousMessagesState, ChatMessage, defaultMessagesState } from "../../Types/Chat-Types";
 import { useAppDispatch, useAppSelector } from '../../Redux/Hooks'
 import { SocketContext } from "../../App";
 import { UserInterface } from "../../Types/User-Types";
 import { debounce } from "../../Utils/Utils-Chat";
 import { useForm } from "react-hook-form";
-import { fetchLoadPrevMessages } from "../../Api/Chat/Chat-Action";
+import { fetchLoadPrevChatMessages } from "../../Api/Chat/Chat-Action";
 import { addChannelMessage } from "../../Redux/ChannelSlice";
-
-const defaultMessagesState: PreviousMessagesState = {
-    loadPreviousMessages: false,
-    reachedMax: false
-}
 
 export function useChannelHook() {
     const [showUsersSidebar, setShowUsersSidebar] = useState<boolean>(true);
@@ -66,7 +61,7 @@ export function useChannelHook() {
     useEffect(() => {
         if (haveToLoad && channelId && channelDatas && !previousMessages.loadPreviousMessages && !previousMessages.reachedMax) {
             setPreviousMessages(prev => { return {...prev, loadPreviousMessages: true}});
-            fetchLoadPrevMessages(channelId, authDatas.token, dispatch, channelDatas?.messages, setPreviousMessages);
+            fetchLoadPrevChatMessages(channelId, authDatas.token, dispatch, channelDatas?.messages, setPreviousMessages);
         }
     }, [haveToLoad])
 
@@ -76,7 +71,7 @@ export function useChannelHook() {
         if (div.length > 0){
             var hasVerticalScrollbar = div[0].scrollHeight > div[0].clientHeight;
             if (!hasVerticalScrollbar && channelId && channelDatas) {
-                fetchLoadPrevMessages(channelId, authDatas.token, dispatch, channelDatas?.messages, setPreviousMessages);
+                fetchLoadPrevChatMessages(channelId, authDatas.token, dispatch, channelDatas?.messages, setPreviousMessages);
             }
         } 
         messagesEndRef.current?.scrollIntoView();
@@ -84,9 +79,11 @@ export function useChannelHook() {
 
     useEffect(() => {
         if (!previousMessages.loadPreviousMessages && channelDatas) {
+            console.log("FIRST COndition");
             scrollToBottom();
             setPrevLength(channelDatas.messages.length);
         } else if (channelDatas) {
+            console.log("SECOND COndition");
             const scrollToMessage = document.getElementById("chat-message-wrapper")?.getElementsByTagName('li');
             if (scrollToMessage && scrollToMessage.length > 0)
                 scrollToMessage[channelDatas.messages.length - prevLength].scrollIntoView();

@@ -200,7 +200,7 @@ button {
 .txt-form-error {
 	color: red;
 	margin: 0;
-	font-size: 14px;
+	font-size: 11px;
 	letter-spacing: 1px;
 }
 
@@ -230,7 +230,8 @@ button {
 }
 	  
 .is-connected-loader-wrapper {
-	@include page-wrapper();
+	height: 100vh;
+	margin-top: -$headerHeight;
 	background-color: $DarkPalette;
 	display: flex;
 	align-items: center;

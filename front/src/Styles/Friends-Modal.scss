@@ -76,18 +76,7 @@
             @include flex-row-alignCenter();
             gap: 10px;
             svg {
-                cursor: pointer;
-                border-radius: 50%;
-                @include width-height(25px, 25px);
-                padding: 2px;
-                &:first-child {
-                    color: green;
-                    border: 1px solid green;
-                }
-                &:last-child {
-                    color: red;
-                    border: 1px solid red;
-                }
+                @include circleButtons(25px);
             }
         }
 

@@ -109,6 +109,21 @@ $OfflineColor: rgb(194, 29, 29);
     }
 }
 
+@mixin circleButtons($size) {
+    cursor: pointer;
+    border-radius: 50%;
+    @include width-height($size, $size);
+    padding: 2px;
+    &:first-child {
+        color: green;
+        border: 1px solid green;
+    }
+    &:last-child {
+        color: red;
+        border: 1px solid red;
+    }
+}
+
 @font-face {
     font-family: Montserrat;
     src: url("../../public/Font/Montserrat/static/Montserrat-Regular.ttf");

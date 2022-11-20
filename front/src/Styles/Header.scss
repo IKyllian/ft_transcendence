@@ -188,10 +188,20 @@
         }
         .notif-dropdown-item {
             background-color: $LightDarkPalette;
-            padding: 10px;
+            padding: 12px;
             border-radius: 5px;
             @include flex-row-alignCenter();
             justify-content: space-between;
+            position: relative;
+
+            .delete-notif-icon {
+                cursor: pointer;
+                position: absolute;
+                top: 2px;
+                right: 2px;
+                @include width-height(11px, 11px);
+            }
+
             .profile-avatar {
                 @include avatar-player(40px);
             }
@@ -212,20 +222,10 @@
             }
             .notif-buttons {
                 display: flex;
-                flex-direction: column;
-                gap: 5px;
-                button {
-                    all: unset;
-                    cursor: pointer;
-                    font-size: 12px;
-                    text-align: center;
-                    padding: 4px;
-                    &:first-child {
-                        background-color: rgb(185, 129, 24);
-                    }
-                    &:last-child {
-                        background-color: #424549;
-                    }
+                flex-direction: row;
+                gap: 7px;
+                svg {
+                    @include circleButtons(20px);
                 }
             }
         }

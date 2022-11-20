@@ -10,6 +10,7 @@ import { loginPending } from "../../Redux/AuthSlice";
 type FormValues = {
     username: string,
     password: string,
+    email?: string,
 }
 
 export function useSignHook() {

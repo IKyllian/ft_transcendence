@@ -1,6 +1,6 @@
 import { useState, useRef, useContext, useEffect, useCallback } from "react";
 
-import { Conversation, PrivateMessage } from "../../Types/Chat-Types";
+import { Conversation, ConversationState, PreviousMessagesState, PrivateMessage, defaultMessagesState } from "../../Types/Chat-Types";
 import { SocketContext } from "../../App";
 import { useLocation, useParams } from "react-router-dom";
 import { useAppSelector } from '../../Redux/Hooks'
@@ -8,17 +8,16 @@ import { getSecondUserIdOfPM } from "../../Utils/Utils-Chat";
 import { UserInterface } from "../../Types/User-Types";
 import { debounce } from "../../Utils/Utils-Chat";
 import { useForm } from "react-hook-form";
-
-interface ConversationState {
-    temporary: boolean,
-    conv: Conversation
-}
+import { fetchLoadPrevConvMessages } from "../../Api/Chat/Chat-Action";
 
 export function usePrivateConvHook() {
     const [convDatas, setConvDatas] = useState<ConversationState | undefined>(undefined);
     const [userTyping, setUserTyping] = useState<UserInterface | undefined>(undefined);
     const [hasSendTypingEvent, setHasTypingEvent] = useState<boolean>(false);
+    const [previousMessages, setPreviousMessages] = useState<PreviousMessagesState>(defaultMessagesState);
     const { register, handleSubmit, reset, formState: {errors} } = useForm<{inputMessage: string}>();
+    const [haveToLoad, setHaveToLoad] = useState<boolean>(false);
+    const [prevLength, setPrevLength] = useState<number>(0);
 
     const authDatas = useAppSelector((state) => state.auth);
     const messagesEndRef = useRef<null | HTMLDivElement>(null);
@@ -28,6 +27,14 @@ export function usePrivateConvHook() {
     const { socket } = useContext(SocketContext);
 
     const scrollToBottom = () => {
+        // Permet de check si la div du chat est scrollable. Si elle ne l'est pas, load des datas pour que la div devienne scrollable
+        var div = document.getElementsByClassName('chat-messages-wrapper');
+        if (div.length > 0){
+            var hasVerticalScrollbar = div[0].scrollHeight > div[0].clientHeight;
+            if (!hasVerticalScrollbar && convId && convDatas) {
+                fetchLoadPrevConvMessages(convId, authDatas.token, setConvDatas, convDatas.conv.messages, setPreviousMessages);
+            }
+        } 
         messagesEndRef.current?.scrollIntoView();
     }
 
@@ -52,6 +59,19 @@ export function usePrivateConvHook() {
     }
 
     const optimizedFn = useCallback(debounce(endOfTyping, 6000), [hasSendTypingEvent, convDatas, authDatas]);
+
+    const handleOnScroll = (e: any) => {
+        if (convId && convDatas && e && e.target && e.target.scrollTop < 5 && !previousMessages.reachedMax && !previousMessages.loadPreviousMessages && !haveToLoad) {
+            setHaveToLoad(true);            
+        }
+    }
+
+    useEffect(() => {
+        if (haveToLoad && convId && convDatas && !previousMessages.loadPreviousMessages && !previousMessages.reachedMax) {
+            setPreviousMessages(prev => { return {...prev, loadPreviousMessages: true}});
+            fetchLoadPrevConvMessages(convId, authDatas.token, setConvDatas, convDatas.conv.messages, setPreviousMessages);
+        }
+    }, [haveToLoad])
 
     const handleSubmitMessage = handleSubmit((data, e: any) => {
         e.preventDefault();
@@ -82,13 +102,26 @@ export function usePrivateConvHook() {
     })
 
     useEffect(() => {
-        scrollToBottom();
-    }, [convDatas])
+        if (!previousMessages.loadPreviousMessages && convDatas) {
+            scrollToBottom();
+            setPrevLength(convDatas.conv.messages.length);
+        } else if (convDatas) {
+            const scrollToMessage = document.getElementById("chat-message-wrapper")?.getElementsByTagName('li');
+            if (scrollToMessage && scrollToMessage.length > 0)
+                scrollToMessage[convDatas.conv.messages.length - prevLength].scrollIntoView();
+            setPrevLength(convDatas.conv.messages.length);
+            setPreviousMessages((prev: PreviousMessagesState) => { return {...prev, loadPreviousMessages: false}});
+            setHaveToLoad(false);
+        }
+    }, [convDatas?.conv.messages]);
 
     useEffect(() => {
         if (convId) {
             setConvDatas(undefined);
             setUserTyping(undefined);
+            setPreviousMessages(defaultMessagesState);
+            setHaveToLoad(false);
+            setPrevLength(0);
             
             const listener = (data: PrivateMessage) => {
                 console.log("NewPrivateMessage", data);
@@ -143,5 +176,7 @@ export function usePrivateConvHook() {
         handleInputChange,
         userTyping,
         register,
+        handleOnScroll,
+        previousMessages,
     };
 }
