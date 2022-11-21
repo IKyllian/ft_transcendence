@@ -76,6 +76,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			// socket.emit('connection', 'failed');
 		}
 		socket.user = user;
+		// console.log("USER", user);
 		console.log(user.username, 'connected')
 		this.server.to(socket.id).emit('StatusUpdate', user);
 		socket.join(`user-${user.id}`);
