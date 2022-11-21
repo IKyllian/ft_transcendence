@@ -1,4 +1,4 @@
-import { Body, ClassSerializerInterceptor, Controller, Delete, ForbiddenException, Get, Param, ParseIntPipe, Patch, Post, Request, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
+import { Body, ClassSerializerInterceptor, Controller, Delete, FileTypeValidator, ForbiddenException, Get, HttpStatus, MaxFileSizeValidator, Param, ParseFilePipe, ParseFilePipeBuilder, ParseIntPipe, Patch, Post, Request, Res, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { Observable, of } from "rxjs";
 import { JwtGuard } from "src/auth/guard/jwt.guard";
@@ -9,22 +9,29 @@ import * as path from 'path';
 import { UserService } from "./user.service";
 import { GetUser } from "src/utils/decorators";
 import { SearchDto } from "./dto/search.dto";
+import { Response } from "express";
 
 export const avatarStorage = {
 	storage: diskStorage({
 		destination: './uploads/',
 		filename: (_req, file, cb) => {
 			const name: string = uuidv4();
-			const extension: string = path.parse(file.originalname).ext;
+			const extension: string = path.extname(file.originalname);
 
 			cb(null, `${name}${extension}`)
+		},
+	}),
+	fileFilter: (_req, file, cb) => {
+		if (file.mimetype.match(/\/(jpg|jpeg|png)$/)) {
+			cb(null, true);
+		} else {
+			cb(null, false)
 		}
-	})
+	}
 }
 
 @Controller('users')
 export class UserController {
-
 	constructor(private userService: UserService) {}
 
 	@UseGuards(JwtGuard)
@@ -41,14 +48,19 @@ export class UserController {
 	@UseGuards(JwtGuard)
 	@Post('avatar/upload')
 	@UseInterceptors(FileInterceptor('image', avatarStorage))
-	uploadFile(@UploadedFile() file, @GetUser() user: User) : Observable<Object> {
+	uploadFile(@UploadedFile() file: Express.Multer.File, @GetUser() user: User) : Observable<Object> {
+		// TODO user file-type to check magic number?
+		if (!file) return of ({error: 'file does not match valid extention'})
 		console.log(file);
-		if (!file)
-			throw new ForbiddenException('Image is missing')
-		if (file.mimetype != 'image/png' && file.mimetype != 'image/jpeg' && file.mimetype != 'image/jpg')
-			throw new ForbiddenException('Invalid file extension ' + file.mimetype)
-		this.userService.updateAvatar(user, file.path);
+		this.userService.updateAvatar(user, file.filename);
 		return of({imagePath: file.path})
+	}
+
+	@UseGuards(JwtGuard)
+	@Get('avatar')
+	serveAvatar(@GetUser() user: User, @Res() res: Response) {
+		console.log("avatar path ", user.avatar)
+		res.sendFile(user.avatar, { root: 'uploads' });
 	}
 
 	@UseGuards(JwtGuard)
@@ -92,7 +104,6 @@ export class UserController {
 		return await this.userService.getUserInfo(user, user2);
 	}
 
-	//probably going to be socked sided
 	@Post(':id/block')
 	@UseGuards(JwtGuard)
 	async blockUser(
