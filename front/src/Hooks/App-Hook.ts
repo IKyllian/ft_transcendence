@@ -11,13 +11,12 @@ import { UserInterface } from "../Types/User-Types";
 import { copyFriendListArray, logoutSuccess, stopIsConnectedLoading } from "../Redux/AuthSlice";
 import { GameMode, PartyInterface, PartyMessage } from "../Types/Lobby-Types";
 import { copyNotificationArray } from "../Redux/NotificationSlice";
-import { addParty, addPartyMessage, cancelQueue, changePartyGameMode, changeQueueStatus, leaveParty } from "../Redux/PartySlice";
+import { addParty, addPartyInvite, addPartyMessage, cancelQueue, changePartyGameMode, changeQueueStatus, leaveParty, removePartyInvite } from "../Redux/PartySlice";
 import { fetchVerifyToken } from "../Api/Sign/Sign-Fetch";
 import { addChannelUser, banChannelUser, muteChannelUser, removeTimeoutChannelUser, removeChannelUser, setChannelDatas, updateChannelUser } from "../Redux/ChannelSlice";
 
 export function useAppHook() {
     const [socket, setSocket] = useState<Socket | undefined>(undefined);
-	const [gameInvite, setGameInvite] = useState<NotificationInterface | undefined>(undefined);
 	const [eventError, setEventError] = useState<string | undefined>(undefined);
     const { token, isAuthenticated, currentUser } = useAppSelector((state) => state.auth);
 	const { party, chatIsOpen } = useAppSelector(state => state.party);
@@ -37,10 +36,6 @@ export function useAppHook() {
 		setSocket(newSocket);
 	}
 
-	const gameNotificationLeave = () => {
-		setGameInvite(undefined);
-	}
-
 	useEffect(() => {
 		console.log("GET ITEM");
 		const localToken: string | null = localStorage.getItem("userToken");
@@ -53,7 +48,6 @@ export function useAppHook() {
 
 	useEffect(() => {
 		if (isAuthenticated && socket === undefined) {
-			console.log("SET SOCKET");
 			localStorage.setItem("userToken", token);
 			connectSocket();
 		}
@@ -137,9 +131,9 @@ export function useAppHook() {
 
 			socket.on("NewPartyInvite", (data: NotificationInterface) => {
 				console.log("NewPartyInvite", data);
-				setGameInvite(data);
-				setTimeout(function() {
-					setGameInvite(undefined);
+				dispatch(addPartyInvite(data));
+				setTimeout(() => {
+					dispatch(removePartyInvite(data.id));
 				}, 15000);
 			});
 
@@ -209,8 +203,6 @@ export function useAppHook() {
         socket,
         eventError,
         closeEventError,
-        gameInvite,
-        gameNotificationLeave,
 		isAuthenticated,
 		partyState: {
 			party,

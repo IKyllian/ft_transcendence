@@ -1,11 +1,13 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { PartyInterface, TeamSide, Player, GameMode, PartyMessage } from '../Types/Lobby-Types';
+import { NotificationInterface } from '../Types/Notification-Types';
 
 interface PartyState {
     party?: PartyInterface,
     modalIsOpen: boolean,
     chatIsOpen: boolean,
     isInQueue: boolean,
+    partyInvite: NotificationInterface[];
 }
 
 const defaultState: PartyState = {
@@ -13,6 +15,7 @@ const defaultState: PartyState = {
     modalIsOpen: false,
     isInQueue: false,
     chatIsOpen: false,
+    partyInvite: [],
 }
 
 export const partySlice = createSlice({
@@ -56,8 +59,14 @@ export const partySlice = createSlice({
             if (state.party) {
                 state.party.game_mode = payload;
             }
-        } 
+        },
+        addPartyInvite: (state, { payload }: PayloadAction<NotificationInterface>) => {
+            state.partyInvite = [...state.partyInvite, payload]
+        },
+        removePartyInvite: (state, { payload }: PayloadAction<number>) => {
+            state.partyInvite = [...state.partyInvite.filter(elem => elem.id !== payload)];
+        },
     }
 });
 
-export const { addParty, leaveParty, addPartyMessage, changeModalStatus, changeSidebarChatStatus, closeSidebarChatStatus, changeQueueStatus, cancelQueue, changePartyGameMode} = partySlice.actions;
+export const { addParty, leaveParty, addPartyMessage, changeModalStatus, changeSidebarChatStatus, closeSidebarChatStatus, changeQueueStatus, cancelQueue, changePartyGameMode, addPartyInvite, removePartyInvite } = partySlice.actions;

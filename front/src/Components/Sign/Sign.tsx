@@ -40,7 +40,7 @@ function Sign() {
                             }
                         })}
                     />
-                    {
+                    {/* {
                         !isSignIn && 
                         <label> Email </label>
                     }
@@ -58,7 +58,7 @@ function Sign() {
                                   }
                             })}
                         />
-                    }
+                    } */}
                     <label> Password </label>
                     {hookForm.errors.password && <p className='txt-form-error'> {hookForm.errors.password.message} </p>}
                     <input

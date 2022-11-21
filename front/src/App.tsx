@@ -110,8 +110,6 @@ function App() {
 		socket,
 		eventError,
 		closeEventError,
-		gameInvite,
-		gameNotificationLeave,
 		isAuthenticated,
 		partyState,
 	} = useAppHook();
@@ -123,10 +121,10 @@ function App() {
 				{ isAuthenticated && eventError !== undefined && <NotifError error={eventError} closeError={closeEventError} />}
 				{ isAuthenticated && <AddFriendModal/> }
 				{ isAuthenticated && <ModalPartyInvite /> }
-				{ isAuthenticated && gameInvite && <NotifGameInvite notif={gameInvite} notifOnLeave={gameNotificationLeave} /> }
+				{ isAuthenticated && <NotifGameInvite /> }
 				{ isAuthenticated && <Header /> }
 				<main className="page-container">
-				{ isAuthenticated && partyState.party && partyState.chatIsOpen && <ChatParty />}
+					{ isAuthenticated && partyState.party && partyState.chatIsOpen && <ChatParty />}
 					<Routes>
 						{
 							routes.map((elem, index) => 

@@ -1,38 +1,46 @@
 import { useContext } from "react";
 import Avatar from "../Images-Icons/pp.jpg";
 import { SocketContext } from "../App";
-import { NotificationInterface } from "../Types/Notification-Types";
-import { useNavigate } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from "../Redux/Hooks";
+import { removePartyInvite } from "../Redux/PartySlice";
 
-function NotifGameInvite(props: {notif: NotificationInterface ,notifOnLeave: Function}) {
-    const {notif, notifOnLeave} = props;
-    const {socket} = useContext(SocketContext);
-    const navigate = useNavigate();
-    
-    const handleAccept = () => {
-        socket!.emit("JoinParty", { id: notif.requester.id });
-        notifOnLeave();
+function NotifGameInvite() {
+    const { partyInvite } = useAppSelector(state => state.party);
+    const dispatch = useAppDispatch();
+    const { socket } = useContext(SocketContext);
+
+    const handleAccept = (notifId: number, requesterId: number) => {
+        socket!.emit("JoinParty", { id: requesterId });
+        dispatch(removePartyInvite(notifId));
     }
 
-    const handleDecline = () => {
-        notifOnLeave();
+    const handleDecline = (notifId: number) => {
+        dispatch(removePartyInvite(notifId));
     }
 
-    return (
-        <div className="game-invite-wrapper">
-            <div className="notif-top">
-                <img className='profile-avatar' src={Avatar} alt="profil pic" />
-                <div className="notif-text">
-                    <p> {notif.requester.username} </p>
-                    <p> Invited you to play a game </p>
-                </div>
-            </div>
-            <div className="separate-line"></div>
-            <div className="notif-bottom">
-                <button onClick={() => handleAccept()}> Accept </button>
-                <button onClick={() => handleDecline()}> Decline </button>
-            </div>
+    return partyInvite.length > 0 ? (
+        <div className="game-invite-container">
+            {
+                partyInvite.map((elem) => 
+                    <div key={elem.id} className="game-invite-wrapper">
+                        <div className="notif-top">
+                            <img className='profile-avatar' src={Avatar} alt="profil pic" />
+                            <div className="notif-text">
+                                <p> {elem.requester.username} </p>
+                                <p> Invited you to play a game </p>
+                            </div>
+                        </div>
+                        <div className="separate-line"></div>
+                        <div className="notif-bottom">
+                            <button onClick={() => handleAccept(elem.id, elem.requester.id)}> Accept </button>
+                            <button onClick={() => handleDecline(elem.id)}> Decline </button>
+                        </div>
+                    </div>
+                )
+            }
         </div>
+    ) : (
+        <> </>
     );
 }
 
