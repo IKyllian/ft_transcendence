@@ -5,7 +5,7 @@ import { useAppSelector } from '../../Redux/Hooks';
 import { useParams } from "react-router-dom";
 
 import { SocketContext } from "../../App";
-import { fetchProfile } from "../../Api/Profile/Profile-Fetch";
+import { fetchGetAvatar, fetchProfile } from "../../Api/Profile/Profile-Fetch";
 import { fetchMe } from "../../Api/Profile/Profile-Fetch";
 import { Modes } from "../../Types/Utils-Types";
 
@@ -50,6 +50,7 @@ export function useProfileHook() {
         handleClick(0);
         if (params.username === currentUser?.username) {
             fetchMe(token, setUserState, friendList);
+            fetchGetAvatar(token, setUserState);
         }
         else if (params.username) {
             fetchProfile(params.username, token, setUserState);
