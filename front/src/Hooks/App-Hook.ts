@@ -11,7 +11,7 @@ import { UserInterface } from "../Types/User-Types";
 import { copyFriendListArray, logoutSuccess, stopIsConnectedLoading } from "../Redux/AuthSlice";
 import { GameMode, PartyInterface, PartyMessage } from "../Types/Lobby-Types";
 import { copyNotificationArray } from "../Redux/NotificationSlice";
-import { addParty, addPartyInvite, addPartyMessage, cancelQueue, changePartyGameMode, changeQueueStatus, leaveParty, removePartyInvite } from "../Redux/PartySlice";
+import { addParty, addPartyInvite, addPartyMessage, cancelQueue, changePartyGameMode, changeQueueStatus, incrementQueueTimer, leaveParty, removePartyInvite, resetQueueTimer } from "../Redux/PartySlice";
 import { fetchVerifyToken } from "../Api/Sign/Sign-Fetch";
 import { addChannelUser, banChannelUser, muteChannelUser, removeTimeoutChannelUser, removeChannelUser, setChannelDatas, updateChannelUser } from "../Redux/ChannelSlice";
 
@@ -19,7 +19,7 @@ export function useAppHook() {
     const [socket, setSocket] = useState<Socket | undefined>(undefined);
 	const [eventError, setEventError] = useState<string | undefined>(undefined);
     const { token, isAuthenticated, currentUser } = useAppSelector((state) => state.auth);
-	const { party, chatIsOpen } = useAppSelector(state => state.party);
+	const { party, chatIsOpen, isInQueue } = useAppSelector(state => state.party);
 	const { currentChannelId } = useAppSelector((state) => state.channel);
 
 	const dispatch = useAppDispatch();
@@ -45,6 +45,16 @@ export function useAppHook() {
 			dispatch(stopIsConnectedLoading());
 		}
 	}, [])
+
+	useEffect(() => {
+        if (isInQueue) {
+            setInterval(() => {
+                dispatch(incrementQueueTimer());
+            }, 1000)
+        } else {
+            dispatch(resetQueueTimer());
+        }
+    }, [isInQueue])
 
 	useEffect(() => {
 		if (isAuthenticated && socket === undefined) {

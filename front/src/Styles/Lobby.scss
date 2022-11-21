@@ -249,6 +249,19 @@ $TeamRedColor: rgb(247, 30, 6);
                 cursor: pointer;
             }
 
+            .queue-button {
+                position: relative;
+                
+                svg {
+                    position: absolute;
+                    left: 10px;
+                    display: flex;
+                    align-items: center;
+                    @include width-height(20px, 20px);
+                    cursor: pointer;
+                }
+            }
+
             .game-modes-dropdown {
                 position: absolute;
                 width: 32.5%;

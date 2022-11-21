@@ -22,10 +22,11 @@ import ChannelsList from "./Components/Chat/Channels-List";
 import NotifGameInvite from "./Components/Notif-Game-Invite";
 import NotifError from "./Components/Notif-Error";
 import Game from "./Components/Game/Game";
-import Lobby from "./Components/Game/Lobby";
+import Lobby from "./Components/Lobby/Lobby";
 import ModalPartyInvite from "./Components/Modal-Party-Invite";
 import CodeVerification from "./Components/Sign/Code-Verification";
 import ChatParty from "./Components/Chat-Party";
+import MatchFound from "./Components/Lobby/Match-Found";
 
 interface RouteProps {
 	path: string,
@@ -122,6 +123,7 @@ function App() {
 				{ isAuthenticated && <AddFriendModal/> }
 				{ isAuthenticated && <ModalPartyInvite /> }
 				{ isAuthenticated && <NotifGameInvite /> }
+				{/* { isAuthenticated && <MatchFound /> } */}
 				{ isAuthenticated && <Header /> }
 				<main className="page-container">
 					{ isAuthenticated && partyState.party && partyState.chatIsOpen && <ChatParty />}

@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { PartyInterface, TeamSide, Player, GameMode, PartyMessage } from '../Types/Lobby-Types';
+import { PartyInterface, GameMode, PartyMessage, QueueTimerInterface } from '../Types/Lobby-Types';
 import { NotificationInterface } from '../Types/Notification-Types';
 
 interface PartyState {
@@ -7,12 +7,19 @@ interface PartyState {
     modalIsOpen: boolean,
     chatIsOpen: boolean,
     isInQueue: boolean,
+    queueTimer: QueueTimerInterface,
     partyInvite: NotificationInterface[];
+}
+
+const defaultQueueTimer: QueueTimerInterface = {
+    seconds: 0,
+    minutes: 0
 }
 
 const defaultState: PartyState = {
     party: undefined,
     modalIsOpen: false,
+    queueTimer: defaultQueueTimer,
     isInQueue: false,
     chatIsOpen: false,
     partyInvite: [],
@@ -66,7 +73,33 @@ export const partySlice = createSlice({
         removePartyInvite: (state, { payload }: PayloadAction<number>) => {
             state.partyInvite = [...state.partyInvite.filter(elem => elem.id !== payload)];
         },
+        incrementQueueTimer: (state) => {
+            if (state.isInQueue) {
+                if (state.queueTimer.seconds === 59)
+                state.queueTimer = {seconds: 0, minutes: state.queueTimer.minutes + 1};
+                else
+                state.queueTimer = {...state.queueTimer, seconds: state.queueTimer.seconds + 1};
+            } else
+                state.queueTimer = defaultQueueTimer;
+        },
+        resetQueueTimer: (state) => {
+            state.queueTimer = defaultQueueTimer;
+        },
     }
 });
 
-export const { addParty, leaveParty, addPartyMessage, changeModalStatus, changeSidebarChatStatus, closeSidebarChatStatus, changeQueueStatus, cancelQueue, changePartyGameMode, addPartyInvite, removePartyInvite } = partySlice.actions;
+export const {
+    addParty,
+    leaveParty,
+    addPartyMessage,
+    changeModalStatus,
+    changeSidebarChatStatus,
+    closeSidebarChatStatus,
+    changeQueueStatus,
+    cancelQueue,
+    changePartyGameMode,
+    addPartyInvite,
+    removePartyInvite,
+    incrementQueueTimer,
+    resetQueueTimer,
+} = partySlice.actions;
