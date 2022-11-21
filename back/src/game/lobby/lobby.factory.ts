@@ -46,15 +46,15 @@ export class LobbyFactory
 		lobby_request.players.forEach((player) => {
 			if (player.team === TeamSide.BLUE) {
 				if (player.pos === PlayerPosition.BACK) {
-					dataToFront.Player_A_Back = player;
+					dataToFront.TeamBlue_Back = player;
 				} else {
-					dataToFront.Player_A_Front = player;
+					dataToFront.TeamBlue_Front = player;
 				}
 			} else {
 				if (player.pos === PlayerPosition.BACK) {
-					dataToFront.Player_B_Back = player;
+					dataToFront.TeamRed_Back = player;
 				} else {
-					dataToFront.Player_B_Front = player;
+					dataToFront.TeamRed_Front = player;
 				}
 			}
 		});
@@ -62,15 +62,15 @@ export class LobbyFactory
 		lobby_request.players.forEach((player) => {
 			if (player.team === TeamSide.BLUE) {
 				if (player.pos === PlayerPosition.BACK) {
-					dataToFront.player_type = PlayerType.Player_A_Back;
+					dataToFront.player_type = PlayerType.TeamBlue_Back;
 				} else {
-					dataToFront.player_type = PlayerType.Player_A_Front;
+					dataToFront.player_type = PlayerType.TeamBlue_Front;
 				}
 			} else {
 				if (player.pos === PlayerPosition.BACK) {
-					dataToFront.player_type = PlayerType.Player_B_Back;
+					dataToFront.player_type = PlayerType.TeamRed_Back;
 				} else {
-					dataToFront.player_type = PlayerType.Player_B_Front;
+					dataToFront.player_type = PlayerType.TeamRed_Front;
 				}
 			}
 			this.globalService.server.to('user-' + player.user.id).emit("newgame_data", dataToFront);

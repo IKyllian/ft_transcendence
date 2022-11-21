@@ -32,8 +32,8 @@ export default class PongCore
 	goal: Goal = Goal.None;
 	score_board: ScoreBoard =
 	{
-		Team_A: 0,
-		Team_B: 0
+		TeamBlue: 0,
+		TeamRed: 0
 	};
 
 	
@@ -234,10 +234,10 @@ export default class PongCore
 		this.score_board = game_state.score;
 		this.ball_data = game_state.balldata;
 
-		this.Player_A_Back_pos = game_state.Player_A_Back;
-		this.Player_A_Front_pos = game_state.Player_A_Front;
-		this.Player_B_Front_pos = game_state.Player_B_Front;
-		this.Player_B_Back_pos = game_state.Player_B_Back;
+		this.Player_A_Back_pos = game_state.TeamBlue_Back;
+		this.Player_A_Front_pos = game_state.TeamBlue_Front;
+		this.Player_B_Front_pos = game_state.TeamRed_Front;
+		this.Player_B_Back_pos = game_state.TeamRed_Back;
 		this.last_processed_id_A_Back = game_state.last_processed_id_A_Back;
 		this.last_processed_id_A_Front = game_state.last_processed_id_A_Front;
 		this.last_processed_id_B_Front = game_state.last_processed_id_B_Front;
@@ -254,10 +254,10 @@ export default class PongCore
 			score: this.score_board,
 			balldata: this.ball_data,
 
-			Player_A_Back: this.Player_A_Back_pos,
-			Player_A_Front: this.Player_A_Front_pos,
-			Player_B_Front: this.Player_B_Front_pos,
-			Player_B_Back: this.Player_B_Back_pos,
+			TeamBlue_Back: this.Player_A_Back_pos,
+			TeamBlue_Front: this.Player_A_Front_pos,
+			TeamRed_Front: this.Player_B_Front_pos,
+			TeamRed_Back: this.Player_B_Back_pos,
 			last_processed_id_A_Back: this.last_processed_id_A_Back,
 			last_processed_id_A_Front: this.last_processed_id_A_Front,
 			last_processed_id_B_Front: this.last_processed_id_B_Front,
@@ -402,7 +402,7 @@ export default class PongCore
 
 	apply_input = (input: PlayerInput) =>
 	{
-		if (input.player_type === PlayerType.Player_A_Back)
+		if (input.player_type === PlayerType.TeamBlue_Back)
 		{
 			if (input.movement === Movement.Up)
 			{
@@ -424,7 +424,7 @@ export default class PongCore
 			}
 			this.last_processed_id_A_Back = input.number;
 		}
-		else if (input.player_type === PlayerType.Player_B_Back)
+		else if (input.player_type === PlayerType.TeamRed_Back)
 		{
 			if (input.movement === Movement.Up)
 			{
@@ -450,7 +450,7 @@ export default class PongCore
 
 		if (this.game_type === GameType.Doubles)
 		{
-			if (input.player_type === PlayerType.Player_A_Front)
+			if (input.player_type === PlayerType.TeamBlue_Front)
 			{
 				if (input.movement === Movement.Up)
 				{
@@ -472,7 +472,7 @@ export default class PongCore
 				}
 				this.last_processed_id_A_Front = input.number;
 			}
-			else if (input.player_type === PlayerType.Player_B_Front)
+			else if (input.player_type === PlayerType.TeamRed_Front)
 			{
 				if (input.movement === Movement.Up)
 				{
@@ -506,25 +506,25 @@ export default class PongCore
 
 		if (this.ball_data.position.x < 0)
 		{
-			this.goal = Goal.Team_B;
-			this.score_board.Team_B += 1;
+			this.goal = Goal.TeamRed;
+			this.score_board.TeamRed += 1;
 		}
 		else if (this.ball_data.position.x > this.field_width)
 		{
-			this.goal = Goal.Team_A;
-			this.score_board.Team_A += 1;
+			this.goal = Goal.TeamBlue;
+			this.score_board.TeamBlue += 1;
 		}
 
 		if (this.goal !== Goal.None)
 		{
 			//check score
-			if (this.score_board.Team_A >= this.point_for_victory)
+			if (this.score_board.TeamBlue >= this.point_for_victory)
 			{
-				this.result = EndResult.Team_A_Win;
+				this.result = EndResult.TeamBlue_Win;
 			}
-			else if (this.score_board.Team_B >= this.point_for_victory)
+			else if (this.score_board.TeamRed >= this.point_for_victory)
 			{
-				this.result = EndResult.Team_B_Win;
+				this.result = EndResult.TeamRed_Win;
 			}
 			else
 			{
