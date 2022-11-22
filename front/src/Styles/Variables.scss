@@ -1,0 +1,128 @@
+$DarkPalette: #0D1B2A;
+$LightDarkPalette: #1B263B;
+$BlueDarkPalette: #415A77;
+$LightBluePalette: #778DA9;
+$WhitePalette: #E0E1DD;
+
+$OrangeProfile: orange;
+
+$HeaderPartyBackground: #303030;
+$HeaderPartyGrey: #565555;
+$HeaderPartyGreyHover: #676767;
+
+$HeaderMarge: 80px;
+$HeaderResponsive800Marge: 40px;
+$HeaderResponsive500Marge: 10px;
+
+$ProfileBlockMarge: 30px $HeaderMarge;
+
+$BreakPoint_800: 855px;
+$BreakPoint_500: 575px;
+$BreakPoint_400: 400px;
+
+$headerHeight: 70px;
+
+$OnlineColor: rgb(15, 187, 15);
+$OfflineColor: rgb(194, 29, 29);
+
+@mixin page-wrapper {
+    min-height: 100%;
+    overflow: auto;
+}
+
+@mixin player-status {
+    height: 13px;
+    width: 13px;
+    border-radius: 50%;
+    margin: 0 10px 0 20px;
+    
+    &-online {
+        background-color: $OnlineColor;
+    }
+
+    &-offline {
+        background-color: $OfflineColor;
+    }
+}
+
+@mixin avatar-player($size) {
+    height: $size;
+    width: $size;
+    border-radius: 50%;
+}
+
+@mixin modal-container($height, $width, $bgColor) {
+    z-index: 100;
+    height: $height;
+    width: $width;
+    position: absolute;
+    left:0;
+    right:0;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+    border-radius: 10px;
+    background-color: $bgColor;
+    @include overflowScroll("y");
+    .modal-exit {
+        position: absolute;
+        right: 5px;
+        top: 5px;
+        width: 20px;
+        height: 20px;
+        color: $WhitePalette;
+        cursor: pointer;
+    }
+
+    @media screen and (max-height: 700px) {
+        height: 97%;
+    }
+
+    @media screen and (max-width: $BreakPoint_800) {
+        width: 90%;
+    }
+}
+
+@mixin flex-row-alignCenter {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+@mixin width-height($width, $height) {
+    width: $width;
+    height: $height;
+}
+
+@mixin overflowScroll($typeOverflow) {
+    @if $typeOverflow == "x" {
+        overflow-x: scroll;
+    } @else if $typeOverflow == "y" {
+        overflow-y: scroll;
+    } @else {
+        overflow: scroll;
+    }
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+@font-face {
+    font-family: Montserrat;
+    src: url("../../public/Font/Montserrat/static/Montserrat-Regular.ttf");
+    font-display: swap;
+}
+
+@font-face {
+    font-family: Silkscreen;
+    src: url("../../public/Font/Silkscreen/Silkscreen-Regular.ttf");
+    font-display: swap;
+}
+
+@font-face {
+    font-family: OpenSans;
+    src: url("../../public/Font/Open_Sans/static/OpenSans/OpenSans-Light.ttf");
+    font-display: swap;
+}

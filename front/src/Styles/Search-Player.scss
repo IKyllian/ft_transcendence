@@ -1,0 +1,49 @@
+@use "./Variables.scss" as *;
+
+.search-player-container {
+    width: 100%;
+    .modal-search {
+        @include width-height(90%, 50px);
+        @include flex-row-alignCenter();
+        border-bottom: 1px solid $WhitePalette;
+        margin: 0 auto;
+        svg {
+            @include width-height(25px, 25px);
+            margin: 0 0 0 10px;
+            cursor: pointer;
+        }
+
+        input {
+            all: unset;
+            width: 100%;
+            padding: 8px 20px;
+            margin: 0px auto;
+            cursor: pointer;
+        }
+    }
+}
+
+@media screen and (max-width: $BreakPoint_800) {
+    .search-player-container {
+        .modal-search {
+            svg {
+                @include width-height(20px, 20px);
+            }
+
+            input {
+                font-size: 15px;
+            }
+        }
+
+        .modal-player-list {
+            &-item {
+                font-size: 14px;
+                .item-player-info {
+                    .modal-picture {
+                        @include avatar-player(40px);
+                    }
+                }
+            }
+        }
+    }
+}

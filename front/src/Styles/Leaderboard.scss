@@ -1,0 +1,171 @@
+@use "./Variables.scss" as *;
+
+.leaderboard-page-container {
+    background-color: $LightBluePalette;
+    padding: 10px 0;
+    @include page-wrapper();
+    h2 {
+        margin: 0;
+        font-size: 45px;
+        text-align: center;
+        font-family: Silkscreen;
+    }
+
+    .mode-select {
+        margin: 0 auto;
+        display: flex;
+        justify-content: center;
+        padding: 5px 10px;
+        background: transparent;
+        border: none;
+        font-weight: bold;
+        font-size: 15px;
+        cursor: pointer;
+        border: 1px solid $DarkPalette;
+        border-radius: 10px;
+    } 
+
+    table {
+        border-collapse: collapse;
+        text-align: left;
+        margin: 10px auto 0 auto;
+        width: 90%;
+        background-color: $DarkPalette;
+
+        thead {
+            th {
+                padding: 25px;
+                font-size: 14px;
+                font-weight: bold;
+            }
+        }
+
+        tbody {
+            .raw-top3 {
+                &:first-child {
+                    td {
+                        &:first-child {
+                            color: gold;
+                        }
+                    }
+                }
+                &:nth-child(2) {
+                    td {
+                        &:first-child {
+                            color: silver;
+                        }
+                    }
+                }
+                &:nth-child(3) {
+                    td {
+                        &:first-child {
+                            color: #CD7F32;
+                        }
+                    }
+                }
+            }
+            tr {
+                &:hover td {
+                    background-color: #202d45;
+                }
+
+                .leaderboard-status .player-status {
+                    @include player-status;
+                }
+
+                td {
+                    padding: 15px 25px;
+                    background: $LightDarkPalette;
+                    font-size: 16px;
+                    border-bottom: 5px solid $DarkPalette;
+
+                    // span {
+                        // width: 60%;
+                        // display: flex;
+                        // margin: 0 auto;
+                    // }
+
+                    .user-info {
+                        @include flex-row-alignCenter();
+                        gap: 10px;
+                        .user-avatar {
+                            @include avatar-player(30px);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+.pagination {
+    &-wrapper {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        gap: 7px;
+        margin: 10px 0;
+        min-width: 100px;
+        .pagination-item {
+            background-color: $LightDarkPalette;
+            height: 35px;
+            width: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 5px;
+            cursor: pointer;
+            p {
+                font-weight: bold;
+                margin: 0;
+            }
+        }
+    }
+}
+
+@media screen and (max-width: $BreakPoint_800) {
+    .leaderboard-page-container {
+        table {
+            thead {
+                .responsive-column {
+                    display: none;
+                }
+                th {
+                    padding: 15px 15px;
+                    font-size: 10px;
+                }
+            }
+            tbody {
+                tr {
+                    .responsive-column {
+                        display: none;
+                    }
+
+                    td {
+                        font-size: 13px;
+                        padding: 15px 15px;
+                    }
+                }
+            }
+        }
+    }
+}
+
+@media screen and (max-width: $BreakPoint_500) {
+    .leaderboard-page-container {
+        table {
+            thead {
+                .responsive-column {
+                    display: none;
+                }
+            }
+            tbody {
+                tr {
+                    .responsive-column {
+                        display: none;
+                    }
+                }
+            }
+        }
+    }
+}

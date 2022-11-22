@@ -1,0 +1,86 @@
+@use "./Variables.scss" as *;
+
+@keyframes notifFromRight {
+	0% {
+	    transform: translateX(100%);
+	}
+	5% {
+	    transform: translateX(0);
+	}
+    94% {
+	    transform: translateX(0);
+    }
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+@keyframes progressBar {
+	0% {
+	    width: 100%;
+	}
+	100% {
+	    width: 0%;
+	}
+}
+
+.game-invite-wrapper {
+    z-index: 100;
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    width: 300px;
+    height: 110px;
+    background-color: #2c2f33;
+    color: #ccd5dc;
+    border-radius: 5px;
+    padding: 7px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+	animation: 15s ease-in 0s 1 notifFromRight;
+    .notif-top {
+        @include flex-row-alignCenter();
+        gap: 20px;
+        .profile-avatar {
+            @include avatar-player(40px);
+        }
+        .notif-text {
+            p {
+                margin: 0;
+                &:first-child {
+                    font-size: 17px;
+                    margin-bottom: 4px;
+                }
+                &:last-child {
+                    font-size: 11px;
+                }
+            }
+        }
+    }
+    .separate-line {
+        height: 1px;
+        background-color: #ccd5dc;
+        margin: 5px 0;
+	    animation: 15s linear 0s 1 progressBar;
+    }
+    .notif-bottom {
+        @include flex-row-alignCenter();
+        gap: 5px;
+        justify-content: space-around;
+        button {
+            all: unset;
+            cursor: pointer;
+            text-align: center;
+            border-radius: 3px;
+            width: 50%;
+            height: 32px;
+            &:last-child {
+                background-color: 	#424549;
+            }
+            &:first-child {
+                background-color: rgb(185, 129, 24);
+            }
+        }
+    }
+}

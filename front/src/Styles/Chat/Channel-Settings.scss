@@ -1,0 +1,181 @@
+@use '../Variables.scss' as *;
+
+.channel-setting-container {
+    display: flex;
+    flex-direction: row;
+    color: $WhitePalette;
+    @include page-wrapper();
+    .sidebar-setting {
+        background-color: $DarkPalette;
+        width: 500px;
+        padding-top: 30px;
+
+        .sidebar-wrapper {
+            width: 50%;
+            float: right;
+            margin-right: 10px;
+
+            p {
+                margin: 0 0 5px 10px;
+                color: rgb(190, 181, 181);
+            }
+
+            ul {
+                list-style-type: none;
+                margin: 0;
+                padding: 0;
+    
+                li {
+                    &:not(&:first-child) {
+                        margin-top: 2px;
+                    }
+                    padding: 10px;
+                    border-radius: 5px;
+                    cursor: pointer;
+
+                    &:hover {
+                        background-color: $LightDarkPalette;
+                    }
+                }
+            }
+    
+            .separate-line {
+                height: 2px;
+                background-color: $LightDarkPalette;
+                margin: 5px 0;
+            }
+    
+            button {
+                all: unset;
+                padding: 10px;
+                border-radius: 5px;
+                width: 100%;
+                cursor: pointer;
+                color: red;
+
+                &:hover {
+                    background-color: $LightDarkPalette;
+                }
+            }
+        } 
+    }
+
+    .content-setting-container {
+        background-color: $LightDarkPalette;
+        width: 100%;
+        padding-top: 30px;
+
+        .content-wrapper {
+            margin-left: 50px;
+            height: 100%;
+
+            .radio-form {
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+                
+                .labelTextInput {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 5px;
+                    font-size: 15px;
+                    margin: 5px 0 10px 5px;
+                    input {
+                        all: unset;
+                        width: 300px;
+                        cursor: pointer;
+                        padding: 8px;
+                        border: 1px solid $WhitePalette;
+                        margin-top: 2px;
+                        &::placeholder {
+                            font-size: 12px;
+                        }
+                    }
+                }
+                .saveInput {
+                    all: unset;
+                    @include width-height(60px, 35px);
+                    text-align: center;
+                    border: none;
+                    font-size: 15px;
+                    font-weight: bold;
+                    cursor: pointer;
+                    border-radius: 10px;
+                    background-color: rgb(255, 123, 0);
+                    color: $WhitePalette;
+                    margin-top: 10px;
+                }
+            }
+            
+            .user-list-container {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                height: 100%;
+                @include overflowScroll("y");
+                h3 {
+                    margin: 0;
+                    padding: 0;
+                    color: rgb(190, 181, 181);
+                }
+                ul {
+                    margin: 0;
+                    padding: 0;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 5px;
+                    margin-bottom: 15px;
+                    .setting-user-item {
+                        width: 300px;
+                        @include flex-row-alignCenter;
+                        justify-content: space-between;
+                        .profil-container {
+                            @include flex-row-alignCenter;
+                            gap: 10px;
+                            .profile-avatar {
+                                @include avatar-player(45px);
+                            }
+                        }
+                        .user-dropdown-container {
+                            position: relative;
+                            svg {
+                                cursor: pointer;
+                            }
+                        }
+    
+                        .unban-button-wrapper {
+                            display: flex;
+                            flex-direction: column;
+                            gap: 2px;
+                            align-items: center;
+                            button {
+                                all: unset;
+                                cursor: pointer;
+                                background-color: $DarkPalette;
+                                padding: 6px;
+                                border-radius: 5px;
+                                font-size: 12px
+                            }
+                            p {
+                                font-size: 8px;
+                                margin: 0;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    .leave-icon {
+        @include width-height(40px, 40px);
+        padding: 5px;
+        color: $WhitePalette;
+        position: absolute;
+        right: 40px;
+        top: 30px;
+        cursor: pointer;
+        border: 2px solid $WhitePalette;
+        border-radius: 50%;
+    }
+}
