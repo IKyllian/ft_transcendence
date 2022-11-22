@@ -145,16 +145,16 @@ export class Lobby
         if (team === TeamSide.BLUE)
         {
             if (pos === PlayerPosition.BACK)
-                return PlayerType.Player_A_Back;
+                return PlayerType.TeamBlue_Back;
             else
-                return PlayerType.Player_A_Front;
+                return PlayerType.TeamBlue_Front;
         }
         else
         {
             if (pos === PlayerPosition.BACK)
-                return PlayerType.Player_B_Back
+                return PlayerType.TeamRed_Back
             else
-                return PlayerType.Player_B_Front
+                return PlayerType.TeamRed_Front
         }
     }
 

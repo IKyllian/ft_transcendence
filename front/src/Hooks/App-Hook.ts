@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { io, Socket } from "socket.io-client";
 import { useAppDispatch, useAppSelector } from '../Redux/Hooks'
 import { socketUrl } from "../env";
@@ -9,9 +9,9 @@ import { addChannel, addPrivateConv, removeChannel } from "../Redux/ChatSlice";
 import { Channel, ChannelUpdateType, ChannelUser, Conversation, UserTimeout } from "../Types/Chat-Types";
 import { UserInterface } from "../Types/User-Types";
 import { copyFriendListArray, logoutSuccess, stopIsConnectedLoading } from "../Redux/AuthSlice";
-import { GameMode, PartyInterface } from "../Types/Lobby-Types";
+import { GameMode, PartyInterface, PartyMessage } from "../Types/Lobby-Types";
 import { copyNotificationArray } from "../Redux/NotificationSlice";
-import { addParty, cancelQueue, changePartyGameMode, changeQueueStatus, leaveParty } from "../Redux/PartySlice";
+import { addParty, addPartyMessage, cancelQueue, changePartyGameMode, changeQueueStatus, leaveParty } from "../Redux/PartySlice";
 import { fetchVerifyToken } from "../Api/Sign/Sign-Fetch";
 import { addChannelUser, banChannelUser, muteChannelUser, removeTimeoutChannelUser, removeChannelUser, setChannelDatas, updateChannelUser } from "../Redux/ChannelSlice";
 
@@ -21,7 +21,7 @@ export function useAppHook() {
 	const [eventError, setEventError] = useState<string | undefined>(undefined);
     const { token, isAuthenticated, currentUser } = useAppSelector((state) => state.auth);
 	const { party, chatIsOpen } = useAppSelector(state => state.party);
-	const {currentChannelId} = useAppSelector((state) => state.channel);
+	const { currentChannelId } = useAppSelector((state) => state.channel);
 
 	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
@@ -113,6 +113,10 @@ export function useAppHook() {
 				dispatch(cancelQueue(data.cancelQueue));
 			});
 
+			socket.on("NewPartyMessage", (data: PartyMessage) => {
+				dispatch(addPartyMessage(data));
+			});
+
 			socket.on("GameModeUpdate", (data: GameMode) => {
 				dispatch(changePartyGameMode(data));
 			})
@@ -197,6 +201,7 @@ export function useAppHook() {
 			socket?.off("exception");
 			socket?.off("OnJoin");
 			socket?.off("OnLeave");
+			socket?.off("Logout");
 		}
 	}, [socket])
 

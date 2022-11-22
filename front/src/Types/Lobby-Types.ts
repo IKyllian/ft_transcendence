@@ -61,9 +61,16 @@ export interface Player {
     team: TeamSide,
 }
 
+export type PartyMessage = {
+	sender: UserInterface;
+	content: string;
+	send_at: string;
+}
+
 export interface PartyInterface {
 	id: string,
 	players: Player[],
 	game_settings: GameSettings,
     game_mode: GameMode,
+    messages: PartyMessage[],
 }

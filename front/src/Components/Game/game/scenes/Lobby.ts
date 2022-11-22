@@ -20,29 +20,29 @@ export default class Lobby extends Phaser.Scene
 
 	socketmanager?: ClientSocketManager;
 
-	Player_A_Back_avatar?: Phaser.GameObjects.Image;
-	Player_A_Back_indicator?: Phaser.GameObjects.Shape;
-	Player_A_Back_name?: Phaser.GameObjects.Text;
-	Player_A_Back_win?: Phaser.GameObjects.Text;
-	Player_A_Back_loss?: Phaser.GameObjects.Text;
+	TeamBlue_Back_avatar?: Phaser.GameObjects.Image;
+	TeamBlue_Back_indicator?: Phaser.GameObjects.Shape;
+	TeamBlue_Back_name?: Phaser.GameObjects.Text;
+	TeamBlue_Back_win?: Phaser.GameObjects.Text;
+	TeamBlue_Back_loss?: Phaser.GameObjects.Text;
 	
-	Player_A_Front_avatar?: Phaser.GameObjects.Image;
-	Player_A_Front_indicator?: Phaser.GameObjects.Shape;
-	Player_A_Front_name?: Phaser.GameObjects.Text;
-	Player_A_Front_win?: Phaser.GameObjects.Text;
-	Player_A_Front_loss?: Phaser.GameObjects.Text;
+	TeamBlue_Front_avatar?: Phaser.GameObjects.Image;
+	TeamBlue_Front_indicator?: Phaser.GameObjects.Shape;
+	TeamBlue_Front_name?: Phaser.GameObjects.Text;
+	TeamBlue_Front_win?: Phaser.GameObjects.Text;
+	TeamBlue_Front_loss?: Phaser.GameObjects.Text;
 
-	Player_B_Front_avatar?: Phaser.GameObjects.Image;
-	Player_B_Front_indicator?: Phaser.GameObjects.Shape;
-	Player_B_Front_name?: Phaser.GameObjects.Text;
-	Player_B_Front_win?: Phaser.GameObjects.Text;
-	Player_B_Front_loss?: Phaser.GameObjects.Text;
+	TeamRed_Front_avatar?: Phaser.GameObjects.Image;
+	TeamRed_Front_indicator?: Phaser.GameObjects.Shape;
+	TeamRed_Front_name?: Phaser.GameObjects.Text;
+	TeamRed_Front_win?: Phaser.GameObjects.Text;
+	TeamRed_Front_loss?: Phaser.GameObjects.Text;
 
-	Player_B_Back_avatar?: Phaser.GameObjects.Image;
-	Player_B_Back_indicator?: Phaser.GameObjects.Shape;
-	Player_B_Back_name?: Phaser.GameObjects.Text;
-	Player_B_Back_win?: Phaser.GameObjects.Text;
-	Player_B_Back_loss?: Phaser.GameObjects.Text;
+	TeamRed_Back_avatar?: Phaser.GameObjects.Image;
+	TeamRed_Back_indicator?: Phaser.GameObjects.Shape;
+	TeamRed_Back_name?: Phaser.GameObjects.Text;
+	TeamRed_Back_win?: Phaser.GameObjects.Text;
+	TeamRed_Back_loss?: Phaser.GameObjects.Text;
 	
 
 	// ready_button?: Phaser.GameObjects.Image;
@@ -53,10 +53,10 @@ export default class Lobby extends Phaser.Scene
 	me: PlayerType = PlayerType.Spectator;
 	lobbystatus: LobbyStatus = 
 	{
-		Player_A_Back: PlayerStatus.Absent,
-		Player_A_Front: PlayerStatus.Absent,
-		Player_B_Front: PlayerStatus.Absent,
-		Player_B_Back: PlayerStatus.Absent,
+		TeamBlue_Back: PlayerStatus.Absent,
+		TeamBlue_Front: PlayerStatus.Absent,
+		TeamRed_Front: PlayerStatus.Absent,
+		TeamRed_Back: PlayerStatus.Absent,
 	}
 
 	anti_spam_count :number = 0;
@@ -68,12 +68,12 @@ export default class Lobby extends Phaser.Scene
 	preload ()
 	{
 		this.load.image(
-			'player_a_back_avatar',
-			this.game.registry.get('players_data').Player_A_Back.avatar
+			'TeamBlue_back_avatar',
+			this.game.registry.get('players_data').TeamBlue_Back.avatar
 			);
 		this.load.image(
-			'player_b_back_avatar',
-			this.game.registry.get('players_data').Player_B_Back.avatar
+			'TeamRed_back_avatar',
+			this.game.registry.get('players_data').TeamRed_Back.avatar
 			);
 
 		// 	this.load.image(
@@ -96,12 +96,12 @@ export default class Lobby extends Phaser.Scene
 		if (this.game_type === GameType.Doubles)
 		{
 			this.load.image(
-				'player_a_front_avatar',
-				this.game.registry.get('players_data').Player_A_Front.avatar
+				'TeamBlue_front_avatar',
+				this.game.registry.get('players_data').TeamBlue_Front.avatar
 				);
 			this.load.image(
-				'player_b_front_avatar',
-				this.game.registry.get('players_data').Player_B_Front.avatar
+				'TeamRed_front_avatar',
+				this.game.registry.get('players_data').TeamRed_Front.avatar
 				);
 
 			// this.load.image(
@@ -130,15 +130,15 @@ export default class Lobby extends Phaser.Scene
 			game_end: this.game_end.bind(this)
         });
 
-		this.Player_A_Back_avatar = this.add.image(130, 130, 'player_a_back_avatar')
+		this.TeamBlue_Back_avatar = this.add.image(130, 130, 'TeamBlue_back_avatar')
 								.setOrigin(0.5,0.5)
 								.setDisplaySize(150, 150);
-		this.Player_B_Back_avatar = this.add.image(670, 130, 'player_b_back_avatar')
+		this.TeamRed_Back_avatar = this.add.image(670, 130, 'TeamRed_back_avatar')
 								.setOrigin(0.5,0.5)
 								.setDisplaySize(150, 150);
 
-		this.Player_A_Back_indicator = this.add.circle(150, 240, 50, 0x000000);
-		this.Player_B_Back_indicator = this.add.circle(650, 240, 50, 0x000000);
+		this.TeamBlue_Back_indicator = this.add.circle(150, 240, 50, 0x000000);
+		this.TeamRed_Back_indicator = this.add.circle(650, 240, 50, 0x000000);
 
 		let style: Phaser.Types.GameObjects.Text.TextStyle = 
 		{
@@ -146,28 +146,28 @@ export default class Lobby extends Phaser.Scene
 			color: '#000000',
 			fontFamily: 'Arial'
 		}
-		this.Player_A_Back_win = this.add.text(100, 320, "Win:" + this.game.registry.get('players_data').Player_A_Back.win, style);
-		this.Player_A_Back_loss = this.add.text(100, 360, "Loss:" + this.game.registry.get('players_data').Player_A_Back.loss, style);
-		this.Player_B_Back_win = this.add.text(700, 320, "Win:" + this.game.registry.get('players_data').Player_B_Back.win, style);
-		this.Player_B_Back_loss = this.add.text(700, 360, "Loss:" + this.game.registry.get('players_data').Player_B_Back.loss, style);
+		this.TeamBlue_Back_win = this.add.text(100, 320, "Win:" + this.game.registry.get('players_data').TeamBlue_Back.win, style);
+		this.TeamBlue_Back_loss = this.add.text(100, 360, "Loss:" + this.game.registry.get('players_data').TeamBlue_Back.loss, style);
+		this.TeamRed_Back_win = this.add.text(700, 320, "Win:" + this.game.registry.get('players_data').TeamRed_Back.win, style);
+		this.TeamRed_Back_loss = this.add.text(700, 360, "Loss:" + this.game.registry.get('players_data').TeamRed_Back.loss, style);
 
 
 		if (this.game_type === GameType.Doubles)
 		{
-			this.Player_A_Front_avatar = this.add.image(280, 130, 'player_a_front_avatar')
+			this.TeamBlue_Front_avatar = this.add.image(280, 130, 'TeamBlue_front_avatar')
 								.setOrigin(0.5,0.5)
 								.setDisplaySize(150, 150);
-			this.Player_B_Front_avatar = this.add.image(520, 130, 'player_b_front_avatar')
+			this.TeamRed_Front_avatar = this.add.image(520, 130, 'TeamRed_front_avatar')
 								.setOrigin(0.5,0.5)
 								.setDisplaySize(150, 150);
 
-			this.Player_A_Front_indicator = this.add.circle(300, 240, 50, 0x000000);
-			this.Player_B_Front_indicator = this.add.circle(500, 240, 50, 0x000000);
+			this.TeamBlue_Front_indicator = this.add.circle(300, 240, 50, 0x000000);
+			this.TeamRed_Front_indicator = this.add.circle(500, 240, 50, 0x000000);
 
-			this.Player_A_Front_win = this.add.text(300, 320, "Win:" + this.game.registry.get('players_data').Player_A_Front.win, style);
-			this.Player_A_Front_loss = this.add.text(300, 360, "Loss:" + this.game.registry.get('players_data').Player_A_Front.loss, style);
-			this.Player_B_Front_win = this.add.text(500, 320, "Win:" + this.game.registry.get('players_data').Player_B_Front.win, style);
-			this.Player_B_Front_loss = this.add.text(500, 360, "Loss:" + this.game.registry.get('players_data').Player_B_Front.loss, style);
+			this.TeamBlue_Front_win = this.add.text(300, 320, "Win:" + this.game.registry.get('players_data').TeamBlue_Front.win, style);
+			this.TeamBlue_Front_loss = this.add.text(300, 360, "Loss:" + this.game.registry.get('players_data').TeamBlue_Front.loss, style);
+			this.TeamRed_Front_win = this.add.text(500, 320, "Win:" + this.game.registry.get('players_data').TeamRed_Front.win, style);
+			this.TeamRed_Front_loss = this.add.text(500, 360, "Loss:" + this.game.registry.get('players_data').TeamRed_Front.loss, style);
 		
 		}
 
@@ -230,59 +230,59 @@ export default class Lobby extends Phaser.Scene
 	{
 		this.lobbystatus = new_status;
 
-		if (this.lobbystatus.Player_A_Back === PlayerStatus.Present)
+		if (this.lobbystatus.TeamBlue_Back === PlayerStatus.Present)
 		{
-			this.Player_A_Back_indicator?.setFillStyle(0xf2fc23);
+			this.TeamBlue_Back_indicator?.setFillStyle(0xf2fc23);
 		}
-		else if (this.lobbystatus.Player_A_Back === PlayerStatus.Ready)
+		else if (this.lobbystatus.TeamBlue_Back === PlayerStatus.Ready)
 		{
-			this.Player_A_Back_indicator?.setFillStyle(0x43f33b);
+			this.TeamBlue_Back_indicator?.setFillStyle(0x43f33b);
 		}
 		else
 		{
-			this.Player_A_Back_indicator?.setFillStyle(0xff0000);
+			this.TeamBlue_Back_indicator?.setFillStyle(0xff0000);
 		}
 
-		if (this.lobbystatus.Player_B_Back === PlayerStatus.Present)
+		if (this.lobbystatus.TeamRed_Back === PlayerStatus.Present)
 		{
-			this.Player_B_Back_indicator?.setFillStyle(0xf2fc23);
+			this.TeamRed_Back_indicator?.setFillStyle(0xf2fc23);
 		}
-		else if (this.lobbystatus.Player_B_Back === PlayerStatus.Ready)
+		else if (this.lobbystatus.TeamRed_Back === PlayerStatus.Ready)
 		{
-			this.Player_B_Back_indicator?.setFillStyle(0x43f33b);
+			this.TeamRed_Back_indicator?.setFillStyle(0x43f33b);
 		}
 		else
 		{
-			this.Player_B_Back_indicator?.setFillStyle(0xff0000);
+			this.TeamRed_Back_indicator?.setFillStyle(0xff0000);
 		}
 
 
 		if (this.game_type === GameType.Doubles)
 		{
-			if (this.lobbystatus.Player_A_Front === PlayerStatus.Present)
+			if (this.lobbystatus.TeamBlue_Front === PlayerStatus.Present)
 			{
-				this.Player_A_Front_indicator?.setFillStyle(0xf2fc23);
+				this.TeamBlue_Front_indicator?.setFillStyle(0xf2fc23);
 			}
-			else if (this.lobbystatus.Player_A_Front === PlayerStatus.Ready)
+			else if (this.lobbystatus.TeamBlue_Front === PlayerStatus.Ready)
 			{
-				this.Player_A_Front_indicator?.setFillStyle(0x43f33b);
+				this.TeamBlue_Front_indicator?.setFillStyle(0x43f33b);
 			}
 			else
 			{
-				this.Player_A_Front_indicator?.setFillStyle(0xff0000);
+				this.TeamBlue_Front_indicator?.setFillStyle(0xff0000);
 			}
 	
-			if (this.lobbystatus.Player_B_Front === PlayerStatus.Present)
+			if (this.lobbystatus.TeamRed_Front === PlayerStatus.Present)
 			{
-				this.Player_B_Front_indicator?.setFillStyle(0xf2fc23);
+				this.TeamRed_Front_indicator?.setFillStyle(0xf2fc23);
 			}
-			else if (this.lobbystatus.Player_B_Front === PlayerStatus.Ready)
+			else if (this.lobbystatus.TeamRed_Front === PlayerStatus.Ready)
 			{
-				this.Player_B_Front_indicator?.setFillStyle(0x43f33b);
+				this.TeamRed_Front_indicator?.setFillStyle(0x43f33b);
 			}
 			else
 			{
-				this.Player_B_Front_indicator?.setFillStyle(0xff0000);
+				this.TeamRed_Front_indicator?.setFillStyle(0xff0000);
 			}	
 		}
 
@@ -297,10 +297,10 @@ export default class Lobby extends Phaser.Scene
 
 		this.update_lobby_status(
 			{
-				Player_A_Back: PlayerStatus.Ready,
-				Player_A_Front: PlayerStatus.Ready,
-				Player_B_Front: PlayerStatus.Ready,
-				Player_B_Back: PlayerStatus.Ready,
+				TeamBlue_Back: PlayerStatus.Ready,
+				TeamBlue_Front: PlayerStatus.Ready,
+				TeamRed_Front: PlayerStatus.Ready,
+				TeamRed_Back: PlayerStatus.Ready,
 			});
 
 
@@ -362,31 +362,31 @@ export default class Lobby extends Phaser.Scene
 
 	clear_all = () =>
 	{
-		this.Player_A_Back_avatar?.destroy();
-		this.Player_A_Back_indicator?.destroy();
-		this.Player_A_Back_name?.destroy();
-		this.Player_A_Back_win?.destroy();
-		this.Player_A_Back_loss?.destroy();
+		this.TeamBlue_Back_avatar?.destroy();
+		this.TeamBlue_Back_indicator?.destroy();
+		this.TeamBlue_Back_name?.destroy();
+		this.TeamBlue_Back_win?.destroy();
+		this.TeamBlue_Back_loss?.destroy();
 
-		this.Player_B_Back_avatar?.destroy();
-		this.Player_B_Back_indicator?.destroy();
-		this.Player_B_Back_name?.destroy();
-		this.Player_B_Back_win?.destroy();
-		this.Player_B_Back_loss?.destroy();
+		this.TeamRed_Back_avatar?.destroy();
+		this.TeamRed_Back_indicator?.destroy();
+		this.TeamRed_Back_name?.destroy();
+		this.TeamRed_Back_win?.destroy();
+		this.TeamRed_Back_loss?.destroy();
 
 		if (this.game_type === GameType.Doubles)
 		{
-			this.Player_A_Front_avatar?.destroy();
-			this.Player_A_Front_indicator?.destroy();
-			this.Player_A_Front_name?.destroy();
-			this.Player_A_Front_win?.destroy();
-			this.Player_A_Front_loss?.destroy();
+			this.TeamBlue_Front_avatar?.destroy();
+			this.TeamBlue_Front_indicator?.destroy();
+			this.TeamBlue_Front_name?.destroy();
+			this.TeamBlue_Front_win?.destroy();
+			this.TeamBlue_Front_loss?.destroy();
 		
-			this.Player_B_Front_avatar?.destroy();
-			this.Player_B_Front_indicator?.destroy();
-			this.Player_B_Front_name?.destroy();
-			this.Player_B_Front_win?.destroy();
-			this.Player_B_Front_loss?.destroy();
+			this.TeamRed_Front_avatar?.destroy();
+			this.TeamRed_Front_indicator?.destroy();
+			this.TeamRed_Front_name?.destroy();
+			this.TeamRed_Front_win?.destroy();
+			this.TeamRed_Front_loss?.destroy();
 		}
 
 	}

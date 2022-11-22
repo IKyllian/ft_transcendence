@@ -104,7 +104,7 @@ export class GameService {
 		// console.log("red elo if win: " + redEloWon);
 		// console.log("red elo if lose: " + redEloLost);
 
-		if (result === EndResult.Team_A_Win) {
+		if (result === EndResult.TeamBlue_Win) {
 			console.log("elo result blue: " + blueEloWon);
 			console.log("elo result red: " + redEloLost);
 			this.saveNewElo(blueTeamIds, blueEloWon, game_type);
@@ -124,9 +124,9 @@ export class GameService {
 	saveMatch(blueTeam: User[], redTeam: User[], game_type: GameType, score: ScoreBoard) {
 		let match: MatchResult = this.matchRepo.create({
 			game_type,
-			blue_team_goals: score.Team_A,
+			blue_team_goals: score.TeamBlue,
 			blue_team_player1: blueTeam[0],
-			red_team_goals: score.Team_B,
+			red_team_goals: score.TeamRed,
 			red_team_player1: redTeam[0],
 		});
 		if (game_type === GameType.Doubles) {

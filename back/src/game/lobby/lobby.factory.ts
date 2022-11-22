@@ -41,15 +41,15 @@ export class LobbyFactory
 		lobby_request.players.forEach((player) => {
 			if (player.team === TeamSide.BLUE) {
 				if (player.pos === PlayerPosition.BACK) {
-					dataToFront.Player_A_Back = player;
+					dataToFront.TeamBlue_Back = player;
 				} else {
-					dataToFront.Player_A_Front = player;
+					dataToFront.TeamBlue_Front = player;
 				}
 			} else {
 				if (player.pos === PlayerPosition.BACK) {
-					dataToFront.Player_B_Back = player;
+					dataToFront.TeamRed_Back = player;
 				} else {
-					dataToFront.Player_B_Front = player;
+					dataToFront.TeamRed_Front = player;
 				}
 			}
 		});

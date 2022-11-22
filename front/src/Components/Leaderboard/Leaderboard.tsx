@@ -2,16 +2,12 @@ import { useContext, useEffect, useState } from "react";
 import { fetchSinglesLeaderBoardDatas, fetchDoublesLeaderBoardDatas } from "../../Api/Leaderboard";
 import { useAppSelector } from "../../Redux/Hooks";
 import { UserInterface } from "../../Types/User-Types";
-import { getMatchPlayed, getWinRate } from "../../Utils/Utils-User";
+import { Modes } from "../../Types/Utils-Types";
+import { getDoublesWinRate, getMatchPlayed, getSinglesWinRate } from "../../Utils/Utils-User";
 import LoadingSpin from "../Utils/Loading-Spin";
 import { ModalContext } from "../Utils/ModalProvider";
 
 import LeaderboardItem from "./Leaderboard-Item";
-
-enum Modes {
-    Singles = "Singles",
-    Doubles = "Doubles",
-};
 
 interface LeaderboardState {
     users: UserInterface[],
@@ -49,7 +45,7 @@ function Leaderboard() {
     }
 
     const onLeaderboardChange = (e: any) => {
-        const mode: Modes = e.target.value === Modes.Singles ? Modes.Singles : Modes.Doubles 
+        const mode: Modes = e.target.value;
         setLeaderboardState(() => { return {...defaultState, mode: mode}})
         if (mode === Modes.Singles)
             fetchSinglesLeaderBoardDatas(0, token, setLeaderboardState);
@@ -85,8 +81,8 @@ function Leaderboard() {
                                         key={elem.id}
                                         pos={((index + 1) + ((leaderboardState.page - 1) * 10))}
                                         name={elem.username}
-                                        gamesPlayed={getMatchPlayed(elem)}
-                                        winRate={getWinRate(elem)}
+                                        gamesPlayed={getMatchPlayed(leaderboardState.mode === Modes.Singles ? elem.statistic.singles_match_won : elem.statistic.doubles_match_won, leaderboardState.mode === Modes.Singles ? elem.statistic.singles_match_lost : elem.statistic.doubles_match_lost)}
+                                        winRate={leaderboardState.mode === Modes.Singles ? getSinglesWinRate(elem) : getDoublesWinRate(elem)}
                                         elo={leaderboardState.mode === Modes.Singles ? elem.singles_elo : elem.doubles_elo}
                                         status={elem.status}
                                     />

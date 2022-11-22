@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { PartyInterface, TeamSide, Player, GameMode } from '../Types/Lobby-Types';
+import { PartyInterface, TeamSide, Player, GameMode, PartyMessage } from '../Types/Lobby-Types';
 
 interface PartyState {
     party?: PartyInterface,
@@ -28,17 +28,19 @@ export const partySlice = createSlice({
             state.modalIsOpen = false;
             state.isInQueue = false;
         },
+        addPartyMessage: (state, { payload }: PayloadAction<PartyMessage>) => {
+            if (state.party) {
+                state.party.messages = [...state.party.messages, payload]
+            }
+        },
         changeModalStatus: (state, { payload }: PayloadAction<boolean>) => {
             state.modalIsOpen = payload;
         },
         changeSidebarChatStatus: (state) => {
-            console.log("changeSidebarChatStatus", state.chatIsOpen);
             if (state.party)
                 state.chatIsOpen = !state.chatIsOpen;
-            console.log("AFTER changeSidebarChatStatus", state.chatIsOpen);
         },
         closeSidebarChatStatus: (state) => {
-            console.log("closeSidebarChatStatus");
             if (state.party && state.chatIsOpen)
                 state.chatIsOpen = false;
         },
@@ -58,4 +60,4 @@ export const partySlice = createSlice({
     }
 });
 
-export const { addParty, leaveParty, changeModalStatus, changeSidebarChatStatus, closeSidebarChatStatus, changeQueueStatus, cancelQueue, changePartyGameMode} = partySlice.actions;
+export const { addParty, leaveParty, addPartyMessage, changeModalStatus, changeSidebarChatStatus, closeSidebarChatStatus, changeQueueStatus, cancelQueue, changePartyGameMode} = partySlice.actions;

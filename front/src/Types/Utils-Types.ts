@@ -16,3 +16,8 @@ export enum SearchBarFunctionality {
     CHAN_INVITE_ON_CREATE,
     PARTY_INVITE,
 }
+
+export enum Modes {
+    Singles = "Singles",
+    Doubles = "Doubles",
+};

@@ -47,8 +47,10 @@ export interface UserInterface {
 }
 
 interface Statistic {
-    match_won: number,
-    match_lost: number,
+    singles_match_won: number,
+    singles_match_lost: number,
+    doubles_match_won: number,
+    doubles_match_lost: number,
 }
 
 export interface MatchResult {
