@@ -13,19 +13,19 @@ export class MatchResult {
 	@Column()
 	blue_team_goals: number;
 
-	@ManyToOne(() => User)
+	@ManyToOne(() => User, { onDelete: 'CASCADE' })
 	blue_team_player1: User;
 
-	@ManyToOne(() => User, { nullable: true })
+	@ManyToOne(() => User, { nullable: true, onDelete: 'CASCADE' })
 	blue_team_player2?: User;
 
 	@Column()
 	red_team_goals: number;
 
-	@ManyToOne(() => User)
+	@ManyToOne(() => User, { onDelete: 'CASCADE' })
 	red_team_player1: User;
 
-	@ManyToOne(() => User, { nullable: true })
+	@ManyToOne(() => User, { nullable: true, onDelete: 'CASCADE' })
 	red_team_player2?: User;
 
 	@CreateDateColumn({ type: 'timestamptz' })

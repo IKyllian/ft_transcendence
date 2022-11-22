@@ -1,4 +1,4 @@
-import { Body, ClassSerializerInterceptor, Controller, Delete, FileTypeValidator, ForbiddenException, Get, HttpStatus, MaxFileSizeValidator, Param, ParseFilePipe, ParseFilePipeBuilder, ParseIntPipe, Patch, Post, Request, Res, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
+import { Body, ClassSerializerInterceptor, Controller, Delete, FileTypeValidator, ForbiddenException, Get, HttpStatus, MaxFileSizeValidator, Param, ParseFilePipe, ParseFilePipeBuilder, ParseIntPipe, Patch, Post, Req, Request, Res, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { Observable, of } from "rxjs";
 import { JwtGuard } from "src/auth/guard/jwt.guard";
@@ -10,6 +10,7 @@ import { UserService } from "./user.service";
 import { GetUser } from "src/utils/decorators";
 import { SearchDto } from "./dto/search.dto";
 import { Response } from "express";
+import { join } from "path";
 
 export const avatarStorage = {
 	storage: diskStorage({
@@ -48,10 +49,11 @@ export class UserController {
 	@UseGuards(JwtGuard)
 	@Post('avatar/upload')
 	@UseInterceptors(FileInterceptor('image', avatarStorage))
-	uploadFile(@UploadedFile() file: Express.Multer.File, @GetUser() user: User) : Observable<Object> {
-		// TODO user file-type to check magic number?
+	uploadFile(@UploadedFile() file: Express.Multer.File, @GetUser() user: User, @Req() req: any) : Observable<Object> {
+		// TODO use file-type to check magic number?
+		console.log(req.file);
+
 		if (!file) return of ({error: 'file does not match valid extention'})
-		console.log(file);
 		this.userService.updateAvatar(user, file.filename);
 		return of({imagePath: file.path})
 	}
@@ -60,7 +62,9 @@ export class UserController {
 	@Get('avatar')
 	serveAvatar(@GetUser() user: User, @Res() res: Response) {
 		console.log("avatar path ", user.avatar)
-		res.sendFile(user.avatar, { root: 'uploads' });
+		if (!user.avatar) { return; }
+		// res.sendFile(user.avatar, { root: 'uploads' });
+		return of(res.sendFile(join(process.cwd(), 'uploads/' + user.avatar)));
 	}
 
 	@UseGuards(JwtGuard)

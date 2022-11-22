@@ -1,6 +1,7 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { join } from 'path';
 import { Repository } from 'typeorm';
 import { AppModule } from './app.module';
 import { ChannelService } from './chat/channel/channel.service';
@@ -13,7 +14,6 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
   app.enableCors();
   app.useGlobalPipes(new ValidationPipe());
-  
   await app.listen(5000);
 
   // const userService = await app.resolve(UserService);
