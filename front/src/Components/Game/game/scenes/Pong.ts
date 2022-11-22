@@ -9,6 +9,7 @@ import AssetSoundClapping from '../../../../Assets/sound/clapping.ogg'
 
 //lagicon not working
 import AssetImageLagIcon from '../../../../Assets/images/button.png'
+//import AssetImageLagIcon from '../../../../Assets/images/lagicon.png'
 
 export default class Pong extends Phaser.Scene
 {
@@ -83,13 +84,9 @@ export default class Pong extends Phaser.Scene
 		last_processed_id_B_Back: 0,
 		send_date: new Date()
 	};
-
 	update_interval: any;
 	is_lagging: boolean = true;
 	lag_count: number = 0;
-
-//test
-	frame_count: number = 0;
 
 	preload ()
 	{
@@ -106,6 +103,7 @@ export default class Pong extends Phaser.Scene
 		this.game_id = this.registry.get('players_data').game_id;
 		this.game_settings = this.game.registry.get('players_data').game_settings;
 		this.game_type = this.game.registry.get('players_data').game_settings.game_type;
+
 		this.me = this.game.registry.get('players_data').player_type;
 	
 		this.sound_a = this.sound.add('sound_a');
@@ -123,30 +121,32 @@ export default class Pong extends Phaser.Scene
 
 		}
 
-		//placing visual elements outside of board for their first instanciation to prevent ghosted visuals
-		this.asset_lag_icon = this.add.image(10400, 300, 'lag_icon');
-		this.asset_lag_icon.setAlpha(1);
+
+		this.asset_lag_icon = this.add.image(400, 300, 'lag_icon');
+		this.asset_lag_icon.setAlpha(0);
 
 		if (this.game_settings)
 		{
 			this.core = new PongCore(this.game_settings);
 
-			this.game_state.game_type = this.game.registry.get('players_data').game_settings.game_type;
+			//???
+		//	this.game_state.game_type = this.game.registry.get('players_data').game_settings.game_type;
+
 			this.game_state.TeamBlue_Back.x = this.game_settings.player_back_advance;
 			this.game_state.TeamBlue_Front.x = this.game_settings.player_front_advance;
 			this.game_state.TeamRed_Back.x = 800 - this.game_settings.player_back_advance;
 			this.game_state.TeamRed_Front.x = 800 - this.game_settings.player_front_advance;
-			this.asset_ball = this.add.circle(10400, 300, 5, 0x000000);
-			this.upper_limit = this.add.rectangle(10000, 0, 800, this.game_settings.up_down_border , 0x000000).setOrigin(0,0);
-			this.lower_limit = this.add.rectangle(10000, (600 - (this.game_settings.up_down_border)), 800, this.game_settings.up_down_border, 0x000000).setOrigin(0,0);
+			this.asset_ball = this.add.circle(400, 300, 5, 0x000000);
+			this.upper_limit = this.add.rectangle(0, 0, 800, this.game_settings.up_down_border , 0x000000).setOrigin(0,0);
+			this.lower_limit = this.add.rectangle(0, (600 - (this.game_settings.up_down_border)), 800, this.game_settings.up_down_border, 0x000000).setOrigin(0,0);
 	
-			this.asset_TeamBlue_Back = this.add.rectangle(10000, 300, 10, this.game_settings.paddle_size_h, 0x000000).setOrigin(1,0.5);
-			this.asset_TeamRed_Back = this.add.rectangle((10000), 300, 10, this.game_settings.paddle_size_h, 0x000000).setOrigin(0,0.5);
+			this.asset_TeamBlue_Back = this.add.rectangle(this.game_settings.player_back_advance, 300, 10, this.game_settings.paddle_size_h, 0x000000).setOrigin(1,0.5);
+			this.asset_TeamRed_Back = this.add.rectangle((800 - this.game_settings.player_back_advance), 300, 10, this.game_settings.paddle_size_h, 0x000000).setOrigin(0,0.5);
 	
 			if (this.game_type === GameType.Doubles)
 			{
-				this.asset_TeamBlue_Front = this.add.rectangle(10000, 300, 10, this.game_settings.paddle_size_h, 0x000000).setOrigin(1,0.5);
-				this.asset_TeamRed_Front = this.add.rectangle((10000), 300, 10, this.game_settings.paddle_size_h, 0x000000).setOrigin(0,0.5);
+				this.asset_TeamBlue_Front = this.add.rectangle(this.game_settings.player_front_advance, 300, 10, this.game_settings.paddle_size_h, 0x000000).setOrigin(1,0.5);
+				this.asset_TeamRed_Front = this.add.rectangle((800 - this.game_settings.player_front_advance), 300, 10, this.game_settings.paddle_size_h, 0x000000).setOrigin(0,0.5);
 			
 			}
 			
@@ -161,7 +161,7 @@ export default class Pong extends Phaser.Scene
 
 		let text: string;
 		text = this.game_state.score.TeamBlue.toString() + " - " + this.game_state.score.TeamRed.toString();
-		this.asset_scoreboard = this.add.text(10000, 100, text, style);
+		this.asset_scoreboard = this.add.text(400, 100, text, style);
 
 
 		if (this.me !== PlayerType.Spectator)
@@ -181,68 +181,19 @@ export default class Pong extends Phaser.Scene
 			});
 		}
 
-		this.place_assets();
-
-		clearInterval(this.update_interval);
-		this.update_interval = setInterval(
-		  (function(self) { return function()
-			{
-				self.frame_advance();
-			}; })(this),
-		  1000 / 60);
-	}
-
-
-	place_assets()
-	{
-		if (this.game_settings)
-		{
-			// this.asset_lag_icon!.x = 400;
-			this.asset_ball!.x = 400;
-			this.upper_limit!.x = 0;
-			this.lower_limit!.x = 0;
-
-			this.asset_TeamBlue_Back!.x = this.game_settings.player_back_advance;
-			this.asset_TeamRed_Back!.x = (600 - this.game_settings.player_back_advance); 
-			this.asset_scoreboard!.x = 400;
-			if (this.game_type === GameType.Doubles)
-			{
-				this.asset_TeamBlue_Front!.x = this.game_settings.player_front_advance;
-				this.asset_TeamRed_Front!.x = (600 - this.game_settings.player_front_advance);
-			}
-		}
+		setTimeout(() => {
+			clearInterval(this.update_interval);
+			this.update_interval = setInterval(
+			  (function(self) { return function()
+				{
+					self.frame_advance();
+				}; })(this),
+			  1000 / 60);
+		}, 50);
 	}
 
 	frame_advance()
 	{
-
-		if (this.frame_count === 0)
-		{
-			this.frame_count++;
-		//	this.place_assets();
-			return;
-		}
-		else if (this.frame_count === 1)
-		{
-			this.asset_TeamBlue_Back!.x = this.game_state.TeamBlue_Back.x;
-			this.asset_TeamBlue_Back!.y = this.game_state.TeamBlue_Back.y;
-			this.asset_TeamRed_Back!.x = this.game_state.TeamRed_Back.x;
-			this.asset_TeamRed_Back!.y = this.game_state.TeamRed_Back.y;
-			this.asset_ball!.x = this.game_state.balldata.position.x;
-			this.asset_ball!.y = this.game_state.balldata.position.y;
-
-			if (this.game_type === GameType.Doubles)
-			{
-				this.asset_TeamBlue_Front!.x = this.game_state.TeamBlue_Front.x;
-				this.asset_TeamBlue_Front!.y = this.game_state.TeamBlue_Front.y;
-				this.asset_TeamRed_Front!.x = this.game_state.TeamRed_Front.x;
-				this.asset_TeamRed_Front!.y = this.game_state.TeamRed_Front.y;
-			}
-			this.frame_count++;
-			return;
-		}
-
-
 		if (this.next_round_setup === undefined)
 		{
 			this.socketmanager?.game_get_round_setup(this.game_id!);
