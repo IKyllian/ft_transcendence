@@ -58,11 +58,18 @@ export class AuthService {
 			account: user_account_create,
 		}
 
-		await this.userService.create(params);
+		const user = await this.userService.create(params);
 		const mailResult = await this.sendValidationMail(dto.email, validation_code);
 		if (mailResult?.error)
 			return { error: mailResult.error };
-		return { success: true, email: params.email }
+		const tokens = await this.signTokens(user.id, user.username);
+		this.updateRefreshHash(user.account, tokens.refresh_token);
+		return {
+			access_token: tokens.access_token,
+			refresh_token: tokens.refresh_token,
+			user: user,
+		}
+		// return { success: true, email: params.email }
 	}
 
 	async activate(dto: ActivateDto) {
