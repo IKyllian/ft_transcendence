@@ -24,9 +24,9 @@ export default class Pong extends Phaser.Scene
 	game_settings: GameSettings | undefined = undefined;
 	game_type: GameType = GameType.Singles;
 
-	sound_a?: any;
-	sound_b?: any;
-	sound_clapping?: any;
+	sound_a?: Phaser.Sound.BaseSound;
+	sound_b?: Phaser.Sound.BaseSound;
+	sound_clapping?: Phaser.Sound.BaseSound;
 
 	core?: PongCore;
 	game_id?: string;
@@ -549,19 +549,19 @@ export default class Pong extends Phaser.Scene
 	sound_event_wall = () =>
 	{
 		this.sound.stopAll();
-		this.sound_a.play();
+		this.sound_a!.play();
 	}
 
 	sound_event_paddle = () =>
 	{
 		this.sound.stopAll();
-		this.sound_b.play();
+		this.sound_b!.play();
 	}
 
 	sound_event_goal = () =>
 	{
 		this.sound.stopAll();
-		this.sound_clapping.play();
+		this.sound_clapping!.play();
 		this.cameras.main.flash(250, 0 , 0, 0);
 	}
 }

@@ -104,45 +104,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
 
 	/* ----- Administration ----- */
 
-// 	@SubscribeMessage('admin_authenticate')
-// 	async onAdminAuthenticate(@ConnectedSocket() client: Socket,
-// 	@MessageBody() data: string)
-// 	{
-// 		if (data == this.admin_secret)
-// 		{
-// 			this.admin = client;
-// 			console.log("admin has logged in");
-// 			client.emit('admin_connection', true);
-// 		}
-// 		else
-// 		{
-// 			client.emit('admin_connection', false);
-// 			//log the incident somewhere
-// 		}
-// 	}
-
-// 	@SubscribeMessage('admin_newgame')
-// 	async onAdminNewGame(@ConnectedSocket() client: Socket,
-// 	@MessageBody() data: LobbyRequest)
-// 	{
-// 		// if (client['id'] == this.admin['id'])
-// 		// {
-			// const gamedata: NewGameData = this.lobbyfactory.lobby_create(data);
-// 			console.log(gamedata);
-
-// //TODO
-// //preparer les PlayersGameData de chaque joueur avec le NewGameData
-// //envoyer les PlayersGameData au joeuurs concerne
-// //-->NEED identification des sockets
-
-// 			client.emit('newgame_data', gamedata);
-// 		// }
-// 		// else
-// 		// {
-// 		// 	//log the event somewhere
-// 		// }	
-// 	}
-
 	// @SubscribeMessage('admin_lobby_quantity')
 	// async onAdminLobbyQuantity(@ConnectedSocket() client: Socket)
 	// {
