@@ -7,7 +7,7 @@ import { SocketContext } from "../../App";
 import { ModalContext } from "../../Components/Utils/ModalProvider";
 import { ConversationInterfaceFront, ChannelsInterfaceFront } from "../../Types/Chat-Types";
 import { copyChannelsAndConvs } from "../../Redux/ChatSlice";
-import { setChannelId, unsetChannelDatas, unsetChannelId } from "../../Redux/ChannelSlice";
+import { setChannelId, unsetChannelDatas, unsetChannelId, updateChannelUserStatus } from "../../Redux/ChannelSlice";
 
 export function useLoadChatDatas() {
     //States
@@ -41,28 +41,27 @@ export function useLoadChatDatas() {
     }, [setShowModal]);
 
     useEffect(() => {
+        if (socket && currentChannelId === undefined && channelId !== undefined) {
+            socket.on("StatusUpdate", (data) => {
+                dispatch(updateChannelUserStatus(data));
+            })
+        }
         if (socket && currentChannelId !== channelId) {
-            if (currentChannelId !== undefined) {
+            if (currentChannelId !== undefined && location.pathname.includes("/chat")) {
                 socket?.emit("LeaveChannelRoom", {
                     id: currentChannelId,
                 });
                 socket?.off("roomData");
                 socket?.off("ChannelUpdate");
                 dispatch(unsetChannelDatas());
+                dispatch(unsetChannelId());
             }
             if (channelId !== undefined)
                 dispatch(setChannelId(channelId));
             else
                 dispatch(unsetChannelId());
-        } else if (socket && currentChannelId !== undefined && location.pathname !== `/chat/channel/${currentChannelId}` && location.pathname !== `/chat/channel/${currentChannelId}/settings`) {
-            socket?.emit("LeaveChannelRoom", {
-                id: currentChannelId,
-            });
-            socket?.off("roomData");
-            socket?.off("ChannelUpdate");
-            dispatch(unsetChannelDatas());
         }
-    }, [channelId, socket, location.pathname])
+    }, [channelId, socket, location.pathname]);
 
     // Les useEffect pour les call api etc..
     useEffect(() => {
@@ -73,14 +72,12 @@ export function useLoadChatDatas() {
             setReponsiveSidebar(true);
         // Permet de mettre en couleur le channel ou la conv selectionner
         if (channelId) {
-            console.log("changeActiveElement");
             dispatch(changeActiveElement({id:channelId, isChannel: true}));
         } else if (convId)
             dispatch(changeActiveElement({id:convId, isChannel: false}));
     }, [channelId, convId, location.pathname, window.innerWidth])
 
     useEffect(() => {
-
         const resolvePromises =  async (channelsUser: Promise<ChannelsInterfaceFront[]>, convsUser: Promise<ConversationInterfaceFront[]>) => {
             const channelResolve: ChannelsInterfaceFront[] = await channelsUser.then(result => { return result });
             const convResolve: ConversationInterfaceFront[] = await convsUser.then(result => { return result });

@@ -1,6 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { Socket } from 'socket.io-client';
-import { AuthState } from '../Types/User-Types';
+import { AuthState, UserStatus } from '../Types/User-Types';
 import { LoginPayload } from '../Types/User-Types';
 import { UserInterface } from '../Types/User-Types';
 
@@ -57,7 +56,27 @@ export const authSlice = createSlice({
         copyFriendListArray: (state, {payload}: PayloadAction<UserInterface[]>) => {
             state.friendList = [...payload];
         },
+        changeFriendListUserStatus: (state, {payload}: PayloadAction<{id: number, status: UserStatus}>) => {
+            if (state.friendList.length > 0) {
+                state.friendList = [...state.friendList.map(elem => {
+                    if (elem.id === payload.id)
+                        return {...elem, status: payload.status};
+                    return elem;
+                })]
+            }
+        },
     }
 });
 
-export const { loginPending, loginSuccess, loginError, setUsername, stopIsConnectedLoading, logoutPending, logoutSuccess, replaceUserObject, copyFriendListArray } = authSlice.actions;
+export const {
+    loginPending,
+    loginSuccess,
+    loginError,
+    setUsername,
+    stopIsConnectedLoading,
+    logoutPending,
+    logoutSuccess,
+    replaceUserObject,
+    copyFriendListArray,
+    changeFriendListUserStatus
+} = authSlice.actions;

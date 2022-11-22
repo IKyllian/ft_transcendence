@@ -360,31 +360,7 @@
                         display: flex;
                         align-items: center;
                         gap: 5px;
-                        .avatar-container {
-                            position: relative;
-                            .user-avatar {
-                                @include avatar-player(40px);
-                            }
-                            .user-status {
-                                @include width-height(20px, 20px);
-                                border-radius: 50%;
-                                background-color: $DarkPalette;
-                                position: absolute;
-                                right: -3px;
-                                top: 25px;
-                                padding: 2.5px 0 0 2.5px;
-                                div {
-                                    @include width-height(14px, 14px);
-                                    border-radius: 50%;
-                                }
-                                .online {
-                                    background-color: $OnlineColor;
-                                }
-                                .offline {
-                                    background-color: $OfflineColor;
-                                }
-                            }
-                        }
+                        @include avatar-status-container();
 
                         .username-wrapper {
                             cursor: pointer;

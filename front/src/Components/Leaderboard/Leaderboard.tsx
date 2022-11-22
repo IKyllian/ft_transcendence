@@ -1,7 +1,8 @@
 import { useContext, useEffect, useState } from "react";
 import { fetchSinglesLeaderBoardDatas, fetchDoublesLeaderBoardDatas } from "../../Api/Leaderboard";
+import { SocketContext } from "../../App";
 import { useAppSelector } from "../../Redux/Hooks";
-import { UserInterface } from "../../Types/User-Types";
+import { UserInterface, UserStatus } from "../../Types/User-Types";
 import { Modes } from "../../Types/Utils-Types";
 import { getDoublesWinRate, getMatchPlayed, getSinglesWinRate } from "../../Utils/Utils-User";
 import LoadingSpin from "../Utils/Loading-Spin";
@@ -29,10 +30,23 @@ function Leaderboard() {
     const modalStatus = useContext(ModalContext);
     const [leaderboardState, setLeaderboardState] = useState<LeaderboardState>(defaultState);
     const {token} = useAppSelector(state => state.auth);
+    const {socket} = useContext(SocketContext);
 
     useEffect(() => {
         fetchSinglesLeaderBoardDatas(0, token, setLeaderboardState);
-    }, [])
+
+        socket?.on("StatusUpdate", (data: {id: number, status: UserStatus}) => {
+            setLeaderboardState(prev => { return {...prev, users: [...prev.users.map((elem: UserInterface) => {
+                if (elem.id === data.id)
+                    return {...elem, status: data.status};
+                return elem;
+            })]}});
+        });
+
+        return () => {
+            socket?.off("StatusUpdate")
+        }
+    }, [socket])
 
     const changePage = (index: number) => {
         if (index + 1 !== leaderboardState.page) {

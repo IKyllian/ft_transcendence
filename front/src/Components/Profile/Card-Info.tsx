@@ -1,18 +1,13 @@
-import { IconEdit, IconMessage, IconBrandAppleArcade } from '@tabler/icons';
+import { useContext } from 'react';
+import { IconEdit, IconMessage, IconBrandAppleArcade, IconSettings } from '@tabler/icons';
 import { ProfileState, UserStatus } from '../../Types/User-Types';
-
-import ProfilePic from "../../Images-Icons/pp.jpg"
+import Avatar from "../../Images-Icons/pp.jpg"
 import { Link } from "react-router-dom";
 import FriendButton from '../Buttons/Friend-Button';
-import { useContext, useState } from 'react';
 import { SocketContext } from '../../App';
-import { fetchUploadAvatar } from '../../Api/Profile/Profile-Fetch';
-import { useAppSelector } from '../../Redux/Hooks';
 
 function CardInfo(props: {userState: ProfileState}) {
     const { userState } = props;
-    const { token } = useAppSelector(state => state.auth);
-    const [inputFile, setInputFile] = useState<File | undefined>(undefined);
 
     const {socket} = useContext(SocketContext);
 
@@ -20,29 +15,20 @@ function CardInfo(props: {userState: ProfileState}) {
         socket?.emit("GameInvite", {id: userState.user.id});
     }
 
-    const onSubmit = (e: any) => {
-        e?.preventDefault();
-        if (inputFile) {
-            let formData = new FormData();
-            formData.append("image", inputFile);
-            fetchUploadAvatar(token, formData);
-        }
-    }
-    
-    const onFileChange = (e: any) => {
-        setInputFile(e.target.files[0]);
-    }    
     return (
         <div className="card-info">
-            <img className='profile-avatar' src={userState.user.avatar} alt="profil pic" />
-            <form onSubmit={(e) => onSubmit(e)}>
-                <input type="file" onChange={(e) => onFileChange(e)} />
-                <button type='submit'> Submit </button>
-            </form>
+            <img className='profile-avatar' src={Avatar} alt="profil pic" />
             <div className={`player-status player-status-${userState.user.status === UserStatus.ONLINE ? "online" : "offline"}`}> </div>
             <p> {userState.user.username} </p>
             {
-                userState.isLoggedUser ? <IconEdit /> : 
+                userState.isLoggedUser ? 
+                <>
+                    <IconEdit />
+                    <Link to={`/profile/${userState.user.username}/settings`}>
+                        <IconSettings className='settings-icon' />
+                    </Link>
+                </>
+                : 
                 <>
                     <FriendButton secondUserId={userState.user.id} relationStatus={userState.relationStatus!} />
                     <Link className="send-message-icon" to="/chat" state={{userIdToSend: userState.user.id}}>

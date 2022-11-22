@@ -13,7 +13,7 @@ import { GameMode, PartyInterface, PartyMessage } from "../Types/Lobby-Types";
 import { copyNotificationArray } from "../Redux/NotificationSlice";
 import { addParty, addPartyInvite, addPartyMessage, cancelQueue, changePartyGameMode, changeQueueStatus, incrementQueueTimer, leaveParty, removePartyInvite, resetQueueTimer } from "../Redux/PartySlice";
 import { fetchVerifyToken } from "../Api/Sign/Sign-Fetch";
-import { addChannelUser, banChannelUser, muteChannelUser, removeTimeoutChannelUser, removeChannelUser, setChannelDatas, updateChannelUser } from "../Redux/ChannelSlice";
+import { addChannelUser, banChannelUser, muteChannelUser, removeTimeoutChannelUser, removeChannelUser, setChannelDatas, updateChannelUser, unsetChannelDatas, unsetChannelId } from "../Redux/ChannelSlice";
 
 export function useAppHook() {
     const [socket, setSocket] = useState<Socket | undefined>(undefined);
@@ -99,6 +99,19 @@ export function useAppHook() {
             });
 		}
 	}, [currentChannelId]);
+
+	useEffect(() => {
+		if (socket && currentChannelId !== undefined && !location.pathname.includes("/chat")) {
+            socket.emit("LeaveChannelRoom", {
+                id: currentChannelId,
+            });
+            socket.off("roomData");
+            socket.off("ChannelUpdate");
+			socket.off("StatusUpdate");
+            dispatch(unsetChannelDatas());
+			dispatch(unsetChannelId());
+        }
+	}, [location.pathname, socket])
 
 	useEffect(() => {
 		if (socket !== undefined) {
@@ -187,6 +200,7 @@ export function useAppHook() {
 
 			socket.on("Logout", () => {
 				socket.disconnect();
+				setSocket(undefined);
 				localStorage.removeItem("userToken");
 				dispatch(logoutSuccess());
 			});

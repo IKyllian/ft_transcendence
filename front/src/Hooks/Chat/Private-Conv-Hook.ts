@@ -5,7 +5,7 @@ import { SocketContext } from "../../App";
 import { useLocation, useParams } from "react-router-dom";
 import { useAppSelector } from '../../Redux/Hooks'
 import { getSecondUserIdOfPM } from "../../Utils/Utils-Chat";
-import { UserInterface } from "../../Types/User-Types";
+import { UserInterface, UserStatus } from "../../Types/User-Types";
 import { debounce } from "../../Utils/Utils-Chat";
 import { useForm } from "react-hook-form";
 import { fetchLoadPrevConvMessages } from "../../Api/Chat/Chat-Action";
@@ -132,6 +132,18 @@ export function usePrivateConvHook() {
             
             socket?.on('NewPrivateMessage', listener);
 
+            socket?.on("StatusUpdate", (data: {id: number, status: UserStatus}) => {
+                setConvDatas(prev => { return prev ? {
+                    ...prev, 
+                    conv: {
+                        ...prev.conv,
+                        user1: prev.conv.user1.id === data.id ? {...prev.conv.user1, status: data.status} : {...prev.conv.user1},
+                        user2: prev.conv.user2.id === data.id ? {...prev.conv.user2, status: data.status} : {...prev.conv.user2},
+                    }
+                } : undefined
+                });
+            });
+
             socket?.on("OnTypingPrivate", (data: {user: UserInterface, isTyping: boolean, convId: number}) => {
                 if (data.convId === convId) {
                     if (data.isTyping)
@@ -162,6 +174,7 @@ export function usePrivateConvHook() {
                 });
             }
             socket?.off("OnTypingPrivate");
+            socket?.off("StatusUpdate")
             socket?.off("ConversationData");
             socket?.off("NewPrivateMessage");
         }

@@ -1,6 +1,6 @@
 import { useState, useContext, useEffect } from "react";
 import { ModalContext } from "../../Components/Utils/ModalProvider";
-import { ProfileState } from "../../Types/User-Types";
+import { ProfileState, UserStatus } from "../../Types/User-Types";
 import { useAppSelector } from '../../Redux/Hooks';
 import { useParams } from "react-router-dom";
 
@@ -68,10 +68,16 @@ export function useProfileHook() {
             setFriendRequestSent(prev => {return prev + 1});
         }))
 
+        socket?.on("StatusUpdate", (data: {id: number, status: UserStatus}) => {
+            console.log("StatusUpdate", data);
+            setUserState(prev => { return prev ? {...prev, user: {...prev?.user, status: data.status}} : undefined});
+        });
+
         return () => {
             socket?.off("RequestValidation");
+            socket?.off("StatusUpdate");
         }
-    }, [])
+    }, [socket])
 
     return {
         userState,

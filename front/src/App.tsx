@@ -27,6 +27,7 @@ import ModalPartyInvite from "./Components/Modal-Party-Invite";
 import CodeVerification from "./Components/Sign/Code-Verification";
 import ChatParty from "./Components/Chat-Party";
 import MatchFound from "./Components/Lobby/Match-Found";
+import ProfileSettings from "./Components/Profile/Settings/Profile-Settings";
 
 interface RouteProps {
 	path: string,
@@ -66,6 +67,12 @@ const routes: RouteProps[] = [
 		element:
 			<PrivateRoute>
 				<Profile />
+			</PrivateRoute>,
+	}, {
+		path: '/profile/:username/settings',
+		element:
+			<PrivateRoute>
+				<ProfileSettings />
 			</PrivateRoute>,
 	}, {
 		path: '/leaderboard',
