@@ -78,10 +78,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		socket.user = user;
 		// console.log("USER", user);
 		console.log(user.username, 'connected')
-		this.server.to(socket.id).emit('StatusUpdate', user);
 		socket.join(`user-${user.id}`);
 		if (user.status === UserStatus.OFFLINE) {
-			this.userService.setStatus(user, UserStatus.ONLINE);
+			this.userService.setStatus(user.id, UserStatus.ONLINE);
+			console.log('user status: ' + user.status)
+			this.server.emit('StatusUpdate', { id: user.id, status: UserStatus.ONLINE });
 		}
 		socket.emit('Connection', {
 			friendList: await this.friendshipService.getFriendlist(user),
@@ -93,9 +94,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	async handleDisconnect(socket: Socket) {
 		if (socket.handshake.headers.authorization) {
 			const payload = this.authService.decodeJwt(socket.handshake.headers.authorization.split(' ')[1]) as JwtPayload;
-			const user = await this.userService.findOneBy({ id: payload?.sub });
-			if (user) {
-				this.userService.setStatus(user, UserStatus.OFFLINE);
+			// const user = await this.userService.findOneBy({ id: payload?.sub });
+			if (payload) {
+				if ((await this.server.in(`user-${payload.sub}`).fetchSockets()).length === 0) {
+					this.userService.setStatus(payload.sub, UserStatus.OFFLINE);
+					this.server.emit('StatusUpdate', { id: payload.sub, status: UserStatus.OFFLINE});
+				}
 				// socket.emit('statusUpdate', { user, status: 'offline' });
 				console.log(payload?.username, 'disconnected');
 			}

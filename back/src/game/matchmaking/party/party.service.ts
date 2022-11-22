@@ -42,6 +42,7 @@ export class PartyService {
 	}
 
 	createParty(user: User) {
+		this.queueService.leaveQueue(user);
 		this.partyJoined.setParty(user.id, new Party(user));
 		return this.partyJoined.getParty(user.id);
 	}
