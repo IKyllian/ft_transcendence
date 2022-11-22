@@ -23,7 +23,7 @@ export class User {
 	@Column({ unique: true, nullable: true })
 	username: string;
 
-	@Column({ default: UserStatus.OFFLINE })
+	@Column({ type: 'enum', enum: UserStatus, default: UserStatus.OFFLINE })
 	status: UserStatus;
 
 	@Column({ unique: true })

@@ -117,9 +117,19 @@ export class UserService {
 		}
 	}
 
-	setStatus(user: User, status: UserStatus) {
-		user.status = status;
-		this.userRepo.save(user)
+	async setStatus(userId: number, status: UserStatus) {
+		// this.userRepo.createQueryBuilder()
+		// 	.update(User)
+		// 	.where("id = :userId", {userId: userId})
+		// 	.set({ status: () => "status = :status" })
+		// 	.setParameter("status", status)
+		// 	.execute(); // pq ca marche paaas
+
+		let user = await this.userRepo.findOneBy({id: userId});
+		if (user) {
+			user.status = status;
+			this.userRepo.save(user)
+		}
 	}
 
 	async getUsers() {
