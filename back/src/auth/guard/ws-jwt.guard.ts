@@ -18,9 +18,5 @@ export class WsJwtGuard implements CanActivate {
 			client.disconnect();
 			return false;
 		}
-		// if (!user)
-		// client.user = user;
-		// // context.switchToHttp().getRequest().user = user
-		// return user ? true : false;
 	}
 }

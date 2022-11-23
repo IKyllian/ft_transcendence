@@ -2,7 +2,7 @@ import { Body, ClassSerializerInterceptor, Controller, Delete, FileTypeValidator
 import { FileInterceptor } from "@nestjs/platform-express";
 import { Observable, of } from "rxjs";
 import { JwtGuard } from "src/auth/guard/jwt.guard";
-import { Statistic, User } from "src/typeorm";
+import { User } from "src/typeorm";
 import { diskStorage } from "multer";
 import { v4 as uuidv4 } from "uuid";
 import * as path from 'path';

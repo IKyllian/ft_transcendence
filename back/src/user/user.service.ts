@@ -9,6 +9,8 @@ import * as argon from 'argon2';
 import { SearchDto } from "./dto/search.dto";
 import { FriendshipService } from "./friendship/friendship.service";
 import { UserStatus } from "src/utils/types/types";
+import { UserAccount } from "src/typeorm/entities/userAccount";
+import { v4 as uuidv4 } from "uuid";
 
 @Injectable()
 export class UserService {
@@ -23,6 +25,8 @@ export class UserService {
 		private statisticRepo: Repository<Statistic>,
 		@InjectRepository(MatchResult)
 		private matchRepo: Repository<MatchResult>,
+		@InjectRepository(UserAccount)
+		private accountRepo: Repository<UserAccount>,
 	) {}
 
 	create(dto: CreateUserDto) {
@@ -39,13 +43,17 @@ export class UserService {
 				'id',
 				'id42',
 				'username',
-				"refresh_hash",
 				'status',
-				'hash',
+				'two_factor_enabled',
+				'two_factor_authenticated'
 			];
 		}
 		return this.userRepo.findOne(options);
 	}
+
+	// findOnePending(options: FindOneOptions<PendingUser>): Promise<PendingUser | null> {
+	// 	return this.pendingUserRepo.findOne(options);
+	// }
 
 	findOneBy(where: FindOptionsWhere<User> | FindOptionsWhere<User>[]): Promise<User | null> {
 		return this.userRepo.findOneBy(where);
@@ -69,7 +77,15 @@ export class UserService {
 			.createQueryBuilder("user")
 			.where("LOWER(user.username) = :name", { name: name.toLowerCase() })
 			.getOne();
-		return nameTaken ? true : false;
+		return nameTaken;
+	}
+
+	async mailTaken(email: string) {
+		const mailTaken = await this.userRepo
+			.createQueryBuilder("user")
+			.where("LOWER(user.email) = :email", { email: email.toLowerCase() })
+			.getOne();
+		return mailTaken;
 	}
 
 	// TODO ask if usefull
@@ -79,9 +95,9 @@ export class UserService {
 				if (await this.nameTaken(dto.username))
 					throw new ForbiddenException('Username taken');
 				user.username = dto.username;
-			case dto.password:
-				const hash = await argon.hash(dto.password);
-				user.hash = hash; // probably wont work cause hash is not selected
+			// case dto.password:
+			// 	const hash = await argon.hash(dto.password);
+			// 	user.hash = hash; // probably wont work cause hash is not selected
 			case dto.avatar:
 				user.avatar = dto.avatar;
 			default:
@@ -126,16 +142,34 @@ export class UserService {
 	}
 
 	logout(user: User) {
-		return this.userRepo.createQueryBuilder()
-		.update(User)
+		return this.accountRepo.createQueryBuilder()
+		.update(UserAccount)
 		.set({ refresh_hash: null })
-		.where("id = :id", { id: user.id })
+		.where("userId = :id", { id: user.id })
 		.execute();
 	}
 
-	async updateRefreshHash(user: User, hash: string) {
-		user.refresh_hash = hash;
-		await this.userRepo.save(user);
+	async updateForgotCode(user: User, code: string) {
+		this.accountRepo.createQueryBuilder("account")
+		.update()
+		.where("account.userId = :userId", { userId: user.id })
+		.set({ forgot_code: () => ":code"})
+		.setParameter('code', code)
+		.execute()
+	}
+
+	async updateRefreshHash(account: UserAccount, hash: string) {
+		account.refresh_hash = hash;
+		await this.accountRepo.save(account);
+	}
+
+	async updatePassword(account: UserAccount, hash: string) {
+		this.accountRepo.createQueryBuilder("account")
+		.update()
+		.where("account.userId = :userId", { userId: account.id })
+		.set({ hash: () => ":hash"})
+		.setParameter('hash', hash)
+		.execute()
 	}
 
 	async deleteUser(id: number) {
@@ -209,5 +243,22 @@ export class UserService {
 		const relationStatus = this.friendshipService.getRelationStatus(user2, relation);
 		const match_history = await this.getMatchHistory(user2.id);
 		return { user: user2, friendList, relationStatus , match_history};
+	}
+
+	async setTwoFactorSecret(user: UserAccount, secret: string) {
+		user.two_factor_secret = secret;
+		this.accountRepo.save(user);
+	}
+
+	async setTwoFactorEnabled(user: User, status: boolean) {
+		user.two_factor_enabled = status;
+		if (status)
+			user.two_factor_authenticated = true;
+		this.userRepo.save(user);
+	}
+
+	async setTwoFactorAuthenticated(user: User, status: boolean) {
+		user.two_factor_authenticated = status;
+		this.userRepo.save(user);
 	}
 }
