@@ -10,7 +10,7 @@ import { loginPending } from "../../Redux/AuthSlice";
 type FormValues = {
     username: string,
     password: string,
-    email?: string,
+    email: string,
 }
 
 export function useSignHook() {
@@ -36,7 +36,7 @@ export function useSignHook() {
     const onSignUp = handleSubmit((data, e) => {
         e?.preventDefault();
         dispatch(loginPending());
-        fetchSignUp({username: data.username, password: data.password, dispatch: dispatch});
+        fetchSignUp({username: data.username, email: data.email, password: data.password, dispatch: dispatch});
     });
 
     useEffect(() => {

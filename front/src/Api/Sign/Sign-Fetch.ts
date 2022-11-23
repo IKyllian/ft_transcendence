@@ -7,6 +7,7 @@ import { NavigateFunction } from "react-router-dom";
 
 interface SignParameter {
     readonly username: string,
+    readonly email?: string,
     readonly password: string,
     dispatch:  Dispatch<AnyAction>,
 }
@@ -25,8 +26,8 @@ export function fetchSignIn({username, password, dispatch}: SignParameter) {
     })
 }
 
-export function fetchSignUp({username, password, dispatch}: SignParameter) {
-    axios.post(`${baseUrl}/auth/signup`, {username: username, password: password})
+export function fetchSignUp({username, email, password, dispatch}: SignParameter) {
+    axios.post(`${baseUrl}/auth/signup`, {username: username, email: email, password: password})
     .then((response) => {
         console.log('JWT =>', response.data);
         const payload: LoginPayload = {

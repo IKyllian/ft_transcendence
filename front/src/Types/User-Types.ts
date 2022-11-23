@@ -37,6 +37,7 @@ export interface LoginPayload {
 export interface UserInterface {
     id: number,
     username: string,
+    email: string,
     avatar: string,
     status: UserStatus,
     statistic: Statistic,

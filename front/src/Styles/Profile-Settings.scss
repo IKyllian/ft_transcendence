@@ -130,9 +130,14 @@
                     background-color: $DarkPalette;
                     border: 1px solid white;
                     border-radius: 3px;
-                    padding: 5px;
+                    padding: 7px;
                     color: white;
-                    cursor: pointer;
+                    font-size: 13px;
+                    cursor: text;
+                }
+
+                .lock-input {
+                    cursor: "not-allowed";
                 }
             }
 

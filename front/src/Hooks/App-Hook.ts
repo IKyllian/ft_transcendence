@@ -29,6 +29,12 @@ export function useAppHook() {
 		setEventError(undefined);
 	}
 
+	// console.log(localStorage);
+
+	// useEffect(() => {
+
+	// }, [localStorage.getItem("userToken")])
+
 	const connectSocket = () => {
 		const newSocket: Socket = io(`${socketUrl}`, {extraHeaders: {
 			"Authorization": `Bearer ${token}`,
