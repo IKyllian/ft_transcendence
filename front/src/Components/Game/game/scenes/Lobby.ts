@@ -100,6 +100,7 @@ export default class Lobby extends Phaser.Scene
         this.socketmanager.set_lobby_triggers({
             ready_to_go: this.ready_to_go.bind(this),
 	//		update_lobby_status: this.update_lobby_status.bind(this),
+			game_abort: this.game_abort.bind(this),
 			store_round_setup: this.store_round_setup.bind(this),
 			lobby_join: this.lobby_join.bind(this),
 			game_end: this.game_end.bind(this)
@@ -111,13 +112,6 @@ export default class Lobby extends Phaser.Scene
 		this.TeamRed_Back_avatar = this.add.image(670, 130, 'TeamRed_back_avatar')
 								.setOrigin(0.5,0.5)
 								.setDisplaySize(150, 150);
-
-		let style: Phaser.Types.GameObjects.Text.TextStyle = 
-		{
-			fontSize: '30px',
-			color: '#000000',
-			fontFamily: 'Arial'
-		}
 
 		if (this.game_type === GameType.Doubles)
 		{
@@ -150,88 +144,8 @@ export default class Lobby extends Phaser.Scene
 	
 				this.server_connect_fail();
 			}
-
 		}
 	}
-
-	// click_event = (pointer: Phaser.Input.Pointer ,gameobject :Phaser.GameObjects.GameObject) =>
-	// {
-	// 	pointer;
-	// 	gameobject;
-
-	// 	// if (gameobject.name === 'ready')
-	// 	// {
-	// 	// 	this.socketmanager!.lobby_send_ready(this.registry.get('players_data').game_id);
-	// 	// 	gameobject.destroy();
-	// 	// }
-
-	// 	// if (gameobject.name === 'exit')
-	// 	// {
-	// 	// 	this.game.destroy(true, false);
-	// 	// }
-	// }
-
-	// update_lobby_status = (new_status: LobbyStatus) =>
-	// {
-	// 	this.lobbystatus = new_status;
-
-	// 	if (this.lobbystatus.TeamBlue_Back === PlayerStatus.Present)
-	// 	{
-	// 		this.TeamBlue_Back_indicator?.setFillStyle(0xf2fc23);
-	// 	}
-	// 	else if (this.lobbystatus.TeamBlue_Back === PlayerStatus.Ready)
-	// 	{
-	// 		this.TeamBlue_Back_indicator?.setFillStyle(0x43f33b);
-	// 	}
-	// 	else
-	// 	{
-	// 		this.TeamBlue_Back_indicator?.setFillStyle(0xff0000);
-	// 	}
-
-	// 	if (this.lobbystatus.TeamRed_Back === PlayerStatus.Present)
-	// 	{
-	// 		this.TeamRed_Back_indicator?.setFillStyle(0xf2fc23);
-	// 	}
-	// 	else if (this.lobbystatus.TeamRed_Back === PlayerStatus.Ready)
-	// 	{
-	// 		this.TeamRed_Back_indicator?.setFillStyle(0x43f33b);
-	// 	}
-	// 	else
-	// 	{
-	// 		this.TeamRed_Back_indicator?.setFillStyle(0xff0000);
-	// 	}
-
-
-	// 	if (this.game_type === GameType.Doubles)
-	// 	{
-	// 		if (this.lobbystatus.TeamBlue_Front === PlayerStatus.Present)
-	// 		{
-	// 			this.TeamBlue_Front_indicator?.setFillStyle(0xf2fc23);
-	// 		}
-	// 		else if (this.lobbystatus.TeamBlue_Front === PlayerStatus.Ready)
-	// 		{
-	// 			this.TeamBlue_Front_indicator?.setFillStyle(0x43f33b);
-	// 		}
-	// 		else
-	// 		{
-	// 			this.TeamBlue_Front_indicator?.setFillStyle(0xff0000);
-	// 		}
-	
-	// 		if (this.lobbystatus.TeamRed_Front === PlayerStatus.Present)
-	// 		{
-	// 			this.TeamRed_Front_indicator?.setFillStyle(0xf2fc23);
-	// 		}
-	// 		else if (this.lobbystatus.TeamRed_Front === PlayerStatus.Ready)
-	// 		{
-	// 			this.TeamRed_Front_indicator?.setFillStyle(0x43f33b);
-	// 		}
-	// 		else
-	// 		{
-	// 			this.TeamRed_Front_indicator?.setFillStyle(0xff0000);
-	// 		}	
-	// 	}
-
-	// }
 
 	ready_to_go = () =>
 	{
@@ -251,17 +165,34 @@ export default class Lobby extends Phaser.Scene
 		}, 2500);
 	}
 
+	game_abort = () =>
+	{
+		this.clear_all();
+
+		let style: Phaser.Types.GameObjects.Text.TextStyle = 
+		{
+			fontSize: '30px',
+			color: '#000000',
+			fontFamily: 'Arial'
+		}
+		this.message_text = this.add.text(400, 100, "Game aborted", style);
+
+		setTimeout(() => {
+			this.game.destroy(true, false);
+		}, 10000);
+	}
+
 	store_round_setup = (round_setup: RoundSetup) =>
 	{
 		this.game.registry.set('round_setup', round_setup);
 	}
 
-	launch_pong = () =>
-	{
-		console.log('imagine the screen fading to black');
+	// launch_pong = () =>
+	// {
+	// 	console.log('imagine the screen fading to black');
 
-		this.scene.start('Pong');
-	}
+	// 	this.scene.start('Pong');
+	// }
 
 	clear_all = () =>
 	{

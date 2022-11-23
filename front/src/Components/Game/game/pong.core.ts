@@ -22,6 +22,8 @@ export default class PongCore
 	ball_acceleration: number = 1; //pixels per update per collision
 	point_for_victory: number = 2;
 
+	fancy_rebound: boolean = true;
+
 	//Core Game Settings
 	field_width: number = 800; //pixels
 	field_height: number = 600; //pixels
@@ -304,6 +306,7 @@ export default class PongCore
 				this.ball_data.vector.x *= -1;	
 //TODO
 //do something cool with vectors for bounce
+				this.doctored_rebound(this.TeamBlue_Back_pos.y);
 				this.ball_data.velocity += this.ball_acceleration;
 				this.pong_triggers?.sound_event_paddle();
 			}
@@ -320,6 +323,7 @@ export default class PongCore
 				this.ball_data.vector.x *= -1;	
 //TODO
 //do something cool with vectors for bounce
+				this.doctored_rebound(this.TeamRed_Back_pos.y);
 				this.ball_data.velocity += this.ball_acceleration;		
 				this.pong_triggers?.sound_event_paddle();
 			}
@@ -339,6 +343,7 @@ export default class PongCore
 					this.ball_data.vector.x *= -1;	
 	//TODO
 	//do something cool with vectors for bounce
+					this.doctored_rebound(this.TeamBlue_Front_pos.y);
 					this.ball_data.velocity += this.ball_acceleration;		
 					this.pong_triggers?.sound_event_paddle();
 				}
@@ -355,6 +360,7 @@ export default class PongCore
 					this.ball_data.vector.x *= -1;	
 	//TODO
 	//do something cool with vectors for bounce
+					this.doctored_rebound(this.TeamRed_Front_pos.y);
 					this.ball_data.velocity += this.ball_acceleration;		
 					this.pong_triggers?.sound_event_paddle();
 				}
@@ -459,6 +465,26 @@ export default class PongCore
 		}
 	}
 
+	doctored_rebound = (paddle_y: number) =>
+	{
+		if (this.fancy_rebound)
+		{
+			let dist = (paddle_y - this.ball_data.position.y);
+			if (dist < 0)
+			{
+				dist *= -1;
+			}
+			let ratio = dist / (this.paddle_size_h / 2);
+			if (ratio > 0.5)
+			{
+				this.ball_data.vector.y += ratio / 1.5;
+			}
+			else if (ratio < 0.10)
+			{
+				this.ball_data.vector.y = ratio * 1.5;
+			}
+		}	
+	}
 	//used only by server, client is forced to wait for server confirmation
 	check_goal = () =>
 	{

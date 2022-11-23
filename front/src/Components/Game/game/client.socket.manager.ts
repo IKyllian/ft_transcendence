@@ -41,11 +41,13 @@ export default class ClientSocketManager
 			//Lobby
 			this.socket.on('lobby_join_response', this.onLobbyJoinResponse.bind(this));
 			this.socket.on('lobby_all_ready', this.onLobbyAllReady.bind(this));
+			this.socket.on('lobby_game_abort', this.onLobbyGameAbort);
 			// this.socket.on('lobby_status', this.onLobbyStatus.bind(this));
-			//Game
-			this.socket.on('game_state', this.onGameGetState.bind(this));
+			//Lobby + Game
 			this.socket.on('round_setup', this.onGameGetRoundSetup.bind(this));
 			this.socket.on('match_winner', this.onGameGetMatchWinner.bind(this));
+			//Game
+			this.socket.on('game_state', this.onGameGetState.bind(this));
 			//Replay
 			this.socket.on('replay_state', this.onReplayState.bind(this));
 		}
@@ -69,14 +71,6 @@ export default class ClientSocketManager
 		}
 	}
 
-	// lobby_send_ready = (game_id: string) =>
-	// {
-	// 	if (this.socket instanceof Socket)
-	// 	{
-	// 		this.socket.emit('user_is_ready', game_id);
-	// 	}
-	// }
-
 	//Lobby Listens
 
 	onLobbyJoinResponse = (response: boolean) =>
@@ -89,10 +83,11 @@ export default class ClientSocketManager
 		this.lobby_triggers?.ready_to_go();
 	}
 
-	// onLobbyStatus = (new_status: LobbyStatus) =>
-	// {
-	// 	this.lobby_triggers?.update_lobby_status(new_status);	
-	// }
+	onLobbyGameAbort = () =>
+	{
+		this.lobby_triggers?.game_abort();
+	}
+
 
 	//Game Emits
 

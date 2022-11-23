@@ -95,64 +95,17 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
 		// this.lobbyfactory.lobby_quit(socket);
 		console.log("Game Gateway Deconnection: ", socket.user.username) 
 	}
-
-	@SubscribeMessage('ping')
-	async onPing(client: Socket)
-	{
-		client.emit('pong');
-	}
-
-	/* ----- Administration ----- */
-
-	// @SubscribeMessage('admin_lobby_quantity')
-	// async onAdminLobbyQuantity(@ConnectedSocket() client: Socket)
-	// {
-	// 	if (client['id'] == this.admin['id'])
-	// 	{
-	// 		client.emit('lobby_quantity', this.lobbyfactory.get_lobby_quantity());
-	// 	}
-	// 	else
-	// 	{
-	// 		//log the event somewhere
-	// 	}	
-	// }
-
-	// @SubscribeMessage('admin_lobby_list')
-	// async onAdminLobbyList(@ConnectedSocket() client: Socket,
-	// @MessageBody() data: {player_A: string, player_B: string})
-	// {
-	// 	if (client['id'] == this.admin['id'])
-	// 	{
-	// 		client.emit('lobby_list', this.lobbyfactory.get_lobby_list());
-	// 	}
-	// 	else
-	// 	{
-		// 		//log the event somewhere
-		// 	}	
-		// }
-		
 		
 		/* ----- Users Lobby Management ----- */
 		
-		@UseGuards(WsJwtGuard)
-		@SubscribeMessage('user_join_lobby')
-		async onUserJoinLobby(@ConnectedSocket() client: AuthenticatedSocket,
-		@MessageBody() game_id: string)
-		{
+	@UseGuards(WsJwtGuard)
+	@SubscribeMessage('user_join_lobby')
+	async onUserJoinLobby(@ConnectedSocket() client: AuthenticatedSocket,
+	@MessageBody() game_id: string)
+	{
 		console.log("joining lobby, ", client.user)
-	//	console.log("user join lobby", data);
 		this.lobbyfactory.lobby_join(client, game_id);
 	}
-
-
-
-//Irrelevant with waitingroom
-	// @SubscribeMessage('user_is_ready')
-	// async onUserisReady(@ConnectedSocket() client: Socket,
-	// @MessageBody() game_id: string)
-	// {
-	// 	this.lobbyfactory.lobby_player_ready(client, game_id);
-	// }
 
 	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('user_lobby_request_status')
@@ -179,7 +132,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
 	async onUserGameGetRoundSetup(@ConnectedSocket() client: AuthenticatedSocket,
 	@MessageBody() game_id: string)
 	{
-		//this.lobbyfactory.lobby_game_input(data);
 		this.lobbyfactory.lobby_game_get_round_setup(client, game_id);
 	}
 
