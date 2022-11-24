@@ -199,13 +199,26 @@ export default class MatchResult extends Phaser.Scene
 
 	eloDisplay = () =>
 	{
+		let style_green: Phaser.Types.GameObjects.Text.TextStyle = 
+		{
+			fontSize: '32px',
+			color: '#00FF00',
+			fontFamily: 'Arial'
+		}
+
+		let style_red: Phaser.Types.GameObjects.Text.TextStyle = 
+		{
+			fontSize: '32px',
+			color: '#FF0000',
+			fontFamily: 'Arial'
+		}
+
 		let style: Phaser.Types.GameObjects.Text.TextStyle = 
 		{
 			fontSize: '32px',
 			color: '#000000',
 			fontFamily: 'Arial'
 		}
-
 
 
 		let blueTeamAverage: number = 0;
@@ -246,12 +259,12 @@ export default class MatchResult extends Phaser.Scene
 			this.TeamRed_Front_newElo += redEloLost;
 			this.TeamRed_Back_newElo += redEloLost;
 
-			this.add.text(100, 460, "+" + blueEloWon, style);
-			this.add.text(700, 460, "" + redEloLost, style);
+			this.add.text(100, 460, "+" + blueEloWon, style_green);
+			this.add.text(700, 460, "" + redEloLost, style_red);
 			if (this.game_type === GameType.Doubles)
 			{
-				this.add.text(300, 460, "+" + blueEloWon, style);
-				this.add.text(500, 460, "" + redEloLost, style);
+				this.add.text(300, 460, "+" + blueEloWon, style_green);
+				this.add.text(500, 460, "" + redEloLost, style_red);
 			}
 
 		}
@@ -262,12 +275,12 @@ export default class MatchResult extends Phaser.Scene
 			this.TeamRed_Front_newElo += redEloWon;	
 			this.TeamRed_Back_newElo += redEloWon;
 
-			this.add.text(100, 460, "" + blueEloLost, style);
-			this.add.text(700, 460, "+" + redEloWon, style);
+			this.add.text(100, 460, "" + blueEloLost, style_red);
+			this.add.text(700, 460, "+" + redEloWon, style_green);
 			if (this.game_type === GameType.Doubles)
 			{
-				this.add.text(300, 460, "" + blueEloLost, style);
-				this.add.text(500, 460, "+" + redEloWon, style);
+				this.add.text(300, 460, "" + blueEloLost, style_red);
+				this.add.text(500, 460, "+" + redEloWon, style_green);
 			}
 
 		}
