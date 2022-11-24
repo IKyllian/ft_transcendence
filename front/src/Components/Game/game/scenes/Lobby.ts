@@ -22,15 +22,19 @@ export default class Lobby extends Phaser.Scene
 
 	TeamBlue_Back_avatar?: Phaser.GameObjects.Image;
 	TeamBlue_Back_name?: Phaser.GameObjects.Text;
+	TeamBlue_Back_elo?: Phaser.GameObjects.Text;
 
 	TeamBlue_Front_avatar?: Phaser.GameObjects.Image;
 	TeamBlue_Front_name?: Phaser.GameObjects.Text;
+	TeamBlue_Front_elo?: Phaser.GameObjects.Text;
 
 	TeamRed_Front_avatar?: Phaser.GameObjects.Image;
 	TeamRed_Front_name?: Phaser.GameObjects.Text;
+	TeamRed_Front_elo?: Phaser.GameObjects.Text;
 
 	TeamRed_Back_avatar?: Phaser.GameObjects.Image;
 	TeamRed_Back_name?: Phaser.GameObjects.Text;
+	TeamRed_Back_elo?: Phaser.GameObjects.Text;
 
 	message_text?: Phaser.GameObjects.Text;
 	game_type: GameType = GameType.Singles;
@@ -113,6 +117,16 @@ export default class Lobby extends Phaser.Scene
 								.setOrigin(0.5,0.5)
 								.setDisplaySize(150, 150);
 
+		let style: Phaser.Types.GameObjects.Text.TextStyle = 
+		{
+			fontSize: '30px',
+			color: '#000000',
+			fontFamily: 'Arial'
+		}
+
+		this.TeamBlue_Back_name = this.add.text(100, 360, "" + this.game.registry.get('players_data').TeamBlue_Back.user.username, style);
+		this.TeamRed_Back_name = this.add.text(700, 360, "" + this.game.registry.get('players_data').TeamRed_Back.user.username, style);
+
 		if (this.game_type === GameType.Doubles)
 		{
 			this.TeamBlue_Front_avatar = this.add.image(280, 130, 'TeamBlue_front_avatar')
@@ -121,6 +135,20 @@ export default class Lobby extends Phaser.Scene
 			this.TeamRed_Front_avatar = this.add.image(520, 130, 'TeamRed_front_avatar')
 								.setOrigin(0.5,0.5)
 								.setDisplaySize(150, 150);
+			this.TeamBlue_Front_name = this.add.text(300, 360, "" + this.game.registry.get('players_data').TeamBlue_Front.user.username, style);
+			this.TeamRed_Front_name = this.add.text(500, 360, "" + this.game.registry.get('players_data').TeamRed_Front.user.username, style);
+
+			this.TeamBlue_Back_elo = this.add.text(100, 420, "" + this.game.registry.get('players_data').TeamBlue_Back.user.doubles_elo, style);
+			this.TeamRed_Back_elo = this.add.text(700, 420, "" + this.game.registry.get('players_data').TeamRed_Back.user.doubles_elo, style);
+
+			this.TeamBlue_Front_elo = this.add.text(300, 420, "" + this.game.registry.get('players_data').TeamBlue_Front.user.doubles_elo, style);
+			this.TeamRed_Front_elo = this.add.text(500, 420, "" + this.game.registry.get('players_data').TeamRed_Front.user.doubles_elo, style);
+
+		}
+		else
+		{
+			this.TeamBlue_Back_elo = this.add.text(100, 420, "" + this.game.registry.get('players_data').TeamBlue_Back.user.singles_elo, style);
+			this.TeamRed_Back_elo = this.add.text(700, 420, "" + this.game.registry.get('players_data').TeamRed_Back.user.singles_elo, style);
 		}
 
 		this.socketmanager.lobby_send_join(this.game.registry.get('players_data').game_id);

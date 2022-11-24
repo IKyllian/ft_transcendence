@@ -163,31 +163,31 @@ export class LobbyFactory
 		}
 	}
 
-	replay_debug(game_id: string)
-	{
-		let replay :Array<GameState> | undefined = this.replay_list.get(game_id);
-		if (replay !== undefined)
-		{
-			console.log('replay debug', game_id);
-			replay.forEach((gamestate, index) => {
+	// replay_debug(game_id: string)
+	// {
+	// 	let replay :Array<GameState> | undefined = this.replay_list.get(game_id);
+	// 	if (replay !== undefined)
+	// 	{
+	// 		console.log('replay debug', game_id);
+	// 		replay.forEach((gamestate, index) => {
 
-				// if (!(index % 10))
-				// {
-					console.log('factory frame#', index)
-					console.log(gamestate);
-					console.log('ball position:',gamestate.balldata.position);
-				// }
+	// 			// if (!(index % 10))
+	// 			// {
+	// 				console.log('factory frame#', index)
+	// 				console.log(gamestate);
+	// 				console.log('ball position:',gamestate.balldata.position);
+	// 			// }
 
-				// if(index === (replay.length -1))
-				// {
-				// 	console.log('@@@@last one');
-				// 	console.log(gamestate);
-				// 	
-				//}
-			});
+	// 			// if(index === (replay.length -1))
+	// 			// {
+	// 			// 	console.log('@@@@last one');
+	// 			// 	console.log(gamestate);
+	// 			// 	
+	// 			//}
+	// 		});
 
-		}
-	}
+	// 	}
+	// }
 
 	async endGameAttribution(players: Player[], result: EndResult, game_type: GameType, game_id: string, score: ScoreBoard) {
 		let blueTeam: User[] = [];

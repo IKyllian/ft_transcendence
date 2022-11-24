@@ -92,10 +92,8 @@ export default class PongCore
 		this.ball_acceleration = game_settings.ball_acceleration;
 		this.point_for_victory = game_settings.point_for_victory;
 
-
 		this.ball_data.velocity = this.ball_start_speed;
-
-
+		
 		this.TeamBlue_Back_pos.x = this.player_back_advance;
 		this.TeamBlue_Front_pos.x = this.player_front_advance;
 		this.TeamRed_Front_pos.x = ( this.field_width - this.player_front_advance );

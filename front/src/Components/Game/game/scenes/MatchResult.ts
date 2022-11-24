@@ -3,6 +3,13 @@ import { EndResult, GameType, PlayerType } from '../types/shared.types';
 import AssetButton from '../../../../Assets/images/button.png';
 
 
+// dans user
+// @Column({ default: 1000 })
+// singles_elo: number;
+
+// @Column({ default: 1000 })
+// doubles_elo: number;
+
 
 export default class MatchResult extends Phaser.Scene
 {
@@ -19,6 +26,11 @@ export default class MatchResult extends Phaser.Scene
 	TeamBlue_Front_name: string = "";
 	TeamRed_Front_name: string = "";
 	TeamRed_Back_name: string = "";
+
+	TeamBlue_Back_newElo: number = 0;
+	TeamBlue_Front_newElo: number = 0;
+	TeamRed_Front_newElo: number = 0;
+	TeamRed_Back_newElo: number = 0;
 
 
 	//Displayed elements
@@ -156,6 +168,14 @@ export default class MatchResult extends Phaser.Scene
 			}		
 		}
 
+
+		this.eloDisplay();
+
+		// console.log("TeamBlue_Back_newElo", this.TeamBlue_Back_newElo);
+		// console.log("TeamBlue_front_newElo", this.TeamBlue_Front_newElo);
+		// console.log("Teamred_front_newElo", this.TeamRed_Front_newElo);
+		// console.log("Teamred_Back_newElo", this.TeamRed_Back_newElo);
+
 		this.result_text = this.add.text(400, 100, text, style);
 		this.input.on('gameobjectdown',this.click_event);
 
@@ -176,5 +196,100 @@ export default class MatchResult extends Phaser.Scene
 			this.game.destroy(true, false);
 		}
 	}
+
+	eloDisplay = () =>
+	{
+		let style: Phaser.Types.GameObjects.Text.TextStyle = 
+		{
+			fontSize: '32px',
+			color: '#000000',
+			fontFamily: 'Arial'
+		}
+
+
+
+		let blueTeamAverage: number = 0;
+		let redTeamAverage: number = 0;
+
+		this.TeamBlue_Back_newElo = this.game_type === GameType.Singles ? 
+									this.game.registry.get('players_data').TeamBlue_Back.user.singles_elo
+									: this.game.registry.get('players_data').TeamBlue_Back.user.doubles_elo;
+
+		this.TeamRed_Back_newElo =	this.game_type === GameType.Singles ? 
+									this.game.registry.get('players_data').TeamRed_Back.user.singles_elo
+									: this.game.registry.get('players_data').TeamRed_Back.user.doubles_elo;
+
+		blueTeamAverage += this.TeamBlue_Back_newElo;
+		redTeamAverage += this.TeamRed_Back_newElo;
+
+		if (this.game_type === GameType.Doubles)
+		{
+			this.TeamBlue_Front_newElo = this.game.registry.get('players_data').TeamBlue_Front.user.doubles_elo;
+			this.TeamRed_Front_newElo = this.game.registry.get('players_data').TeamRed_Front.user.doubles_elo;
+
+			blueTeamAverage += this.TeamBlue_Front_newElo;
+			redTeamAverage += this.TeamRed_Front_newElo;
+			
+			blueTeamAverage /= 2;
+			redTeamAverage /= 2;
+		}
+
+		const blueEloWon: number = Math.round(50 / (1 + Math.pow(10, (blueTeamAverage - redTeamAverage) / 400)));
+		const blueEloLost: number = blueEloWon - 50;
+		const redEloWon: number = Math.abs(blueEloLost);
+		const redEloLost: number = redEloWon - 50;
+		
+		if (this.winner === EndResult.TeamBlue_Win)
+		{
+			this.TeamBlue_Back_newElo += blueEloWon;
+			this.TeamBlue_Front_newElo += blueEloWon;
+			this.TeamRed_Front_newElo += redEloLost;
+			this.TeamRed_Back_newElo += redEloLost;
+
+			this.add.text(100, 460, "+" + blueEloWon, style);
+			this.add.text(700, 460, "" + redEloLost, style);
+			if (this.game_type === GameType.Doubles)
+			{
+				this.add.text(300, 460, "+" + blueEloWon, style);
+				this.add.text(500, 460, "" + redEloLost, style);
+			}
+
+		}
+		else
+		{
+			this.TeamBlue_Back_newElo += blueEloLost;
+			this.TeamBlue_Front_newElo += blueEloLost;
+			this.TeamRed_Front_newElo += redEloWon;	
+			this.TeamRed_Back_newElo += redEloWon;
+
+			this.add.text(100, 460, "" + blueEloLost, style);
+			this.add.text(700, 460, "+" + redEloWon, style);
+			if (this.game_type === GameType.Doubles)
+			{
+				this.add.text(300, 460, "" + blueEloLost, style);
+				this.add.text(500, 460, "+" + redEloWon, style);
+			}
+
+		}
+
+
+
+		this.add.text(100, 420, "" + this.TeamBlue_Back_newElo, style);
+		this.add.text(700, 420, "" + this.TeamRed_Back_newElo, style);
+
+		// this.add.text(100, 460, "" + this.TeamBlue_Back_newElo, style);
+		// this.add.text(700, 460, "" + this.TeamRed_Back_newElo, style);
+
+		if (this.game_type === GameType.Doubles)
+		{
+			this.add.text(300, 420, "" + this.TeamBlue_Front_newElo, style);
+			this.add.text(500, 420, "" + this.TeamRed_Front_newElo, style);
+		}
+	
+
+
+	}
+
+
 
 }
