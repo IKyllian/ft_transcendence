@@ -62,6 +62,8 @@ function Header() {
             setShowNotifDropdown(false);
     }, [location.pathname])
 
+    console.log("!!!!!!!!!!!!!!HEADER AVATAR !!!!!!!!!!!!!", currentUser);
+
     return location.pathname === "/sign" || location.pathname === "/set-username" ? (
         <> </>
     ) : (
@@ -83,7 +85,8 @@ function Header() {
                     </Link>
                 </div>
                 <Link className='header-profile' to={`/profile/${currentUser?.username}`}>
-                    <img className='header-picture' src={ProfilPic} alt="profil pic" />
+                    {/* <img className='header-picture' src={ProfilPic} alt="profil pic" /> */}
+                    <img className='header-picture' src={currentUser?.avatar} alt="profil pic" />
                     {currentUser?.username}
                 </Link>
                 <IconLogout onClick={() => handleLogout()} />

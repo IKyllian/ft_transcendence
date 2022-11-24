@@ -2,15 +2,15 @@ import { Conversation, ConversationInfoSidebar, TimeoutType, UserTimeout } from 
 import { UserInterface } from "../Types/User-Types";
 
 export function getSecondUserIdOfPM(conversation: Conversation | ConversationInfoSidebar, userConnectedId: number): number {
-    return conversation?.user1.id !== userConnectedId ? conversation?.user1.id : conversation?.user2.id;
+    return conversation.user1.id !== userConnectedId ? conversation.user1.id : conversation.user2.id;
 }
 
 export function getSecondUserOfPM(conversation: Conversation | ConversationInfoSidebar, userConnectedId: number): UserInterface {
-    return conversation?.user1.id !== userConnectedId ? conversation?.user1 : conversation?.user2;
+    return conversation.user1.id !== userConnectedId ? conversation?.user1 : conversation.user2;
 }
 
 export function getSecondUsernameOfPM(conversation: Conversation, userConnectedId: number): string {
-    return conversation?.user1.id !== userConnectedId ? conversation?.user1.username : conversation?.user2.username;
+    return conversation.user1.id !== userConnectedId ? conversation.user1.username : conversation.user2.username;
 }
 
 export function getMessageDateString(date: string): string {
@@ -42,7 +42,8 @@ export const debounce = (func: Function, debouneTime: number) => {
     let timer: any;
     return function (...args: any) {
       const context: any = debounce;
-      if (timer) clearTimeout(timer);
+      if (timer)
+        clearTimeout(timer);
       timer = setTimeout(() => {
         timer = null;
         func.apply(context, args);

@@ -178,7 +178,7 @@ export function usePrivateConvHook() {
             socket?.off("ConversationData");
             socket?.off("NewPrivateMessage");
         }
-    }, [socket, convId])
+    }, [convId])
 
     return {
         convDatas,

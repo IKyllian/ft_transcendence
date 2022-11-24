@@ -37,7 +37,7 @@ import { TwoFactorModule } from './2fa/twoFactor.module';
       database: process.env.POSTGRES_NAME,
       entities,
       synchronize: true, // Setting synchronize: true shouldn't be used in production - otherwise you can lose production data.
-    //   dropSchema: true,
+      // dropSchema: true,
       // logging: true,
     }),
   ],

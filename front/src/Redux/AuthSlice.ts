@@ -53,6 +53,10 @@ export const authSlice = createSlice({
         replaceUserObject: (state, {payload}: PayloadAction<UserInterface>) => {
             state.currentUser = {...payload};
         },
+        addAvatar: (state, {payload}: PayloadAction<string>) => {
+            if (state.currentUser)
+                state.currentUser = {...state.currentUser, avatar: payload};
+        },
         copyFriendListArray: (state, {payload}: PayloadAction<UserInterface[]>) => {
             state.friendList = [...payload];
         },
@@ -77,6 +81,7 @@ export const {
     logoutPending,
     logoutSuccess,
     replaceUserObject,
+    addAvatar,
     copyFriendListArray,
     changeFriendListUserStatus
 } = authSlice.actions;

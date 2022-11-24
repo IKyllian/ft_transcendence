@@ -1,12 +1,14 @@
 @use "./Variables.scss" as *;
 
+$orangeColor: rgba(222, 153, 24, 0.974);
+
 .match-found-container {
     z-index: 5000;
     position: absolute;
     @include width-height(350px, 350px);
     border-radius: 50%;
     background-color: $DarkPalette;
-    border: 4px solid orange;
+    border: 4px solid $orangeColor;
     margin: auto;
     top: 0;
     bottom: 0;
@@ -30,9 +32,15 @@
             padding: 5px;
             border-radius: 50%;
             background-color: $DarkPalette;
-            border: 1px solid orange;
+            border: 1px solid $orangeColor;
             top: 10px;
             right: 70px;
+            color: $orangeColor;
+
+            &:hover {
+                color: $DarkPalette;
+                background-color: $orangeColor;
+            }
         }
     }
 
@@ -58,6 +66,14 @@
         border-top-right-radius: 5px;
         border-bottom-left-radius: 50%;
         border-bottom-right-radius: 50%;
-        border: 1px solid orange;
+        border: 1px solid $orangeColor;
+        font-weight: bold;
+        color: $orangeColor;
+
+        &:hover {
+            color: $DarkPalette;
+            background-color: $orangeColor;
+            border: 1px solid $DarkPalette;
+        }
     }
 }

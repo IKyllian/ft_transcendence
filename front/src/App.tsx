@@ -6,6 +6,7 @@ import { useAppHook } from "./Hooks/App-Hook";
 import Header from "./Components/Header/Header";
 import Home from './Components/Home/Home';
 import Sign from './Components/Sign/Sign';
+import ResetPassword from './Components/Sign/Reset-Password';
 import Profile from './Components/Profile/Profile';
 import Leaderboard from './Components/Leaderboard/Leaderboard';
 import AddFriendModal from './Components/Friends-Modal';
@@ -34,7 +35,11 @@ interface RouteProps {
 	element: JSX.Element,
 }
 interface SocketContextType {
-	socket : Socket | undefined;
+	socket: Socket | undefined;
+}
+
+interface CacheContextType {
+	cache: Cache | undefined; 
 }
 
 const routes: RouteProps[] = [
@@ -48,7 +53,7 @@ const routes: RouteProps[] = [
 		path: '/sign',
 		element:
 			<PublicRoute>
-				<Sign />
+				<ResetPassword />
 			</PublicRoute>,
 	}, {
 		path: '/account-verification',
@@ -112,10 +117,12 @@ const routes: RouteProps[] = [
 ]
 
 export const SocketContext = createContext<SocketContextType>({socket: undefined});
+export const CacheContext = createContext<CacheContextType>({cache: undefined});
 
 function App() {
 	const {
 		socket,
+		cache,
 		eventError,
 		closeEventError,
 		isAuthenticated,
@@ -125,68 +132,70 @@ function App() {
   return (
 	<div className="app-container">
 		<SocketContext.Provider value={{socket: socket}} >
-			<ModalProvider>
-				{ isAuthenticated && eventError !== undefined && <NotifError error={eventError} closeError={closeEventError} />}
-				{ isAuthenticated && <AddFriendModal/> }
-				{ isAuthenticated && <ModalPartyInvite /> }
-				{ isAuthenticated && <NotifGameInvite /> }
-				{/* { isAuthenticated && <MatchFound /> } */}
-				{ isAuthenticated && <Header /> }
-				<main className="page-container">
-					{ isAuthenticated && partyState.party && partyState.chatIsOpen && <ChatParty />}
-					<Routes>
-						{
-							routes.map((elem, index) => 
-								<Route key={index} path={elem.path} element={elem.element} />
-							)
-						}
-						<Route
-							path='/chat'
-							element= {
-								<PrivateRoute>
-									<Chat />
-								</PrivateRoute>
+			<CacheContext.Provider value={{cache: cache}} >
+				<ModalProvider>
+					{ isAuthenticated && eventError !== undefined && <NotifError error={eventError} closeError={closeEventError} />}
+					{ isAuthenticated && <AddFriendModal/> }
+					{ isAuthenticated && <ModalPartyInvite /> }
+					{ isAuthenticated && <NotifGameInvite /> }
+					{/* { isAuthenticated && <MatchFound /> } */}
+					{ isAuthenticated && <Header /> }
+					<main className="page-container">
+						{ isAuthenticated && partyState.party && partyState.chatIsOpen && <ChatParty />}
+						<Routes>
+							{
+								routes.map((elem, index) => 
+									<Route key={index} path={elem.path} element={elem.element} />
+								)
 							}
-						>
 							<Route
-								path="channel/:channelId"
+								path='/chat'
 								element= {
 									<PrivateRoute>
-										<ChatChannel />
+										<Chat />
 									</PrivateRoute>
 								}
-							/>
-							<Route
-								path="private-message/:convId"
-								element= {
-									<PrivateRoute>
-										<ChatPrivateMessage />
-									</PrivateRoute>
-								}
-							/>
-							{/* <Route
-								path="channel/:channelId/settings"
-								element= {
-									<PrivateRoute>
-										<ChannelSettings />
-									</PrivateRoute>
-								}
-							/> */}
-							<Route
-								path="channels-list"
-								element= {
-									<PrivateRoute>
-										<ChannelsList />
-									</PrivateRoute>
-								}
-							/>
-						</Route>
-					</Routes>
-				</main>
-			</ModalProvider>
+							>
+								<Route
+									path="channel/:channelId"
+									element= {
+										<PrivateRoute>
+											<ChatChannel />
+										</PrivateRoute>
+									}
+								/>
+								<Route
+									path="private-message/:convId"
+									element= {
+										<PrivateRoute>
+											<ChatPrivateMessage />
+										</PrivateRoute>
+									}
+								/>
+								{/* <Route
+									path="channel/:channelId/settings"
+									element= {
+										<PrivateRoute>
+											<ChannelSettings />
+										</PrivateRoute>
+									}
+								/> */}
+								<Route
+									path="channels-list"
+									element= {
+										<PrivateRoute>
+											<ChannelsList />
+										</PrivateRoute>
+									}
+								/>
+							</Route>
+						</Routes>
+					</main>
+				</ModalProvider>
+			</CacheContext.Provider>
 		</SocketContext.Provider>
     </div>
-  );
+  )
 }
 
 export default App;

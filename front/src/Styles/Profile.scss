@@ -85,9 +85,10 @@ $FontSizeTextResponsive: 15px;
             }
 
             .settings-icon {
-                @include width-height(15px, 15px);
+                @include width-height(20px, 20px);
+                cursor: pointer;
                 margin-left: 10px;
-                margin-top: 5px;
+                margin-top: 8px;
             }
 
             .friend-request-pending {

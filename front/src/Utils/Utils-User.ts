@@ -1,5 +1,6 @@
 import { UserInterface } from "../Types/User-Types";
-import { useAppSelector } from "../Redux/Hooks";
+import { fetchResponseAvatar } from "../Api/Profile/Profile-Fetch";
+import { baseUrl } from "../env";
 
 export function getMatchPlayed(match_won: number, match_lost: number): number {
     return (match_won + match_lost);
@@ -23,11 +24,30 @@ export function userIdIsBlocked(connectedUser: UserInterface, secondUserId: numb
     return (connectedUser.blocked.find(elem => elem.id === secondUserId) ? true : false);
 }
 
-export function IsLog() {
-    let authDatas = useAppSelector((state) => state.auth);
-    
-    if (authDatas.currentUser === undefined)
-        return false;
-    else
-        return true;
+export async function getPlayerAvatar(cache: Cache, token: string): Promise<string | undefined> {
+    let req = new Request(`${baseUrl}/users/avatar`, {method: 'GET', headers: {"Authorization": `Bearer ${token}`}});
+    return await cache.match(req).then(async (cacheResponse) => {
+        if (cacheResponse) {
+            return cacheResponse;
+        } else 
+            return await fetchResponseAvatar(token, req).then(fetchResponse => {
+                if (!fetchResponse.ok) {
+                    return undefined;
+                }
+                cache.put(req, fetchResponse);
+                return fetchResponse;
+            })
+    })
+    .then((response) => {
+        if (response)
+            return response.blob();
+        return undefined;
+    })
+    .then(blob => {
+        if (blob) {
+            const url = URL.createObjectURL(blob);
+            return url;
+        }
+        return undefined;
+    })
 }

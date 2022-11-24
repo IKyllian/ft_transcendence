@@ -46,7 +46,7 @@ function Leaderboard() {
         return () => {
             socket?.off("StatusUpdate")
         }
-    }, [socket])
+    }, [])
 
     const changePage = (index: number) => {
         if (index + 1 !== leaderboardState.page) {

@@ -4,15 +4,13 @@ import LoadingSpin from "../Utils/Loading-Spin";
 import { useAppSelector } from "../../Redux/Hooks";
 import { IconPlus, IconChevronRight } from "@tabler/icons";
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
 import { SidebarContext } from "./Chat";
 import { SocketContext } from "../../App";
 import { fetchVisibleChannels } from "../../Api/Chat/Chat-Fetch";
 
-function ChannelItem(props: {channelData: Channel, token: string}) {
+function ChannelItem(props: {channelData: Channel}) {
     const { register, handleSubmit, formState: {errors} } = useForm<{password?: string}>();
-    const { channelData, token } = props;
-    const navigate = useNavigate();
+    const { channelData } = props;
     const {socket} = useContext(SocketContext);
 
     const handleClick = handleSubmit((data, e) => {
@@ -38,7 +36,6 @@ function ChannelItem(props: {channelData: Channel, token: string}) {
                             channelData.option === ChannelModes.PROTECTED &&
                             <input type="password" placeholder="password" {...register("password")} />
                         }
-                        
                         <IconPlus onClick={() => handleClick()} />
                     </div>
                 </div>
@@ -49,50 +46,40 @@ function ChannelItem(props: {channelData: Channel, token: string}) {
 
 function ChannelsList() {
     const [channelsList, setChannelsList] = useState<undefined | Channel[]>(undefined);
-    // const [ joinError, setJoinError] = useState<string | undefined>(undefined);
 
     let authDatas = useAppSelector((state) => state.auth);
     const sidebarStatus = useContext(SidebarContext);
-    const {socket} = useContext(SocketContext);
 
     useEffect(() => {
-        // socket!.on('exception', (data: any) => {
-        //     console.log("exception", data);
-        //     console.log(data.message);
-        //     setJoinError(data.message);
-        // });
-
         fetchVisibleChannels(authDatas.token, setChannelsList);
-
-        // return () => {
-        //     socket?.off('exception');
-        // }
     }, [])
 
-    // useEffect(() => {
-       
+    if (!channelsList) {
+        return (
+            <div>
+                <LoadingSpin />
+            </div>
+        );
+    }
 
-       
-    // }, [])
-
-    return !channelsList ? (
-       <div>
-            <LoadingSpin />
-       </div>
-    ) : (
+    return channelsList.length > 0 ? (
         <div className="channels-list-wrapper">
-            {
-                sidebarStatus.sidebar === false &&
-                <div className="sidebar-button" onClick={() => sidebarStatus.setSidebarStatus()}>
-                    <IconChevronRight />
-                </div>
-            }
-            {
-                channelsList.map((elem) => 
-                    <ChannelItem  key={elem.id} channelData={elem} token={authDatas.token} />
-                )
-            }
-        </div>   
+        {
+            sidebarStatus.sidebar === false &&
+            <div className="sidebar-button" onClick={() => sidebarStatus.setSidebarStatus()}>
+                <IconChevronRight />
+            </div>
+        }
+        {
+            channelsList.map((elem) => 
+                <ChannelItem  key={elem.id} channelData={elem} />
+            )
+        }
+    </div>   
+    ) : (
+        <div className="no-target-message">
+            <p> No Channel created yet </p>
+        </div> 
     )
 }
 

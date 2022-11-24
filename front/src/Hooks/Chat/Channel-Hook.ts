@@ -123,7 +123,7 @@ export function useChannelHook() {
                 socket?.off("NewChannelMessage");
             }
         }
-    }, [socket, channelId])
+    }, [channelId])
 
     const handleSubmitMessage = handleSubmit((data, e: any) => {
         e.preventDefault();

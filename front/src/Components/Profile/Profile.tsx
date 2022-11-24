@@ -16,6 +16,9 @@ function Profile() {
         changeMode,
     } = useProfileHook();
 
+    console.log("USERSTATe", userState);
+
+    // return !userState || (userState && !userState.user) ? (
     return !userState?.user ? (
        <LoadingSpin classContainer="profile-container" />
     ) : (

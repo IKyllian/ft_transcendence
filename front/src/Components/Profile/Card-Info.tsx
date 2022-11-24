@@ -12,18 +12,20 @@ function CardInfo(props: {userState: ProfileState}) {
     const {socket} = useContext(SocketContext);
 
     const invitePlayer = () => {
-        socket?.emit("GameInvite", {id: userState.user.id});
+        if (userState.user)
+            socket?.emit("GameInvite", {id: userState.user.id});
     }
 
-    return (
+    return userState.user ? (
         <div className="card-info">
-            <img className='profile-avatar' src={Avatar} alt="profil pic" />
+            {/* <img className='profile-avatar' src={Avatar} alt="profil pic" /> */}
+            <img className='profile-avatar' src={userState.user.avatar} alt="profil pic" />
             <div className={`player-status player-status-${userState.user.status === UserStatus.ONLINE ? "online" : "offline"}`}> </div>
             <p> {userState.user.username} </p>
             {
                 userState.isLoggedUser ? 
                 <>
-                    <IconEdit />
+                    {/* <IconEdit /> */}
                     <Link to={`/profile/${userState.user.username}/settings`}>
                         <IconSettings className='settings-icon' />
                     </Link>
@@ -41,6 +43,8 @@ function CardInfo(props: {userState: ProfileState}) {
                 </>
             }
         </div>
+    ) : (
+        <> </>
     );
 }
 

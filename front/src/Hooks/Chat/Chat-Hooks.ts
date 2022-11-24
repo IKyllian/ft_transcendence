@@ -61,7 +61,7 @@ export function useLoadChatDatas() {
             else
                 dispatch(unsetChannelId());
         }
-    }, [channelId, socket, location.pathname]);
+    }, [channelId, location.pathname]);
 
     // Les useEffect pour les call api etc..
     useEffect(() => {

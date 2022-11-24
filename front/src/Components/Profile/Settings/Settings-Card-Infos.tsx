@@ -1,10 +1,13 @@
+import { IconLock } from "@tabler/icons";
 import { useForm } from "react-hook-form";
 import { UserInterface } from "../../../Types/User-Types";
 
 function SettingsCardInfos(props: {currentUser: UserInterface}) {
     const { currentUser } = props;
     console.log("currentUser", currentUser);
-    const {register} = useForm<{username: string}>({defaultValues: {username: currentUser.username}});
+    const {register, watch} = useForm<{username: string}>({defaultValues: {username: currentUser?.username}});
+
+    const watchUsersame = watch("username");
     return (
         <div className="user-infos-card">
             <h3> Edit Profile </h3>
@@ -12,13 +15,18 @@ function SettingsCardInfos(props: {currentUser: UserInterface}) {
                 <div>
                     <label>
                         Username
-                        <input type="text" {...register("username")} />
+                        <div className="lock-input-wrapper">
+                            <input type="text" {...register("username")} />
+                            { watchUsersame !== currentUser.username && <button className="username-save" type="submit"> Save </button> }
+                        </div>
                     </label>
-                    {/* <button type="submit"> Update </button> */}
                 </div>
-                <label className="lock-input">
+                <label >
                     Email
-                    <input  disabled type="text" value={currentUser.email} />
+                    <div className="lock-input-wrapper">
+                        <input disabled className="lock-input" type="text" value={currentUser.email} />
+                        <IconLock />
+                    </div>
                 </label>
             </form>
             <form>
@@ -30,9 +38,14 @@ function SettingsCardInfos(props: {currentUser: UserInterface}) {
                     New Password
                     <input type="password" />
                 </label>
-                <button type="submit"> Change Password </button>
+                <div>
+                    <button type="submit"> Change Password </button>
+                </div>
             </form>
-            <button> Activate Two-Factor Authentication </button>
+            <div>
+                <button> Activate Two-Factor Authentication </button>
+            </div>
+            
         </div>
     );
 }
