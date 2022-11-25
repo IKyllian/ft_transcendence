@@ -5,6 +5,7 @@ import { SocketContext } from "../../App";
 import { useContext } from "react";
 import { Link } from "react-router-dom";
 import { IconX, IconCheck } from "@tabler/icons";
+import ExternalImage from "../External-Image";
 
 function NotifItem(props: {notification: NotificationInterface}){
     const { notification } = props;
@@ -22,7 +23,7 @@ function NotifItem(props: {notification: NotificationInterface}){
     return (
         <div className="notif-dropdown-item">
             <IconX className="delete-notif-icon" />
-            <img className='profile-avatar' src={Avatar} alt="profil pic" />
+            <ExternalImage src={notification.requester.avatar} alt="User Avatar" className='profile-avatar' userId={notification.requester.id} />
             <div className="notif-content">
                 <Link to={`/profile/${notification.requester.username}`}> {notification.requester.username} </Link>
                 <p>

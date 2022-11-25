@@ -9,7 +9,7 @@ import { addChannel, addPrivateConv, removeChannel } from "../Redux/ChatSlice";
 import { Channel, ChannelUpdateType, ChannelUser, Conversation, UserTimeout } from "../Types/Chat-Types";
 import { UserInterface } from "../Types/User-Types";
 import { addAvatar, copyFriendListArray, logoutSuccess, stopIsConnectedLoading } from "../Redux/AuthSlice";
-import { GameMode, PartyInterface, PartyMessage } from "../Types/Lobby-Types";
+import { GameMode, PartyInterface, PartyMessage, Player } from "../Types/Lobby-Types";
 import { copyNotificationArray } from "../Redux/NotificationSlice";
 import { addParty, addPartyInvite, addPartyMessage, cancelQueue, changePartyGameMode, changeQueueStatus, incrementQueueTimer, leaveParty, removePartyInvite, resetQueueTimer } from "../Redux/PartySlice";
 import { fetchVerifyToken } from "../Api/Sign/Sign-Fetch";
@@ -39,19 +39,21 @@ export function useAppHook() {
 	}
 
 	const openCache = async () => {
-		const openCache = await caches.open('avatar-cache');
-		getPlayerAvatar(openCache, token).then(avatarResponse => {
-			if (avatarResponse)
-				dispatch(addAvatar(avatarResponse));
-			else
-				throw "Failed To Load Avatar";
-		})
-		setCache(openCache);
+		if ('caches' in window) {
+			const openCache = await caches.open('avatar-cache');
+			setCache(openCache);
+		} else {
+			throw "Caches not supported";
+		}
 	}
 
 	const deleteCache = () => {
+		console.log("DELETE");
 		caches.delete('avatar-cache').then(isGone => {
 			console.log("Cache is delete", isGone);
+		})
+		.catch(err => {
+			console.log("ERR", err);
 		})
 	}
 
@@ -135,14 +137,15 @@ export function useAppHook() {
 	}, [location.pathname, socket])
 
 	useEffect(() => {
-		if (socket !== undefined) {
+		if (socket !== undefined && cache) {
 			console.log("SOCKET CONDITION");
 			socket.on("Connection", (data: {friendList: UserInterface[], notification: NotificationInterface[], party: PartyInterface}) => {
 				console.log("data connection", data);
 				dispatch(copyNotificationArray(data.notification));
 				dispatch(copyFriendListArray(data.friendList));
-				if (data.party)
+				if (data.party) {
 					dispatch(addParty(data.party));
+				}	
 			});
 
 			socket.on("PartyUpdate", (data: {party: PartyInterface, cancelQueue: boolean}) => {
@@ -242,7 +245,7 @@ export function useAppHook() {
 			socket?.off("OnLeave");
 			socket?.off("Logout");
 		}
-	}, [socket])
+	}, [socket, cache])
 
     return {
         socket,

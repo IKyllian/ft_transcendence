@@ -38,7 +38,7 @@ export interface UserInterface {
     id: number,
     username: string,
     email: string,
-    avatar: string,
+    avatar: string | null,
     status: UserStatus,
     statistic: Statistic,
     channelUser: Channel[],

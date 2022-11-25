@@ -3,6 +3,7 @@ import Avatar from "../Images-Icons/pp.jpg";
 import { SocketContext } from "../App";
 import { useAppDispatch, useAppSelector } from "../Redux/Hooks";
 import { removePartyInvite } from "../Redux/PartySlice";
+import ExternalImage from "./External-Image";
 
 function NotifGameInvite() {
     const { partyInvite } = useAppSelector(state => state.party);
@@ -24,7 +25,7 @@ function NotifGameInvite() {
                 partyInvite.map((elem) => 
                     <div key={elem.id} className="game-invite-wrapper">
                         <div className="notif-top">
-                            <img className='profile-avatar' src={Avatar} alt="profil pic" />
+                        <ExternalImage src={elem.requester.avatar} alt="User Avatar" className='profile-avatar' userId={elem.requester.id} />
                             <div className="notif-text">
                                 <p> {elem.requester.username} </p>
                                 <p> Invited you to play a game </p>

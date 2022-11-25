@@ -24,23 +24,25 @@ export function userIdIsBlocked(connectedUser: UserInterface, secondUserId: numb
     return (connectedUser.blocked.find(elem => elem.id === secondUserId) ? true : false);
 }
 
-export async function getPlayerAvatar(cache: Cache, token: string): Promise<string | undefined> {
-    let req = new Request(`${baseUrl}/users/avatar`, {method: 'GET', headers: {"Authorization": `Bearer ${token}`}});
+export async function getPlayerAvatar(cache: Cache, token: string, userId: number): Promise<string | undefined> {
+    let req = new Request(`${baseUrl}/users/${userId}/avatar`, {method: 'GET', headers: {"Authorization": `Bearer ${token}`}});
+    console.log("req", req);
     return await cache.match(req).then(async (cacheResponse) => {
         if (cacheResponse) {
             return cacheResponse;
         } else 
-            return await fetchResponseAvatar(token, req).then(fetchResponse => {
+            return await fetchResponseAvatar(req).then(fetchResponse => {
                 if (!fetchResponse.ok) {
                     return undefined;
                 }
-                cache.put(req, fetchResponse);
+                cache.put(req, fetchResponse.clone());
                 return fetchResponse;
             })
     })
-    .then((response) => {
-        if (response)
-            return response.blob();
+    .then(async (response) => {
+        console.log("response AVATAR", response);
+        if (response !== undefined)
+            return await response.blob();
         return undefined;
     })
     .then(blob => {

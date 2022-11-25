@@ -12,6 +12,7 @@ import MuteButton from "../../Buttons/Mute-Button";
 
 import { getMessageDateString, getMessageHour } from "../../../Utils/Utils-Chat";
 import { PartyMessage } from "../../../Types/Lobby-Types";
+import ExternalImage from "../../External-Image";
 
 function MessageItem(props: {isFromChan: boolean, message: ChatMessage | PrivateMessage | PartyMessage, loggedUserIsOwner: boolean, chan?: Channel, isNewSender?: boolean, index?: number}) {
     const {isFromChan, message, loggedUserIsOwner, chan, isNewSender, index} = props;
@@ -29,7 +30,7 @@ function MessageItem(props: {isFromChan: boolean, message: ChatMessage | Private
             {
                 isNewSender &&
                 <li style={isNewSender && index && index > 0 ? {marginTop: '20px'}: {}} className={`message-item-container`}>
-                    <img src={ProfilPic} alt="profil pic" />
+                    <ExternalImage src={message.sender.avatar} alt="User Avatar" className='' userId={message.sender.id} />
                     <div className="message-content-wrapper">
                         <div className="message-info-wrapper">
                             <span className="sender-txt" onClick={() => handleClick()}> {message.sender.username} </span>

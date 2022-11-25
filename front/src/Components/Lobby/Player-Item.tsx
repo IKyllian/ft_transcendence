@@ -3,6 +3,7 @@ import Avatar from "../../Images-Icons/pp.jpg";
 import { IconCheck, IconPlus } from "@tabler/icons";
 import { GameMode, Player, TeamSide, PlayerPosition } from "../../Types/Lobby-Types";
 import { changeModalStatus } from "../../Redux/PartySlice";
+import ExternalImage from "../External-Image";
 
 interface PlayerItemProps {
     user?: Player,
@@ -32,7 +33,7 @@ function PlayerListItem(props: PlayerItemProps) {
     return user ? (
         <li className={`${displayTeam ? `team-${user.team === TeamSide.BLUE ? "blue" : "red" }` : ""}`} >
             { displayTeam && onChangeTeam && loggedUserId === user.user.id && <TeamCircles user={user} onChangeTeam={onChangeTeam} /> }
-            <img className={`player-avatar ${displayTeam ? "avatar-shadow" : ""}`} src={Avatar} alt="profil pic" />
+            <ExternalImage src={user.user.avatar} alt="User Avatar" className={`player-avatar ${displayTeam ? "avatar-shadow" : ""}`} userId={user.user.id} />
             <p> {user.user.username} </p>
             {
                 user.user.id === loggedUserId && lobbyLength && onChangePos && displaySelectPos &&

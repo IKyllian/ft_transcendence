@@ -2,9 +2,10 @@ import { useState } from "react";
 import { fetchUploadAvatar } from "../../../Api/Profile/Profile-Fetch";
 import Avatar from "../../../Images-Icons/pp.jpg";
 import { useAppSelector } from "../../../Redux/Hooks";
+import ExternalImage from "../../External-Image";
 
 function SettingsCardAvatar() {
-    const { token } = useAppSelector(state => state.auth);
+    const { token, currentUser } = useAppSelector(state => state.auth);
     const [inputFile, setInputFile] = useState<File | undefined>(undefined);
     const [urlFile, setUrlFile] = useState<string>("");
 
@@ -29,11 +30,12 @@ function SettingsCardAvatar() {
             setInputFile(undefined)
         }
     }
-    return (
+    return currentUser ? (
         <div className="avatar-card">
-            <p className="card-username"> Kyllian </p>
+            <p className="card-username"> {currentUser?.username} </p>
             <div className="avatar-form-container">
-                <img className='profile-avatar' src={inputFile === undefined ? Avatar : urlFile} alt="profil pic" />
+                {inputFile === undefined && <ExternalImage src={currentUser.avatar} alt="User Avatar" className='profile-avatar' userId={currentUser.id} /> }
+                {inputFile && <img className='profile-avatar' src={urlFile} alt="New Avatar" />  }
                 <form onSubmit={(e) => onSubmit(e)}>
                     <label>
                         Upload New Avatar
@@ -47,6 +49,8 @@ function SettingsCardAvatar() {
             </div>
             <p className="member-txt"> Member Since: <span> 12 Novembre 2022 </span> </p>
         </div>
+    ) : (
+        <> </>
     );
 }
 

@@ -6,9 +6,10 @@ import FriendListModal from "../Friend-Dropdown";
 import Avatar from "../../../Images-Icons/pp.jpg";
 import { Link } from "react-router-dom";
 import { useAppSelector } from "../../../Redux/Hooks";
+import ExternalImage from "../../External-Image";
 
-function FriendItem(props: {name: string, profilPic: string, userProfileId: number}) {
-    const {name, profilPic, userProfileId} = props;
+function FriendItem(props: {name: string, avatar: string | null, userProfileId: number}) {
+    const {name, avatar, userProfileId} = props;
 
     const [showModal, setShowModal] = useState<boolean>(false);
     const {currentUser} = useAppSelector(state => state.auth);
@@ -20,7 +21,7 @@ function FriendItem(props: {name: string, profilPic: string, userProfileId: numb
     return (
         <div className="friend-item">
             <div className="friend-content">
-                <img className='friend-avatar' src={profilPic} alt="profil pic" />
+                <ExternalImage src={avatar} alt="User Avatar" className="friend-avatar" userId={userProfileId} />
                 <Link to={`/profile/${name}`}>
                     { name }
                 </Link>
@@ -42,7 +43,7 @@ function BlockFriends(props: {friendList: UserInterface[], userProfileId: number
         <div className="profile-block-wrapper friends-list">
             {
                 friendList.map((elem, index) =>
-                    <FriendItem key={index} name={elem.username} profilPic={Avatar} userProfileId={userProfileId} />
+                    <FriendItem key={index} name={elem.username} avatar={elem.avatar} userProfileId={userProfileId} />
                 )
             }
         </div>

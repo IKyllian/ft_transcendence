@@ -2,6 +2,7 @@ import Avatar from "../../../Images-Icons/pp.jpg";
 import { UserTimeout } from "../../../Types/Chat-Types";
 import { useContext } from "react";
 import { SocketContext } from "../../../App";
+import ExternalImage from "../../External-Image";
 
 function ChannelBanUser(props: {chanId: number, usersBan: UserTimeout[] | undefined}) {
     const { usersBan, chanId } = props;
@@ -20,7 +21,7 @@ function ChannelBanUser(props: {chanId: number, usersBan: UserTimeout[] | undefi
                 usersBan.map(elem => 
                     <div key={elem.id} className="setting-user-item">
                         <div className="profil-container">
-                            <img className='profile-avatar' src={Avatar} alt="profil pic" />
+                            <ExternalImage src={elem.user.avatar} alt="User Avatar" className='profile-avatar' userId={elem.user.id} />
                             <p> { elem.user.username } </p>
                         </div>
                         <div className="unban-button-wrapper"> 
