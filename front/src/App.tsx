@@ -53,7 +53,7 @@ const routes: RouteProps[] = [
 		path: '/sign',
 		element:
 			<PublicRoute>
-				<ResetPassword />
+				<Sign />
 			</PublicRoute>,
 	}, {
 		path: '/account-verification',
