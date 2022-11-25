@@ -12,6 +12,8 @@ import { SearchDto } from "./dto/search.dto";
 import { Response } from "express";
 import { join } from "path";
 import { UserIdDto } from "src/chat/gateway/dto/user-id.dto";
+import { EditUsernameDto } from "./dto/edit-username.dto";
+import { EditPasswordDto } from "./dto/edit-password.dto";
 
 export const avatarStorage = {
 	storage: diskStorage({
@@ -70,16 +72,21 @@ export class UserController {
 				throw new NotFoundException('User not found');
 			}
 			console.log("avatar path ", user.avatar)
-			if (!user.avatar) { return; }
+			if (!user.avatar) { return undefined; }
 			// res.sendFile(user.avatar, { root: 'uploads' });
 			return of(res.sendFile(join(process.cwd(), 'uploads/' + user.avatar)));
 	}
 
 	@UseGuards(JwtGuard)
 	@Patch('edit-username')
-	//TODO validation body
-	async editUser(@GetUser() user: User, @Body() body) {
-		return await this.userService.editUsername(user, body.username);
+	async editUser(@GetUser() user: User, @Body() data: EditUsernameDto) {
+		return await this.userService.editUsername(user, data.username);
+	}
+
+	@UseGuards(JwtGuard)
+	@Patch('edit-password')
+	async editPassword(@GetUser() user: User, @Body() data: EditPasswordDto) {
+		return await this.userService.editPassword(user, data);
 	}
 
 	@UseGuards(JwtGuard)
@@ -88,7 +95,7 @@ export class UserController {
 		return this.userService.getUsers();
 	}
 
-	// test
+	// test TODO del?
  	// @UseGuards(JwtGuard)
 	@Get(':id')
 	async getUserById(@Param('id', ParseIntPipe) id: number) {

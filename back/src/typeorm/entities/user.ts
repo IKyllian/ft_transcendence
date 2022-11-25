@@ -1,7 +1,7 @@
 
 import { Exclude } from "class-transformer";
 import { UserStatus } from "src/utils/types/types";
-import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn, Unique, ManyToMany, JoinTable, ManyToOne, BaseEntity } from "typeorm";
+import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn, Unique, ManyToMany, JoinTable, ManyToOne, BaseEntity, CreateDateColumn } from "typeorm";
 import { Avatar } from "./avatar";
 import { ChannelUser } from "./channelUser";
 import { Conversation } from "./conversation";
@@ -17,7 +17,6 @@ export class User {
 	id: number;
 
 	@Column({ nullable: true })
-	@Exclude()
 	id42?: number;
 
 	@Column({ unique: true, nullable: true })
@@ -74,6 +73,9 @@ export class User {
 	@Exclude()
 	@Column({ default: false, select: false })
 	two_factor_authenticated: boolean;
+
+	@CreateDateColumn({ type: 'timestamptz' })
+	created_at: Date;
 
 	// @Exclude()
 	// @Column({ nullable: true, select: false })

@@ -17,6 +17,8 @@ import { ChangeRoleDto } from '../gateway/dto/change-role.dto';
 import { ChannelInviteDto } from '../gateway/dto/channel-invite.dto';
 import { Server } from 'socket.io';
 import { GlobalService } from 'src/utils/global/global.service';
+import { EditChannelNameDto } from './dto/edit-channel-name.dto';
+import { EditChannelOptionDto } from './dto/edit-channel-option.dto';
 
 @Injectable()
 export class ChannelService {
@@ -421,8 +423,25 @@ export class ChannelService {
 	}
 
 
-	//TODO DElete
-	getTimedout() {
-		return this.timeoutRepo.find();
+	async editName(dto: EditChannelNameDto) {
+		let channel: Channel = await this.channelRepo.findOne({
+			where: { id: dto.chanId },
+		});
+		if (!channel) {
+			throw new ChannelNotFoundException();
+		}
+		channel.name = dto.name;
+		return this.channelRepo.save(channel);
+	}
+
+	async editOption(dto: EditChannelOptionDto) {
+		let channel: Channel = await this.channelRepo.findOne({
+			where: { id: dto.chanId },
+		});
+		if (!channel) {
+			throw new ChannelNotFoundException();
+		}
+		channel.option = dto.option;
+		return this.channelRepo.save(channel);
 	}
 }

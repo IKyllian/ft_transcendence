@@ -1,16 +1,16 @@
-import { IsString, IsNotEmpty, IsOptional, MinLength, MaxLength, IsEnum, IsNumber } from "class-validator";
+import { IsString, IsNotEmpty, IsOptional, MinLength, MaxLength, IsEnum, IsNumber, IsAlphanumeric } from "class-validator";
 import { channelOption } from "src/utils/types/types";
 
 export class CreateChannelDto {
 
 	@IsString()
 	@IsNotEmpty()
+	@IsAlphanumeric()
 	@MinLength(2)
 	@MaxLength(20)
 	name: string;
 
 	@IsEnum(channelOption)
-	@IsNumber()
 	option: channelOption;
 
 	@IsString()

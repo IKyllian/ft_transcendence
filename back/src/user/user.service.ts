@@ -2,7 +2,7 @@ import { BadRequestException, ForbiddenException, forwardRef, Inject, Injectable
 import { InjectRepository } from "@nestjs/typeorm";
 import { FindManyOptions, FindOneOptions, FindOptionsWhere, IsNull, Like, Not, Repository } from "typeorm";
 import { AuthService } from "src/auth/auth.service";
-import { CreateUserDto } from "./dto/createUser.dto";
+import { CreateUserDto } from "./dto/create-user.dto";
 import { MatchResult, Statistic, User } from "src/typeorm";
 import { EditUserDto } from "./dto/editUser.dto";
 import * as argon from 'argon2';
@@ -11,6 +11,7 @@ import { FriendshipService } from "./friendship/friendship.service";
 import { UserStatus } from "src/utils/types/types";
 import { UserAccount } from "src/typeorm/entities/userAccount";
 import { v4 as uuidv4 } from "uuid";
+import { EditPasswordDto } from "./dto/edit-password.dto";
 
 @Injectable()
 export class UserService {
@@ -88,33 +89,39 @@ export class UserService {
 		return mailTaken;
 	}
 
-	// TODO ask if usefull
-	async editUser(user: User, dto: EditUserDto) {
-		switch (dto) {
-			case dto.username:
-				if (await this.nameTaken(dto.username))
-					throw new ForbiddenException('Username taken');
-				user.username = dto.username;
-			// case dto.password:
-			// 	const hash = await argon.hash(dto.password);
-			// 	user.hash = hash; // probably wont work cause hash is not selected
-			case dto.avatar:
-				user.avatar = dto.avatar;
-			default:
-				break;
-		}
-		return this.userRepo.save(user);
-	}
-
 	async editUsername(user: User, name: string) {
 		if (await this.nameTaken(name))
 			throw new ForbiddenException('Username taken');
 		user.username = name;
-		user = await this.userRepo.save(user);
+		return this.userRepo.save(user);
+		//TODO return user
 		return {
 			access_token: ((await this.authService.signTokens(user.id, user.username)).access_token),
 			user: user,
 		}
+	}
+
+	async editPassword(user: User, dto: EditPasswordDto) {
+		if (user.id42) { throw new BadRequestException(); }
+
+		let account: UserAccount = await this.accountRepo.findOne({
+			where: { user: { id: user.id } },
+		});
+		if (!account) {
+			throw new NotFoundException("Pas normal");
+		}
+		
+		const pwdMatches = await argon.verify(
+			account.hash,
+			dto.old,
+		);
+		if (!pwdMatches) {
+			throw new BadRequestException("Old password does not match");
+		}
+
+		const hash = await argon.hash(dto.new);
+		account.hash = hash
+		this.accountRepo.save(account);
 	}
 
 	async setStatus(userId: number, status: UserStatus) {

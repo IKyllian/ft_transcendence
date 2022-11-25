@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, UseGuards } from "@nestjs/common";
 import { JwtGuard } from "src/auth/guard/jwt.guard";
 import { User } from "src/typeorm";
 import { GetUser } from "src/utils/decorators";
@@ -10,6 +10,7 @@ import { BanUserDto } from "./dto/ban-user.dto";
 import { CreateChannelDto } from "./dto/create-channel.dto";
 import { SearchToInviteInChanDto } from "./dto/search-user-to-invite.dto";
 import { MuteUserDto } from "./dto/mute-user.dto";
+import { EditChannelNameDto } from "./dto/edit-channel-name.dto";
 
 @Controller('channel')
 export class ChannelController {
@@ -46,17 +47,9 @@ export class ChannelController {
 		return await this.channelService.create(user, channelDto);
 	}
 
-	@Delete(':id')
-	async deleteChannel(
-		@Param('id') id: number,
-	) {
-		return await this.channelService.delete(id);
-	}
-
-	//TODO delete
-	@Get('get_timedout')
-	// @UseGuards(JwtGuard)
-	async getTimedout() {
-		return await this.channelService.getTimedout()
+	@Patch('edit-name')
+	@UseGuards(JwtGuard, InChannelGuard, ChannelPermissionGuard)
+	async editName(@Body() dto: EditChannelNameDto) {
+		return await this.channelService.editName(dto);
 	}
 }
