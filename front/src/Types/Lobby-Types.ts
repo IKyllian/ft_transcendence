@@ -30,6 +30,11 @@ export enum PlayerPosition {
     FRONT,
 }
 
+export interface QueueTimerInterface {
+    seconds: number,
+    minutes: number
+}
+
 export type GameSettings =
 {
     game_type?: GameType,

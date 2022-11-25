@@ -14,7 +14,9 @@ function ChatPrivateMessage() {
         optimizedFn,
         handleInputChange,
         userTyping,
-        register
+        register,
+        handleOnScroll,
+        previousMessages,
     } = usePrivateConvHook();
 
     return (convDatas === undefined) ? (
@@ -25,7 +27,13 @@ function ChatPrivateMessage() {
         <div className="message-container">
             <div className="message-container-main">
                 <ChatHeader privateConvUser={getSecondUserOfPM(convDatas.conv, loggedUser!.id)} />
-                <ul>
+                <ul id="chat-message-wrapper" className="chat-messages-wrapper" onScroll={(e) => handleOnScroll(e)}>
+                    {
+                        previousMessages.loadPreviousMessages && 
+                        <li className="loader-wrapper">
+                            <span className="prev-messages-loader"></span>
+                        </li>
+                    }
                     {
                         convDatas.conv.messages.map((elem, index) => {
                             const dateMessage = new Date(elem.send_at);

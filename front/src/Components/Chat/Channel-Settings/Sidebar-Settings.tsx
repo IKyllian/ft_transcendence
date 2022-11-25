@@ -1,5 +1,5 @@
-import { useNavigate, useParams } from "react-router-dom";
-import { useAppDispatch, useAppSelector } from '../../../Redux/Hooks'
+import { useParams } from "react-router-dom";
+import { useAppDispatch } from '../../../Redux/Hooks'
 import { Channel } from "../../../Types/Chat-Types"
 import { SocketContext } from "../../../App";
 import { useContext } from "react";

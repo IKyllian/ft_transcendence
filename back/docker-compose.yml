@@ -6,10 +6,7 @@ services:
       - '5432:5432'
     env_file:
       - .env
-    networks:
-      - dev-net
     restart: always
-
   adminer:
     image: adminer
     restart: always

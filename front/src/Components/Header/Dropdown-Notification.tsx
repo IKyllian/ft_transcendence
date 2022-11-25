@@ -4,6 +4,7 @@ import { NotificationInterface, notificationType } from "../../Types/Notificatio
 import { SocketContext } from "../../App";
 import { useContext } from "react";
 import { Link } from "react-router-dom";
+import { IconX, IconCheck } from "@tabler/icons";
 
 function NotifItem(props: {notification: NotificationInterface}){
     const { notification } = props;
@@ -20,6 +21,7 @@ function NotifItem(props: {notification: NotificationInterface}){
 
     return (
         <div className="notif-dropdown-item">
+            <IconX className="delete-notif-icon" />
             <img className='profile-avatar' src={Avatar} alt="profil pic" />
             <div className="notif-content">
                 <Link to={`/profile/${notification.requester.username}`}> {notification.requester.username} </Link>
@@ -31,8 +33,8 @@ function NotifItem(props: {notification: NotificationInterface}){
                 </p>
             </div>
             <div className="notif-buttons">
-                <button onClick={() => handleClick("accepted")}> Accept </button>
-                <button onClick={() => handleClick("declined")}> Decline </button>
+                <IconCheck onClick={() => handleClick("accepted")} />
+                <IconX onClick={() => handleClick("declined")} />
             </div>
         </div>
     );

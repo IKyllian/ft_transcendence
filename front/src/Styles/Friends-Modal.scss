@@ -57,10 +57,8 @@
         .item-player-info {
             display: flex;
             align-items: center;
-            .modal-picture {
-                @include avatar-player(50px);
-                margin-right: 10px;
-            }
+            gap: 10px;
+            @include avatar-status-container();
         }
         button {
             cursor: pointer;
@@ -76,18 +74,7 @@
             @include flex-row-alignCenter();
             gap: 10px;
             svg {
-                cursor: pointer;
-                border-radius: 50%;
-                @include width-height(25px, 25px);
-                padding: 2px;
-                &:first-child {
-                    color: green;
-                    border: 1px solid green;
-                }
-                &:last-child {
-                    color: red;
-                    border: 1px solid red;
-                }
+                @include circleButtons(25px);
             }
         }
 

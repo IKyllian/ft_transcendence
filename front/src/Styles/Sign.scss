@@ -135,4 +135,24 @@
             padding: 5px;
         }
     }
+
+    .email-notification-wrapper {
+        margin: auto;
+        background-color: $LightDarkPalette;
+        padding: 40px;
+        border-radius: 10px;
+        text-align: center;
+        svg {
+            @include width-height(130px, 130px);
+        }
+        h3 {
+           font-size: 25px;
+        }
+        p {
+            font-size: 15px;
+            span {
+                color: $OrangeProfile;
+            }
+        }
+    }
 }

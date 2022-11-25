@@ -13,6 +13,7 @@ import entities from './typeorm';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TaskScheduler } from './task-scheduling/task.module';
 import { GlobalModule } from './utils/global/global.module';
+import { TwoFactorModule } from './2fa/twoFactor.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { GlobalModule } from './utils/global/global.module';
 	  GameModule,
 	  GlobalModule,
     MatchmakingModule,
+	  TwoFactorModule,
     ConfigModule.forRoot({ envFilePath: '.env', isGlobal: true }),
     NotificationModule,
     TaskScheduler,
@@ -35,7 +37,7 @@ import { GlobalModule } from './utils/global/global.module';
       database: process.env.POSTGRES_NAME,
       entities,
       synchronize: true, // Setting synchronize: true shouldn't be used in production - otherwise you can lose production data.
-    //   dropSchema: true,
+      // dropSchema: true,
       // logging: true,
     }),
   ],

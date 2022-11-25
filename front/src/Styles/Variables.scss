@@ -51,6 +51,34 @@ $OfflineColor: rgb(194, 29, 29);
     border-radius: 50%;
 }
 
+@mixin avatar-status-container() {
+    .avatar-container {
+        position: relative;
+        .user-avatar {
+            @include avatar-player(40px);
+        }
+        .user-status {
+            @include width-height(20px, 20px);
+            border-radius: 50%;
+            background-color: $DarkPalette;
+            position: absolute;
+            right: -3px;
+            top: 25px;
+            padding: 2.5px 0 0 2.5px;
+            div {
+                @include width-height(14px, 14px);
+                border-radius: 50%;
+            }
+            .online {
+                background-color: $OnlineColor;
+            }
+            .offline {
+                background-color: $OfflineColor;
+            }
+        }
+    }
+}
+
 @mixin modal-container($height, $width, $bgColor) {
     z-index: 100;
     height: $height;
@@ -106,6 +134,21 @@ $OfflineColor: rgb(194, 29, 29);
     scrollbar-width: none;
     &::-webkit-scrollbar {
         display: none;
+    }
+}
+
+@mixin circleButtons($size) {
+    cursor: pointer;
+    border-radius: 50%;
+    @include width-height($size, $size);
+    padding: 2px;
+    &:first-child {
+        color: green;
+        border: 1px solid green;
+    }
+    &:last-child {
+        color: red;
+        border: 1px solid red;
     }
 }
 

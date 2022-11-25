@@ -26,7 +26,8 @@ function Sign() {
                 </div>
                 {authDatas.error && <p className='txt-form-error'> {authDatas.error} </p> }
                 <form className='form-wrapper' onSubmit={isSignIn ? onSignIn : onSignUp}>
-                    <label> Username </label>
+                    { !isSignIn && <label> Username </label>}
+                    { isSignIn && <label> Username or Email </label>}
                     {hookForm.errors.username && <p className='txt-form-error'> {hookForm.errors.username.message} </p>}
                     <input
                         id="username"
@@ -39,7 +40,25 @@ function Sign() {
                             }
                         })}
                     />
-
+                    {
+                        !isSignIn && 
+                        <label> Email </label>
+                    }
+                    {!isSignIn && hookForm.errors.email && <p className='txt-form-error'> {hookForm.errors.email.message} </p>}
+                    {
+                        !isSignIn && 
+                        <input
+                            id="email"
+                            type="text"
+                            {...hookForm.register("email", {
+                                required: "Email is required",
+                                pattern: {
+                                    value: new RegExp(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i),
+                                    message: "invalid email address"
+                                  }
+                            })}
+                        />
+                    }
                     <label> Password </label>
                     {hookForm.errors.password && <p className='txt-form-error'> {hookForm.errors.password.message} </p>}
                     <input

@@ -25,7 +25,7 @@ function SearchBarPlayers(props: {functionality: SearchBarFunctionality, checkbo
                 {
                     formHook.getValues('textInput') && formHook.getValues('textInput').length > 0 && usersList && usersList.length > 0 &&
                     usersList.map((elem, index) =>
-                        <UserFindItem key={index} avatar={Avatar} name={elem.user.username} >
+                        <UserFindItem key={index} avatar={Avatar} name={elem.user.username} status={elem.user.status}>
                             { renderSearchBarButton({functionality: functionality, user: elem.user, checkboxOnChange: checkboxOnChange, checkboxArray: checkboxArray, handleSendMessage: handleSendMessage, userFromList: elem}) }
                         </UserFindItem>
                     )
@@ -33,7 +33,7 @@ function SearchBarPlayers(props: {functionality: SearchBarFunctionality, checkbo
                 {
                     !formHook.getValues('textInput') && checkboxArray && checkboxArray.length > 0 &&
                     checkboxArray.map((elem, index) =>
-                        <UserFindItem key={index} avatar={Avatar} name={elem.username} >
+                        <UserFindItem key={index} avatar={Avatar} name={elem.username} status={elem.status}>
                             { renderSearchBarButton({functionality: functionality, user: elem, checkboxOnChange: checkboxOnChange, checkboxArray: checkboxArray, handleSendMessage: handleSendMessage}) }
                         </UserFindItem>
                     )

@@ -1,20 +1,34 @@
 import { IconX, IconUser, IconMessage, IconBrandAppleArcade } from "@tabler/icons";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 import { ModalContext } from "./Utils/ModalProvider";
 import UserFindItem from "./Search-Bar/User-Find-Item";
 import SearchBarPlayers from "./Search-Bar/SearchBarPlayers";
-import { friendsDatas } from "../Types/Datas-Examples";
 import { fetchSearchUsersToAdd } from "../Api/User-Fetch";
-import { useAppSelector } from "../Redux/Hooks";
+import { useAppDispatch, useAppSelector } from "../Redux/Hooks";
 import Avatar from "../Images-Icons/pp.jpg";
 import { SearchBarFunctionality } from "../Types/Utils-Types";
+import { SocketContext } from "../App";
+import { UserStatus } from "../Types/User-Types";
+import { changeFriendListUserStatus } from "../Redux/AuthSlice";
 
 function AddFriendModal() {
     const [showFriendList, setShowFriendList] = useState<boolean>(true);
 
     const {friendList} = useAppSelector((state) => state.auth);
     const modalStatus = useContext(ModalContext);
+    const {socket} = useContext(SocketContext);
+    const dispatch = useAppDispatch();
+
+    useEffect(() => {
+        socket?.on("StatusUpdate", (data: {id: number, status: UserStatus}) => {
+            dispatch(changeFriendListUserStatus(data));
+        });
+
+        return () => {
+            socket?.off("StatusUpdate");
+        }
+    }, [socket]);
 
     return modalStatus.modal.isOpen ? (
         <>
@@ -34,7 +48,7 @@ function AddFriendModal() {
                         <div className="modal-player-list modal-friend-list">
                             {
                                 friendList.map((elem, index) =>                    
-                                    <UserFindItem key={index} avatar={Avatar} name={elem.username}>
+                                    <UserFindItem key={index} avatar={Avatar} name={elem.username} status={elem.status}>
                                         <div className="icons-player-item">
                                             <IconUser />
                                             <IconMessage />

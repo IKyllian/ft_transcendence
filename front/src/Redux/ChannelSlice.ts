@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { Channel, ChannelUser, UserTimeout, ChatMessage } from '../Types/Chat-Types';
+import { UserStatus } from '../Types/User-Types';
 
 interface ChannelState {
     channelDatas: Channel | undefined,
@@ -59,7 +60,15 @@ export const channelSlice = createSlice({
                     return elem
                 })]
             }
-            
+        },
+        updateChannelUserStatus: (state, {payload}: PayloadAction<{id: number, status: UserStatus}>) => {
+            if (state.channelDatas) {
+                state.channelDatas.channelUsers = [...state.channelDatas.channelUsers.map((elem: ChannelUser) => {
+                    if (elem.user.id === payload.id)
+                        return {...elem, user: {...elem.user, status: payload.status}};
+                    return elem;
+                })];
+            }
         },
         addChannelMessage: (state, {payload}: PayloadAction<ChatMessage>) => {
             if (state.channelDatas)
@@ -92,6 +101,7 @@ export const {
     muteChannelUser,
     removeTimeoutChannelUser,
     updateChannelUser,
+    updateChannelUserStatus,
     unsetChannelDatas,
     setChannelId,
     addChannelMessage,

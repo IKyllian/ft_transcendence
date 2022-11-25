@@ -1,13 +1,14 @@
 import { useState, useContext, useEffect } from "react";
 import { ModalContext } from "../../Components/Utils/ModalProvider";
-import { ProfileState } from "../../Types/User-Types";
+import { ProfileState, UserInterface, UserStatus } from "../../Types/User-Types";
 import { useAppSelector } from '../../Redux/Hooks';
 import { useParams } from "react-router-dom";
 
-import { SocketContext } from "../../App";
-import { fetchProfile } from "../../Api/Profile/Profile-Fetch";
+import { CacheContext, SocketContext } from "../../App";
+import { fetchGetAvatar, fetchProfile } from "../../Api/Profile/Profile-Fetch";
 import { fetchMe } from "../../Api/Profile/Profile-Fetch";
 import { Modes } from "../../Types/Utils-Types";
+import { getPlayerAvatar } from "../../Utils/Utils-User";
 
 interface ProfileMenuButtons {
     title: string;
@@ -29,6 +30,7 @@ export function useProfileHook() {
     let {currentUser, token, friendList} = useAppSelector(state => state.auth);
     let {notifications} = useAppSelector(state => state.notification);
     const {socket} = useContext(SocketContext);
+    const {cache} = useContext(CacheContext);
 
     const handleClick = (index: number) => {
         let newArray = [...attributes];
@@ -49,7 +51,23 @@ export function useProfileHook() {
     useEffect(() => {
         handleClick(0);
         if (params.username === currentUser?.username) {
-            fetchMe(token, setUserState, friendList);
+            fetchMe(token).then(fetchResponse => {
+                if (fetchResponse.statusText === "OK") {
+                    getPlayerAvatar(cache!, token).then(avatarResponse => {
+                        if (avatarResponse) {
+                            const userObject: UserInterface = {...fetchResponse.data.user, avatar: avatarResponse};
+                            setUserState({
+                                isLoggedUser: true,
+                                user: userObject,
+                                match_history: fetchResponse.data.match_history,
+                                friendList: friendList,
+                            });
+                        } else {
+                            throw "Failed To Load Avatar";
+                        }
+                    })
+                }
+            });            
         }
         else if (params.username) {
             fetchProfile(params.username, token, setUserState);
@@ -67,10 +85,20 @@ export function useProfileHook() {
             setFriendRequestSent(prev => {return prev + 1});
         }))
 
+        socket?.on("StatusUpdate", (data: {id: number, status: UserStatus}) => {
+            console.log("StatusUpdate", data);
+            setUserState(prev => {
+                if (prev && prev.user)
+                    return {...prev, user: {...prev.user, status: data.status}};
+                return prev;
+            });
+        });
+
         return () => {
             socket?.off("RequestValidation");
+            socket?.off("StatusUpdate");
         }
-    }, [])
+    }, [socket])
 
     return {
         userState,
