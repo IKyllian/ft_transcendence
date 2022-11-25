@@ -59,9 +59,9 @@ export class AuthService {
 		}
 
 		const user = await this.userService.create(params);
-		const mailResult = await this.sendValidationMail(dto.email, validation_code);
-		if (mailResult?.error)
-			return { error: mailResult.error };
+		// const mailResult = await this.sendValidationMail(dto.email, validation_code);
+		// if (mailResult?.error)
+		// 	return { error: mailResult.error };
 		const tokens = await this.signTokens(user.id, user.username);
 		this.updateRefreshHash(user.account, tokens.refresh_token);
 		return {

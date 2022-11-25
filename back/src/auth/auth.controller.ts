@@ -21,6 +21,7 @@ export class AuthController {
 		return this.authService.signup(dto);
 	}
 
+	// Email Validation
 	@HttpCode(HttpStatus.OK)
 	@Post('activate')
 	activate(@Body() dto: ActivateDto) {
