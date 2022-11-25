@@ -23,7 +23,7 @@ export class LobbyFactory
 
 	private lobby_list: Map<Lobby['game_id'], Lobby> = new Map<Lobby['game_id'], Lobby>();
 	private client_list: Map<Socket['id'], Lobby['game_id']> = new Map<Socket['id'], Lobby['game_id']>();
-	replay_list: Map<string, Array<GameState>> = new Map <string, Array<GameState>>();
+	// replay_list: Map<string, Array<GameState>> = new Map <string, Array<GameState>>();
 
 	lobby_create(lobby_request: MatchmakingLobby)
 	{
@@ -136,32 +136,32 @@ export class LobbyFactory
 		this.lobby_list.get(game_id)?.game_send_round_setup(client);
 	}
 
-	save_replay(game_id: string, save: Array<GameState>)
-	{
-		this.replay_list.set(game_id, save);
-	}
+	// save_replay(game_id: string, save: Array<GameState>)
+	// {
+	// 	this.replay_list.set(game_id, save);
+	// }
 
-	send_replay(client: Socket, game_id: string)
-	{
-		let replay :Array<GameState> | undefined = this.replay_list.get(game_id);
+	// send_replay(client: Socket, game_id: string)
+	// {
+	// 	let replay :Array<GameState> | undefined = this.replay_list.get(game_id);
 	
-		//this.replay_debug(game_id);
-		if (replay !== undefined)
-		{
-			console.log('starting replay send', game_id, 'frame count', replay.length);
+	// 	//this.replay_debug(game_id);
+	// 	if (replay !== undefined)
+	// 	{
+	// 		console.log('starting replay send', game_id, 'frame count', replay.length);
 		
-			replay.forEach((gamestate, index) => {
-				setTimeout(() => {
-					client.emit('replay_state', gamestate);
-				}, index * (1000 / 60));
-			  });
-		}
-		else
-		{
-			//emit au client not found
-			console.log('replay not found:', game_id);
-		}
-	}
+	// 		replay.forEach((gamestate, index) => {
+	// 			setTimeout(() => {
+	// 				client.emit('replay_state', gamestate);
+	// 			}, index * (1000 / 60));
+	// 		  });
+	// 	}
+	// 	else
+	// 	{
+	// 		//emit au client not found
+	// 		console.log('replay not found:', game_id);
+	// 	}
+	// }
 
 	// replay_debug(game_id: string)
 	// {
@@ -189,7 +189,14 @@ export class LobbyFactory
 	// 	}
 	// }
 
-	async endGameAttribution(players: Player[], result: EndResult, game_type: GameType, game_id: string, score: ScoreBoard) {
+	async endGameAttribution(
+					players: Player[],
+					result: EndResult,
+					game_type: GameType,
+					game_id: string,
+					score: ScoreBoard,
+					saved_states: GameState[])
+	{
 		let blueTeam: User[] = [];
 		let redTeam: User[] = [];
 		players.forEach((player) => {
@@ -200,7 +207,7 @@ export class LobbyFactory
 			}
 		})
 		this.gameService.eloAttribution(players, result, game_type);
-		await this.gameService.saveMatch(blueTeam, redTeam, game_type, score);
+		await this.gameService.saveMatch(blueTeam, redTeam, game_type, score, saved_states, game_id);
 		this.lobby_delete(game_id);
 	}
 }

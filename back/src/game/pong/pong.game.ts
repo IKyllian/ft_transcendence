@@ -69,14 +69,15 @@ export class PongGame
 				});
 				console.log("result", gamestate.result)
 
-				this.lobby.factory.save_replay(this.lobby.game_id, this.saved_states);
+			//	this.lobby.factory.save_replay(this.lobby.game_id, this.saved_states);
 				if (this.game_settings.is_ranked) {
 					this.lobby.factory.endGameAttribution(
 						this.lobby.lobby_data.players,
 						gamestate.result,
 						this.lobby.game_type,
 						this.lobby.game_id,
-						gamestate.score
+						gamestate.score,
+						this.saved_states
 					);
 				}
 				else

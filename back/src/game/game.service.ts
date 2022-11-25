@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { MatchResult, Statistic, User } from "src/typeorm";
-import { EndResult, GameType, Leaderboard, ScoreBoard, TeamSide } from "src/utils/types/game.types";
+import { EndResult, GameSettings, GameState, GameType, Leaderboard, ScoreBoard, TeamSide } from "src/utils/types/game.types";
 import { Repository } from "typeorm";
 import { Player } from "./player";
 import { UserSessionManager } from "./user.session";
@@ -121,13 +121,15 @@ export class GameService {
 		}
 	}
 
-	saveMatch(blueTeam: User[], redTeam: User[], game_type: GameType, score: ScoreBoard) {
+	saveMatch(blueTeam: User[], redTeam: User[], game_type: GameType, score: ScoreBoard, saved_states: GameState[], game_id: string) {
 		let match: MatchResult = this.matchRepo.create({
 			game_type,
 			blue_team_goals: score.TeamBlue,
 			blue_team_player1: blueTeam[0],
 			red_team_goals: score.TeamRed,
 			red_team_player1: redTeam[0],
+			replay: saved_states,
+			game_id: game_id
 		});
 		if (game_type === GameType.Doubles) {
 			match.blue_team_player2 = blueTeam[1],
@@ -136,6 +138,15 @@ export class GameService {
 		console.log("matchResult", match);
 		return this.matchRepo.save(match);
 	}
+
+	// async getReplay(game_id: string): Promise<MatchResult>
+	// {
+	// 	const replay: GameState[] = await this.matchRepo.find
+	// 	return
+	// 	{
+	// 		replay
+	// 	}
+	// }
 
 	async getSinglesLeaderboard(user: User, page: number): Promise<Leaderboard> {
 		const nb_of_users: number = await this.userRepo.createQueryBuilder('user').getCount()

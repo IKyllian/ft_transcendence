@@ -103,7 +103,6 @@ export default class Lobby extends Phaser.Scene
 
         this.socketmanager.set_lobby_triggers({
             ready_to_go: this.ready_to_go.bind(this),
-	//		update_lobby_status: this.update_lobby_status.bind(this),
 			game_abort: this.game_abort.bind(this),
 			store_round_setup: this.store_round_setup.bind(this),
 			lobby_join: this.lobby_join.bind(this),
@@ -215,44 +214,27 @@ export default class Lobby extends Phaser.Scene
 		this.game.registry.set('round_setup', round_setup);
 	}
 
-	// launch_pong = () =>
-	// {
-	// 	console.log('imagine the screen fading to black');
-
-	// 	this.scene.start('Pong');
-	// }
-
 	clear_all = () =>
 	{
 		this.TeamBlue_Back_avatar?.destroy();
-		// this.TeamBlue_Back_indicator?.destroy();
 		this.TeamBlue_Back_name?.destroy();
-		// this.TeamBlue_Back_win?.destroy();
-		// this.TeamBlue_Back_loss?.destroy();
+		this.TeamBlue_Back_elo?.destroy();
 
 		this.TeamRed_Back_avatar?.destroy();
-		// this.TeamRed_Back_indicator?.destroy();
 		this.TeamRed_Back_name?.destroy();
-		// this.TeamRed_Back_win?.destroy();
-		// this.TeamRed_Back_loss?.destroy();
+		this.TeamRed_Back_elo?.destroy();
 
 		if (this.game_type === GameType.Doubles)
 		{
 			this.TeamBlue_Front_avatar?.destroy();
-			// this.TeamBlue_Front_indicator?.destroy();
 			this.TeamBlue_Front_name?.destroy();
-			// this.TeamBlue_Front_win?.destroy();
-			// this.TeamBlue_Front_loss?.destroy();
+			this.TeamBlue_Front_elo?.destroy();
 		
 			this.TeamRed_Front_avatar?.destroy();
-			// this.TeamRed_Front_indicator?.destroy();
 			this.TeamRed_Front_name?.destroy();
-			// this.TeamRed_Front_win?.destroy();
-			// this.TeamRed_Front_loss?.destroy();
+			this.TeamRed_Front_elo?.destroy();
 		}
-
 	}
-
 
 	server_connect_fail = () =>
 	{
