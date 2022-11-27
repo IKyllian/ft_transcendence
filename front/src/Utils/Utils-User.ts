@@ -24,32 +24,34 @@ export function userIdIsBlocked(connectedUser: UserInterface, secondUserId: numb
     return (connectedUser.blocked.find(elem => elem.id === secondUserId) ? true : false);
 }
 
-export async function getPlayerAvatar(cache: Cache, token: string, userId: number): Promise<string | undefined> {
+export async function getPlayerAvatar(cache: Cache | null, token: string, userId: number): Promise<string | undefined> {
     let req = new Request(`${baseUrl}/users/${userId}/avatar`, {method: 'GET', headers: {"Authorization": `Bearer ${token}`}});
     console.log("req", req);
-    return await cache.match(req).then(async (cacheResponse) => {
-        if (cacheResponse) {
-            return cacheResponse;
-        } else 
-            return await fetchResponseAvatar(req).then(fetchResponse => {
-                if (!fetchResponse.ok) {
-                    return undefined;
-                }
-                cache.put(req, fetchResponse.clone());
-                return fetchResponse;
-            })
-    })
-    .then(async (response) => {
-        console.log("response AVATAR", response);
-        if (response !== undefined)
-            return await response.blob();
+    let avatarResponse: Response | undefined;
+    if (cache !== null) {
+        avatarResponse = await cache.match(req).then(async (cacheResponse) => {
+            if (cacheResponse) {
+                return cacheResponse;
+            } else 
+                return await fetchResponseAvatar(req).then(fetchResponse => {
+                    if (!fetchResponse.ok)
+                        return undefined;
+                    cache.put(req, fetchResponse.clone());
+                    return fetchResponse;
+                })
+        })
+    } else {
+        avatarResponse = await fetchResponseAvatar(req).then(fetchResponse => {
+            if (!fetchResponse.ok)
+                return undefined;
+            return fetchResponse;
+        })
+    }
+    if (avatarResponse !== undefined) {
+        const avatarBlob = await avatarResponse.blob();
+        if (avatarBlob) 
+            return URL.createObjectURL(avatarBlob);
         return undefined;
-    })
-    .then(blob => {
-        if (blob) {
-            const url = URL.createObjectURL(blob);
-            return url;
-        }
-        return undefined;
-    })
+    }
+    return undefined;
 }

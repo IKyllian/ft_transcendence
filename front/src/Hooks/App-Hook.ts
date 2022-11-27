@@ -18,7 +18,7 @@ import { getPlayerAvatar } from "../Utils/Utils-User";
 
 export function useAppHook() {
     const [socket, setSocket] = useState<Socket | undefined>(undefined);
-    const [cache, setCache] = useState<Cache | undefined>(undefined);
+    const [cache, setCache] = useState<Cache | undefined | null>(undefined);
 	const [eventError, setEventError] = useState<string | undefined>(undefined);
     const { token, isAuthenticated, currentUser } = useAppSelector((state) => state.auth);
 	const { party, chatIsOpen, isInQueue } = useAppSelector(state => state.party);
@@ -40,10 +40,16 @@ export function useAppHook() {
 
 	const openCache = async () => {
 		if ('caches' in window) {
-			const openCache = await caches.open('avatar-cache');
-			setCache(openCache);
+			caches.open('avatar-cache').then(cache => {
+				setCache(cache);
+			})
+			.catch(err => {
+				console.log(err);
+				setCache(null);
+			})
 		} else {
-			throw "Caches not supported";
+			setCache(null);
+			console.log("Caches not supported");
 		}
 	}
 
@@ -137,7 +143,7 @@ export function useAppHook() {
 	}, [location.pathname, socket])
 
 	useEffect(() => {
-		if (socket !== undefined && cache) {
+		if (socket !== undefined) {
 			console.log("SOCKET CONDITION");
 			socket.on("Connection", (data: {friendList: UserInterface[], notification: NotificationInterface[], party: PartyInterface}) => {
 				console.log("data connection", data);
@@ -245,7 +251,7 @@ export function useAppHook() {
 			socket?.off("OnLeave");
 			socket?.off("Logout");
 		}
-	}, [socket, cache])
+	}, [socket])
 
     return {
         socket,

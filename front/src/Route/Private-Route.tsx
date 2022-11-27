@@ -13,7 +13,7 @@ function PrivateRoute({ children }: { children: JSX.Element }) {
         return <IsConnectedLoading />;
     else if (!isAuthenticated)
         return <Navigate to="/sign" />;
-    else if (isAuthenticated && (!socket || !cache))
+    else if (isAuthenticated && (!socket || cache === undefined))
         return <IsConnectedLoading />;
     return children;
 }

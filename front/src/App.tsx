@@ -39,7 +39,7 @@ interface SocketContextType {
 }
 
 interface CacheContextType {
-	cache: Cache | undefined; 
+	cache: Cache | undefined | null; 
 }
 
 const routes: RouteProps[] = [

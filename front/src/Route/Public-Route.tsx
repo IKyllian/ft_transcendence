@@ -13,7 +13,7 @@ function PublicRoute({ children }: { children: JSX.Element }) {
         if (!isAuthenticated)
             return children;
         else {
-            if (!socket || !cache)
+            if (!socket || cache === undefined)
                 return <IsConnectedLoading />;
             return <Navigate to="/" />;
         }
