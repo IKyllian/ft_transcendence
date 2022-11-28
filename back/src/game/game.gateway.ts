@@ -56,7 +56,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
 	{
 		console.log(client.id);
 		let user: User = null;
-		client.multiTab = false;
+		client.multi_tab = false;
 		if (client.handshake.headers.authorization) {
 			const token = client.handshake.headers.authorization.split(' ')[1];
 			user = await this.authService.verify(token);
@@ -65,7 +65,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
 			client.user = user;
 			console.log("Game Gateway Connection: ", client.user.username);
 			if (this.userSession.getUser(user.id)) {
-				client.multiTab = true;
+				client.multi_tab = true;
 				client.emit('MultiTabError');
 				client.disconnect();
 			} else {
@@ -73,6 +73,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
 				client.emit('Connected')
 			}
 		} else {
+			// TODO EMIT UN TRUC 
 			console.log('invalid credential')
 			client.disconnect();
 		}
@@ -85,7 +86,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
 			const payload = this.authService.decodeJwt(socket.handshake.headers.authorization.split(' ')[1]) as JwtPayload;
 			// get usersocket instance instead of call db ?
 			const user = await this.userService.findOneBy({ id: payload?.sub });
-			if (user && socket.multiTab === false) {
+			if (user && socket.multi_tab === false) {
 				this.userSession.removeUser(user.id)
 				// console.log("Game Gateway Deconnection: ", user.username) 
 			}
@@ -173,11 +174,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
 		
 		/* ----- Users Lobby Management ----- */
 		
-		@UseGuards(WsJwtGuard)
-		@SubscribeMessage('user_join_lobby')
-		async onUserJoinLobby(@ConnectedSocket() client: AuthenticatedSocket,
-		@MessageBody() game_id: string)
-		{
+	@SubscribeMessage('user_join_lobby')
+	async onUserJoinLobby(@ConnectedSocket() client: AuthenticatedSocket,
+	@MessageBody() game_id: string)
+	{
 		console.log("joining lobby, ", client.user)
 	//	console.log("user join lobby", data);
 		this.lobbyfactory.lobby_join(client, game_id);
@@ -193,7 +193,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
 	// 	this.lobbyfactory.lobby_player_ready(client, game_id);
 	// }
 
-	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('user_lobby_request_status')
 	async onUserLobbyRequestStatus(@ConnectedSocket() client: AuthenticatedSocket,
 	@MessageBody() game_id: string)
@@ -204,10 +203,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
 	/* ----- Users Game Management ----- */
 	
 	
-	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('user_game_input')
 	async onUserGameInput(
-		@ConnectedSocket() client: AuthenticatedSocket,
+	@ConnectedSocket() client: AuthenticatedSocket,
 	@MessageBody() data: any)
 	{
 		this.lobbyfactory.lobby_game_input(client, data);
