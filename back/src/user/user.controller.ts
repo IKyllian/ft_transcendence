@@ -40,7 +40,7 @@ export class UserController {
 
 	@UseGuards(JwtGuard)
 	@Get('me')
-	async getMe(@GetUser() user: User) {
+	async getMe(@GetUser() user: User, @Req() req) {
 		console.log('me')
 		const match_history = await this.userService.getMatchHistory(user.id);
 		return {

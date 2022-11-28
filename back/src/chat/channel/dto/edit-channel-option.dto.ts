@@ -1,4 +1,4 @@
-import { IsEnum, IsNumber } from "class-validator";
+import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator";
 import { channelOption } from "src/utils/types/types";
 
 export class EditChannelOptionDto {
@@ -7,4 +7,9 @@ export class EditChannelOptionDto {
 	
 	@IsEnum(channelOption)
 	option: channelOption;
+
+	@IsString()
+	@IsNotEmpty()
+	@IsOptional()
+	password?: string;
 }

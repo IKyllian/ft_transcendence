@@ -442,6 +442,18 @@ export class ChannelService {
 			throw new ChannelNotFoundException();
 		}
 		channel.option = dto.option;
+		if (channel.option === channelOption.PROTECTED) {
+			if (!dto.password) {
+				throw new BadRequestException("You need to include a password");
+			}
+			const hash = await argon.hash(dto.password);
+			this.channelRepo.createQueryBuilder('chan')
+			.update()
+			.where("chan.id = :id", { id: channel.id })
+			.set({ hash: () => ":hash" })
+			.setParameter('hash', hash)
+			.execute()
+		}
 		return this.channelRepo.save(channel);
 	}
 }
