@@ -69,6 +69,7 @@ async function bootstrap() {
 	// 	.set({ match_lost: () => "match_lost + 1" })
 	// 	.execute();
     // console.log(new Date().toLocaleString())
+	console.log(process.cwd())
 
 }
 bootstrap();
