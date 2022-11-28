@@ -447,9 +447,9 @@ export class ChannelService {
 				throw new BadRequestException("You need to include a password");
 			}
 			const hash = await argon.hash(dto.password);
-			this.channelRepo.createQueryBuilder('chan')
+			this.channelRepo.createQueryBuilder()
 			.update()
-			.where("chan.id = :id", { id: channel.id })
+			.where("id = :id", { id: channel.id })
 			.set({ hash: () => ":hash" })
 			.setParameter('hash', hash)
 			.execute()

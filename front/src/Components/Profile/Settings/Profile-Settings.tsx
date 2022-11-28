@@ -3,7 +3,7 @@ import SettingsCardAvatar from "./Settings-Card-Avatar";
 import SettingsCardInfos from "./Settings-Card-Infos";
 
 function ProfileSettings() {
-    const {currentUser} = useAppSelector(state => state.auth);
+    const {currentUser, token} = useAppSelector(state => state.auth);
     
     return (
         <div className="profile-settings-container">

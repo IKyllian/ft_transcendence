@@ -2,19 +2,18 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { io, Socket } from "socket.io-client";
 import { useAppDispatch, useAppSelector } from '../Redux/Hooks'
-import { baseUrl, socketUrl } from "../env";
+import { socketUrl } from "../env";
 import { NotificationInterface } from "../Types/Notification-Types";
 import { addNotification, deleteNotification } from "../Redux/NotificationSlice";
 import { addChannel, addPrivateConv, removeChannel } from "../Redux/ChatSlice";
 import { Channel, ChannelUpdateType, ChannelUser, Conversation, UserTimeout } from "../Types/Chat-Types";
 import { UserInterface } from "../Types/User-Types";
-import { addAvatar, copyFriendListArray, logoutSuccess, stopIsConnectedLoading } from "../Redux/AuthSlice";
-import { GameMode, PartyInterface, PartyMessage, Player } from "../Types/Lobby-Types";
+import { copyFriendListArray, logoutSuccess, stopIsConnectedLoading } from "../Redux/AuthSlice";
+import { GameMode, PartyInterface, PartyMessage } from "../Types/Lobby-Types";
 import { copyNotificationArray } from "../Redux/NotificationSlice";
 import { addParty, addPartyInvite, addPartyMessage, cancelQueue, changePartyGameMode, changeQueueStatus, incrementQueueTimer, leaveParty, removePartyInvite, resetQueueTimer } from "../Redux/PartySlice";
 import { fetchVerifyToken } from "../Api/Sign/Sign-Fetch";
 import { addChannelUser, banChannelUser, muteChannelUser, removeTimeoutChannelUser, removeChannelUser, setChannelDatas, updateChannelUser, unsetChannelDatas, unsetChannelId } from "../Redux/ChannelSlice";
-import { getPlayerAvatar } from "../Utils/Utils-User";
 
 export function useAppHook() {
     const [socket, setSocket] = useState<Socket | undefined>(undefined);

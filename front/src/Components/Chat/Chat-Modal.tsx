@@ -12,6 +12,7 @@ import { fetchSearchAllUsers } from "../../Api/User-Fetch";
 import { fetchSearchUsersToInvite } from "../../Api/Chat/Chat-Fetch";
 import { SearchBarFunctionality } from "../../Types/Utils-Types";
 import { ChannelModes, CreateChanBodyRequest, ChannelModesArray } from "../../Types/Chat-Types"
+import { selectChanMode } from "../../Utils/Utils-Chat";
 
 type FormValues = {
     chanMode: string,
@@ -37,14 +38,6 @@ function ChatModal(props: {onCloseModal: Function, showModal: number}) {
             setUsersInvited(prev => prev.filter(elem => elem.id !== val.id));
         else
             setUsersInvited(prev => [...prev, val]);
-    }
-
-    const selectChanMode = (modeString: string): ChannelModes => {
-        if (modeString === "public")
-            return ChannelModes.PUBLIC;
-        else if (modeString === "protected")
-            return ChannelModes.PROTECTED;
-        return ChannelModes.PRIVATE;
     }
 
     const formSubmit = handleSubmit((data, e) => {
@@ -79,7 +72,7 @@ function ChatModal(props: {onCloseModal: Function, showModal: number}) {
                 <div className="form-modal-wrapper">
                     <h3> {showModal === 1 ? "Create Channel" : "Inviter des gens"}  </h3>
                     <form onSubmit={formSubmit}>
-                        {   showModal === 1 && 
+                        { showModal === 1 && 
                             <>
                                 <div className="checkbox-container">
                                     {

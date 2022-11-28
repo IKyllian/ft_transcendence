@@ -1,20 +1,30 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { fetchUploadAvatar } from "../../../Api/Profile/Profile-Fetch";
-import Avatar from "../../../Images-Icons/pp.jpg";
-import { useAppSelector } from "../../../Redux/Hooks";
+import { CacheContext } from "../../../App";
+import { setUserAvatar } from "../../../Redux/AuthSlice";
+import { useAppDispatch, useAppSelector } from "../../../Redux/Hooks";
+import { updatePlayerAvatar } from "../../../Utils/Utils-User";
 import ExternalImage from "../../External-Image";
 
 function SettingsCardAvatar() {
     const { token, currentUser } = useAppSelector(state => state.auth);
     const [inputFile, setInputFile] = useState<File | undefined>(undefined);
     const [urlFile, setUrlFile] = useState<string>("");
+    const {cache} = useContext(CacheContext);
+    const dispatch = useAppDispatch();
 
-    const onSubmit = (e: any) => {
+    const onSubmit = async (e: any) => {
         e?.preventDefault();
         if (inputFile) {
             let formData = new FormData();
             formData.append("image", inputFile);
             fetchUploadAvatar(token, formData);
+            if (cache && currentUser) {
+                const newUrl: string | undefined = await updatePlayerAvatar(cache, token, currentUser?.id);
+                console.log("newUrl", newUrl);
+                if (newUrl)
+                    dispatch(setUserAvatar(newUrl));
+            }       
         }
     }
     

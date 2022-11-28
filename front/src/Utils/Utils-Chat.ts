@@ -1,4 +1,4 @@
-import { Conversation, ConversationInfoSidebar, TimeoutType, UserTimeout } from "../Types/Chat-Types";
+import { ChannelModes, Conversation, ConversationInfoSidebar, TimeoutType, UserTimeout } from "../Types/Chat-Types";
 import { UserInterface } from "../Types/User-Types";
 
 export function getSecondUserIdOfPM(conversation: Conversation | ConversationInfoSidebar, userConnectedId: number): number {
@@ -36,6 +36,22 @@ export function getMessageHour(date: string): string {
 
 export function UserIsMute(usersTimeout: UserTimeout[], userId: number): boolean {
     return usersTimeout.find(elem => (elem.user.id === userId && elem.type === TimeoutType.MUTED)) ? true : false;
+}
+
+export const selectChanMode = (modeString: string): ChannelModes => {
+    if (modeString === "public")
+        return ChannelModes.PUBLIC;
+    else if (modeString === "protected")
+        return ChannelModes.PROTECTED;
+    return ChannelModes.PRIVATE;
+}
+
+export const ChanModeToString = (mode: ChannelModes): string => {
+    if (mode === ChannelModes.PUBLIC)
+        return "public" ;
+    else if (mode === ChannelModes.PROTECTED)
+        return "protected";
+    return "private";
 }
 
 export const debounce = (func: Function, debouneTime: number) => {

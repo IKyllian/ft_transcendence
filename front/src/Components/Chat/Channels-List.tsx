@@ -15,12 +15,7 @@ function ChannelItem(props: {channelData: Channel}) {
 
     const handleClick = handleSubmit((data, e) => {
         e?.preventDefault();
-        let body: {password?: string};
-        if (data.password)
-            body = {password: data.password};
-        else
-            body = {};
-        socket?.emit("JoinChannel", {id: channelData.id, pwdDto: body});
+        socket?.emit("JoinChannel", {id: channelData.id, password: data.password ? data.password : undefined});
     })
 
     return (
