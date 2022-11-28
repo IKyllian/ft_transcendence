@@ -11,6 +11,7 @@ import { CreateChannelDto } from "./dto/create-channel.dto";
 import { SearchToInviteInChanDto } from "./dto/search-user-to-invite.dto";
 import { MuteUserDto } from "./dto/mute-user.dto";
 import { EditChannelNameDto } from "./dto/edit-channel-name.dto";
+import { EditChannelOptionDto } from "./dto/edit-channel-option.dto";
 
 @Controller('channel')
 export class ChannelController {
@@ -51,5 +52,11 @@ export class ChannelController {
 	@UseGuards(JwtGuard, InChannelGuard, ChannelPermissionGuard)
 	async editName(@Body() dto: EditChannelNameDto) {
 		return await this.channelService.editName(dto);
+	}
+
+	@Patch('edit-option')
+	@UseGuards(JwtGuard, InChannelGuard, ChannelPermissionGuard)
+	async editOption(@Body() dto: EditChannelOptionDto) {
+		return await this.channelService.editOption(dto);
 	}
 }
