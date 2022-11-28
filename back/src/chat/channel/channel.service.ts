@@ -112,7 +112,7 @@ export class ChannelService {
 		return channel.channelUsers.find((chanUser) => chanUser.user.id === id);
 	}
 
-	async join(user: User, chanId: number, pwdDto?: ChannelPasswordDto, isInvited: Boolean = false) {
+	async join(user: User, chanId: number, password?: string, isInvited: Boolean = false) {
 		const channel = await this.findOne({ where: { id: chanId } }, true);
 		if (!channel)
 			throw new ChannelNotFoundException();
@@ -138,9 +138,9 @@ export class ChannelService {
 			if (channel.option === channelOption.PRIVATE)
 				throw new UnauthorizedException('You need an invite to join this channel');
 			else if (channel.option === channelOption.PROTECTED) {
-				if (!pwdDto.password)
+				if (!password)
 					throw new UnauthorizedException('Password is not provided');
-				const pwdMatches = await argon.verify(channel.hash, pwdDto.password);
+				const pwdMatches = await argon.verify(channel.hash, password);
 				if (!pwdMatches)
 					throw new UnauthorizedException('Password incorrect');
 			}
@@ -156,7 +156,7 @@ export class ChannelService {
 			throw new BadRequestException('You are not invite to this channel');
 		await this.notifService.delete(invite.id);
 		if (dto.response === ResponseType.ACCEPTED) {
-			return this.join(user, dto.chanId, {}, true);
+			return this.join(user, dto.chanId, null, true);
 		}
 		return null;
 	}

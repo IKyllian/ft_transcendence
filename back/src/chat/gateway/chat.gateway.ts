@@ -32,6 +32,7 @@ import { PartyService } from 'src/game/matchmaking/party/party.service';
 import { AuthenticatedSocket } from 'src/utils/types/auth-socket';
 import { ChanIdDto } from '../channel/dto/chan-id.dto';
 import { GlobalService } from 'src/utils/global/global.service';
+import { JoinChannelDto } from './dto/join-channel.dto';
 
 @UseFilters(GatewayExceptionFilter)
 @UsePipes(new ValidationPipe())
@@ -123,17 +124,16 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@SubscribeMessage('JoinChannel')
 	async joinChannel(
 		@GetUser() user: User,
-		@MessageBody() channel: RoomDto,
-		@MessageBody() pwdDto?: ChannelPasswordDto,
+		@MessageBody() dto: JoinChannelDto,
 	) {
-		const channelUser = await this.channelService.join(user, channel.id, pwdDto);
-		this.server.to(`channel-${channel.id}`).emit('ChannelUpdate', { type: ChannelUpdateType.JOIN, data: channelUser });
+		const channelUser = await this.channelService.join(user, dto.id, dto.password);
+		this.server.to(`channel-${dto.id}`).emit('ChannelUpdate', { type: ChannelUpdateType.JOIN, data: channelUser });
 		this.server.to(`user-${user.id}`).emit('OnJoin', channelUser.channel);
 		const servMsg = await this.channelMsgService.createServer({
 			chanId: channelUser.channelId,
 			content: `Welcome ${user.username}, say hi!`,
 		});
-		this.server.to(`channel-${channel.id}`).emit('NewChannelMessage', servMsg);
+		this.server.to(`channel-${dto.id}`).emit('NewChannelMessage', servMsg);
 	}
 
 	@UseGuards(WsInChannelGuard)
