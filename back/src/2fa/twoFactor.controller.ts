@@ -1,4 +1,4 @@
-import { Body, ClassSerializerInterceptor, Controller, Post, Req, Res, UnauthorizedException, UseGuards, UseInterceptors } from "@nestjs/common";
+import { BadRequestException, Body, ClassSerializerInterceptor, Controller, Post, Req, Res, UnauthorizedException, UseGuards, UseInterceptors } from "@nestjs/common";
 import { User } from "src/typeorm";
 import { GetUser } from "src/utils/decorators";
 import { TwoFactorService } from "./twoFactor.service";
@@ -18,7 +18,7 @@ export class TwoFactorController {
 	@Post('generate')
 	@UseGuards(Jwt1faGuard)
 	async generate(@Res() response: Response, @GetUser() user: User) {
-		const { otpUrl } = await this.twoFactorService.generateTwoFactorSecret(user.account);
+		const { otpUrl } = await this.twoFactorService.generateTwoFactorSecret(user);
 		
 		return this.twoFactorService.pipeQrCodeStream(response, otpUrl);
 	}
@@ -28,14 +28,30 @@ export class TwoFactorController {
 	async enableTwoFactor(@GetUser() user: User, @Body() body: TwoFactorDto) {	
 
 		if (user.two_factor_enabled)
-			throw new UnauthorizedException('2FA already enabled for this user');
+			throw new BadRequestException('2FA already enabled for this user');
 		
 		const isValid = this.twoFactorService.verify(body.code, user.account);
 
 		if (!isValid)
-			throw new UnauthorizedException('Invalid 2FA code');
+			throw new BadRequestException('Invalid 2FA code');
 
 		await this.userService.setTwoFactorEnabled(user, true);
+		return {success: true}
+	}
+
+	@Post('disable')
+	@UseGuards(Jwt1faGuard)
+	async disableTwoFactor(@GetUser() user: User, @Body() body: TwoFactorDto) {	
+
+		if (user.two_factor_enabled)
+			throw new BadRequestException('2FA already disable for this user');
+		
+		const isValid = this.twoFactorService.verify(body.code, user.account);
+
+		if (!isValid)
+			throw new BadRequestException('Invalid 2FA code');
+
+		await this.userService.setTwoFactorEnabled(user, false);
 		return {success: true}
 	}
 

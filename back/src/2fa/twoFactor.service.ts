@@ -13,12 +13,12 @@ export class TwoFactorService {
 		private readonly configService: ConfigService
 	){}
 
-	public async generateTwoFactorSecret(account: UserAccount) {
+	public async generateTwoFactorSecret(user: User) {
 		const secret = authenticator.generateSecret();
 
-		const otpUrl = authenticator.keyuri(account.user.username, this.configService.get('TWO_FACTOR_APP_NAME'), secret);
+		const otpUrl = authenticator.keyuri(user.username, this.configService.get('TWO_FACTOR_APP_NAME'), secret);
 
-		await this.userService.setTwoFactorSecret(account, secret);
+		await this.userService.setTwoFactorSecret(user.account, secret);
 
 		return { secret, otpUrl };
 	}
