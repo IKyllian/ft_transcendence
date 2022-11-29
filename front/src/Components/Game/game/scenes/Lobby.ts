@@ -7,8 +7,17 @@ import {
 		EndResult,
 		GameType} from '../types/shared.types';
 import { io, Socket } from "socket.io-client";
+import { Player } from '../../../../Types/Lobby-Types'
 import ClientSocketManager from '../client.socket.manager';
 //import AssetButton from '../../../../Assets/images/button.png';
+import { elo_to_rank_as_string } from '../elo_tools';
+import AssetRankSilver from '../../../../Assets/images/silver.png';
+import AssetRankGold from '../../../../Assets/images/gold.png';
+import AssetRankPlatine from '../../../../Assets/images/platine.png';
+import AssetRankDiamond from '../../../../Assets/images/diamond.png';
+import AssetRankChampion from '../../../../Assets/images/champion.png';
+import AssetRankLegend from '../../../../Assets/images/legend.png';
+
 
 
 export default class Lobby extends Phaser.Scene
@@ -21,18 +30,22 @@ export default class Lobby extends Phaser.Scene
 	socketmanager?: ClientSocketManager;
 
 	TeamBlue_Back_avatar?: Phaser.GameObjects.Image;
+	TeamBlue_Back_rank?: Phaser.GameObjects.Image;
 	TeamBlue_Back_name?: Phaser.GameObjects.Text;
 	TeamBlue_Back_elo?: Phaser.GameObjects.Text;
 
 	TeamBlue_Front_avatar?: Phaser.GameObjects.Image;
+	TeamBlue_Front_rank?: Phaser.GameObjects.Image;
 	TeamBlue_Front_name?: Phaser.GameObjects.Text;
 	TeamBlue_Front_elo?: Phaser.GameObjects.Text;
 
 	TeamRed_Front_avatar?: Phaser.GameObjects.Image;
+	TeamRed_Front_rank?: Phaser.GameObjects.Image;
 	TeamRed_Front_name?: Phaser.GameObjects.Text;
 	TeamRed_Front_elo?: Phaser.GameObjects.Text;
 
 	TeamRed_Back_avatar?: Phaser.GameObjects.Image;
+	TeamRed_Back_rank?: Phaser.GameObjects.Image;
 	TeamRed_Back_name?: Phaser.GameObjects.Text;
 	TeamRed_Back_elo?: Phaser.GameObjects.Text;
 
@@ -70,7 +83,13 @@ export default class Lobby extends Phaser.Scene
 				);
 		}
 
-
+		this.load.image('Silver', AssetRankSilver);
+		this.load.image('Gold',AssetRankGold);
+		this.load.image('Platine',AssetRankPlatine);
+		this.load.image('Diamond',AssetRankDiamond);
+		this.load.image('Champion',AssetRankChampion);
+		this.load.image('Legend',AssetRankLegend);
+			
 		// this.load.image(
 		// 	'TeamBlue_back_avatar',
 		// 	this.game.registry.get('players_data').TeamBlue_Back.user.avatar
@@ -109,10 +128,12 @@ export default class Lobby extends Phaser.Scene
 			game_end: this.game_end.bind(this)
         });
 
-		this.TeamBlue_Back_avatar = this.add.image(130, 130, 'TeamBlue_back_avatar')
+		this.TeamBlue_Back_avatar = this.add.image(130, 130,
+								'TeamBlue_back_avatar')
 								.setOrigin(0.5,0.5)
 								.setDisplaySize(150, 150);
-		this.TeamRed_Back_avatar = this.add.image(670, 130, 'TeamRed_back_avatar')
+		this.TeamRed_Back_avatar = this.add.image(670, 130,
+								'TeamRed_back_avatar')
 								.setOrigin(0.5,0.5)
 								.setDisplaySize(150, 150);
 
@@ -123,31 +144,77 @@ export default class Lobby extends Phaser.Scene
 			fontFamily: 'Arial'
 		}
 
-		this.TeamBlue_Back_name = this.add.text(100, 360, "" + this.game.registry.get('players_data').TeamBlue_Back.user.username, style);
-		this.TeamRed_Back_name = this.add.text(700, 360, "" + this.game.registry.get('players_data').TeamRed_Back.user.username, style);
+		this.TeamBlue_Back_name = this.add.text(100, 360, "" +
+								this.game.registry.get('players_data').TeamBlue_Back.user.username, style);
+		this.TeamRed_Back_name = this.add.text(700, 360, "" +
+								this.game.registry.get('players_data').TeamRed_Back.user.username, style);
 
 		if (this.game_type === GameType.Doubles)
 		{
+			
+			this.TeamBlue_Back_rank = this.add.image(75, 420,
+									elo_to_rank_as_string(
+									this.game.registry.get('players_data').TeamBlue_Back.user.doubles_elo))
+									.setOrigin(0.5,0.5)
+									.setDisplaySize(20, 20);
+			this.TeamBlue_Back_elo = this.add.text(100, 420, "" +
+									this.game.registry.get('players_data').TeamBlue_Back.user.doubles_elo, style);
+
+
 			this.TeamBlue_Front_avatar = this.add.image(280, 130, 'TeamBlue_front_avatar')
-								.setOrigin(0.5,0.5)
-								.setDisplaySize(150, 150);
+										.setOrigin(0.5,0.5)
+										.setDisplaySize(150, 150);
+			this.TeamBlue_Front_rank = this.add.image(275, 420,
+									elo_to_rank_as_string(
+									this.game.registry.get('players_data').TeamBlue_Front.user.doubles_elo))
+									.setOrigin(0.5,0.5)
+									.setDisplaySize(20, 20);
+			this.TeamBlue_Front_name = this.add.text(300, 360, "" +
+									this.game.registry.get('players_data').TeamBlue_Front.user.username, style);
+			this.TeamBlue_Front_elo = this.add.text(300, 420, "" +
+									this.game.registry.get('players_data').TeamBlue_Front.user.doubles_elo, style);
+
+
 			this.TeamRed_Front_avatar = this.add.image(520, 130, 'TeamRed_front_avatar')
-								.setOrigin(0.5,0.5)
-								.setDisplaySize(150, 150);
-			this.TeamBlue_Front_name = this.add.text(300, 360, "" + this.game.registry.get('players_data').TeamBlue_Front.user.username, style);
-			this.TeamRed_Front_name = this.add.text(500, 360, "" + this.game.registry.get('players_data').TeamRed_Front.user.username, style);
+									.setOrigin(0.5,0.5)
+									.setDisplaySize(150, 150);
+			this.TeamRed_Front_rank = this.add.image(475, 360,
+									elo_to_rank_as_string(
+									this.game.registry.get('players_data').TeamRed_Front.user.doubles_elo))
+									.setOrigin(0.5,0.5)
+									.setDisplaySize(20, 20);
+			this.TeamRed_Front_name = this.add.text(500, 360, "" +
+									this.game.registry.get('players_data').TeamRed_Front.user.username, style);
+			this.TeamRed_Front_elo = this.add.text(500, 420, "" +
+									this.game.registry.get('players_data').TeamRed_Front.user.doubles_elo, style);
 
-			this.TeamBlue_Back_elo = this.add.text(100, 420, "" + this.game.registry.get('players_data').TeamBlue_Back.user.doubles_elo, style);
-			this.TeamRed_Back_elo = this.add.text(700, 420, "" + this.game.registry.get('players_data').TeamRed_Back.user.doubles_elo, style);
 
-			this.TeamBlue_Front_elo = this.add.text(300, 420, "" + this.game.registry.get('players_data').TeamBlue_Front.user.doubles_elo, style);
-			this.TeamRed_Front_elo = this.add.text(500, 420, "" + this.game.registry.get('players_data').TeamRed_Front.user.doubles_elo, style);
-
+			this.TeamRed_Back_rank = this.add.image(675, 420,
+									elo_to_rank_as_string(
+									this.game.registry.get('players_data').TeamRed_Back.user.doubles_elo))
+									.setOrigin(0.5,0.5)
+									.setDisplaySize(20, 20);
+			this.TeamRed_Back_elo = this.add.text(700, 420, "" +
+									this.game.registry.get('players_data').TeamRed_Back.user.doubles_elo, style);
 		}
 		else
 		{
-			this.TeamBlue_Back_elo = this.add.text(100, 420, "" + this.game.registry.get('players_data').TeamBlue_Back.user.singles_elo, style);
-			this.TeamRed_Back_elo = this.add.text(700, 420, "" + this.game.registry.get('players_data').TeamRed_Back.user.singles_elo, style);
+			this.TeamBlue_Back_rank = this.add.image(75, 420,
+									elo_to_rank_as_string(
+									this.game.registry.get('players_data').TeamBlue_Back.user.singles_elo))
+									.setOrigin(0.5,0.5)
+									.setDisplaySize(20, 20);
+			this.TeamBlue_Back_elo = this.add.text(100, 420, "" +
+									this.game.registry.get('players_data').TeamBlue_Back.user.singles_elo, style);
+			
+									
+			this.TeamRed_Back_rank = this.add.image(675, 420,
+									elo_to_rank_as_string(
+									this.game.registry.get('players_data').TeamRed_Back.user.singles_elo))
+									.setOrigin(0.5,0.5)
+									.setDisplaySize(20, 20);
+			this.TeamRed_Back_elo = this.add.text(700, 420, "" +
+									this.game.registry.get('players_data').TeamRed_Back.user.singles_elo, style);
 		}
 
 		this.socketmanager.lobby_send_join(this.game.registry.get('players_data').game_id);
@@ -217,20 +284,24 @@ export default class Lobby extends Phaser.Scene
 	clear_all = () =>
 	{
 		this.TeamBlue_Back_avatar?.destroy();
+		this.TeamBlue_Back_rank?.destroy();
 		this.TeamBlue_Back_name?.destroy();
 		this.TeamBlue_Back_elo?.destroy();
 
 		this.TeamRed_Back_avatar?.destroy();
+		this.TeamRed_Back_rank?.destroy();
 		this.TeamRed_Back_name?.destroy();
 		this.TeamRed_Back_elo?.destroy();
 
 		if (this.game_type === GameType.Doubles)
 		{
 			this.TeamBlue_Front_avatar?.destroy();
+			this.TeamBlue_Front_rank?.destroy();
 			this.TeamBlue_Front_name?.destroy();
 			this.TeamBlue_Front_elo?.destroy();
 		
 			this.TeamRed_Front_avatar?.destroy();
+			this.TeamRed_Front_rank?.destroy();
 			this.TeamRed_Front_name?.destroy();
 			this.TeamRed_Front_elo?.destroy();
 		}
@@ -276,5 +347,4 @@ export default class Lobby extends Phaser.Scene
 
 		this.scene.start('MatchResult');
 	}
-
 }

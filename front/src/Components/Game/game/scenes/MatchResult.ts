@@ -1,7 +1,13 @@
 import 'phaser';
 import { EndResult, GameType, PlayerType } from '../types/shared.types';
 import AssetButton from '../../../../Assets/images/button.png';
-
+import { check_rank_change } from '../elo_tools';
+import AssetRankSilver from '../../../../Assets/images/silver.png';
+import AssetRankGold from '../../../../Assets/images/gold.png';
+import AssetRankPlatine from '../../../../Assets/images/platine.png';
+import AssetRankDiamond from '../../../../Assets/images/diamond.png';
+import AssetRankChampion from '../../../../Assets/images/champion.png';
+import AssetRankLegend from '../../../../Assets/images/legend.png';
 
 // dans user
 // @Column({ default: 1000 })
@@ -26,6 +32,11 @@ export default class MatchResult extends Phaser.Scene
 	TeamBlue_Front_name: string = "";
 	TeamRed_Front_name: string = "";
 	TeamRed_Back_name: string = "";
+
+	TeamBlue_Back_oldElo: number = 0;
+	TeamBlue_Front_oldElo: number = 0;
+	TeamRed_Front_oldElo: number = 0;
+	TeamRed_Back_oldElo: number = 0;
 
 	TeamBlue_Back_newElo: number = 0;
 	TeamBlue_Front_newElo: number = 0;
@@ -73,6 +84,25 @@ export default class MatchResult extends Phaser.Scene
 
 
 		}
+		this.load.image('Silver', AssetRankSilver);
+		this.load.image('Gold',AssetRankGold);
+		this.load.image('Platine',AssetRankPlatine);
+		this.load.image('Diamond',AssetRankDiamond);
+		this.load.image('Champion',AssetRankChampion);
+		this.load.image('Legend',AssetRankLegend);
+
+
+
+		this.load.image(
+			'rank_UP',
+			AssetButton
+			);
+
+		this.load.image(
+			'rank_DOWN',
+			AssetButton
+			);
+
 
 		this.scene.remove('Pong');
 	}
@@ -224,24 +254,25 @@ export default class MatchResult extends Phaser.Scene
 		let blueTeamAverage: number = 0;
 		let redTeamAverage: number = 0;
 
-		this.TeamBlue_Back_newElo = this.game_type === GameType.Singles ? 
+		this.TeamBlue_Back_oldElo = this.game_type === GameType.Singles ? 
 									this.game.registry.get('players_data').TeamBlue_Back.user.singles_elo
 									: this.game.registry.get('players_data').TeamBlue_Back.user.doubles_elo;
 
-		this.TeamRed_Back_newElo =	this.game_type === GameType.Singles ? 
+		this.TeamRed_Back_oldElo =	this.game_type === GameType.Singles ? 
 									this.game.registry.get('players_data').TeamRed_Back.user.singles_elo
 									: this.game.registry.get('players_data').TeamRed_Back.user.doubles_elo;
 
-		blueTeamAverage += this.TeamBlue_Back_newElo;
-		redTeamAverage += this.TeamRed_Back_newElo;
+		blueTeamAverage += this.TeamBlue_Back_oldElo;
+		redTeamAverage += this.TeamRed_Back_oldElo;
+
 
 		if (this.game_type === GameType.Doubles)
 		{
-			this.TeamBlue_Front_newElo = this.game.registry.get('players_data').TeamBlue_Front.user.doubles_elo;
-			this.TeamRed_Front_newElo = this.game.registry.get('players_data').TeamRed_Front.user.doubles_elo;
+			this.TeamBlue_Front_oldElo = this.game.registry.get('players_data').TeamBlue_Front.user.doubles_elo;
+			this.TeamRed_Front_oldElo = this.game.registry.get('players_data').TeamRed_Front.user.doubles_elo;
 
-			blueTeamAverage += this.TeamBlue_Front_newElo;
-			redTeamAverage += this.TeamRed_Front_newElo;
+			blueTeamAverage += this.TeamBlue_Front_oldElo;
+			redTeamAverage += this.TeamRed_Front_oldElo;
 			
 			blueTeamAverage /= 2;
 			redTeamAverage /= 2;
@@ -254,10 +285,10 @@ export default class MatchResult extends Phaser.Scene
 		
 		if (this.winner === EndResult.TeamBlue_Win)
 		{
-			this.TeamBlue_Back_newElo += blueEloWon;
-			this.TeamBlue_Front_newElo += blueEloWon;
-			this.TeamRed_Front_newElo += redEloLost;
-			this.TeamRed_Back_newElo += redEloLost;
+			this.TeamBlue_Back_newElo += this.TeamBlue_Back_oldElo + blueEloWon;
+			this.TeamBlue_Front_newElo += this.TeamBlue_Front_oldElo + blueEloWon;
+			this.TeamRed_Front_newElo += this.TeamRed_Front_oldElo + redEloLost;
+			this.TeamRed_Back_newElo += this.TeamRed_Back_oldElo + redEloLost;
 
 			this.add.text(100, 460, "+" + blueEloWon, style_green);
 			this.add.text(700, 460, "" + redEloLost, style_red);
@@ -270,10 +301,10 @@ export default class MatchResult extends Phaser.Scene
 		}
 		else
 		{
-			this.TeamBlue_Back_newElo += blueEloLost;
-			this.TeamBlue_Front_newElo += blueEloLost;
-			this.TeamRed_Front_newElo += redEloWon;	
-			this.TeamRed_Back_newElo += redEloWon;
+			this.TeamBlue_Back_newElo += this.TeamBlue_Back_oldElo + blueEloLost;
+			this.TeamBlue_Front_newElo += this.TeamBlue_Front_oldElo + blueEloLost;
+			this.TeamRed_Front_newElo += this.TeamRed_Front_oldElo + redEloWon;	
+			this.TeamRed_Back_newElo += this.TeamRed_Back_oldElo + redEloWon;
 
 			this.add.text(100, 460, "" + blueEloLost, style_red);
 			this.add.text(700, 460, "+" + redEloWon, style_green);
@@ -285,13 +316,89 @@ export default class MatchResult extends Phaser.Scene
 
 		}
 
+		if (check_rank_change(
+			this.TeamBlue_Back_oldElo,
+			this.TeamBlue_Back_newElo))
+		{
+			if (this.TeamBlue_Back_newElo > this.TeamBlue_Back_oldElo)
+			{
+				this.add.image(130, 130, 'rank_UP')
+								.setOrigin(0.5,0.5)
+								.setDisplaySize(50, 50);
+			}
+			else
+			{
+				this.add.image(130, 130, 'rank_DOWN')
+								.setOrigin(0.5,0.5)
+								.setDisplaySize(50, 50);
+			}
+		}
 
+
+
+		if (check_rank_change(
+			this.TeamRed_Back_oldElo,
+			this.TeamRed_Back_newElo))
+		{
+			if (this.TeamRed_Back_newElo > this.TeamRed_Back_oldElo)
+			{
+				this.add.image(260, 130, 'rank_UP')
+								.setOrigin(0.5,0.5)
+								.setDisplaySize(50, 50);
+			}
+			else
+			{
+				this.add.image(260, 130, 'rank_DOWN')
+								.setOrigin(0.5,0.5)
+								.setDisplaySize(50, 50);
+			}
+		}
+
+		if (this.game_type === GameType.Doubles)
+		{
+			if (check_rank_change(
+				this.TeamBlue_Front_oldElo,
+				this.TeamBlue_Front_newElo))
+			{
+				if (this.TeamBlue_Front_newElo > this.TeamBlue_Front_oldElo)
+				{
+					this.add.image(260, 130, 'rank_UP')
+									.setOrigin(0.5,0.5)
+									.setDisplaySize(50, 50);
+				}
+				else
+				{
+					this.add.image(260, 130, 'rank_DOWN')
+									.setOrigin(0.5,0.5)
+									.setDisplaySize(50, 50);
+				}
+			}
+	
+	
+	
+			if (check_rank_change(
+				this.TeamRed_Front_oldElo,
+				this.TeamRed_Front_newElo))
+			{
+				if (this.TeamRed_Front_newElo > this.TeamRed_Front_oldElo)
+				{
+					this.add.image(260, 130, 'rank_UP')
+									.setOrigin(0.5,0.5)
+									.setDisplaySize(50, 50);
+				}
+				else
+				{
+					this.add.image(260, 130, 'rank_DOWN')
+									.setOrigin(0.5,0.5)
+									.setDisplaySize(50, 50);
+				}
+			}
+
+
+		}
 
 		this.add.text(100, 420, "" + this.TeamBlue_Back_newElo, style);
 		this.add.text(700, 420, "" + this.TeamRed_Back_newElo, style);
-
-		// this.add.text(100, 460, "" + this.TeamBlue_Back_newElo, style);
-		// this.add.text(700, 460, "" + this.TeamRed_Back_newElo, style);
 
 		if (this.game_type === GameType.Doubles)
 		{
