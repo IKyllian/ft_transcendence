@@ -157,9 +157,9 @@ export class UserService {
 	}
 
 	async updateForgotCode(user: User, code: string) {
-		this.accountRepo.createQueryBuilder("account")
+		this.accountRepo.createQueryBuilder()
 		.update()
-		.where("account.userId = :userId", { userId: user.id })
+		.where("userId = :userId", { userId: user.id })
 		.set({ forgot_code: () => ":code"})
 		.setParameter('code', code)
 		.execute()
@@ -171,9 +171,9 @@ export class UserService {
 	}
 
 	async updatePassword(account: UserAccount, hash: string) {
-		this.accountRepo.createQueryBuilder("account")
+		this.accountRepo.createQueryBuilder()
 		.update()
-		.where("account.userId = :userId", { userId: account.id })
+		.where("userId = :userId", { userId: account.id })
 		.set({ hash: () => ":hash"})
 		.setParameter('hash', hash)
 		.execute()

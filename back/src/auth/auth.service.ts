@@ -286,7 +286,8 @@ export class AuthService {
 		}
     }
 
-	async forgotPassword(dto: ForgotPasswordDto) {		
+	async forgotPassword(dto: ForgotPasswordDto) {	
+		//TODO NO 42 	
 		const user = await this.userService.findOne({
 			where: { email: dto.email }
 		})
@@ -304,15 +305,15 @@ export class AuthService {
             html: `
             <h3>Password Reset</h3>
 			<p>Hi, you have submitted a password reset request on <b>Pong Game</b></p>
-			<p>To set your new password, <a href=http://localhost:5000/api/auth/reset-password?code=${validation_code}>Click here</a></p>
+			<p>To set your new password, <a href=http://${process.env.SERVER_IP}:3000/reset-password?code=${validation_code}>Click here</a></p>
             `,
         }
 
         this.transporter.sendMail(message, function(err, info) {
             if (err)
-                console.log(err);
+                console.log('err', err);
             else
-                console.log(info);
+                console.log('info', info);
         });
 
 		return { success: true }

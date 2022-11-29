@@ -73,8 +73,8 @@ export class UserController {
 			}
 			console.log("avatar path ", user.avatar)
 			if (!user.avatar) { return undefined; }
-			// res.sendFile(user.avatar, { root: 'uploads' });
-			return of(res.sendFile(join(process.cwd(), 'uploads/' + user.avatar)));
+			res.sendFile(user.avatar, { root: 'uploads' });
+			// return of(res.sendFile(join(process.cwd(), 'uploads/' + user.avatar)));
 	}
 
 	@UseGuards(JwtGuard)
