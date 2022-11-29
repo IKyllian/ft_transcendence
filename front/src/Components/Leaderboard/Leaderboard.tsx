@@ -80,6 +80,7 @@ function Leaderboard() {
                     <table> 
                         <thead>
                             <tr>
+                                <th> Pos </th>
                                 <th> Rank </th>
                                 <th> Name </th>
                                 <th className="responsive-column"> Games Played </th>

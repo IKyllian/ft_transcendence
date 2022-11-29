@@ -3,6 +3,7 @@ import { IconEye } from "@tabler/icons";
 import Avatar from "../../Images-Icons/pp.jpg";
 import { UserInterface, UserStatus } from "../../Types/User-Types";
 import ExternalImage from "../External-Image";
+import DisplayRank from "../Display-Rank";
 
 interface LeaderboardItemProps {
     pos: number,
@@ -14,14 +15,13 @@ interface LeaderboardItemProps {
     elo: number,
 }
 
-
-
 function LeaderboardItem(props: LeaderboardItemProps) {
     const { pos, user, gamesPlayed, winRate, elo } = props;
 
     return (
         <tr className={`${pos >= 1 && pos <= 3 ? "raw-top3" : ""} `}>
             <td> { pos } </td>
+            <td> <DisplayRank elo={elo} /> </td>
             <td>
                 <div className="user-info">
                     <ExternalImage src={user.avatar} alt="User Avatar" className='user-avatar' userId={user.id} />

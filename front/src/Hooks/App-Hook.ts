@@ -14,7 +14,6 @@ import { copyNotificationArray } from "../Redux/NotificationSlice";
 import { addParty, addPartyInvite, addPartyMessage, cancelQueue, changePartyGameMode, changeQueueStatus, incrementQueueTimer, leaveParty, removePartyInvite, resetQueueTimer } from "../Redux/PartySlice";
 import { fetchVerifyToken } from "../Api/Sign/Sign-Fetch";
 import { addChannelUser, banChannelUser, muteChannelUser, removeTimeoutChannelUser, removeChannelUser, setChannelDatas, updateChannelUser, unsetChannelDatas, unsetChannelId } from "../Redux/ChannelSlice";
-import { fetchGetAvatar } from "../Api/Profile/Profile-Fetch";
 
 export function useAppHook() {
     const [socket, setSocket] = useState<Socket | undefined>(undefined);

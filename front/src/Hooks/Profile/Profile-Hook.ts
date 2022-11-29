@@ -1,6 +1,6 @@
 import { useState, useContext, useEffect } from "react";
 import { ModalContext } from "../../Components/Utils/ModalProvider";
-import { ProfileState, UserInterface, UserStatus } from "../../Types/User-Types";
+import { ProfileState, UserStatus } from "../../Types/User-Types";
 import { useAppSelector } from '../../Redux/Hooks';
 import { useParams } from "react-router-dom";
 import { SocketContext } from "../../App";
@@ -47,16 +47,18 @@ export function useProfileHook() {
 
     useEffect(() => {
         handleClick(0);
+        setUserState(undefined);
         if (params.username && currentUser) {
-            const promiseProfileFetch: Promise<AxiosResponse<any, any>> =  params.username === currentUser.username ? fetchMe(token) : fetchProfile(params.username, token, setUserState);
+            const isLoggedUser: boolean = params.username === currentUser.username ? true : false;
+            const promiseProfileFetch: Promise<AxiosResponse<any, any>> = isLoggedUser ? fetchMe(token) : fetchProfile(params.username, token);
             promiseProfileFetch.then(fetchResponse => {
                 if (fetchResponse) {
                     console.log("fetchResponse", fetchResponse);
                     setUserState({
-                        isLoggedUser: params.username === currentUser!.username ? true : false,
+                        isLoggedUser: isLoggedUser ? true : false,
                         user: {...fetchResponse.data.user},
                         match_history: fetchResponse.data.match_history,
-                        friendList: friendList,
+                        friendList: isLoggedUser ? friendList : fetchResponse.data.friendList,
                         relationStatus: fetchResponse.data.relationStatus ? fetchResponse.data.relationStatus : undefined,
                     });
                 }

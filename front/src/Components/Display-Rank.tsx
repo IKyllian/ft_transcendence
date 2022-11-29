@@ -8,6 +8,8 @@ import Legend from "../Images-Icons/Ranks/legend.png";
 function DisplayRank(props: {elo: number}) {
     const { elo } = props;
 
+    console.log("ELO", elo);
+
     if (elo < 1000)
         return ( <img src={Silver} alt="Rank icone" /> );
     else if (elo >= 1000 && elo < 1125)

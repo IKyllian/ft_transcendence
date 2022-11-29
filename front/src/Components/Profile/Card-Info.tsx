@@ -16,6 +16,8 @@ function CardInfo(props: {userState: ProfileState}) {
             socket?.emit("GameInvite", {id: userState.user.id});
     }
 
+    console.log("userState in CARD INFO", userState);
+
     return userState.user ? (
         <div className="card-info">
             <ExternalImage src={userState.user.avatar} alt="User Avatar" className='profile-avatar' userId={userState.user.id} />
