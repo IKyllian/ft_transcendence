@@ -25,21 +25,22 @@ export function userIdIsBlocked(connectedUser: UserInterface, secondUserId: numb
 }
 
 export async function getPlayerAvatar(cache: Cache | null, token: string, userId: number, userAvatar: string): Promise<string | undefined> {
-    let req = new Request(`${baseUrl}/users/${userId}/avatar`, {method: 'GET', headers: {"Authorization": `Bearer ${token}`}});
-    console.log("req", req);
+    const req = new Request(`${baseUrl}/users/${userId}/avatar`, {method: 'GET', headers: {"Authorization": `Bearer ${token}`}});
     let avatarResponse: Response | undefined;
+    let headerFileName: string | null = null;
     if (cache !== null) {
         avatarResponse = await cache.match(req).then(async (cacheResponse) => {
-            // console.log("cacheResponse", cacheResponse);
             if (cacheResponse) {
+                headerFileName = cacheResponse.headers.get("Content-Disposition");
                 return cacheResponse;
-            } else 
+            } else {
                 return await fetchResponseAvatar(req).then(fetchResponse => {
                     if (!fetchResponse.ok)
                         return undefined;
                     cache.put(req, fetchResponse.clone());
                     return fetchResponse;
                 })
+            }
         })
     } else {
         avatarResponse = await fetchResponseAvatar(req).then(fetchResponse => {
@@ -48,9 +49,13 @@ export async function getPlayerAvatar(cache: Cache | null, token: string, userId
             return fetchResponse;
         })
     }
+    if (headerFileName !== null && userAvatar.match("base64") === null && headerFileName !== userAvatar) {
+        console.log("NEED TO UPDATE CACHE");
+        return await updatePlayerAvatar(cache, token, userId);
+    }
     if (avatarResponse !== undefined) {
         const avatarBlob = await avatarResponse.blob();
-        if (avatarBlob) 
+        if (avatarBlob)
             return URL.createObjectURL(avatarBlob);
         return undefined;
     }
@@ -58,7 +63,7 @@ export async function getPlayerAvatar(cache: Cache | null, token: string, userId
 }
 
 export async function updatePlayerAvatar(cache: Cache | null, token: string, userId: number): Promise<string | undefined> {
-    let req = new Request(`${baseUrl}/users/${userId}/avatar`, {method: 'GET', headers: {"Authorization": `Bearer ${token}`}});
+    const req = new Request(`${baseUrl}/users/${userId}/avatar`, {method: 'GET', headers: {"Authorization": `Bearer ${token}`}});
     console.log("req", req);
     let avatarResponse: Response | undefined;
     if (cache !== null) {

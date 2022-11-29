@@ -48,23 +48,23 @@ export function fetchUploadAvatar(token: string, file: FormData) {
 
 }
 
-export function fetchGetAvatar(token: string, setUserState: Function) {
-    axios.get(`${baseUrl}/users/avatar`, {
+export function fetchGetAvatar(token: string, userId: number, setUserState: Function) {
+    axios.get(`${baseUrl}/users/${userId}/avatar`, {
         headers: {
             "Authorization": `Bearer ${token}`,
         },
         responseType: 'arraybuffer'
     })
     .then(response => {
-        console.log(response);
+        console.log("fetchGetAvatar", response);
         const base64 = window.btoa(
             new Uint8Array(response.data).reduce(
               (data, byte) => data + String.fromCharCode(byte),
               '',
             ),
           );
-        console.log("data:;base64," + base64);
-        setUserState((prev: ProfileState) => { return {...prev, user: {...prev.user, avatar: "data:;base64," + base64}}});
+        console.log("data" + base64);
+        // setUserState((prev: ProfileState) => { return {...prev, user: {...prev.user, avatar: "data:;base64," + base64}}});
     })
     .catch(err => {
         console.log(err);

@@ -1,5 +1,6 @@
 import LoadingSpin from '../Utils/Loading-Spin';
 import { useSignHook } from '../../Hooks/Sign/Sign-Hook';
+import { Link } from 'react-router-dom';
 
 function Sign() {
     const {
@@ -55,7 +56,7 @@ function Sign() {
                                 pattern: {
                                     value: new RegExp(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i),
                                     message: "invalid email address"
-                                  }
+                                }
                             })}
                         />
                     }
@@ -72,6 +73,9 @@ function Sign() {
                             } : 5
                         })}
                     />
+                    <Link to="/forgot-password">
+                        <p className='forgot-password'> Mot de passe oublié ? </p>
+                    </Link>
                     <button type='submit'>
                         {isSignIn ? "Login" : "Create Account"}
                     </button>

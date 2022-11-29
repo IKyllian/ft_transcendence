@@ -5,6 +5,7 @@ import LoadingSpin from "../Utils/Loading-Spin";
 import { getDoublesWinRate, getMatchPlayed, getSinglesWinRate } from "../../Utils/Utils-User";
 import { useProfileHook } from "../../Hooks/Profile/Profile-Hook";
 import { Modes } from "../../Types/Utils-Types";
+import ChampionRank from "../../Images-Icons/Ranks/champion.png";
 
 function Profile() {
     const {
@@ -31,6 +32,10 @@ function Profile() {
                     </select>
                     <StatsInfoItem label="Games Played" value={getMatchPlayed(statsMode === Modes.Singles ? userState.user.statistic.singles_match_won : userState.user.statistic.doubles_match_won, statsMode === Modes.Singles ? userState.user.statistic.singles_match_lost : userState.user.statistic.doubles_match_lost).toString()} />
                     <StatsInfoItem label="Win Rate" value={`${statsMode === Modes.Singles ? getSinglesWinRate(userState.user) : getDoublesWinRate(userState.user)}%`} />
+                    {/* <div className='stat-elem'>
+                        <p> Rank </p>
+                        <img src={ChampionRank} alt="rank icon" />
+                    </div> */}
                     <StatsInfoItem label="Rank" value="#3" />
                 </div>
                 <CardInfo userState={userState} />

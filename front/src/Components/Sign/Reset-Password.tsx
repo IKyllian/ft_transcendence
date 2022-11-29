@@ -1,16 +1,41 @@
+import axios from "axios";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { baseUrl } from "../../env";
 
 function ResetPassword() {
     const {register, handleSubmit, setError, formState: {errors}, reset} = useForm<{password: string, passwordConfirm: string, error: string}>();
+    const [searchParams] = useSearchParams();
+    const navigate = useNavigate();
+    const authorizationCode = searchParams.get('code');
+
+    useEffect(() => {
+        if (!authorizationCode)
+            navigate("/sign");
+    }, [])
 
     const formSubmit = handleSubmit((data, e) => {
         e?.preventDefault();
-        if (data.password !== data.passwordConfirm)
+        if (data.password !== data.passwordConfirm) {
             setError("error", {message: "Passwords should be same"});
+            return ;
+        }
         else {
-            setError("error", {message: undefined});
+            // setError("error", {message: undefined});
+            if (authorizationCode) {
+                axios.post(`${baseUrl}/auth/reset-password`, {code: authorizationCode, newPassword: data.password})
+                .then(response => {
+                    console.log(response);
+                    navigate("/sign");
+                })
+                .catch(err => {
+                    console.log(err);
+                })
+            }
         }
     })
+    
     return (
         <div className="sign-container">
             <div className='auth-wrapper'>
