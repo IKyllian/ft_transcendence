@@ -133,7 +133,7 @@ export class GameService {
 			match.blue_team_player2 = blueTeam[1],
 			match.red_team_player2 = redTeam[1];
 		}
-		console.log("matchResult", match);
+		// console.log("matchResult", match);
 		return this.matchRepo.save(match);
 	}
 

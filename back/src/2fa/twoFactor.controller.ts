@@ -45,8 +45,7 @@ export class TwoFactorController {
 	@Post('disable')
 	@UseGuards(JwtGuard)
 	async disableTwoFactor(@GetUser() user: User, @Body() body: TwoFactorDto) {	
-
-		if (user.two_factor_enabled)
+		if (!user.two_factor_enabled)
 			throw new BadRequestException('2FA already disable for this user');
 		
 		const isValid = this.twoFactorService.verify(body.code, user.account);
