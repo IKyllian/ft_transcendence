@@ -76,9 +76,9 @@ export const partySlice = createSlice({
         incrementQueueTimer: (state) => {
             if (state.isInQueue) {
                 if (state.queueTimer.seconds === 59)
-                state.queueTimer = {seconds: 0, minutes: state.queueTimer.minutes + 1};
+                    state.queueTimer = {seconds: 0, minutes: state.queueTimer.minutes + 1};
                 else
-                state.queueTimer = {...state.queueTimer, seconds: state.queueTimer.seconds + 1};
+                    state.queueTimer = {...state.queueTimer, seconds: state.queueTimer.seconds + 1};
             } else
                 state.queueTimer = defaultQueueTimer;
         },

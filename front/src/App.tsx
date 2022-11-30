@@ -21,7 +21,6 @@ import PrivateRoute from "./Route/Private-Route";
 import UsernameForm from "./Components/Sign/Username-Form";
 import ChannelsList from "./Components/Chat/Channels-List";
 import NotifGameInvite from "./Components/Notif-Game-Invite";
-import NotifError from "./Components/Notif-Error";
 import Game from "./Components/Game/Game";
 import Lobby from "./Components/Lobby/Lobby";
 import ModalPartyInvite from "./Components/Modal-Party-Invite";
@@ -30,6 +29,7 @@ import ChatParty from "./Components/Chat-Party";
 import MatchFound from "./Components/Lobby/Match-Found";
 import ProfileSettings from "./Components/Profile/Settings/Profile-Settings";
 import SendMailPassword from "./Components/Sign/Send-Mail-Password";
+import Alert from "./Components/Alert";
 
 interface RouteProps {
 	path: string,
@@ -69,7 +69,7 @@ const routes: RouteProps[] = [
 				<ResetPassword />
 			</PublicRoute>,
 	}, {
-		path: '/account-verification',
+		path: '/2fa-verification',
 		element:
 			<PublicRoute>
 				<CodeVerification />
@@ -136,8 +136,6 @@ function App() {
 	const {
 		socket,
 		cache,
-		eventError,
-		closeEventError,
 		isAuthenticated,
 		partyState,
 	} = useAppHook();
@@ -147,7 +145,7 @@ function App() {
 		<SocketContext.Provider value={{socket: socket}} >
 			<CacheContext.Provider value={{cache: cache}} >
 				<ModalProvider>
-					{ isAuthenticated && eventError !== undefined && <NotifError error={eventError} closeError={closeEventError} />}
+					{ isAuthenticated && <Alert /> }
 					{ isAuthenticated && <AddFriendModal/> }
 					{ isAuthenticated && <ModalPartyInvite /> }
 					{ isAuthenticated && <NotifGameInvite /> }
