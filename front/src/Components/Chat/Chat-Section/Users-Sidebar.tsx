@@ -9,6 +9,7 @@ import MuteButton from "../../Buttons/Mute-Button";
 import BanButton from "../../Buttons/Ban-Button";
 import { useAppSelector } from "../../../Redux/Hooks";
 import { UserStatus } from "../../../Types/User-Types";
+import ExternalImage from "../../External-Image";
 
 function UserSidebarItem(props: {user: ChannelUser, usersTimeout: UserTimeout[], loggedUserIsOwner: boolean}) {
     const { user, usersTimeout, loggedUserIsOwner } = props;
@@ -22,7 +23,7 @@ function UserSidebarItem(props: {user: ChannelUser, usersTimeout: UserTimeout[],
     return (
         <li>
             <div className="avatar-container">
-                <img className='user-avatar' src={ProfilPic} alt="profil pic" />
+            <ExternalImage src={user.user.avatar} alt="User Avatar" className='user-avatar' userId={user.user.id} />
                 <div className="user-status">
                     <div className={`${user.user.status === UserStatus.ONLINE ? "online" : "offline"}`}> </div>
                 </div>

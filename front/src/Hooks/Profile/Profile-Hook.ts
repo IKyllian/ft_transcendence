@@ -1,14 +1,12 @@
 import { useState, useContext, useEffect } from "react";
 import { ModalContext } from "../../Components/Utils/ModalProvider";
-import { ProfileState, UserInterface, UserStatus } from "../../Types/User-Types";
+import { ProfileState, UserStatus } from "../../Types/User-Types";
 import { useAppSelector } from '../../Redux/Hooks';
 import { useParams } from "react-router-dom";
-
-import { CacheContext, SocketContext } from "../../App";
-import { fetchGetAvatar, fetchProfile } from "../../Api/Profile/Profile-Fetch";
-import { fetchMe } from "../../Api/Profile/Profile-Fetch";
+import { SocketContext } from "../../App";
+import { fetchProfile, fetchMe } from "../../Api/Profile/Profile-Fetch";
 import { Modes } from "../../Types/Utils-Types";
-import { getPlayerAvatar } from "../../Utils/Utils-User";
+import { AxiosResponse } from "axios";
 
 interface ProfileMenuButtons {
     title: string;
@@ -30,7 +28,6 @@ export function useProfileHook() {
     let {currentUser, token, friendList} = useAppSelector(state => state.auth);
     let {notifications} = useAppSelector(state => state.notification);
     const {socket} = useContext(SocketContext);
-    const {cache} = useContext(CacheContext);
 
     const handleClick = (index: number) => {
         let newArray = [...attributes];
@@ -50,27 +47,22 @@ export function useProfileHook() {
 
     useEffect(() => {
         handleClick(0);
-        if (params.username === currentUser?.username) {
-            fetchMe(token).then(fetchResponse => {
-                if (fetchResponse.statusText === "OK") {
-                    getPlayerAvatar(cache!, token).then(avatarResponse => {
-                        if (avatarResponse) {
-                            const userObject: UserInterface = {...fetchResponse.data.user, avatar: avatarResponse};
-                            setUserState({
-                                isLoggedUser: true,
-                                user: userObject,
-                                match_history: fetchResponse.data.match_history,
-                                friendList: friendList,
-                            });
-                        } else {
-                            throw "Failed To Load Avatar";
-                        }
-                    })
+        setUserState(undefined);
+        if (params.username && currentUser) {
+            const isLoggedUser: boolean = params.username === currentUser.username ? true : false;
+            const promiseProfileFetch: Promise<AxiosResponse<any, any>> = isLoggedUser ? fetchMe(token) : fetchProfile(params.username, token);
+            promiseProfileFetch.then(fetchResponse => {
+                if (fetchResponse) {
+                    console.log("fetchResponse", fetchResponse);
+                    setUserState({
+                        isLoggedUser: isLoggedUser ? true : false,
+                        user: {...fetchResponse.data.user},
+                        match_history: fetchResponse.data.match_history,
+                        friendList: isLoggedUser ? friendList : fetchResponse.data.friendList,
+                        relationStatus: fetchResponse.data.relationStatus ? fetchResponse.data.relationStatus : undefined,
+                    });
                 }
-            });            
-        }
-        else if (params.username) {
-            fetchProfile(params.username, token, setUserState);
+            });
         }
     }, [params.username])
 

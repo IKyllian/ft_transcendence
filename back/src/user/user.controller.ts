@@ -1,6 +1,6 @@
-import { Body, ClassSerializerInterceptor, Controller, Delete, FileTypeValidator, ForbiddenException, Get, HttpStatus, MaxFileSizeValidator, Param, ParseFilePipe, ParseFilePipeBuilder, ParseIntPipe, Patch, Post, Req, Request, Res, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
+import { Body, ClassSerializerInterceptor, Controller, Delete, FileTypeValidator, ForbiddenException, Get, HttpStatus, MaxFileSizeValidator, NotFoundException, Param, ParseFilePipe, ParseFilePipeBuilder, ParseIntPipe, Patch, Post, Req, Request, Res, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
-import { Observable, of } from "rxjs";
+import { NotFoundError, Observable, of } from "rxjs";
 import { JwtGuard } from "src/auth/guard/jwt.guard";
 import { User } from "src/typeorm";
 import { diskStorage } from "multer";
@@ -11,6 +11,9 @@ import { GetUser } from "src/utils/decorators";
 import { SearchDto } from "./dto/search.dto";
 import { Response } from "express";
 import { join } from "path";
+import { UserIdDto } from "src/chat/gateway/dto/user-id.dto";
+import { EditUsernameDto } from "./dto/edit-username.dto";
+import { EditPasswordDto } from "./dto/edit-password.dto";
 
 export const avatarStorage = {
 	storage: diskStorage({
@@ -37,7 +40,7 @@ export class UserController {
 
 	@UseGuards(JwtGuard)
 	@Get('me')
-	async getMe(@GetUser() user: User) {
+	async getMe(@GetUser() user: User, @Req() req) {
 		console.log('me')
 		const match_history = await this.userService.getMatchHistory(user.id);
 		return {
@@ -59,19 +62,31 @@ export class UserController {
 	}
 
 	@UseGuards(JwtGuard)
-	@Get('avatar')
-	serveAvatar(@GetUser() user: User, @Res() res: Response) {
-		console.log("avatar path ", user.avatar)
-		if (!user.avatar) { return; }
-		// res.sendFile(user.avatar, { root: 'uploads' });
-		return of(res.sendFile(join(process.cwd(), 'uploads/' + user.avatar)));
+	@Get(':id/avatar')
+	async serveAvatar(
+		@Res() res: Response,
+		@Param('id', ParseIntPipe) id: number,
+		) {
+			const user = await this.userService.findOneBy({ id });
+			if (!user) {
+				throw new NotFoundException('User not found');
+			}
+			console.log("avatar path ", user.avatar)
+			if (!user.avatar) { return undefined; }
+			res.sendFile(user.avatar, { root: 'uploads', headers: {"Content-Disposition": user.avatar}});
+			// return of(res.sendFile(join(process.cwd(), 'uploads/' + user.avatar)));
 	}
 
 	@UseGuards(JwtGuard)
 	@Patch('edit-username')
-	//TODO validation body
-	async editUser(@GetUser() user: User, @Body() body) {
-		return await this.userService.editUsername(user, body.username);
+	async editUser(@GetUser() user: User, @Body() data: EditUsernameDto) {
+		return await this.userService.editUsername(user, data.username);
+	}
+
+	@UseGuards(JwtGuard)
+	@Patch('edit-password')
+	async editPassword(@GetUser() user: User, @Body() data: EditPasswordDto) {
+		return await this.userService.editPassword(user, data);
 	}
 
 	@UseGuards(JwtGuard)
@@ -80,7 +95,7 @@ export class UserController {
 		return this.userService.getUsers();
 	}
 
-	// test
+	// test TODO del?
  	// @UseGuards(JwtGuard)
 	@Get(':id')
 	async getUserById(@Param('id', ParseIntPipe) id: number) {

@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import ProfilPic from "../../../Images-Icons/pp.jpg"
 import { MatchResult } from "../../../Types/User-Types";
 import { UserInterface } from "../../../Types/User-Types";
+import ExternalImage from "../../External-Image";
 
 function MatchHistoryItem(props: {match: MatchResult}) {
     const {match} = props;
@@ -13,7 +14,7 @@ function MatchHistoryItem(props: {match: MatchResult}) {
                 <Link to={`/profile/${match.blue_team_player1.username}`}>
                     { match.blue_team_player1.username }
                 </Link>
-                <img className='avatar-player' src={ProfilPic} alt="profil pic" />
+                <ExternalImage src={match.blue_team_player1.avatar} alt="User Avatar" className="avatar-player" userId={match.blue_team_player1.id} />
             </div>
             <p className="history-score">
                 <span className={`${match.blue_team_goals > match.red_team_goals ? "higher-score" : ""}`}> {match.blue_team_goals} </span>
@@ -21,7 +22,7 @@ function MatchHistoryItem(props: {match: MatchResult}) {
                 <span className={`${match.red_team_goals > match.blue_team_goals ? "higher-score" : ""}`}> {match.red_team_goals} </span>
             </p>
             <div className="player-container">
-                <img className='avatar-player' src={ProfilPic} alt="profil pic" />
+            <ExternalImage src={match.red_team_player1.avatar} alt="User Avatar" className="avatar-player" userId={match.red_team_player1.id} />
                 <Link to={`/profile/${match.red_team_player1.username}`}>
                     { match.red_team_player1.username }
                 </Link>

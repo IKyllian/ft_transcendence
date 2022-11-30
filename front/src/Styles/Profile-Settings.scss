@@ -74,7 +74,7 @@
                         }
 
                         &:last-child {
-                            color: #87beff;
+                            color: $LightBlueButton;
                             border: 1px solid $BlueDarkPalette;
                         }
 
@@ -85,7 +85,7 @@
                             }
     
                             &:last-child {
-                                background-color: #87beff;
+                                background-color: $LightBlueButton;
                             }
                         }
                     }
@@ -118,15 +118,15 @@
             all: unset;
             cursor: pointer;
             font-size: 14px;
-            border: 1px solid #87beff;
-            color: #87beff;
+            border: 1px solid $LightBlueButton;
+            color: $LightBlueButton;
             padding: 10px;
             border-radius: 3px;
             font-weight: bold;
             margin-top: 5px;
 
             &:hover {
-                background-color: #87beff;
+                background-color: $LightBlueButton;
                 color: #0D1B2A;
             }
         }
@@ -152,7 +152,7 @@
                     cursor: text;
                 }
 
-                .lock-input-wrapper {
+                .label-input-wrapper {
                     @include flex-row-alignCenter();
                     gap: 5px;
 

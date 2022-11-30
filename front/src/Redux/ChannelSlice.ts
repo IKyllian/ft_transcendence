@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { Channel, ChannelUser, UserTimeout, ChatMessage } from '../Types/Chat-Types';
+import { Channel, ChannelUser, UserTimeout, ChatMessage, ChannelModes } from '../Types/Chat-Types';
 import { UserStatus } from '../Types/User-Types';
 
 interface ChannelState {
@@ -28,6 +28,10 @@ export const channelSlice = createSlice({
                 state.loggedUserIsOwner = true;
             state.channelDatas =  payload.channel;
             state.loading = false;
+        },
+        changeChannelSettings:  (state, {payload}: PayloadAction<{chanName: string, option: ChannelModes}>) => {
+            if (state.channelDatas)
+                state.channelDatas = {...state.channelDatas, name: payload.chanName, option: payload.option};  
         },
         addChannelUser: (state, {payload}: PayloadAction<ChannelUser>) => {
             if (state.channelDatas)
@@ -96,6 +100,7 @@ export const {
     loadingChannelDatas,
     setChannelDatas,
     addChannelUser,
+    changeChannelSettings,
     removeChannelUser,
     banChannelUser,
     muteChannelUser,

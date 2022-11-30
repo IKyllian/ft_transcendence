@@ -2,23 +2,22 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { io, Socket } from "socket.io-client";
 import { useAppDispatch, useAppSelector } from '../Redux/Hooks'
-import { baseUrl, socketUrl } from "../env";
+import { socketUrl } from "../env";
 import { NotificationInterface } from "../Types/Notification-Types";
 import { addNotification, deleteNotification } from "../Redux/NotificationSlice";
 import { addChannel, addPrivateConv, removeChannel } from "../Redux/ChatSlice";
 import { Channel, ChannelUpdateType, ChannelUser, Conversation, UserTimeout } from "../Types/Chat-Types";
 import { UserInterface } from "../Types/User-Types";
-import { addAvatar, copyFriendListArray, logoutSuccess, stopIsConnectedLoading } from "../Redux/AuthSlice";
+import { copyFriendListArray, logoutSuccess, stopIsConnectedLoading } from "../Redux/AuthSlice";
 import { GameMode, PartyInterface, PartyMessage } from "../Types/Lobby-Types";
 import { copyNotificationArray } from "../Redux/NotificationSlice";
 import { addParty, addPartyInvite, addPartyMessage, cancelQueue, changePartyGameMode, changeQueueStatus, incrementQueueTimer, leaveParty, removePartyInvite, resetQueueTimer } from "../Redux/PartySlice";
 import { fetchVerifyToken } from "../Api/Sign/Sign-Fetch";
 import { addChannelUser, banChannelUser, muteChannelUser, removeTimeoutChannelUser, removeChannelUser, setChannelDatas, updateChannelUser, unsetChannelDatas, unsetChannelId } from "../Redux/ChannelSlice";
-import { getPlayerAvatar } from "../Utils/Utils-User";
 
 export function useAppHook() {
     const [socket, setSocket] = useState<Socket | undefined>(undefined);
-    const [cache, setCache] = useState<Cache | undefined>(undefined);
+    const [cache, setCache] = useState<Cache | undefined | null>(undefined);
 	const [eventError, setEventError] = useState<string | undefined>(undefined);
     const { token, isAuthenticated, currentUser } = useAppSelector((state) => state.auth);
 	const { party, chatIsOpen, isInQueue } = useAppSelector(state => state.party);
@@ -39,19 +38,27 @@ export function useAppHook() {
 	}
 
 	const openCache = async () => {
-		const openCache = await caches.open('avatar-cache');
-		getPlayerAvatar(openCache, token).then(avatarResponse => {
-			if (avatarResponse)
-				dispatch(addAvatar(avatarResponse));
-			else
-				throw "Failed To Load Avatar";
-		})
-		setCache(openCache);
+		if ('caches' in window) {
+			caches.open('avatar-cache').then(cache => {
+				setCache(cache);
+			})
+			.catch(err => {
+				console.log(err);
+				setCache(null);
+			})
+		} else {
+			setCache(null);
+			console.log("Caches not supported");
+		}
 	}
 
 	const deleteCache = () => {
+		console.log("DELETE");
 		caches.delete('avatar-cache').then(isGone => {
 			console.log("Cache is delete", isGone);
+		})
+		.catch(err => {
+			console.log("ERR", err);
 		})
 	}
 
@@ -141,8 +148,9 @@ export function useAppHook() {
 				console.log("data connection", data);
 				dispatch(copyNotificationArray(data.notification));
 				dispatch(copyFriendListArray(data.friendList));
-				if (data.party)
+				if (data.party) {
 					dispatch(addParty(data.party));
+				}	
 			});
 
 			socket.on("PartyUpdate", (data: {party: PartyInterface, cancelQueue: boolean}) => {

@@ -9,13 +9,13 @@ export enum UserStatus {
 
 export interface ExampleUser {
     id: number,
-    username: string;
-    profilPic: string;
-    gamesPlayed: number;
-    winRate: number;
-    points: number;
-    isOnline: boolean;
-    isInGame: boolean;
+    username: string,
+    profilPic: string,
+    gamesPlayed: number,
+    winRate: number,
+    points: number,
+    isOnline: boolean,
+    isInGame: boolean,
 }
 
 export interface AuthState {
@@ -26,7 +26,8 @@ export interface AuthState {
     loadingIsConnected: boolean,
     token: string,
     setUsersame: boolean,
-    friendList: UserInterface[];
+    friendList: UserInterface[],
+    loggedUserAvatar: string | undefined,
 }
 
 export interface LoginPayload {
@@ -38,11 +39,11 @@ export interface UserInterface {
     id: number,
     username: string,
     email: string,
-    avatar: string,
+    avatar: string | null,
     status: UserStatus,
     statistic: Statistic,
     channelUser: Channel[],
-    blocked: UserInterface[];
+    blocked: UserInterface[],
     singles_elo: number;
 	doubles_elo: number;
 }

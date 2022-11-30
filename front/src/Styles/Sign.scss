@@ -28,7 +28,7 @@
         background-color: $LightDarkPalette;
         padding: 15px;
         width: 300px;
-        min-height: 380px;
+        // min-height: 380px;
         border-radius: 5px;
 
         .auth-separator {
@@ -115,6 +115,12 @@
                 border-radius: 3px;
                 height: 35px;
                 background-color: $LightBluePalette;
+            }
+
+            .forgot-password {
+                font-size: 10px;
+                margin: 0;
+                text-align: end;
             }
         }
         .btn-switch-form {

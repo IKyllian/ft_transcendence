@@ -69,10 +69,59 @@
             margin-left: 50px;
             height: 100%;
 
+            form {
+                &:first-child {
+                    margin-bottom: 15px;
+                }
+            }
+
             .radio-form {
                 display: flex;
                 flex-direction: column;
                 gap: 5px;
+
+                button, .saveInput {
+                    all: unset;
+                    cursor: pointer;
+                    font-size: 14px;
+                    border: 1px solid $LightBlueButton;
+                    color: $LightBlueButton;
+                    padding: 7px;
+                    border-radius: 3px;
+                    font-weight: bold;
+                    text-align: center;
+                    width: 40px;
+                    margin: 0;
+
+                    &:hover {
+                        background-color: $LightBlueButton;
+                        color: #0D1B2A;
+                    }
+                }
+
+                .label-input-wrapper {
+                    @include flex-row-alignCenter();
+                    gap: 5px;
+
+                    input {
+                        all: unset;
+                        width: 200px;
+                        background-color: $DarkPalette;
+                        border: 1px solid white;
+                        border-radius: 3px;
+                        padding: 7px;
+                        color: white;
+                        font-size: 13px;
+                        cursor: text;
+                    }
+                }
+
+                label {
+                    input[type="radio"] {
+                        accent-color: $LightBlueButton;
+                    }
+                }
+                
                 
                 .labelTextInput {
                     display: flex;
@@ -91,19 +140,6 @@
                             font-size: 12px;
                         }
                     }
-                }
-                .saveInput {
-                    all: unset;
-                    @include width-height(60px, 35px);
-                    text-align: center;
-                    border: none;
-                    font-size: 15px;
-                    font-weight: bold;
-                    cursor: pointer;
-                    border-radius: 10px;
-                    background-color: rgb(255, 123, 0);
-                    color: $WhitePalette;
-                    margin-top: 10px;
                 }
             }
             

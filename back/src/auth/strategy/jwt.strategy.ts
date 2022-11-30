@@ -27,6 +27,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
 				"username",
 				"avatar",
 				"email",
+				"status",
 				"two_factor_enabled"
 			],
 			relations: {

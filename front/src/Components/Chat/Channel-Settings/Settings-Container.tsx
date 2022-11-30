@@ -11,9 +11,8 @@ import { setChannelId, unsetChannelDatas, unsetChannelId } from "../../../Redux/
 
 function ChannelSettings() {
     const [sidebarItem, setSidebarItem] = useState<string>("Users");
-    const {channelDatas, loggedUserIsOwner} = useAppSelector((state) => state.channel);
-
-    const {currentChannelId} = useAppSelector((state) => state.channel);
+    const {channelDatas, loggedUserIsOwner, currentChannelId} = useAppSelector((state) => state.channel);
+    
     const params = useParams();
     const location = useLocation();
     const navigate = useNavigate();

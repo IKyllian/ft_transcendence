@@ -32,6 +32,7 @@ import { PartyService } from 'src/game/matchmaking/party/party.service';
 import { AuthenticatedSocket } from 'src/utils/types/auth-socket';
 import { ChanIdDto } from '../channel/dto/chan-id.dto';
 import { GlobalService } from 'src/utils/global/global.service';
+import { JoinChannelDto } from './dto/join-channel.dto';
 
 @UseFilters(GatewayExceptionFilter)
 @UsePipes(new ValidationPipe())
@@ -89,6 +90,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			notification: await this.notificationService.getNotifications(user),
 			party: this.partyService.partyJoined.getParty(user.id),
 		});
+		// console.log(socket)
 	}
 
 	async handleDisconnect(socket: Socket) {
@@ -108,7 +110,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			// TODO emit disconnected for front retry to reconnect ?
 	}
 
-	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('Logout')
 	async logout(@GetUser() user: User) {
 		console.log("logout")
@@ -120,24 +121,22 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	/* ---------- CHANNEL SECTION --------- */
 	/* ------------------------------------ */
 
-	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('JoinChannel')
 	async joinChannel(
 		@GetUser() user: User,
-		@MessageBody() channel: RoomDto,
-		@MessageBody() pwdDto?: ChannelPasswordDto,
+		@MessageBody() dto: JoinChannelDto,
 	) {
-		const channelUser = await this.channelService.join(user, channel.id, pwdDto);
-		this.server.to(`channel-${channel.id}`).emit('ChannelUpdate', { type: ChannelUpdateType.JOIN, data: channelUser });
+		const channelUser = await this.channelService.join(user, dto.id, dto.password);
+		this.server.to(`channel-${dto.id}`).emit('ChannelUpdate', { type: ChannelUpdateType.JOIN, data: channelUser });
 		this.server.to(`user-${user.id}`).emit('OnJoin', channelUser.channel);
 		const servMsg = await this.channelMsgService.createServer({
 			chanId: channelUser.channelId,
 			content: `Welcome ${user.username}, say hi!`,
 		});
-		this.server.to(`channel-${channel.id}`).emit('NewChannelMessage', servMsg);
+		this.server.to(`channel-${dto.id}`).emit('NewChannelMessage', servMsg);
 	}
 
-	@UseGuards(WsJwtGuard, WsInChannelGuard)
+	@UseGuards(WsInChannelGuard)
 	@SubscribeMessage('LeaveChannel')
 	async leaveChannel(
 		@GetChannelUser() chanUser: ChannelUser,
@@ -160,7 +159,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	 * @param socket
 	 * @param room = channel id
 	 */
-	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('JoinChannelRoom')
 	async joinChannelRoom(
 		@ConnectedSocket() socket: AuthenticatedSocket,
@@ -177,7 +175,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 	}
 
-	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('LeaveChannelRoom')
 	leaveChannelRoom(
 		@ConnectedSocket() socket: AuthenticatedSocket,
@@ -186,7 +183,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		console.log(socket.user.username + ' left room')
 	}
 
-	@UseGuards(WsJwtGuard, WsInChannelGuard)
+	@UseGuards(WsInChannelGuard)
 	@SubscribeMessage('ChannelMessage')
 	async sendChannelMessage(
 		@MessageBody() data: ChannelMessageDto,
@@ -198,7 +195,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			this.notificationService.sendMessageNotif(data.chanId);
 	}
 
-	@UseGuards(WsJwtGuard, WsInChannelGuard)
+	@UseGuards(WsInChannelGuard)
 	@SubscribeMessage('ChannelInvite')
 	async channelInvite(
 		@GetUser() user: User,
@@ -208,7 +205,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		this.server.to(`user-${dto.userId}`).emit('NewNotification', notif);
 	}
 
-	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('ChannelInviteResponse')
 	async respondToChannelInvite(
 		@GetUser() user: User,
@@ -222,7 +218,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		this.server.to(`user-${user.id}`).emit('DeleteNotification', dto.id);
 	}
 
-	@UseGuards(WsJwtGuard, WsInChannelGuard, ChannelPermissionGuard)
+	@UseGuards(WsInChannelGuard, ChannelPermissionGuard)
 	@SubscribeMessage('Ban')
 	async banUser(
 		@GetChannelUser() chanUser: ChannelUser,
@@ -234,7 +230,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		this.server.to(`user-${dto.userId}`).emit('OnLeave', bannedUser.channel);
 	}
 
-	@UseGuards(WsJwtGuard, WsInChannelGuard, ChannelPermissionGuard)
+	@UseGuards(WsInChannelGuard, ChannelPermissionGuard)
 	@SubscribeMessage('Unban')
 	async unbanUser(
 		@MessageBody() dto: BanUserDto,
@@ -243,7 +239,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		this.server.to(`channel-${dto.chanId}`).emit('ChannelUpdate', { type: ChannelUpdateType.UNTIMEOUT, data: bannedUser.id });
 	}
 
-	@UseGuards(WsJwtGuard, WsInChannelGuard, ChannelPermissionGuard)
+	@UseGuards(WsInChannelGuard, ChannelPermissionGuard)
 	@SubscribeMessage('Mute')
 	async muteUser(
 		@GetChannelUser() chanUser: ChannelUser,
@@ -254,7 +250,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		this.server.to(`channel-${dto.chanId}`).emit('ChannelUpdate', { type: ChannelUpdateType.MUTE, data: user });
 	}
 
-	@UseGuards(WsJwtGuard, WsInChannelGuard, ChannelPermissionGuard)
+	@UseGuards(WsInChannelGuard, ChannelPermissionGuard)
 	@SubscribeMessage('UnMute')
 	async unMuteUser(
 		@MessageBody() dto: MuteUserDto,
@@ -263,7 +259,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		this.server.to(`channel-${dto.chanId}`).emit('ChannelUpdate', { type: ChannelUpdateType.UNTIMEOUT, data: muted.id });
 	}
 
-	@UseGuards(WsJwtGuard, WsInChannelGuard, ChannelPermissionGuard)
+	@UseGuards(WsInChannelGuard, ChannelPermissionGuard)
 	@SubscribeMessage('ChangeRole')
 	async changeUserRole(
 		@GetChannelUser() chanUser: ChannelUser,
@@ -275,7 +271,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			this.server.to(`channel-${dto.chanId}`).emit('ChannelUpdate', { type: ChannelUpdateType.CHANUSER, data: info.chanUser });
 	}
 
-	@UseGuards(WsJwtGuard, WsInChannelGuard)
+	@UseGuards(WsInChannelGuard)
 	@SubscribeMessage('OnTypingChannel')
 	async onTypingChannel(
 		@GetUser() user: User,
@@ -289,7 +285,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	/* ---------- PRIVATE MESSAGE SECTION --------- */
 	/* -------------------------------------------- */
 
-	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('CreateConversation')
 	async createConversation(
 		@ConnectedSocket() socket: AuthenticatedSocket,
@@ -305,7 +300,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		this.notificationService.sendPrivateMessageNotif(socket.user.id, conv);
 	}
 
-	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('JoinConversationRoom')
 	async joinConvRoom(
 		@ConnectedSocket() socket: AuthenticatedSocket,
@@ -324,7 +318,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 	}
 
-	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('LeaveConversationRoom')
 	async leaveConvRoom(
 		@ConnectedSocket() socket: AuthenticatedSocket,
@@ -334,7 +327,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		socket.leave(`conversation-${room.id}`);
 	}
 
-	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('PrivateMessage')
 	async sendPrivateMessage(
 		@ConnectedSocket() socket: AuthenticatedSocket,
@@ -347,7 +339,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			this.notificationService.sendPrivateMessageNotif(socket.user.id, message.conversation);
 	}
 
-	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('OnTypingPrivate')
 	async onTypingPrivate(
 		@GetUser() user: User,
@@ -362,7 +353,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	/* ---------- FRIENDSHIP SECTION --------- */
 	/* --------------------------------------- */
 
-	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('FriendRequest')
 	async sendFriendRequest(
 		@ConnectedSocket() socket: AuthenticatedSocket,
@@ -377,7 +367,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		socket.to(`user-${dto.id}`).emit('NewNotification', notif);
 	}
 
-	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('FriendRequestResponse')
 	async friendRequestResponse(
 		@ConnectedSocket() socket: AuthenticatedSocket,
@@ -405,7 +394,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 	}
 
-	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('UnFriend')
 	async unFriend(
 		@GetUser() user: User,

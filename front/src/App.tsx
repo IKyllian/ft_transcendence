@@ -29,6 +29,7 @@ import CodeVerification from "./Components/Sign/Code-Verification";
 import ChatParty from "./Components/Chat-Party";
 import MatchFound from "./Components/Lobby/Match-Found";
 import ProfileSettings from "./Components/Profile/Settings/Profile-Settings";
+import SendMailPassword from "./Components/Sign/Send-Mail-Password";
 
 interface RouteProps {
 	path: string,
@@ -39,7 +40,7 @@ interface SocketContextType {
 }
 
 interface CacheContextType {
-	cache: Cache | undefined; 
+	cache: Cache | undefined | null; 
 }
 
 const routes: RouteProps[] = [
@@ -54,6 +55,18 @@ const routes: RouteProps[] = [
 		element:
 			<PublicRoute>
 				<Sign />
+			</PublicRoute>,
+	}, {
+		path: '/forgot-password',
+		element:
+			<PublicRoute>
+				<SendMailPassword />
+			</PublicRoute>,
+	}, {
+		path: '/reset-password',
+		element:
+			<PublicRoute>
+				<ResetPassword />
 			</PublicRoute>,
 	}, {
 		path: '/account-verification',

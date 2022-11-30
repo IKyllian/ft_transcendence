@@ -80,6 +80,7 @@ function Leaderboard() {
                     <table> 
                         <thead>
                             <tr>
+                                <th> Pos </th>
                                 <th> Rank </th>
                                 <th> Name </th>
                                 <th className="responsive-column"> Games Played </th>
@@ -93,12 +94,11 @@ function Leaderboard() {
                                 leaderboardState.users.map((elem, index) => (
                                     <LeaderboardItem
                                         key={elem.id}
+                                        user={elem}
                                         pos={((index + 1) + ((leaderboardState.page - 1) * 10))}
-                                        name={elem.username}
                                         gamesPlayed={getMatchPlayed(leaderboardState.mode === Modes.Singles ? elem.statistic.singles_match_won : elem.statistic.doubles_match_won, leaderboardState.mode === Modes.Singles ? elem.statistic.singles_match_lost : elem.statistic.doubles_match_lost)}
                                         winRate={leaderboardState.mode === Modes.Singles ? getSinglesWinRate(elem) : getDoublesWinRate(elem)}
                                         elo={leaderboardState.mode === Modes.Singles ? elem.singles_elo : elem.doubles_elo}
-                                        status={elem.status}
                                     />
                                 ))
                             }

@@ -48,7 +48,7 @@ function AddFriendModal() {
                         <div className="modal-player-list modal-friend-list">
                             {
                                 friendList.map((elem, index) =>                    
-                                    <UserFindItem key={index} avatar={Avatar} name={elem.username} status={elem.status}>
+                                    <UserFindItem key={index} avatar={elem.avatar} name={elem.username} status={elem.status} userId={elem.id} >
                                         <div className="icons-player-item">
                                             <IconUser />
                                             <IconMessage />

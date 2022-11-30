@@ -6,6 +6,7 @@ import DropdownContainer from "../../Utils/Dropdown-Container";
 import { Link } from "react-router-dom";
 import BlockButton from "../../Buttons/Block-Button";
 import RoleButton from "../../Buttons/Role-Button";
+import ExternalImage from "../../External-Image";
 
 export function ChannelUserItem(props: {userDatas: ChannelUser, loggedUserIsOwner: boolean}) {
     const { userDatas, loggedUserIsOwner } = props;
@@ -18,7 +19,7 @@ export function ChannelUserItem(props: {userDatas: ChannelUser, loggedUserIsOwne
     return (
         <li className="setting-user-item">
             <div className="profil-container">
-                <img className='profile-avatar' src={ProfilePic} alt="profil pic" />
+                <ExternalImage src={userDatas.user.avatar} alt="User Avatar" className='profile-avatar' userId={userDatas.user.id} />
                 <p> {userDatas.user.username } </p>
             </div>
             <div className="user-dropdown-container">

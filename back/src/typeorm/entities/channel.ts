@@ -13,7 +13,7 @@ export class Channel {
 	@Column({ unique: true })
 	name: string;
 
-	@Column({ default: channelOption.PUBLIC })
+	@Column({ type: 'enum', enum: channelOption, default: channelOption.PUBLIC })
 	option: channelOption;
 
 	@OneToMany(() => ChannelUser, (channelUser) => channelUser.channel, {

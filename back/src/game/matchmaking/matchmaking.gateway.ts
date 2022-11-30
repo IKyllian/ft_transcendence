@@ -44,7 +44,6 @@ export class MatchmakingGateway implements OnGatewayDisconnect {
 	 *
 	 */
 
-	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('PartyInvite')
 	async sendGameInvite(
 		@GetUser() user: User,
@@ -62,7 +61,6 @@ export class MatchmakingGateway implements OnGatewayDisconnect {
 		socket.to(`user-${dto.id}`).emit('NewPartyInvite', notif);
 	}
 
-	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('CreateParty')
 	createLobby(
 		@GetUser() user: User,
@@ -73,7 +71,6 @@ export class MatchmakingGateway implements OnGatewayDisconnect {
 		}
 	}
 
-	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('JoinParty')
 	async joinLobby(
 		@GetUser() user: User,
@@ -92,7 +89,6 @@ export class MatchmakingGateway implements OnGatewayDisconnect {
 		this.partyService.joinParty(user, requester.id);
 	}
 
-	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('LeaveParty')
 	leaveLobby(
 		@GetUser() user: User,
@@ -100,7 +96,6 @@ export class MatchmakingGateway implements OnGatewayDisconnect {
 		this.partyService.leaveParty(user);
 	}
 
-	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('KickParty')
 	kickFromLobby(
 		@GetUser() user: User,
@@ -109,7 +104,6 @@ export class MatchmakingGateway implements OnGatewayDisconnect {
 		this.partyService.kickFromParty(user, data.id);
 	}
 
-	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('NewPartyMessage')
 	newPartyMessage(
 		@GetUser() user: User,
@@ -125,7 +119,6 @@ export class MatchmakingGateway implements OnGatewayDisconnect {
 	 *
 	 */
 
-	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('SetReadyState')
 	setReadyState(
 		@GetUser() user: User,
@@ -135,7 +128,6 @@ export class MatchmakingGateway implements OnGatewayDisconnect {
 		this.partyService.setReadyState(user, data.isReady);
 	}
 
-	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('SetTeamSide')
 	setTeamSide(
 		@GetUser() user: User,
@@ -144,7 +136,6 @@ export class MatchmakingGateway implements OnGatewayDisconnect {
 		this.partyService.setTeamSide(user, data.team);
 	}
 
-	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('SetPlayerPos')
 	setPlayerPos(
 		@GetUser() user: User,
@@ -153,7 +144,6 @@ export class MatchmakingGateway implements OnGatewayDisconnect {
 		this.partyService.setPlayerPos(user, data.pos);
 	}
 
-	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('SetSettings')
 	setSetting(
 		@GetUser() user: User,
@@ -162,7 +152,6 @@ export class MatchmakingGateway implements OnGatewayDisconnect {
 		this.partyService.setSettings(user, settings)
 	}
 
-	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('SetGameMode')
 	setGameMode(
 		@GetUser() user: User,
@@ -177,7 +166,6 @@ export class MatchmakingGateway implements OnGatewayDisconnect {
 	 *
 	 */
 
-	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('StartQueue')
 	startQueue(
 		@GetUser() user: User,
@@ -191,7 +179,6 @@ export class MatchmakingGateway implements OnGatewayDisconnect {
 		}
 	}
 
-	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('StopQueue')
 	stopQueue(
 		@GetUser() user: User,

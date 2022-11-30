@@ -12,6 +12,7 @@ const defaultState: AuthState = {
     loadingIsConnected: true,
     token:'',
     setUsersame: false,
+    loggedUserAvatar: undefined,
 }
 
 const defaultLogout: AuthState = {...defaultState, loadingIsConnected: false};
@@ -69,6 +70,9 @@ export const authSlice = createSlice({
                 })]
             }
         },
+        setUserAvatar: (state, {payload}: PayloadAction<string>) => {
+            state.loggedUserAvatar = payload;
+        },
     }
 });
 
@@ -83,5 +87,6 @@ export const {
     replaceUserObject,
     addAvatar,
     copyFriendListArray,
-    changeFriendListUserStatus
+    changeFriendListUserStatus,
+    setUserAvatar,
 } = authSlice.actions;
