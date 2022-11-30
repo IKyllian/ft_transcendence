@@ -70,10 +70,6 @@ export class User {
 	@Column({ default: false })
 	two_factor_enabled: boolean;
 
-	@Exclude()
-	@Column({ default: false, select: false })
-	two_factor_authenticated: boolean;
-
 	@CreateDateColumn({ type: 'timestamptz' })
 	created_at: Date;
 

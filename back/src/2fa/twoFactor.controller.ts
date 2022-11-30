@@ -6,17 +6,20 @@ import { Response } from 'express';
 import { TwoFactorDto } from "./dto/2fa.dto";
 import { UserService } from "src/user/user.service";
 import { Jwt1faGuard } from "src/auth/guard/jwt1fa.guard";
+import { AuthService } from "src/auth/auth.service";
+import { JwtGuard } from "src/auth/guard/jwt.guard";
 
 @Controller('2fa')
 @UseInterceptors(ClassSerializerInterceptor)
 export class TwoFactorController {
 	constructor(
 		private readonly twoFactorService: TwoFactorService,
-		private readonly userService: UserService
+		private readonly userService: UserService,
+		private readonly authService: AuthService,
 	){}
 
 	@Post('generate')
-	@UseGuards(Jwt1faGuard)
+	@UseGuards(JwtGuard)
 	async generate(@Res() response: Response, @GetUser() user: User) {
 		const { otpUrl } = await this.twoFactorService.generateTwoFactorSecret(user);
 		
@@ -24,7 +27,7 @@ export class TwoFactorController {
 	}
 
 	@Post('enable')
-	@UseGuards(Jwt1faGuard)
+	@UseGuards(JwtGuard)
 	async enableTwoFactor(@GetUser() user: User, @Body() body: TwoFactorDto) {	
 
 		if (user.two_factor_enabled)
@@ -40,7 +43,7 @@ export class TwoFactorController {
 	}
 
 	@Post('disable')
-	@UseGuards(Jwt1faGuard)
+	@UseGuards(JwtGuard)
 	async disableTwoFactor(@GetUser() user: User, @Body() body: TwoFactorDto) {	
 
 		if (user.two_factor_enabled)
@@ -58,8 +61,6 @@ export class TwoFactorController {
 	@Post('authenticate')
 	@UseGuards(Jwt1faGuard)
 	async authenticate(@GetUser() user: User, @Body() body: TwoFactorDto) {
-		if (user.two_factor_authenticated)
-			throw new UnauthorizedException('User already authenticated');
 		if (!user.two_factor_enabled)
 			throw new UnauthorizedException('2FA is not enabled for this user');
 
@@ -68,7 +69,12 @@ export class TwoFactorController {
 		if (!isValid)
 			throw new UnauthorizedException('Invalid 2FA code');
 	
-		await this.userService.setTwoFactorAuthenticated(user, true);
-		return {success: true}
+		const tokens = await this.authService.signTokens(user.id, user.username);
+		this.authService.updateRefreshHash(user.account, tokens.refresh_token);
+		return {
+			access_token: tokens.access_token,
+			refresh_token: tokens.refresh_token,
+			user: user,
+		};
 	}
 }

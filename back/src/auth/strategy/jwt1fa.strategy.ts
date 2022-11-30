@@ -15,7 +15,7 @@ export class Jwt1faStrategy extends PassportStrategy(Strategy, 'jwt-1fa') {
 		config: ConfigService,
 		) {
 		super({
-			secretOrKey: config.get('ACCESS_SECRET'),
+			secretOrKey: config.get('ACCESS_2FA_SECRET'),
 			jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken()
 		});
 	}
@@ -24,10 +24,14 @@ export class Jwt1faStrategy extends PassportStrategy(Strategy, 'jwt-1fa') {
 		sub: number;
 		username: string;
 	}) {
-		const user = await this.userRepo.createQueryBuilder("user")
-			.leftJoinAndSelect("user.account", "account")
+		const user: User = await this.userRepo
+			.createQueryBuilder("user")
 			.where("user.id = :userId", { userId: payload.sub })
-			.getOne()
+			.leftJoinAndSelect("user.account", "account")
+			.leftJoinAndSelect("user.channelUser", "ChannelUser")
+			.leftJoinAndSelect("ChannelUser.channel", "Channel")
+			.leftJoinAndSelect("user.blocked", "Blocked")
+			.getOne();
 		if (!user) {
 			throw new NotFoundException('User not found')
 		}

@@ -21,26 +21,16 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
 		username: string;
 	}) {
 		const user = await this.userService.findOne({
-			// select: [
-			// 	"id",
-			// 	"id42",
-			// 	"username",
-			// 	"avatar",
-			// 	"email",
-			// 	"status",
-			// 	"two_factor_enabled"
-			// ],
 			relations: {
 				channelUser: true,
 				blocked: true,
 				statistic: true,
+				account: true,
 			},
 			where: {
 				id: payload.sub,
 			}
 		});
-		if (!user) return null;//TODO clean, what happen if two_factor_enabled = true ?
-		if (!user.two_factor_enabled) return user;
-		else if (user.two_factor_authenticated) return user;
+		return user;
 	}
 }

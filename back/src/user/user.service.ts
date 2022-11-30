@@ -37,18 +37,7 @@ export class UserService {
 		return this.userRepo.save(user);
 	}
 
-	findOne(options: FindOneOptions<User>, selectAll: Boolean = false): Promise<User | null> {
-		if (selectAll) {
-			options.select = [
-				'avatar',
-				'id',
-				'id42',
-				'username',
-				'status',
-				'two_factor_enabled',
-				'two_factor_authenticated'
-			];
-		}
+	findOne(options: FindOneOptions<User>): Promise<User | null> {
 		return this.userRepo.findOne(options);
 	}
 
@@ -259,13 +248,6 @@ export class UserService {
 
 	async setTwoFactorEnabled(user: User, status: boolean) {
 		user.two_factor_enabled = status;
-		if (status)
-			user.two_factor_authenticated = true;
-		this.userRepo.save(user);
-	}
-
-	async setTwoFactorAuthenticated(user: User, status: boolean) {
-		user.two_factor_authenticated = status;
 		this.userRepo.save(user);
 	}
 }

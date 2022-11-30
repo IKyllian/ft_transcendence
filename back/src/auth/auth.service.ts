@@ -102,17 +102,14 @@ export class AuthService {
 			.leftJoinAndSelect("user.channelUser", "ChannelUser")
 			.leftJoinAndSelect("ChannelUser.channel", "Channel")
 			.leftJoinAndSelect("user.account", "account")
-			// .leftJoinAndSelect("user.statistic", "Statistic")
 			.leftJoinAndSelect("user.blocked", "Blocked")
 			.getOne();
 
-		console.log('user', user)
-		if (!user || user.id42 || !user.account.hash) 
-		throw new NotFoundException('invalid credentials')
+		if (!user || user.id42 || !user.account.hash) {
+			throw new NotFoundException('invalid credentials')
+		}
 		// else if (!user.register)
 		// 	throw new UnauthorizedException("Email not validated");
-
-		this.userService.setTwoFactorAuthenticated(user, false);
 
 		const pwdMatches = await argon.verify(
 			user.account.hash,
@@ -121,11 +118,16 @@ export class AuthService {
 		if (!pwdMatches)
 			throw new UnauthorizedException('invalid credentials');
 
+		if (user.two_factor_enabled) {
+			return {
+				access_2fa_token: await this.sign2FaToken(user.id, user.username),
+			};
+		}
+
 		const tokens = await this.signTokens(user.id, user.username);
 		this.updateRefreshHash(user.account, tokens.refresh_token);
 		return {
 			access_token: tokens.access_token,
-			//TODO not sure about refresh
 			refresh_token: tokens.refresh_token,
 			user: user,
 		}
@@ -205,6 +207,13 @@ export class AuthService {
 			
 		])
 		return { access_token, refresh_token };
+	}
+
+	sign2FaToken(userId: number, username: string): Promise<string> {
+		return this.jwt.signAsync(
+				{ sub: userId, username },
+				{ expiresIn: '15m', secret: this.config.get('ACCESS_2FA_SECRET') }
+		);
 	}
 
 	async refreshTokens(userId: number, refreshToken: string) {
