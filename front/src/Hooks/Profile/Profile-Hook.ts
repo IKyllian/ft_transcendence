@@ -25,9 +25,9 @@ export function useProfileHook() {
 
     const params = useParams();
     const modalStatus = useContext(ModalContext);
-    let {currentUser, token, friendList} = useAppSelector(state => state.auth);
-    let {notifications} = useAppSelector(state => state.notification);
-    const {socket} = useContext(SocketContext);
+    let { currentUser, token, friendList } = useAppSelector(state => state.auth);
+    let { notifications } = useAppSelector(state => state.notification);
+    const { socket } = useContext(SocketContext);
 
     const handleClick = (index: number) => {
         let newArray = [...attributes];
@@ -35,7 +35,7 @@ export function useProfileHook() {
         newArray.find(elem => {
             if (elem.isActive === "true")
                 elem.isActive = "false"
-       })
+        })
         newArray[index].isActive = "true";
         setAttributes(newArray);
     }

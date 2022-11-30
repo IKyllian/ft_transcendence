@@ -1,0 +1,89 @@
+@use "./Variables.scss" as *;
+
+$successLight: #c3f4aa;
+$successDark: rgb(5, 65, 8);
+
+$errorLight: #f4aaaa;
+$errorDark: rgb(65, 5, 5);
+
+$warningLight: #f4f3aa;
+$warningDark: rgb(65, 61, 5);
+
+
+.notif-container {
+    position: absolute;
+    z-index: 30000;
+    left: 0;
+    right: 0;
+    top: 80px;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+
+    .notif-success {
+        background-color: $successLight;
+        color: $successDark;
+        .notif-content-container {
+            .icon-wrapper {
+                svg {
+                    border: 2.5px solid $successDark;
+                }
+            }
+        }
+    }
+    
+    .notif-error {
+        background-color: $errorLight;
+        color: $errorDark;
+        .notif-content-container {
+            .icon-wrapper {
+                svg {
+                    border: 2.5px solid $errorDark;
+                }
+            }
+        }
+    }
+    
+    .notif-warning {
+        background-color: $warningLight;
+        color: $warningDark;
+        .notif-content-container {
+            .icon-wrapper {
+                svg {
+                    border: 2.5px solid $warningDark;
+                }
+            }
+        }
+    }
+    
+    .notif-wrapper {
+        width: 300px;
+        border-radius: 40px;
+        padding: 7px 11px;
+    
+        .notif-content-container {
+            @include flex-row-alignCenter();
+            justify-content: space-between;
+            gap: 15px;
+            position: relative;
+            p {
+                margin: 0;
+                font-weight: bold;
+            }
+            .icon-wrapper {
+                @include width-height(30px, 30px);
+                svg {
+                    @include width-height(30px, 30px);
+                    border-radius: 50%;
+                }
+            }
+            .close-notif {
+                @include width-height(22px, 22px);
+                cursor: pointer;
+            }
+        }
+    }
+}
+

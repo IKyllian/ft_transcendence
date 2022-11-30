@@ -12,18 +12,8 @@ interface SignParameter {
     dispatch:  Dispatch<AnyAction>,
 }
 
-export function fetchSignIn({username, password, dispatch}: SignParameter) {
-    axios.post(`${baseUrl}/auth/login`, {username: username, password: password})
-    .then((response) => {
-        console.log('JWT =>', response.data);
-        const payload: LoginPayload = {
-            token: response.data.access_token,
-            user: response.data.user,
-        }
-        dispatch(loginSuccess(payload));
-    }).catch(err => {
-        dispatch(loginError("username or password incorect"));
-    })
+export async function fetchSignIn(username: string, password: string) {
+    return await axios.post(`${baseUrl}/auth/login`, {username: username, password: password});
 }
 
 export function fetchSignUp({username, email, password, dispatch}: SignParameter) {

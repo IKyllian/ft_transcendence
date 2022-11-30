@@ -1,6 +1,7 @@
 import { useContext, useState } from "react";
 import { fetchUploadAvatar } from "../../../Api/Profile/Profile-Fetch";
 import { CacheContext } from "../../../App";
+import { addAlert, AlertType } from "../../../Redux/AlertSlice";
 import { setUserAvatar } from "../../../Redux/AuthSlice";
 import { useAppDispatch, useAppSelector } from "../../../Redux/Hooks";
 import { updatePlayerAvatar } from "../../../Utils/Utils-User";
@@ -24,7 +25,8 @@ function SettingsCardAvatar() {
                 console.log("newUrl", newUrl);
                 if (newUrl)
                     dispatch(setUserAvatar(newUrl));
-            }       
+            }
+            dispatch(addAlert({message: "New Avatar Uploaded", type: AlertType.SUCCESS}));
         }
     }
     

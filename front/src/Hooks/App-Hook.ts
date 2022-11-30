@@ -14,21 +14,17 @@ import { copyNotificationArray } from "../Redux/NotificationSlice";
 import { addParty, addPartyInvite, addPartyMessage, cancelQueue, changePartyGameMode, changeQueueStatus, incrementQueueTimer, leaveParty, removePartyInvite, resetQueueTimer } from "../Redux/PartySlice";
 import { fetchVerifyToken } from "../Api/Sign/Sign-Fetch";
 import { addChannelUser, banChannelUser, muteChannelUser, removeTimeoutChannelUser, removeChannelUser, setChannelDatas, updateChannelUser, unsetChannelDatas, unsetChannelId } from "../Redux/ChannelSlice";
+import { addAlert, AlertType } from "../Redux/AlertSlice";
 
 export function useAppHook() {
     const [socket, setSocket] = useState<Socket | undefined>(undefined);
     const [cache, setCache] = useState<Cache | undefined | null>(undefined);
-	const [eventError, setEventError] = useState<string | undefined>(undefined);
-    const { token, isAuthenticated, currentUser } = useAppSelector((state) => state.auth);
+    const { token, isAuthenticated, currentUser, displayQRCode } = useAppSelector((state) => state.auth);
 	const { party, chatIsOpen, isInQueue } = useAppSelector(state => state.party);
 	const { currentChannelId } = useAppSelector((state) => state.channel);
 
 	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
-
-	const closeEventError = () => {
-		setEventError(undefined);
-	}
 
 	const connectSocket = () => {
 		const newSocket: Socket = io(`${socketUrl}`, {extraHeaders: {
@@ -195,7 +191,7 @@ export function useAppHook() {
 
 			socket.on("exception", (data) => {
 				console.log(data);
-				setEventError(data.message);
+				dispatch(addAlert({message: data.message, type: AlertType.ERROR}));
 			});
 
 			socket.on("FriendListUpdate", (data: UserInterface[]) => {
@@ -255,8 +251,7 @@ export function useAppHook() {
     return {
         socket,
 		cache,
-        eventError,
-        closeEventError,
+		displayQRCode,
 		isAuthenticated,
 		partyState: {
 			party,

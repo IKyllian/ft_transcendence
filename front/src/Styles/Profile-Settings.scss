@@ -103,7 +103,9 @@
     }
 
     .user-infos-card {
-        @include width-height(450px, 530px);
+        // @include width-height(450px, 530px);
+        width: 450px;
+        min-height: 530px;
         background-color:$DarkPalette;
         display: flex;
         flex-direction: column;
@@ -171,6 +173,14 @@
             button {
                 text-align: center;
                 padding: 8px;
+            }
+        }
+
+        .qrcode-wrapper {
+            @include flex-row-alignCenter();
+            gap: 10px;
+            img {
+                @include width-height(140px, 140px);
             }
         }
     }
