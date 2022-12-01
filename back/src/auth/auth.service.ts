@@ -54,7 +54,6 @@ export class AuthService {
 		const params = {
 			username: dto.username,
 			email: dto.email,
-			register: false,
 			account: user_account_create,
 		}
 
@@ -69,7 +68,6 @@ export class AuthService {
 			refresh_token: tokens.refresh_token,
 			user: user,
 		}
-		// return { success: true, email: params.email }
 	}
 
 	async activate(dto: ActivateDto) {
@@ -80,8 +78,6 @@ export class AuthService {
 		console.log(user_account)
 		if (!user_account)
 			throw new ForbiddenException('Validation code not found');
-
-		user_account.user.register = true;
 		await this.userRepo.save(user_account.user);
 		//TODO redirect to login page?
 		
@@ -108,8 +104,6 @@ export class AuthService {
 		if (!user || user.id42 || !user.account.hash) {
 			throw new NotFoundException('invalid credentials')
 		}
-		// else if (!user.register)
-		// 	throw new UnauthorizedException("Email not validated");
 
 		const pwdMatches = await argon.verify(
 			user.account.hash,
@@ -157,10 +151,7 @@ export class AuthService {
 		const response = await lastValueFrom(this.httpService.get(`https://api.intra.42.fr/v2/me?access_token=${token}`));
 		let user = await this.userService.findOne({
 			relations: {
-				channelUser: {
-					channel: true,
-				},
-				// statistic: true,
+				channelUser: { channel: true },
 				blocked: true,
 				account: true,
 			},
@@ -176,12 +167,17 @@ export class AuthService {
 			}
 			const account = this.accountRepo.create();
 			const params = {
-				register: true,
 				account: account,
 				id42: response.data.id,
 				email: response.data.email,
 			}
 			user = await this.userService.create(params);
+		}
+
+		if (user.two_factor_enabled) {
+			return {
+				access_2fa_token: await this.sign2FaToken(user.id, user.username),
+			};
 		}
 
 		const tokens = await this.signTokens(user.id, user.username);
@@ -191,7 +187,7 @@ export class AuthService {
 			refresh_token: tokens.refresh_token,
 			user: user,
 			usernameSet: user.username ? true : false,
-		}
+		};
 	}
 	
 	async signTokens(userId: number, username: string): Promise<{ access_token: string, refresh_token: string }> {

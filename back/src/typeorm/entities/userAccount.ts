@@ -2,7 +2,6 @@ import { Exclude } from "class-transformer";
 import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "./user";
 
-// Represents a user that registered but hasn't validated his email address yet
 @Entity()
 export class UserAccount {
 

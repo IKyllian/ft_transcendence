@@ -98,12 +98,9 @@ export class FriendshipService {
 		if (requester.id === addressee.id)
 			throw new BadRequestException("You can't request yourself");
 		const relationFound = await this.getRelation(requester, addressee);
-		if (relationFound && relationFound.status !== 'declined')
+		if (relationFound)
 			throw new BadRequestException('Already ' + relationFound.status);
-		else if (relationFound) {
-			relationFound.status = 'requested';
-			return this.friendshipRepo.save(relationFound);
-		}
+
 		const request = this.friendshipRepo.create({ requester, addressee, status: 'requested' });
 		return this.friendshipRepo.save(request);
 	}
@@ -141,6 +138,10 @@ export class FriendshipService {
 			throw new NotFoundException('Request not found');
 		}
 		friendship.status = status.response;
+		if (status.response === 'declined') {
+			await this.friendshipRepo.delete(friendship.id);
+			return friendship;
+		}
 		return this.friendshipRepo.save(friendship);
 	}
 
