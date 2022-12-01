@@ -92,7 +92,7 @@ export class NotificationService {
 	async getNotifications(user: User): Promise<Notification[]> {
 		return this.notifRepo.createQueryBuilder("notif")
 			.leftJoin("notif.requester", "requester")
-			.addSelect(["requester.id", "requester.username"])
+			.addSelect(["requester.id", "requester.username", "requester.avatar"])
 			.leftJoin("notif.channel", "channel")
 			.addSelect(["channel.id", "channel.name"])
 			.leftJoin("notif.conversation", "conv")
