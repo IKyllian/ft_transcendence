@@ -30,6 +30,7 @@ import MatchFound from "./Components/Lobby/Match-Found";
 import ProfileSettings from "./Components/Profile/Settings/Profile-Settings";
 import SendMailPassword from "./Components/Sign/Send-Mail-Password";
 import Alert from "./Components/Alert";
+import LoadingSpin from "./Components/Utils/Loading-Spin";
 
 interface RouteProps {
 	path: string,
@@ -138,9 +139,16 @@ function App() {
 		cache,
 		isAuthenticated,
 		partyState,
+		isSign,
 	} = useAppHook();
 
-  return (
+	console.log("APP RENDER");
+
+  return !isAuthenticated && isSign ? (
+	<div className="app-container">
+		<LoadingSpin />
+	</div>
+  ) : (
 	<div className="app-container">
 		<SocketContext.Provider value={{socket: socket}} >
 			<CacheContext.Provider value={{cache: cache}} >
@@ -149,7 +157,7 @@ function App() {
 					{ isAuthenticated && <AddFriendModal/> }
 					{ isAuthenticated && <ModalPartyInvite /> }
 					{ isAuthenticated && <NotifGameInvite /> }
-					{/* { isAuthenticated && <MatchFound /> } */}
+					{ isAuthenticated && <MatchFound /> }
 					{ isAuthenticated && <Header /> }
 					<main className="page-container">
 						{ isAuthenticated && partyState.party && partyState.chatIsOpen && <ChatParty />}
@@ -206,7 +214,7 @@ function App() {
 			</CacheContext.Provider>
 		</SocketContext.Provider>
     </div>
-  )
+  );
 }
 
 export default App;

@@ -14,6 +14,23 @@ export interface AlertState {
 
 const defaultState: {alerts: AlertState[]}  = {
     alerts: [],
+
+    //FOR TEST
+    // alerts: [
+    //     {
+    //         id: 0,
+    //         message: "Alert 1",
+    //         type: AlertType.SUCCESS,
+    //     }, {
+    //         id: 1,
+    //         message: "Alert 2",
+    //         type: AlertType.WARNING,
+    //     }, {
+    //         id: 2,
+    //         message: "Alert 3",
+    //         type: AlertType.ERROR,
+    //     },
+    // ],
 }
 
 const selectAlertId = (alerts: AlertState[], newId: number): number => {
@@ -27,8 +44,10 @@ export const alertSlice = createSlice({
     initialState: defaultState,
     reducers: {
         addAlert: (state, {payload}: PayloadAction<{message: string, type: AlertType}>) => {
+            if (state.alerts.length === 3)
+                state.alerts.pop();
             const alertId: number = selectAlertId(state.alerts, state.alerts.length);
-            state.alerts = [...state.alerts, {...payload, id: alertId}];
+            state.alerts = [{...payload, id: alertId}, ...state.alerts];
         },
         removeAlert: (state, { payload }: PayloadAction<number>) => {
             state.alerts = [...state.alerts.filter(elem => elem.id !== payload)];

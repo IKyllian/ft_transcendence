@@ -5,7 +5,7 @@ import { useAppDispatch, useAppSelector } from "../Redux/Hooks";
 import { PlayersGameData } from "../Components/Game/game/types/shared.types";
 import { GameModeState, GameMode, Player, GameType, TeamSide, PlayerPosition, GameSettings } from "../Types/Lobby-Types";
 import { useForm } from "react-hook-form";
-import { changeQueueStatus } from "../Redux/PartySlice";
+import { changeQueueStatus, newGameFound } from "../Redux/PartySlice";
 import { partyIsReady } from "../Utils/Utils-Party";
 import { fetchIsAlreadyInGame } from "../Api/Lobby";
 
@@ -212,7 +212,8 @@ export function useLobbyHook() {
                     socket?.on("newgame_data", (data: PlayersGameData) => {
                         console.log("new_game_data", data);
                         dispatch(changeQueueStatus(false));
-                        navigate("/game", {state: data});
+                        dispatch(newGameFound(data));
+                        // navigate("/game", {state: data});
                     });
                 } else
                     navigate("/");

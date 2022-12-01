@@ -1,5 +1,5 @@
 import { IconCheck, IconX } from "@tabler/icons";
-import { UserInterface, UsersListInterface } from "../../Types/User-Types";
+import { UserInterface } from "../../Types/User-Types";
 import { useFriendHook } from "../../Hooks/Friend-Hook";
 import { SearchBarButtonsProps } from "../../Types/Utils-Types";
 import { SearchBarFunctionality } from "../../Types/Utils-Types";
@@ -16,8 +16,6 @@ function SearchBarButtons(props: SearchBarButtonsProps) {
     } = useFriendHook();
 
     const onPartyInvite = () => {
-        console.log("TEST");
-        console.log("ID", user?.id)
         socket?.emit("PartyInvite", {
             id: user?.id,
         });

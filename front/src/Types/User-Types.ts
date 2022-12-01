@@ -21,6 +21,7 @@ export interface ExampleUser {
 export interface AuthState {
     currentUser: UserInterface | undefined,
     isAuthenticated: boolean,
+    isSign: boolean,
     error?: string,
     loading: boolean,
     loadingIsConnected: boolean,
