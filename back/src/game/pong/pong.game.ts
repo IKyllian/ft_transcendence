@@ -59,7 +59,7 @@ export class PongGame
 			else
 			{
 				//game ended
-				console.log('game has ended', this.lobby.game_id);
+		//		console.log('game has ended', this.lobby.game_id);
 				this.lobby.lobby_broadcast_data('match_winner', gamestate.result);
 				this.lobby.game_set_finished();
 				clearInterval(this.update_interval);
@@ -67,9 +67,8 @@ export class PongGame
 					console.log("disconnecting: " + socket.id)
 					socket.disconnect()
 				});
-				console.log("result", gamestate.result)
+		//		console.log("result", gamestate.result)
 
-			//	this.lobby.factory.save_replay(this.lobby.game_id, this.saved_states);
 				if (this.game_settings.is_ranked) {
 					this.lobby.factory.endGameAttribution(
 						this.lobby.lobby_data.players,
@@ -77,14 +76,15 @@ export class PongGame
 						this.lobby.game_type,
 						this.lobby.game_id,
 						gamestate.score,
-						this.saved_states
+					//	this.saved_states
 					);
 				}
 				else
 				{
 					//TODO set a specific proc for replay saved
 					setTimeout( () => {
-					this.lobby.factory.lobby_delete(this.lobby.game_id);
+						//console.log("oops");
+					 this.lobby.factory.lobby_delete(this.lobby.game_id);
 					}, 2000);
 				}
 

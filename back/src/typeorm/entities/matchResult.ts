@@ -36,9 +36,6 @@ export class MatchResult {
 	@CreateDateColumn({ type: 'timestamptz' })
 	created_at: Date;
 
-	// @Column({ type: 'jsonb'})
-	// settings: GameSettings;
-
-	@Column({ type: 'jsonb', array: true })
-	replay: GameState[];
+	// @Column({ type: 'jsonb', array: true })
+	// replay: GameState[];
 }

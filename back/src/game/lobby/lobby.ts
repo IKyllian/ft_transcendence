@@ -1,6 +1,7 @@
 import { Socket } from "socket.io";
 import { AuthenticatedSocket } from "src/utils/types/auth-socket";
 import { GameType, TeamSide, PlayerPosition, PlayerStatus, GameSettings, GameState, LobbyStatus, PlayerInput, PlayerType, RoundSetup } from "src/utils/types/game.types";
+import { setTimeout } from "timers/promises";
 import { MatchmakingLobby } from "../matchmaking/matchmakingLobby";
 import { PongGame } from "../pong/pong.game";
 import { LobbyFactory } from "./lobby.factory";
@@ -16,6 +17,8 @@ export class Lobby
 	already_started: boolean = false;
 	already_finished: boolean = false;
 
+	timeout: any;
+
 	constructor(
 		public lobby_data: MatchmakingLobby,
 		public game_id: string,
@@ -23,7 +26,31 @@ export class Lobby
 		)
 	{
 		this.game_type = lobby_data.game_settings.game_type;
+
+
+	//	this.test();
 	}
+
+	// test()
+	// {
+
+
+	// 	setTimeout( () => {
+	// 		console.log("oops");
+	// 	//this.lobby.factory.lobby_delete(this.lobby.game_id);
+	// 	}, 2000);
+
+
+	// 	setTimeout( () => {
+	// 		console.log("oops");
+	// 	//this.lobby.factory.lobby_delete(this.lobby.game_id);
+	// 	}, 2000);
+
+	// 	// setTimeout( () => {
+	// 	// 	console.log("oops");
+	// 	// //this.lobby.factory.lobby_delete(this.lobby.game_id);
+	// 	// }, 2000);
+	// }
 
 	game_set_finished()
 	{
@@ -57,6 +84,7 @@ export class Lobby
 			{
 				this.game.start();
 				this.already_started = true;
+				//cancel timeout vu que tout le monde est la
 			}
 		}
 	}

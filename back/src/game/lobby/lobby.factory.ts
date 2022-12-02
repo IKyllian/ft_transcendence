@@ -195,7 +195,8 @@ export class LobbyFactory
 					game_type: GameType,
 					game_id: string,
 					score: ScoreBoard,
-					saved_states: GameState[])
+					//saved_states: GameState[]
+					)
 	{
 		let blueTeam: User[] = [];
 		let redTeam: User[] = [];
@@ -207,7 +208,9 @@ export class LobbyFactory
 			}
 		})
 		this.gameService.eloAttribution(players, result, game_type);
-		await this.gameService.saveMatch(blueTeam, redTeam, game_type, score, saved_states, game_id);
+		await this.gameService.saveMatch(blueTeam, redTeam, game_type, score,
+			// saved_states,
+			  game_id);
 		this.lobby_delete(game_id);
 	}
 }

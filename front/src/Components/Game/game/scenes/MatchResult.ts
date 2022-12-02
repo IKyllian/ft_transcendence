@@ -1,14 +1,15 @@
 import 'phaser';
 import { EndResult, GameType, PlayerType } from '../types/shared.types';
-import AssetButton from '../../../../Assets/images/button.png';
 import { check_rank_change } from '../elo_tools';
-import AssetRankSilver from '../../../../Assets/images/silver.png';
-import AssetRankGold from '../../../../Assets/images/gold.png';
-import AssetRankPlatine from '../../../../Assets/images/platine.png';
-import AssetRankDiamond from '../../../../Assets/images/diamond.png';
-import AssetRankChampion from '../../../../Assets/images/champion.png';
-import AssetRankLegend from '../../../../Assets/images/legend.png';
+import { elo_to_rank_as_string } from '../elo_tools';
 
+import AssetButton from '../../../../Assets/images/lagicon.png';
+import AssetRankSilver from '../../../../Images-Icons/Ranks/silver.png'
+import AssetRankGold from '../../../../Images-Icons/Ranks/gold.png';
+import AssetRankPlatine from '../../../../Images-Icons/Ranks/platine.png';
+import AssetRankDiamond from '../../../../Images-Icons/Ranks/diamond.png';
+import AssetRankChampion from '../../../../Images-Icons/Ranks/champion.png';
+import AssetRankLegend from '../../../../Images-Icons/Ranks/legend.png';
 // dans user
 // @Column({ default: 1000 })
 // singles_elo: number;
@@ -23,6 +24,8 @@ export default class MatchResult extends Phaser.Scene
 	{
 		super({ key: 'MatchResult' });
 	}
+
+	test?: Phaser.GameObjects.Image;
 
 	winner: EndResult = EndResult.Undecided;
 	me: PlayerType = PlayerType.Spectator;
@@ -109,6 +112,12 @@ export default class MatchResult extends Phaser.Scene
 
 	create ()
 	{
+
+		this.test = this.add.image(130, 130, 'TeamBlue_back_avatar')
+								.setOrigin(0.5,0.5)
+								.setDisplaySize(150, 150);
+
+
 		this.me = this.game.registry.get('players_data').player_type;
 
 		this.TeamBlue_Back_name = this.game.registry.get('players_data').TeamBlue_Back.name;
