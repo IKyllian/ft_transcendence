@@ -2,20 +2,19 @@ import 'phaser';
 import { EndResult, GameType, PlayerType } from '../types/shared.types';
 import { check_rank_change } from '../elo_tools';
 import { elo_to_rank_as_string } from '../elo_tools';
+import {  await_load_base64, loadAvatar } from '../texture_loader';
 
-import AssetButton from '../../../../Assets/images/lagicon.png';
+import AssetButton from '../../../../Assets/images/button.png';
+
+import AssetRankUP from '../../../../Assets/images/green_arrow.png';
+import AssetRankDOWN from '../../../../Assets/images/red_arrow.png';
+
 import AssetRankSilver from '../../../../Images-Icons/Ranks/silver.png'
 import AssetRankGold from '../../../../Images-Icons/Ranks/gold.png';
 import AssetRankPlatine from '../../../../Images-Icons/Ranks/platine.png';
 import AssetRankDiamond from '../../../../Images-Icons/Ranks/diamond.png';
 import AssetRankChampion from '../../../../Images-Icons/Ranks/champion.png';
 import AssetRankLegend from '../../../../Images-Icons/Ranks/legend.png';
-// dans user
-// @Column({ default: 1000 })
-// singles_elo: number;
-
-// @Column({ default: 1000 })
-// doubles_elo: number;
 
 
 export default class MatchResult extends Phaser.Scene
@@ -25,16 +24,29 @@ export default class MatchResult extends Phaser.Scene
 		super({ key: 'MatchResult' });
 	}
 
-	test?: Phaser.GameObjects.Image;
-
 	winner: EndResult = EndResult.Undecided;
 	me: PlayerType = PlayerType.Spectator;
 	game_type: GameType = GameType.Singles;
 
-	TeamBlue_Back_name: string = "";
-	TeamBlue_Front_name: string = "";
-	TeamRed_Front_name: string = "";
-	TeamRed_Back_name: string = "";
+	TeamBlue_Back_avatar?: Phaser.GameObjects.Image;
+	TeamBlue_Back_rank?: Phaser.GameObjects.Image;
+	TeamBlue_Back_name?: Phaser.GameObjects.Text;
+	TeamBlue_Back_elo?: Phaser.GameObjects.Text;
+
+	TeamBlue_Front_avatar?: Phaser.GameObjects.Image;
+	TeamBlue_Front_rank?: Phaser.GameObjects.Image;
+	TeamBlue_Front_name?: Phaser.GameObjects.Text;
+	TeamBlue_Front_elo?: Phaser.GameObjects.Text;
+
+	TeamRed_Front_avatar?: Phaser.GameObjects.Image;
+	TeamRed_Front_rank?: Phaser.GameObjects.Image;
+	TeamRed_Front_name?: Phaser.GameObjects.Text;
+	TeamRed_Front_elo?: Phaser.GameObjects.Text;
+
+	TeamRed_Back_avatar?: Phaser.GameObjects.Image;
+	TeamRed_Back_rank?: Phaser.GameObjects.Image;
+	TeamRed_Back_name?: Phaser.GameObjects.Text;
+	TeamRed_Back_elo?: Phaser.GameObjects.Text;
 
 	TeamBlue_Back_oldElo: number = 0;
 	TeamBlue_Front_oldElo: number = 0;
@@ -46,83 +58,61 @@ export default class MatchResult extends Phaser.Scene
 	TeamRed_Front_newElo: number = 0;
 	TeamRed_Back_newElo: number = 0;
 
-
-	//Displayed elements
-	TeamBlue_Back_avatar?: Phaser.GameObjects.Image;
-	TeamBlue_Front_avatar?: Phaser.GameObjects.Image;
-	TeamRed_Front_avatar?: Phaser.GameObjects.Image;
-	TeamRed_Back_avatar?: Phaser.GameObjects.Image;
-
 	result_text?: Phaser.GameObjects.Text;
 	close_button?: Phaser.GameObjects.Image;
-	//replay_button?: Phaser.GameObjects.Image;
 
 	preload ()
 	{
-		this.load.image(
+		loadAvatar(
+			this.game.registry.get('players_data').TeamBlue_Back.user,
 			'TeamBlue_back_avatar',
-			this.game.registry.get('players_data').TeamBlue_Back.avatar
-			);
-		this.load.image(
+			this.registry.get('token'),
+			this.registry.get('cache'),
+			this);
+
+		loadAvatar(
+			this.game.registry.get('players_data').TeamRed_Back.user,
 			'TeamRed_back_avatar',
-			this.game.registry.get('players_data').TeamRed_Back.avatar
-			);
-		this.load.image(
-			'button',
-			AssetButton
-			);
+			this.registry.get('token'),
+			this.registry.get('cache'),
+			 this);
 
 		this.game_type = this.game.registry.get('players_data').game_settings.game_type;
 
 		if (this.game_type === GameType.Doubles)
 		{
-			this.load.image(
+			loadAvatar(
+				this.game.registry.get('players_data').TeamBlue_Front.user,
 				'TeamBlue_front_avatar',
-				this.game.registry.get('players_data').TeamBlue_Front.avatar
-				);
-			this.load.image(
-				'TeamRed_front_avatar',
-				this.game.registry.get('players_data').TeamRed_Front.avatar
-				);
-
-
+				this.registry.get('token'),
+				this.registry.get('cache'),
+				 this);
+			loadAvatar(
+				this.game.registry.get('players_data').TeamBlue_Front.user,
+				'TeamBlue_front_avatar',this.registry.get('token'),
+				this.registry.get('cache'),
+				 this);
 		}
-		this.load.image('Silver', AssetRankSilver);
-		this.load.image('Gold',AssetRankGold);
-		this.load.image('Platine',AssetRankPlatine);
-		this.load.image('Diamond',AssetRankDiamond);
-		this.load.image('Champion',AssetRankChampion);
-		this.load.image('Legend',AssetRankLegend);
 
+		await_load_base64(AssetRankSilver, "Silver", this);
+		await_load_base64(AssetRankGold, "Gold", this);
+		await_load_base64(AssetRankPlatine, "Platine", this);
+		await_load_base64(AssetRankDiamond, "Diamond", this);
+		await_load_base64(AssetRankChampion, "Champion", this);
+		await_load_base64(AssetRankLegend, "Legend", this);
 
-
-		this.load.image(
-			'rank_UP',
-			AssetButton
-			);
-
-		this.load.image(
-			'rank_DOWN',
-			AssetButton
-			);
-
-
-		this.scene.remove('Pong');
+		await_load_base64(AssetRankUP, "rank_UP", this);
+		await_load_base64(AssetRankDOWN, "rank_DOWN", this);
+//		this.scene.remove('Pong');
 	}
 
 	create ()
 	{
-
-		this.test = this.add.image(130, 130, 'TeamBlue_back_avatar')
-								.setOrigin(0.5,0.5)
-								.setDisplaySize(150, 150);
-
-
 		this.me = this.game.registry.get('players_data').player_type;
+		this.winner = this.game.registry.get('winner');
 
 		this.TeamBlue_Back_name = this.game.registry.get('players_data').TeamBlue_Back.name;
 		this.TeamRed_Back_name = this.game.registry.get('players_data').TeamRed_Back.name;
-		this.winner = this.game.registry.get('winner');
 		
 		this.TeamBlue_Back_avatar = this.add.image(130, 130, 'TeamBlue_back_avatar')
 								.setOrigin(0.5,0.5)

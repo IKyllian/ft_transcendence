@@ -1,25 +1,10 @@
 import 'phaser';
-import { Scene, Textures } from "phaser";
-import { 
-		PlayerStatus,
-		PlayerType,
-		LobbyStatus, 
-		RoundSetup,
-		EndResult,
-		GameType} from '../types/shared.types';
-import { io, Socket } from "socket.io-client";
-import { Player } from '../../../../Types/Lobby-Types'
-
-// import { CacheContext } from '../../../../App';
-// import { useContext } from 'react';
-// import { useAppSelector } from '../../../../Redux/Hooks';
-
+import {PlayerType, RoundSetup, EndResult, GameType } from '../types/shared.types';
 import ClientSocketManager from '../client.socket.manager';
 import {  await_load_base64, loadAvatar } from '../texture_loader';
-import { getPlayerAvatar } from '../../../../Utils/Utils-User';
-//import AssetButton from '../../../../Assets/images/button.png';
+
 import { elo_to_rank_as_string } from '../elo_tools';
-// import AssetRankSilver from '../../../../Images-Icons/Ranks/silver.png'
+
 import AssetRankSilver from '../../../../Images-Icons/Ranks/silver.png'
 import AssetRankGold from '../../../../Images-Icons/Ranks/gold.png';
 import AssetRankPlatine from '../../../../Images-Icons/Ranks/platine.png';
@@ -27,46 +12,8 @@ import AssetRankDiamond from '../../../../Images-Icons/Ranks/diamond.png';
 import AssetRankChampion from '../../../../Images-Icons/Ranks/champion.png';
 import AssetRankLegend from '../../../../Images-Icons/Ranks/legend.png';
 
-import AssetDefaultAvatar from '../../../../Images-Icons/pp.jpg'
 import AssetButton from '../../../../Assets/images/button.png';
-//import AssetButtonTEST from '../../../../Assets/images/lagicon.png';
 
-
-// const loadBase64Image = (props: {
-// 	data: any;
-// 	key: string;
-// 	scene: Scene;
-//   }) => {
-// 	return new Promise<void>((resolve) => {
-// 	  props.scene.textures.once(Textures.Events.ADD, () => {
-// 		resolve();
-// 	  });
-// 	  props.scene.textures.addBase64(props.key, props.data);
-// 	});
-//   };
-
-// const loadBase64Image = (props: {
-// 	data: any;
-// 	key: string;
-// 	scene: Scene;
-//   }) => {
-// 	return new Promise<void>((resolve) => {
-// 	  props.scene.textures.once(Textures.Events.ADD, () => {
-// 		resolve();
-// 	  });
-// 	  props.scene.textures.addBase64(props.key, props.data);
-// 	});
-//   };
-  
-//   export async function await_load_base64 (data: string, key: string, scene: Scene)
-//   {
-// 	  await loadBase64Image({
-// 		  data: data,
-// 		  key: key,
-// 		  scene: scene,
-// 		  }); 
-//   }
-  
 
 export default class Lobby extends Phaser.Scene
 {
@@ -75,14 +22,7 @@ export default class Lobby extends Phaser.Scene
 		super({ key: 'Lobby' });
 	}
 
-	test?: Phaser.GameObjects.Image;
-	//testB?: Phaser.GameObjects.Image;
-	//const {cache} = useContext(CacheContext);
 	socketmanager?: ClientSocketManager;
-//	token = useAppSelector(state => state.auth);
-	//user_cache = useContext(CacheContext);
-
-	//token?: string;
 
 	TeamBlue_Back_avatar?: Phaser.GameObjects.Image;
 	TeamBlue_Back_rank?: Phaser.GameObjects.Image;
@@ -115,30 +55,22 @@ export default class Lobby extends Phaser.Scene
 
 	preload ()
 	{
-		console.log("avatarBLUE:", this.game.registry.get('players_data').TeamBlue_Back.user.avatar);
-		console.log("avatarRED:", this.game.registry.get('players_data').TeamRed_Back.user.avatar);
 
-
-
-console.log('######################################');
 		loadAvatar(
 			this.game.registry.get('players_data').TeamBlue_Back.user,
 			'TeamBlue_back_avatar',
 			this.registry.get('token'),
 			this.registry.get('cache'),
 			this);
-console.log('######################################');
+
 		loadAvatar(
 			this.game.registry.get('players_data').TeamRed_Back.user,
 			'TeamRed_back_avatar',
 			this.registry.get('token'),
 			this.registry.get('cache'),
 			 this);
-console.log('######################################');
 
-
-
-this.game_type = this.game.registry.get('players_data').game_settings.game_type;
+		this.game_type = this.game.registry.get('players_data').game_settings.game_type;
 
 		if (this.game_type === GameType.Doubles)
 		{
@@ -155,15 +87,6 @@ this.game_type = this.game.registry.get('players_data').game_settings.game_type;
 				 this);
 		}
 
-
-		// await_load_base64(AssetDefaultAvatar, 'TeamBlue_back_avatar', this);
-		// await_load_base64(AssetDefaultAvatar, 'TeamRed_back_avatar', this);
-		// await_load_base64(AssetRankSilver, 'TeamBlue_back_avatar', this);
-		// await_load_base64(AssetRankSilver, "TeamRed_back_avatar", this);
-		
-
-	//	await_load_base64(AssetDefaultAvatar, "Default", this);
-
 		await_load_base64(AssetRankSilver, "Silver", this);
 		await_load_base64(AssetRankGold, "Gold", this);
 		await_load_base64(AssetRankPlatine, "Platine", this);
@@ -175,29 +98,8 @@ this.game_type = this.game.registry.get('players_data').game_settings.game_type;
 		this.load.image('button', AssetButton);
 	}
 
-
-	// create()
-	// {
-	// 	this.test = this.add.image(300, 300, "TeamBlue_back_avatar")
-	// 				.setOrigin(0.5,0.5)
-	// 				.setDisplaySize(150, 150);
-	// }
-
 	create ()
 	{
-
-
-
-		
-
-		// this.test = this.add.image(300, 300, "Silver")
-		// 			.setOrigin(0.5,0.5)
-		// 			.setDisplaySize(150, 150);
-
-		// this.testB = this.add.image(130, 130, 'buttonTEST')
-		// .setOrigin(0.5,0.5)
-		// .setDisplaySize(150, 150);
-
 		this.me = this.game.registry.get('players_data').player_type;
 		this.socketmanager = new ClientSocketManager(this.game.registry.get('socket'));
 		this.game.registry.set('socketmanager', this.socketmanager);

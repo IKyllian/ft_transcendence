@@ -17,6 +17,8 @@ export function elo_to_rank_as_string (elo: number) :string
 		return 'Silver'
 }
 
+
+
 // export function check_rank_change (oldElo: number, newElo: number): RankChange
 // {
 // 	if (elo_to_rank_as_string(oldElo) === elo_to_rank_as_string(newElo))
