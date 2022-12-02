@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { useLocation, useNavigate } from "react-router-dom";
 import { baseUrl } from "../../env";
@@ -8,11 +8,12 @@ import { useAppDispatch, useAppSelector } from "../../Redux/Hooks";
 import { LoginPayload } from "../../Types/User-Types";
 
 function CodeVerification() {
-    const {register, handleSubmit, setError, formState: {errors}} = useForm<{code: string}>();
+    const {register, handleSubmit, setError, formState: {errors}, watch} = useForm<{code: string}>();
     const { verification2FA } = useAppSelector(state => state.auth);
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
     const location = useLocation();
+    const codeWatch = watch("code");
 
     useEffect(() => {
         if (!location.state || !verification2FA)
@@ -22,28 +23,50 @@ function CodeVerification() {
             dispatch(leave2fa());
         }
     }, []);
+
+    useEffect(() => {
+        if (codeWatch && codeWatch.length === 6) {
+            axios.post(`${baseUrl}/2fa/authenticate`, {code: codeWatch}, {
+                headers: {
+                    "Authorization": `Bearer ${locationState.access_2fa_token}`,
+                }
+            })
+            .then(response => {
+                console.log("Response Authenticate", response);
+                const payload: LoginPayload = {
+                    token: response.data.access_token,
+                    user: response.data.user,
+                }
+                dispatch(loginSuccess(payload));
+            })
+            .catch(err => {
+                console.log("ERR Authenticate", err);
+                setError("code", {message: "Code Incorrect"});
+            });
+        }
+    }, [codeWatch])
     
     const locationState = location.state as {access_2fa_token: string};
     
     const codeSubmmit = handleSubmit((data, e) => {
         e?.preventDefault();
-        axios.post(`${baseUrl}/2fa/authenticate`, {code: data.code}, {
-            headers: {
-                "Authorization": `Bearer ${locationState.access_2fa_token}`,
-            }
-        })
-        .then(response => {
-            console.log("Response Authenticate", response);
-            const payload: LoginPayload = {
-                token: response.data.access_token,
-                user: response.data.user,
-            }
-            dispatch(loginSuccess(payload));
-        })
-        .catch(err => {
-            console.log("ERR Authenticate", err);
-            setError("code", {message: "Code Incorrect"});
-        });
+        // axios.post(`${baseUrl}/2fa/authenticate`, {code: data.code}, {
+        //     headers: {
+        //         "Authorization": `Bearer ${locationState.access_2fa_token}`,
+        //     }
+        // })
+        // .then(response => {
+        //     console.log("Response Authenticate", response);
+        //     const payload: LoginPayload = {
+        //         token: response.data.access_token,
+        //         user: response.data.user,
+        //     }
+        //     dispatch(loginSuccess(payload));
+        // })
+        // .catch(err => {
+        //     console.log("ERR Authenticate", err);
+        //     setError("code", {message: "Code Incorrect"});
+        // });
     })
 
     return (
@@ -58,8 +81,10 @@ function CodeVerification() {
                     <input
                         className="code-input"
                         type="text"
+                        maxLength={6}
                         {...register("code", {
-                            required: "Code is required"
+                            required: "Code is required",
+                            minLength: {value: 6, message: "Code should have a length of 6"}
                         })}
                     />
                     <button> Valider </button>

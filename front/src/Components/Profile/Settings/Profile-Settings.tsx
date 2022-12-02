@@ -7,8 +7,10 @@ function ProfileSettings() {
     
     return (
         <div className="profile-settings-container">
-            <SettingsCardAvatar />
-            <SettingsCardInfos currentUser={currentUser!} />
+            <div className="settings-wrapper">
+                <SettingsCardAvatar />
+                <SettingsCardInfos currentUser={currentUser!} />
+            </div>
         </div>
     );
 }

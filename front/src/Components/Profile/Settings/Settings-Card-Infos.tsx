@@ -226,8 +226,8 @@ function QRCodeValidation(props: {qrcode: string, token: string, setDisplayQRCod
         <div className="qrcode-wrapper">
             <img src={qrcode} alt="QR Code" />
             <form onSubmit={codeSubmit}>
-            <label>
-                    Enter Your Code
+            <label className="label-qrcode">
+                    Scan your QRCode on the Google Auth App and enter your code
                     { errors && errors.code && <p className='txt-form-error'> {errors.code.message} </p> }
                     <input
                         type="text"

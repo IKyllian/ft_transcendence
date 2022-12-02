@@ -7,6 +7,7 @@ const defaultState: AuthState = {
     currentUser: undefined,
     friendList: [],
     isAuthenticated: false,
+    isSign: false,
     error: undefined,
     loading: false,
     loadingIsConnected: true,
@@ -26,11 +27,14 @@ export const authSlice = createSlice({
         loginPending: (state) => {
             state.loading = true;
         },
+        userFullAuthenticated: (state) => {
+            state.isAuthenticated = true;
+        },
         loginSuccess: (state, {payload}: PayloadAction<LoginPayload>) => {
 			console.log("payload", payload);
             state.currentUser = payload.user;
             state.token = payload.token;
-            state.isAuthenticated = true;
+            state.isSign = true;
             state.loading = false;
             state.loadingIsConnected = false,
             console.log("state", state);
@@ -94,6 +98,7 @@ export const authSlice = createSlice({
 
 export const {
     loginPending,
+    userFullAuthenticated,
     loginSuccess,
     loginError,
     setUsername,

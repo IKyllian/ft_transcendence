@@ -2,8 +2,7 @@ import { Dispatch, AnyAction } from "@reduxjs/toolkit";
 import axios from "axios";
 import { baseUrl } from "../../env";
 import { LoginPayload } from "../../Types/User-Types";
-import { loginSuccess, loginError, setUsername, stopIsConnectedLoading } from "../../Redux/AuthSlice";
-import { NavigateFunction } from "react-router-dom";
+import { loginSuccess, loginError, stopIsConnectedLoading } from "../../Redux/AuthSlice";
 
 interface SignParameter {
     readonly username: string,
@@ -30,25 +29,8 @@ export function fetchSignUp({username, email, password, dispatch}: SignParameter
     })
 }
 
-export function fetchLogin42(authorizationCode: string, dispatch: Dispatch<AnyAction>, navigate: NavigateFunction) {
-    axios.post(`${baseUrl}/auth/login42`, { authorizationCode })
-    .then((response) => {
-        console.log('JWT =>', response.data);
-        if (response.data.usernameSet) {
-            const payload: LoginPayload = {
-                token: response.data.access_token,
-                user: response.data.user,
-            }
-            dispatch(loginSuccess(payload));
-        } else {
-            dispatch(setUsername());
-            navigate("/set-username", {state:{token: response.data.access_token}});
-        }
-    })
-    .catch(err => {
-        console.log(err);
-        dispatch(loginError("Error while login with 42"));
-    });
+export async function fetchLogin42(authorizationCode: string) {
+    return await axios.post(`${baseUrl}/auth/login42`, { authorizationCode });
 }
 
 export function fetchSetUsername(username: string, token: string, dispatch: Dispatch<AnyAction>) {
@@ -59,11 +41,10 @@ export function fetchSetUsername(username: string, token: string, dispatch: Disp
     })
     .then((response) => {
         const payload: LoginPayload = {
-            user: response.data.user,
-            token: response.data.access_token,
+            user: response.data,
+            token: token,
         }
 		console.log("response,", response);
-		console.log("response.data.access_token,", response.data.access_token);
         dispatch(loginSuccess(payload));
     })
     .catch(err => {
@@ -87,14 +68,3 @@ export function fetchVerifyToken(token: string, dispatch: Dispatch<AnyAction>) {
         dispatch(stopIsConnectedLoading());
     })
 }
-
-// export function fetchLogout(token: string) {
-//     axios.post(`${baseUrl}/auth/logout`, {}, {
-//         headers: {
-//             "Authorization": `Bearer ${token}`,
-//         }
-//     })
-//     .catch((err) => {
-//         console.log(err);
-//     })
-// }

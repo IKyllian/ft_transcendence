@@ -25,7 +25,7 @@ function ExternalImage(props: {src: string | null, alt: string, className: strin
                         setAvatarUrl(loggedUserAvatar);
                     else {
                         let result: string | undefined =  await getPlayerAvatar(cache, token, userId, src);
-                        if (result) {     
+                        if (result) {
                             if (currentUser?.id === userId && loggedUserAvatar == undefined)
                                 dispatch(setUserAvatar(result));
                             setAvatarUrl(result);

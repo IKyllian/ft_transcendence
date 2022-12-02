@@ -3,185 +3,211 @@
 .profile-settings-container {
     @include page-wrapper();
     background-color: $LightDarkPalette;
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    padding-top: 100px;
-    gap: 10px;
-
-    .avatar-card {
-        @include width-height(350px, 350px);
-        background-color: $DarkPalette;
-
-        padding: 5px;
-        border-radius: 5px;
+    .settings-wrapper {
+        @include width-height(100%, 100%);
+        background-color: $LightDarkPalette;
         display: flex;
-        flex-direction: column;
+        flex-direction: row;
+        justify-content: center;
         align-items: center;
-        justify-content: space-around;
-
-        .card-username {
-            font-size: 20px;
-            margin: 0;
-            font-weight: bold;
-        }
-
-        .avatar-form-container {
+        gap: 10px;
+        .avatar-card {
+            @include width-height(350px, 350px);
+            background-color: $DarkPalette;
+            padding: 5px;
+            border-radius: 5px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 10px;
-            img {
-                @include avatar-player(150px);
+            justify-content: space-around;
+    
+            .card-username {
+                font-size: 20px;
+                margin: 0;
+                font-weight: bold;
             }
-
-            form {
+    
+            .avatar-form-container {
                 display: flex;
                 flex-direction: column;
                 align-items: center;
                 gap: 10px;
-
-                label {
-                    cursor: pointer;
-                    background-color: $BlueDarkPalette;
-                    padding: 7px;
-                    border-radius: 3px;
-                    font-size: 13px;
-                    font-weight: bold;
-                    input {
-                        display: none;
-                    }
-                }    
-                
-                .buttons-container {
-                    @include flex-row-alignCenter();
-                    justify-content: center;
-                    gap: 5px;
-                    width: 100%;
-                    text-align: center;
-
-                    button {
-                        all: unset;
+                img {
+                    @include avatar-player(150px);
+                }
+    
+                form {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    gap: 10px;
+    
+                    label {
                         cursor: pointer;
-                        @include width-height(45%, 30px);
                         font-size: 13px;
-                        border-radius: 4px;
                         font-weight: bold;
+                        @include flex-row-alignCenter();
+                        gap: 10px;
+                        border-radius: 5px;
+                        padding: 8px 18px;
 
-                        &:first-child {
-                            color: rgb(181, 4, 4);
-                            border: 0.8px solid rgb(181, 4, 4);
-                        }
+                        background-color: $LightBlueButton;
+                        color: #0D1B2A;
+                        border: 1px solid;
 
-                        &:last-child {
-                            color: $LightBlueButton;
-                            border: 1px solid $BlueDarkPalette;
-                        }
+                        // border: 1px solid $LightBlueButton;
+                        // color: $LightBlueButton;
 
                         &:hover {
-                            color: #0D1B2A;
+                            // background-color: $LightBlueButton;
+                            // color: #0D1B2A;
+
+                            border: 1px solid $LightBlueButton;
+                            color: $LightBlueButton;
+                            background-color: $DarkPalette;
+                        }
+                        svg {
+                            @include width-height(20px, 20px);
+                        }
+                        input {
+                            display: none;
+                        }
+                    }    
+                    
+                    .buttons-container {
+                        @include flex-row-alignCenter();
+                        justify-content: center;
+                        gap: 5px;
+                        width: 100%;
+                        text-align: center;
+    
+                        button {
+                            all: unset;
+                            cursor: pointer;
+                            @include width-height(45%, 30px);
+                            font-size: 13px;
+                            border-radius: 4px;
+                            font-weight: bold;
+    
                             &:first-child {
-                                background-color: rgb(181, 4, 4);
+                                color: rgb(181, 4, 4);
+                                border: 0.8px solid rgb(181, 4, 4);
                             }
     
                             &:last-child {
-                                background-color: $LightBlueButton;
+                                color: $LightBlueButton;
+                                border: 1px solid $BlueDarkPalette;
+                            }
+    
+                            &:hover {
+                                color: #0D1B2A;
+                                &:first-child {
+                                    background-color: rgb(181, 4, 4);
+                                }
+        
+                                &:last-child {
+                                    background-color: $LightBlueButton;
+                                }
                             }
                         }
                     }
                 }
             }
+            
+            .member-txt {
+                font-size: 13px;
+                span {
+                    font-weight: bolder;
+                    font-size: 12px;
+                }
+            }      
         }
-        
-        .member-txt {
-            font-size: 13px;
-            span {
-                font-weight: bolder;
-                font-size: 12px;
-            }
-        }      
-    }
-
-    .user-infos-card {
-        // @include width-height(450px, 530px);
-        width: 450px;
-        min-height: 530px;
-        background-color:$DarkPalette;
-        display: flex;
-        flex-direction: column;
-        gap: 30px;
-        padding: 15px;
-
-        h3 {
-            margin: 0;
-        }
-
-        button {
-            all: unset;
-            cursor: pointer;
-            font-size: 14px;
-            border: 1px solid $LightBlueButton;
-            color: $LightBlueButton;
-            padding: 10px;
-            border-radius: 3px;
-            font-weight: bold;
-            margin-top: 5px;
-
-            &:hover {
-                background-color: $LightBlueButton;
-                color: #0D1B2A;
-            }
-        }
-
-        form {
+    
+        .user-infos-card {
+            width: 450px;
+            min-height: 530px;
+            background-color:$DarkPalette;
             display: flex;
             flex-direction: column;
-            gap: 15px;
-            label {
+            gap: 30px;
+            padding: 15px;
+            border-radius: 5px;
+    
+            h3 {
+                margin: 0;
+            }
+    
+            button {
+                all: unset;
+                cursor: pointer;
+                font-size: 14px;
+                border: 1px solid $LightBlueButton;
+                color: $LightBlueButton;
+                padding: 10px;
+                border-radius: 3px;
+                font-weight: bold;
+                margin-top: 5px;
+    
+                &:hover {
+                    background-color: $LightBlueButton;
+                    color: #0D1B2A;
+                }
+            }
+    
+            form {
                 display: flex;
                 flex-direction: column;
-                gap: 5px;
-
-                input {
-                    all: unset;
-                    width: 200px;
-                    background-color: $DarkPalette;
-                    border: 1px solid white;
-                    border-radius: 3px;
-                    padding: 7px;
-                    color: white;
-                    font-size: 13px;
-                    cursor: text;
-                }
-
-                .label-input-wrapper {
-                    @include flex-row-alignCenter();
+                gap: 15px;
+                label {
+                    display: flex;
+                    flex-direction: column;
                     gap: 5px;
-
-                    .lock-input {
-                        cursor: not-allowed;
-                    }
-
-                    .username-save {
-                        width: 40px;
-                        margin: 0;
+    
+                    input {
+                        all: unset;
+                        width: 200px;
+                        background-color: $DarkPalette;
+                        border: 1px solid white;
+                        border-radius: 3px;
                         padding: 7px;
+                        color: white;
+                        font-size: 13px;
+                        cursor: text;
+                    }
+    
+                    .label-input-wrapper {
+                        @include flex-row-alignCenter();
+                        gap: 5px;
+    
+                        .lock-input {
+                            cursor: not-allowed;
+                        }
+    
+                        .username-save {
+                            width: 40px;
+                            margin: 0;
+                            padding: 7px;
+                        }
                     }
                 }
-            }
 
-            button {
-                text-align: center;
-                padding: 8px;
+                .label-qrcode {
+                    font-size: 13px;
+                }
+    
+                button {
+                    text-align: center;
+                    padding: 8px;
+                }
+            }
+    
+            .qrcode-wrapper {
+                @include flex-row-alignCenter();
+                gap: 10px;
+                img {
+                    @include width-height(140px, 140px);
+                }
             }
         }
-
-        .qrcode-wrapper {
-            @include flex-row-alignCenter();
-            gap: 10px;
-            img {
-                @include width-height(140px, 140px);
-            }
-        }
-    }
+    }    
 }
