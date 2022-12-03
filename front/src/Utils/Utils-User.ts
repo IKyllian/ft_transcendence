@@ -35,6 +35,8 @@ export async function getPlayerAvatar(cache: Cache | null, token: string, userId
                 return cacheResponse;
             } else {
                 return await fetchResponseAvatar(req).then(fetchResponse => {
+                    // console.log("fetchResponse", fetchResponse);
+                    console.log('Response Headers:', fetchResponse.headers);
                     if (!fetchResponse.ok)
                         return undefined;
                     headerFileName = fetchResponse.headers.get("Content-Disposition");
@@ -66,7 +68,6 @@ export async function getPlayerAvatar(cache: Cache | null, token: string, userId
 
 export async function updatePlayerAvatar(cache: Cache | null, token: string, userId: number): Promise<string | undefined> {
     const req = new Request(`${baseUrl}/users/${userId}/avatar`, {method: 'GET', headers: {"Authorization": `Bearer ${token}`}});
-    console.log("req", req);
     let avatarResponse: Response | undefined;
     if (cache !== null) {
         cache.delete(req);

@@ -76,6 +76,7 @@ export class UserController {
 			}
 			console.log("avatar path ", user.avatar)
 			if (!user.avatar) { return undefined; }
+			// res.set('Content-Disposition', `attachment; filename=${user.avatar}`)
 			res.sendFile(user.avatar, { root: 'uploads', headers: {"Content-Disposition": user.avatar}});
 			// return of(res.sendFile(join(process.cwd(), 'uploads/' + user.avatar)));
 	}
