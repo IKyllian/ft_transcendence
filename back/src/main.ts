@@ -12,7 +12,9 @@ import { channelOption } from './utils/types/types';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.setGlobalPrefix('api');
-  app.enableCors();
+  app.enableCors({
+    exposedHeaders: 'Content-Disposition'
+  });
   app.useGlobalPipes(new ValidationPipe());
   await app.listen(5000);
 

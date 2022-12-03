@@ -65,9 +65,8 @@ export function useProfileHook() {
     }, [params.username])
 
     useEffect(() => {
-        console.log("FRIEND LIST ", friendList);
         if (params.username === currentUser?.username) {
-            setUserState((prev: any) => { return {...prev, friendList: friendList}});
+            setUserState((prev: ProfileState | undefined) => { return prev ? {...prev, friendList: friendList} : prev});
         }
     }, [friendList])
 
@@ -77,7 +76,7 @@ export function useProfileHook() {
                 return prev && data.id === prev.user.id ? {
                     ...prev,
                     relationStatus: data.relation
-                } : undefined});
+                } : prev});
         });
 
         socket?.on("StatusUpdate", (data: {id: number, status: UserStatus}) => {
