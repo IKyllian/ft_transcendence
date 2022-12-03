@@ -1,4 +1,4 @@
-import { Body, ClassSerializerInterceptor, Controller, Delete, FileTypeValidator, ForbiddenException, Get, HttpStatus, MaxFileSizeValidator, NotFoundException, Param, ParseFilePipe, ParseFilePipeBuilder, ParseIntPipe, Patch, Post, Req, Request, Res, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
+import { BadRequestException, Body, ClassSerializerInterceptor, Controller, Delete, FileTypeValidator, ForbiddenException, Get, HttpStatus, MaxFileSizeValidator, NotFoundException, Param, ParseFilePipe, ParseFilePipeBuilder, ParseIntPipe, Patch, Post, Req, Request, Res, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { NotFoundError, Observable, of } from "rxjs";
 import { JwtGuard } from "src/auth/guard/jwt.guard";
@@ -26,7 +26,7 @@ export const avatarStorage = {
 		},
 	}),
 	fileFilter: (_req, file, cb) => {
-		if (file.mimetype.match(/\/(jpg|jpeg|png)$/)) {
+		if (file.mimetype.match(/\/(jpg|jpeg|png|gif)$/)) {
 			cb(null, true);
 		} else {
 			cb(null, false)
@@ -55,8 +55,11 @@ export class UserController {
 	uploadFile(@UploadedFile() file: Express.Multer.File, @GetUser() user: User, @Req() req: any) : Observable<Object> {
 		// TODO use file-type to check magic number?
 		console.log(req.file);
+		if (!file) {
+			throw new BadRequestException("file does not match valid extention");
+		}
 
-		if (!file) return of ({error: 'file does not match valid extention'})
+		// if (!file) return of ({error: 'file does not match valid extention'})
 		this.userService.updateAvatar(user, file.filename);
 		return of({imagePath: file.path})
 	}
