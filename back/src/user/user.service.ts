@@ -146,6 +146,7 @@ export class UserService {
 	}
 
 	async updateForgotCode(user: User, code: string) {
+		console.log(user)
 		this.accountRepo.createQueryBuilder()
 		.update()
 		.where("userId = :userId", { userId: user.id })
@@ -163,7 +164,8 @@ export class UserService {
 		this.accountRepo.createQueryBuilder()
 		.update()
 		.where("userId = :userId", { userId: account.id })
-		.set({ hash: () => ":hash"})
+		.set({ hash: () => ":hash" })
+		.set({ forgot_code: () => null })
 		.setParameter('hash', hash)
 		.execute()
 	}

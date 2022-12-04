@@ -92,8 +92,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			notification: await this.notificationService.getNotifications(user),
 			party: party,
 		});
-		if (party)
-			console.log(party.players)
 	}
 
 	async handleDisconnect(socket: Socket) {

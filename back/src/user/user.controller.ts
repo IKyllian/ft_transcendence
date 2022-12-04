@@ -14,8 +14,16 @@ import { join } from "path";
 import { UserIdDto } from "src/chat/gateway/dto/user-id.dto";
 import { EditUsernameDto } from "./dto/edit-username.dto";
 import { EditPasswordDto } from "./dto/edit-password.dto";
+import * as sharp from 'sharp';
+import { promisify } from "util";
+import * as fs from "fs";
+const readFileAsyc = promisify(fs.readFile);
 
 export const avatarStorage = {
+	limits: {
+		files: 1,
+		fileSize: 10485760, // 10 mo
+	},
 	storage: diskStorage({
 		destination: './uploads/',
 		filename: (_req, file, cb) => {
@@ -31,7 +39,7 @@ export const avatarStorage = {
 		} else {
 			cb(null, false)
 		}
-	}
+	},
 }
 
 @Controller('users')
@@ -44,19 +52,43 @@ export class UserController {
 		console.log('me')
 		const match_history = await this.userService.getMatchHistory(user.id);
 		return {
-			user,
+			user: user,
 			match_history,
 		}
+	}
+
+	private async resizeImage(file: Express.Multer.File) {
+		readFileAsyc(file.path)
+		  .then((b: Buffer) => {
+			return sharp(b, { animated: true })
+			  .resize(300, 300)
+			  .webp()
+			  .toFile(file.path);
+		  })
+		  .then(console.log)
+		  .catch(() => {
+			try {
+				fs.unlinkSync(file.path);
+				throw new BadRequestException("file type is not supported");
+			} catch(err) {
+				console.log(err);
+			}
+			return false;
+		  });
+		  return true;
 	}
 
 	@UseGuards(JwtGuard)
 	@Post('avatar/upload')
 	@UseInterceptors(FileInterceptor('image', avatarStorage))
-	uploadFile(@UploadedFile() file: Express.Multer.File, @GetUser() user: User, @Req() req: any) : Observable<Object> {
+	async uploadFile(@UploadedFile() file: Express.Multer.File, @GetUser() user: User, @Req() req: any) : Promise<Observable<Object>> {
 		// TODO use file-type to check magic number?
 		console.log(req.file);
 		if (!file) {
 			throw new BadRequestException("file does not match valid extention");
+		}
+		if (!await this.resizeImage(file)) {
+			throw new BadRequestException("Error occured in file upload");
 		}
 
 		// if (!file) return of ({error: 'file does not match valid extention'})
@@ -76,9 +108,7 @@ export class UserController {
 			}
 			console.log("avatar path ", user.avatar)
 			if (!user.avatar) { return undefined; }
-			// res.set('Content-Disposition', `attachment; filename=${user.avatar}`)
 			res.sendFile(user.avatar, { root: 'uploads', headers: {"Content-Disposition": user.avatar}});
-			// return of(res.sendFile(join(process.cwd(), 'uploads/' + user.avatar)));
 	}
 
 	@UseGuards(JwtGuard)

@@ -101,7 +101,7 @@ export class AuthService {
 			.leftJoinAndSelect("user.blocked", "Blocked")
 			.getOne();
 
-		if (!user || user.id42 || !user.account.hash) {
+		if (!user || !user.account.hash) {
 			throw new NotFoundException('invalid credentials')
 		}
 
@@ -141,7 +141,7 @@ export class AuthService {
 			));
 			return response.data.access_token;
 		} catch(error) {
-			console.log(error.message)
+			console.log('error 42 login', error.message, code)
 			throw new UnauthorizedException('Failed to retreive 42 token');
 		}
 	}
@@ -292,8 +292,8 @@ export class AuthService {
     }
 
 	async forgotPassword(dto: ForgotPasswordDto) {	
-		//TODO NO 42 	
 		const user = await this.userService.findOne({
+			select: ['username', 'email', 'id'],
 			where: { email: dto.email }
 		})
 
@@ -301,7 +301,7 @@ export class AuthService {
 			throw new NotFoundException("Email not found");
 
 		const validation_code: string = uuidv4();
-		this.userService.updateForgotCode(user, validation_code);
+		await this.userService.updateForgotCode(user, validation_code);
 
 		const message = {
             from: process.env.MAIL_USER,
@@ -309,7 +309,7 @@ export class AuthService {
             subject: 'Pong Game - Password reset request',
             html: `
             <h3>Password Reset</h3>
-			<p>Hi, you have submitted a password reset request on <b>Pong Game</b></p>
+			<p>Hi ${user.username}, you have submitted a password reset request on <b>Pong Game</b></p>
 			<p>To set your new password, <a href=http://${process.env.SERVER_IP}:3000/reset-password?code=${validation_code}>Click here</a></p>
             `,
         }
@@ -328,7 +328,7 @@ export class AuthService {
 		const user_account = await this.accountRepo.findOne({
 			where: { forgot_code: dto.code }
 		})
-
+		console.log('reset pass', user_account, dto.code)
 		if (!user_account)
 			throw new NotFoundException("Invalid code");
 
