@@ -12,7 +12,6 @@ import { SignupDto } from "./dto/signup.dto";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import * as nodemailer from 'nodemailer';
-import { ActivateDto } from "./dto/activate.dto";
 import { ForgotPasswordDto } from "./dto/forgot-password.dto";
 import { v4 as uuidv4 } from "uuid";
 import { ResetPasswordDto } from "./dto/reset-password.dto";
@@ -48,9 +47,8 @@ export class AuthService {
 		if (await this.userService.mailTaken(dto.email))
 			throw new ForbiddenException('Email already in use');
 
-		const hash = await argon.hash(dto.password);
-		const validation_code: string = uuidv4();	
-		const user_account_create = this.accountRepo.create({ hash, validation_code });
+		const hash = await argon.hash(dto.password);	
+		const user_account_create = this.accountRepo.create({ hash });
 		const params = {
 			username: dto.username,
 			email: dto.email,
@@ -58,9 +56,6 @@ export class AuthService {
 		}
 
 		const user = await this.userService.create(params);
-		// const mailResult = await this.sendValidationMail(dto.email, validation_code);
-		// if (mailResult?.error)
-		// 	return { error: mailResult.error };
 		const tokens = await this.signTokens(user.id, user.username);
 		this.updateRefreshHash(user.account, tokens.refresh_token);
 		return {
@@ -68,26 +63,6 @@ export class AuthService {
 			refresh_token: tokens.refresh_token,
 			user: user,
 		}
-	}
-
-	async activate(dto: ActivateDto) {
-		const user_account = await this.accountRepo.findOne({
-			relations: { user : true },
-			where: { validation_code: dto.code }
-		});
-		console.log(user_account)
-		if (!user_account)
-			throw new ForbiddenException('Validation code not found');
-		await this.userRepo.save(user_account.user);
-		//TODO redirect to login page?
-		
-		// const tokens = await this.signTokens(user_account.user.id, user_account.user.username);
-		// this.updateRefreshHash(user_account, tokens.refresh_token);
-		// return {
-		// 	access_token: tokens.access_token,
-		// 	refresh_token: tokens.refresh_token,
-		// 	user: user_account.user,
-		// }
 	}
 
 	async login(dto: LoginDto) {
@@ -271,25 +246,6 @@ export class AuthService {
 		await this.userService.logout(user);
 		return { success: true, message: "logged out successfuly" };
 	}
-
-	private async sendValidationMail(email: string, code: string) {		
-        const message = {
-            from: process.env.MAIL_USER,
-            to: email,
-            subject: 'Pong Game - Account verification',
-            html: `
-            <h3>Account Verification</h3>
-			<p>Hi, you have recently created an account on <b>Pong Game</b></p>
-			<p>To validate your email, please <a href=http://localhost:5000/api/auth/activate?code=${code}>Click here</a></p>
-            `,
-        }
-
-		try {
-        	return await this.transporter.sendMail(message);
-		} catch(err) {
-			return { error: err };
-		}
-    }
 
 	async forgotPassword(dto: ForgotPasswordDto) {	
 		const user = await this.userService.findOne({

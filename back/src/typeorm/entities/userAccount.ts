@@ -20,10 +20,6 @@ export class UserAccount {
 	@Column({ nullable: true })
 	refresh_hash?: string
 
-    @Exclude()
-    @Column({ unique: true, nullable: true })
-	validation_code?: string;
-
 	@Exclude()
 	@Column({ nullable: true })
 	two_factor_secret?: string
