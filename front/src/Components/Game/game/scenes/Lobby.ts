@@ -56,6 +56,8 @@ export default class Lobby extends Phaser.Scene
 	preload ()
 	{
 
+		// sharp(this.game.registry.get('players_data').TeamBlue_Back.user, { pages: -1 }).toFile("output.png")
+
 		loadAvatar(
 			this.game.registry.get('players_data').TeamBlue_Back.user,
 			'TeamBlue_back_avatar',

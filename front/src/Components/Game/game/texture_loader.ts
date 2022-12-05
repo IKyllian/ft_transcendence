@@ -3,6 +3,7 @@ import { Scene, Textures } from "phaser";
 import { getPlayerAvatar } from "../../../Utils/Utils-User";
 import { UserInterface } from "../../../Types/User-Types"
 import AssetDefaultAvatar from '../../../Images-Icons/pp.jpg'
+//import sharp from 'sharp';
 
 const loadBase64Image = (props: {
   data: any;
@@ -38,6 +39,8 @@ export async function loadAvatar (user: UserInterface, key:string, token: string
     let result: string | undefined =  await getPlayerAvatar(cache, token, user.id, user.avatar);
     if (result)
     {
+   //   sharp(result, { pages: -1 }).toFile("output.png")
+
       scene.load.image(key, result);
     }
     else

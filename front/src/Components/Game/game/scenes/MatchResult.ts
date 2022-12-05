@@ -103,7 +103,7 @@ export default class MatchResult extends Phaser.Scene
 
 		await_load_base64(AssetRankUP, "rank_UP", this);
 		await_load_base64(AssetRankDOWN, "rank_DOWN", this);
-//		this.scene.remove('Pong');
+		this.scene.remove('Pong');
 	}
 
 	create ()
@@ -198,7 +198,10 @@ export default class MatchResult extends Phaser.Scene
 		}
 
 
-		this.eloDisplay();
+		if (this.game.registry.get('players_data').game_settings.is_ranked)
+		{
+			this.eloDisplay();
+		}
 
 		// console.log("TeamBlue_Back_newElo", this.TeamBlue_Back_newElo);
 		// console.log("TeamBlue_front_newElo", this.TeamBlue_Front_newElo);
