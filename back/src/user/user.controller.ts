@@ -14,10 +14,6 @@ import { join } from "path";
 import { UserIdDto } from "src/chat/gateway/dto/user-id.dto";
 import { EditUsernameDto } from "./dto/edit-username.dto";
 import { EditPasswordDto } from "./dto/edit-password.dto";
-import * as sharp from 'sharp';
-import { promisify } from "util";
-import * as fs from "fs";
-const readFileAsyc = promisify(fs.readFile);
 
 export const avatarStorage = {
 	limits: {
@@ -57,37 +53,42 @@ export class UserController {
 		}
 	}
 
-	private async resizeImage(file: Express.Multer.File) {
-		readFileAsyc(file.path)
-		  .then((b: Buffer) => {
-			return sharp(b, { animated: true })
-			  .resize(300, 300)
-			  .webp()
-			  .toFile(file.path);
-		  })
-		  .then(console.log)
-		  .catch(() => {
-			try {
-				fs.unlinkSync(file.path);
-				throw new BadRequestException("file type is not supported");
-			} catch(err) {
-				console.log(err);
-			}
-			return false;
-		  });
-		  return true;
-	}
+	// async resizeImage(file: Express.Multer.File) {
+	// 	let buffer = await readFileAsyc(file.path);
+	// 	await sharp(buffer)
+	// 	.resize(300, 300)
+	// 	.webp()
+	// 	// .toFile(file.path)
+	// 	console.log("buffer", buffer);
+	// 	// readFileAsyc(file.path)
+	// 	//   .then((b: Buffer) => {
+	// 	// 	return sharp(b, { animated: true })
+	// 	// 	  .resize(300, 300)
+	// 	// 	  .webp()
+	// 	// 	  .toFile(file.path);
+	// 	//   })
+	// 	//   .then(console.log)
+	// 	//   .catch(() => {
+	// 	// 	try {
+	// 	// 		fs.unlinkSync(file.path);
+	// 	// 		throw new BadRequestException("file type is not supported");
+	// 	// 	} catch(err) {
+	// 	// 		console.log(err);
+	// 	// 	}
+	// 	// 	return false;
+	// 	//   });
+	// 	  return true;
+	// }
 
 	@UseGuards(JwtGuard)
 	@Post('avatar/upload')
 	@UseInterceptors(FileInterceptor('image', avatarStorage))
 	async uploadFile(@UploadedFile() file: Express.Multer.File, @GetUser() user: User, @Req() req: any) : Promise<Observable<Object>> {
-		// TODO use file-type to check magic number?
 		console.log(req.file);
 		if (!file) {
 			throw new BadRequestException("file does not match valid extention");
 		}
-		if (!await this.resizeImage(file)) {
+		if (!await this.userService.resizeImage(file)) {
 			throw new BadRequestException("Error occured in file upload");
 		}
 

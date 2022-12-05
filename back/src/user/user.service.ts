@@ -12,6 +12,10 @@ import { UserStatus } from "src/utils/types/types";
 import { UserAccount } from "src/typeorm/entities/userAccount";
 import { v4 as uuidv4 } from "uuid";
 import { EditPasswordDto } from "./dto/edit-password.dto";
+import * as sharp from 'sharp';
+import * as fs from "fs";
+import { promisify } from "util";
+const readFileAsyc = promisify(fs.readFile);
 
 @Injectable()
 export class UserService {
@@ -251,5 +255,25 @@ export class UserService {
 	async setTwoFactorEnabled(user: User, status: boolean) {
 		user.two_factor_enabled = status;
 		this.userRepo.save(user);
+	}
+
+	async resizeImage(file: Express.Multer.File) {
+		readFileAsyc(file.path)
+		  .then((b: Buffer) => {
+			return sharp(b, { animated: true })
+			  .resize(300, 300)
+			  .webp()
+			  .toFile(file.path);
+		  })
+		//   .then(console.log)
+		  .catch(() => {
+			try {
+				fs.unlinkSync(file.path);
+			} catch(err) {
+				console.log(err);
+			}
+			return false;
+		  });
+		  return true;
 	}
 }
