@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { baseUrl } from "../../../env";
 import { addAlert, AlertType } from "../../../Redux/AlertSlice";
-import { change2faStatus, changeQRCodeStatus, replaceUserObject } from "../../../Redux/AuthSlice";
+import { change2faStatus, replaceUserObject } from "../../../Redux/AuthSlice";
 import { useAppDispatch, useAppSelector } from "../../../Redux/Hooks";
 import { UserInterface } from "../../../Types/User-Types";
 
@@ -18,7 +18,7 @@ interface FormState {
     }
 }
 
-function SettingsCardInfos(props: {currentUser: UserInterface}) {
+function SettingsCardInfos(props: {currentUser: UserInterface }) {
     const { currentUser } = props;
     const [displayQRCode, setDisplayQRCode] = useState<{show: boolean, qrcode: string | undefined}>({show: false, qrcode: undefined});
     const [disable2fa, setDisable2fa] = useState<boolean>(false);
@@ -68,7 +68,6 @@ function SettingsCardInfos(props: {currentUser: UserInterface}) {
         const req = new Request(`${baseUrl}/2fa/generate`, {method: 'POST', body: undefined ,headers: {"Authorization": `Bearer ${token}`}});
         fetch(req)
         .then(async (response) => {
-            console.log("2FA response", response);
             const avatarBlob = await response.blob();
             const qrCodeUrl = URL.createObjectURL(avatarBlob)
             setDisplayQRCode({show: true, qrcode: qrCodeUrl});
@@ -117,11 +116,11 @@ function SettingsCardInfos(props: {currentUser: UserInterface}) {
                     <input
                         type="password"
                         {...register("passwordForm.oldPassword", {
-                            required: "Old password is required",
-                            minLength: {
-                                value: 5,
-                                message: "Min length is 5",
-                            }
+                            // required: "Old password is required",
+                            // minLength: {
+                            //     value: 5,
+                            //     message: "Min length is 5",
+                            // }
                         })}
                     />
                 </label>
@@ -131,11 +130,11 @@ function SettingsCardInfos(props: {currentUser: UserInterface}) {
                     <input
                         type="password"
                         {...register("passwordForm.newPassword", {
-                            required: "New password is required",
-                            minLength: {
-                                value: 5,
-                                message: "Min length is 5",
-                            }
+                            // required: "New password is required",
+                            // minLength: {
+                            //     value: 5,
+                            //     message: "Min length is 5",
+                            // }
                         })}
                     />
                 </label>

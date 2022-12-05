@@ -52,7 +52,16 @@ function Lobby() {
                 {
                     ((party && party.game_mode === GameMode.PRIVATE_MATCH) || (!party && gameMode.gameModes[gameMode.indexSelected].gameMode === GameMode.PRIVATE_MATCH)) &&
                     <div className="lobby-settings">
-                        <GameSettingsWrapper hookForm={{handleSubmit: settingsFormSubmit, control: formHook.control, watch: formHook.watch, getValues: formHook.getValues}} onInputChange={onInputChange} loggedUserIsLeader={loggedUserIsLeader} />
+                        <GameSettingsWrapper 
+                            hookForm={{
+                                handleSubmit: settingsFormSubmit,
+                                control: formHook.control,
+                                watch: formHook.watch,
+                                getValues: formHook.getValues
+                            }}
+                            onInputChange={onInputChange}
+                            loggedUserIsLeader={loggedUserIsLeader}
+                        />
                         <BoardGame hookForm={{watch: formHook.watch}} />
                     </div>
                 }
