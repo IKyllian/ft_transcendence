@@ -3,10 +3,10 @@ import { WebSocketGateway, MessageBody, WebSocketServer, ConnectedSocket, OnGate
 import { Server, Socket } from 'socket.io';
 import { AuthService } from 'src/auth/auth.service';
 import { WsJwtGuard } from 'src/auth/guard/ws-jwt.guard';
-import { ChannelUser, Notification, User, UserTimeout } from 'src/typeorm';
+import { ChannelUser, Friendship, Notification, User, UserTimeout } from 'src/typeorm';
 import { ChannelService } from '../channel/channel.service';
 import { UserService } from 'src/user/user.service';
-import { ChannelUpdateType, JwtPayload, notificationType, UserStatus } from 'src/utils/types/types';
+import { ChannelUpdateType, JwtPayload, notificationType, RelationStatus, UserStatus } from 'src/utils/types/types';
 import { GetChannelUser, GetUser } from 'src/utils/decorators';
 import { ChannelMessageService } from '../channel/message/ChannelMessage.service';
 import { ChannelMessageDto } from '../channel/message/dto/channelMessage.dto';
@@ -71,13 +71,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 		
 		if (!user) {
-			// throw new WsException('invalid credential');
-			console.log(user, 'invalid credential')
-			return socket.disconnect();
-			// socket.emit('connection', 'failed');
+			socket.emit('Logout');
 		}
 		socket.user = user;
-		// console.log("USER", user);
 		console.log(user.username, 'connected')
 		socket.join(`user-${user.id}`);
 		if (user.status === UserStatus.OFFLINE) {
@@ -85,12 +81,17 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			console.log('user status: ' + user.status)
 			this.server.emit('StatusUpdate', { id: user.id, status: UserStatus.ONLINE });
 		}
+		let party = this.partyService.partyJoined.getParty(user.id);
+		if (party) {
+			party.players.forEach(async player => {
+				player.user = await this.userService.findOne({ where: { id: player.user.id }});
+			});
+		}
 		socket.emit('Connection', {
 			friendList: await this.friendshipService.getFriendlist(user),
 			notification: await this.notificationService.getNotifications(user),
-			party: this.partyService.partyJoined.getParty(user.id),
+			party: party,
 		});
-		// console.log(socket)
 	}
 
 	async handleDisconnect(socket: Socket) {
@@ -361,8 +362,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		const addressee = await this.userService.findOneBy({ id: dto.id });
 		if (!addressee)
 			throw new NotFoundException('User not found');
-		await this.friendshipService.sendFriendRequest(socket.user, addressee);
-		this.server.to(`user-${socket.user.id}`).emit("RequestValidation");
+		const friendship: Friendship = await this.friendshipService.sendFriendRequest(socket.user, addressee);
+		// this.server.to(`user-${socket.user.id}`).emit("RequestValidation", { id: addressee.id, relation: this.friendshipService.getRelationStatus(socket.user, friendship)});
+		this.server.to(`user-${addressee.id}`).emit("RelationUpdate", { id: socket.user.id, relation: this.friendshipService.getRelationStatus(socket.user, friendship)});
+		this.server.to(`user-${socket.user.id}`).emit("RelationUpdate", { id: addressee.id, relation: this.friendshipService.getRelationStatus(addressee, friendship)});
 		const notif = await this.notificationService.createFriendRequestNotif(addressee, socket.user);
 		socket.to(`user-${dto.id}`).emit('NewNotification', notif);
 	}
@@ -383,8 +386,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				type: notificationType.FRIEND_REQUEST,
 			}
 		});
-		this.server.to(`user-${socket.user.id}`).emit("RequestValidation");
+		this.server.to(`user-${requester.id}`).emit("RelationUpdate", { id: socket.user.id, relation: this.friendshipService.getRelationStatus(socket.user, friendship)});
+		this.server.to(`user-${socket.user.id}`).emit("RelationUpdate", { id: requester.id, relation: this.friendshipService.getRelationStatus(requester, friendship)});
 		if (notif) {
+			console.log('deleting notif')
 			await this.notificationService.delete(notif.id);
 			this.server.to(`user-${socket.user.id}`).emit('DeleteNotification', notif.id);
 		}
@@ -400,6 +405,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		@MessageBody() dto: UserIdDto,
 	) {
 		const user2 = await this.friendshipService.unFriend(user, dto);
+		this.server.to(`user-${user.id}`).emit("RelationUpdate", { id: user2.id, relation: RelationStatus.NONE});
+		this.server.to(`user-${user2.id}`).emit("RelationUpdate", { id: user.id, relation: RelationStatus.NONE});
 		this.server.to(`user-${user.id}`).emit('FriendListUpdate', await this.friendshipService.getFriendlist(user));
 		this.server.to(`user-${user2.id}`).emit('FriendListUpdate', await this.friendshipService.getFriendlist(user2));
 	}

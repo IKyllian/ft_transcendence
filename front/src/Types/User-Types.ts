@@ -21,6 +21,7 @@ export interface ExampleUser {
 export interface AuthState {
     currentUser: UserInterface | undefined,
     isAuthenticated: boolean,
+    isSign: boolean,
     error?: string,
     loading: boolean,
     loadingIsConnected: boolean,
@@ -28,11 +29,13 @@ export interface AuthState {
     setUsersame: boolean,
     friendList: UserInterface[],
     loggedUserAvatar: string | undefined,
+    displayQRCode: boolean,
+    verification2FA: boolean,
 }
 
 export interface LoginPayload {
     user: UserInterface,
-    token: string
+    token: string,
 }
 
 export interface UserInterface {
@@ -44,8 +47,9 @@ export interface UserInterface {
     statistic: Statistic,
     channelUser: Channel[],
     blocked: UserInterface[],
-    singles_elo: number;
-	doubles_elo: number;
+    singles_elo: number,
+	doubles_elo: number,
+    two_factor_enabled: boolean,
 }
 
 interface Statistic {

@@ -21,7 +21,6 @@ import PrivateRoute from "./Route/Private-Route";
 import UsernameForm from "./Components/Sign/Username-Form";
 import ChannelsList from "./Components/Chat/Channels-List";
 import NotifGameInvite from "./Components/Notif-Game-Invite";
-import NotifError from "./Components/Notif-Error";
 import Game from "./Components/Game/Game";
 import Lobby from "./Components/Lobby/Lobby";
 import ModalPartyInvite from "./Components/Modal-Party-Invite";
@@ -30,6 +29,8 @@ import ChatParty from "./Components/Chat-Party";
 import MatchFound from "./Components/Lobby/Match-Found";
 import ProfileSettings from "./Components/Profile/Settings/Profile-Settings";
 import SendMailPassword from "./Components/Sign/Send-Mail-Password";
+import Alert from "./Components/Alert";
+import LoadingSpin from "./Components/Utils/Loading-Spin";
 
 interface RouteProps {
 	path: string,
@@ -69,7 +70,7 @@ const routes: RouteProps[] = [
 				<ResetPassword />
 			</PublicRoute>,
 	}, {
-		path: '/account-verification',
+		path: '/2fa-verification',
 		element:
 			<PublicRoute>
 				<CodeVerification />
@@ -136,22 +137,27 @@ function App() {
 	const {
 		socket,
 		cache,
-		eventError,
-		closeEventError,
 		isAuthenticated,
 		partyState,
+		isSign,
 	} = useAppHook();
 
-  return (
+	console.log("APP RENDER");
+
+  return !isAuthenticated && isSign ? (
+	<div className="app-container">
+		<LoadingSpin />
+	</div>
+  ) : (
 	<div className="app-container">
 		<SocketContext.Provider value={{socket: socket}} >
 			<CacheContext.Provider value={{cache: cache}} >
 				<ModalProvider>
-					{ isAuthenticated && eventError !== undefined && <NotifError error={eventError} closeError={closeEventError} />}
+					{ isAuthenticated && <Alert /> }
 					{ isAuthenticated && <AddFriendModal/> }
 					{ isAuthenticated && <ModalPartyInvite /> }
 					{ isAuthenticated && <NotifGameInvite /> }
-					{/* { isAuthenticated && <MatchFound /> } */}
+					{ isAuthenticated && <MatchFound /> }
 					{ isAuthenticated && <Header /> }
 					<main className="page-container">
 						{ isAuthenticated && partyState.party && partyState.chatIsOpen && <ChatParty />}
@@ -208,7 +214,7 @@ function App() {
 			</CacheContext.Provider>
 		</SocketContext.Provider>
     </div>
-  )
+  );
 }
 
 export default App;

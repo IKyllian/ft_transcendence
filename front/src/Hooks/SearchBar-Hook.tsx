@@ -27,12 +27,21 @@ export function useSearchBarHook(props: {functionality: SearchBarFunctionality, 
     }
 
     useEffect(() => {
-        socket?.on("RequestValidation", () => {
-            fetchUserFunction(getValues('textInput'), token, setUsersList);
+        socket?.on("RelationUpdate", (data: {id: number, relation: string}) => {
+            if (data.relation === "friend") {
+                setUsersList((prev: UsersListInterface[] | undefined) => { return prev !== undefined ? [...prev.filter(elem => elem.user.id !== data.id)] : undefined})
+            } else {
+                setUsersList((prev: UsersListInterface[] | undefined) => { return prev !== undefined ? [...prev.map(elem => {
+                    if (elem.user.id === data.id)
+                        return {...elem, relationStatus: data.relation};
+                    else
+                        return elem;   
+                })] : undefined})
+            }
         });
 
         return () => {
-            socket?.off("RequestValidation");
+            socket?.off("RelationUpdate");
         }
     }, [])
 

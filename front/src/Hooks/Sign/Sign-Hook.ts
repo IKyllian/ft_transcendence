@@ -5,8 +5,8 @@ import { useAppDispatch, useAppSelector } from '../../Redux/Hooks'
 import { uid } from "../../env";
 import { fetchSignIn, fetchSignUp, fetchLogin42 } from '../../Api/Sign/Sign-Fetch';
 
-import { loginPending } from "../../Redux/AuthSlice";
-import axios from 'axios';
+import { loginError, loginPending, loginSuccess, setUsername, verification2fa } from "../../Redux/AuthSlice";
+import { LoginPayload } from '../../Types/User-Types';
 
 type FormValues = {
     username: string,
@@ -31,7 +31,23 @@ export function useSignHook() {
     const onSignIn = handleSubmit((data, e) => {
         e?.preventDefault();
         dispatch(loginPending());
-        fetchSignIn({username: data.username, password: data.password, dispatch: dispatch});
+        fetchSignIn(data.username, data.password).then(response => {
+            console.log('JWT =>', response.data);
+            if (response.data.access_2fa_token) {
+                dispatch(verification2fa());
+                navigate("/2fa-verification", {state: {access_2fa_token: response.data.access_2fa_token}});
+            } else {
+                const payload: LoginPayload = {
+                    token: response.data.access_token,
+                    user: response.data.user,
+                }
+                dispatch(loginSuccess(payload));
+            }
+        })
+        .catch(err => {
+            dispatch(loginError("username or password incorect"));
+        })
+        // fetchSignIn({username: data.username, password: data.password, dispatch: dispatch});
     });
 
     const onSignUp = handleSubmit((data, e) => {
@@ -46,7 +62,27 @@ export function useSignHook() {
             if (authDatas.setUsersame || authDatas.error || !authDatas.loading)
                 navigate("/sign");
             dispatch(loginPending());
-            fetchLogin42(authorizationCode, dispatch, navigate);
+            fetchLogin42(authorizationCode).then(response => {
+                if (response.data.access_2fa_token) {
+                    dispatch(verification2fa());
+                    navigate("/2fa-verification", {state: {access_2fa_token: response.data.access_2fa_token}});
+                } else {
+                    if (response.data.usernameSet) {
+                        const payload: LoginPayload = {
+                            token: response.data.access_token,
+                            user: response.data.user,
+                        }
+                        dispatch(loginSuccess(payload));
+                    } else {
+                        dispatch(setUsername());
+                        navigate("/set-username", {state:{token: response.data.access_token}});
+                    }
+                }
+            })
+            .catch(err => {
+                console.log(err);
+                dispatch(loginError("Error while login with 42"));
+            });
         }
     }, []);
 

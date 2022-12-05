@@ -16,11 +16,11 @@ import ExternalImage from '../External-Image';
 function NotifIcon(props: {notifications: NotificationInterface[] | undefined ,handleNotifDropdownClick: Function}) {
     const {handleNotifDropdownClick, notifications} = props;
     return (
-        <div className='badge-wrapper'>
+        <div className='badge-wrapper' onClick={() => handleNotifDropdownClick()}>
             { notifications !== undefined
             && notifications.filter(elem => elem.type !== notificationType.CHANNEL_MESSAGE && elem.type !== notificationType.PARTY_INVITE  && elem.type !== notificationType.PRIVATE_MESSAGE).length > 0
             && <div className='badge badge-notif'> {notifications.filter(elem => elem.type !== notificationType.CHANNEL_MESSAGE && elem.type !== notificationType.PARTY_INVITE && elem.type !== notificationType.PRIVATE_MESSAGE).length} </div> }
-            <IconBell onClick={() => handleNotifDropdownClick()} />
+            <IconBell />
         </div>
     );
 }

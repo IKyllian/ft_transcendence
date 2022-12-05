@@ -12,6 +12,10 @@ import { UserStatus } from "src/utils/types/types";
 import { UserAccount } from "src/typeorm/entities/userAccount";
 import { v4 as uuidv4 } from "uuid";
 import { EditPasswordDto } from "./dto/edit-password.dto";
+import * as sharp from 'sharp';
+import * as fs from "fs";
+import { promisify } from "util";
+const readFileAsyc = promisify(fs.readFile);
 
 @Injectable()
 export class UserService {
@@ -37,18 +41,7 @@ export class UserService {
 		return this.userRepo.save(user);
 	}
 
-	findOne(options: FindOneOptions<User>, selectAll: Boolean = false): Promise<User | null> {
-		if (selectAll) {
-			options.select = [
-				'avatar',
-				'id',
-				'id42',
-				'username',
-				'status',
-				'two_factor_enabled',
-				'two_factor_authenticated'
-			];
-		}
+	findOne(options: FindOneOptions<User>): Promise<User | null> {
 		return this.userRepo.findOne(options);
 	}
 
@@ -157,6 +150,7 @@ export class UserService {
 	}
 
 	async updateForgotCode(user: User, code: string) {
+		console.log(user)
 		this.accountRepo.createQueryBuilder()
 		.update()
 		.where("userId = :userId", { userId: user.id })
@@ -174,7 +168,8 @@ export class UserService {
 		this.accountRepo.createQueryBuilder()
 		.update()
 		.where("userId = :userId", { userId: account.id })
-		.set({ hash: () => ":hash"})
+		.set({ hash: () => ":hash" })
+		.set({ forgot_code: () => null })
 		.setParameter('hash', hash)
 		.execute()
 	}
@@ -259,13 +254,26 @@ export class UserService {
 
 	async setTwoFactorEnabled(user: User, status: boolean) {
 		user.two_factor_enabled = status;
-		if (status)
-			user.two_factor_authenticated = true;
 		this.userRepo.save(user);
 	}
 
-	async setTwoFactorAuthenticated(user: User, status: boolean) {
-		user.two_factor_authenticated = status;
-		this.userRepo.save(user);
+	async resizeImage(file: Express.Multer.File) {
+		readFileAsyc(file.path)
+		  .then((b: Buffer) => {
+			return sharp(b, { animated: true })
+			  .resize(300, 300)
+			  .webp()
+			  .toFile(file.path);
+		  })
+		//   .then(console.log)
+		  .catch(() => {
+			try {
+				fs.unlinkSync(file.path);
+			} catch(err) {
+				console.log(err);
+			}
+			return false;
+		  });
+		  return true;
 	}
 }

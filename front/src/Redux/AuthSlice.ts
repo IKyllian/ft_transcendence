@@ -7,12 +7,15 @@ const defaultState: AuthState = {
     currentUser: undefined,
     friendList: [],
     isAuthenticated: false,
+    isSign: false,
     error: undefined,
     loading: false,
     loadingIsConnected: true,
     token:'',
     setUsersame: false,
     loggedUserAvatar: undefined,
+    displayQRCode: false,
+    verification2FA: false,
 }
 
 const defaultLogout: AuthState = {...defaultState, loadingIsConnected: false};
@@ -24,11 +27,14 @@ export const authSlice = createSlice({
         loginPending: (state) => {
             state.loading = true;
         },
+        userFullAuthenticated: (state) => {
+            state.isAuthenticated = true;
+        },
         loginSuccess: (state, {payload}: PayloadAction<LoginPayload>) => {
 			console.log("payload", payload);
             state.currentUser = payload.user;
             state.token = payload.token;
-            state.isAuthenticated = true;
+            state.isSign = true;
             state.loading = false;
             state.loadingIsConnected = false,
             console.log("state", state);
@@ -40,9 +46,16 @@ export const authSlice = createSlice({
             state.loadingIsConnected = false;
         },
         setUsername: (state) => {
-            state.setUsersame = true,
+            state.setUsersame = true;
             state.loading = false;
             state.loadingIsConnected = false;
+        },
+        verification2fa: (state) => {
+            state.verification2FA = true;
+            state.loading = false;
+        },
+        leave2fa: (state) => {
+            state.verification2FA = false;
         },
         stopIsConnectedLoading: (state) => {
             state.loadingIsConnected = false;
@@ -73,14 +86,24 @@ export const authSlice = createSlice({
         setUserAvatar: (state, {payload}: PayloadAction<string>) => {
             state.loggedUserAvatar = payload;
         },
+        change2faStatus: (state, {payload}: PayloadAction<boolean>) => {
+            if (state.currentUser)
+                state.currentUser = {...state.currentUser, two_factor_enabled: payload};
+        },
+        changeQRCodeStatus: (state, {payload}: PayloadAction<boolean>) => {
+            state.displayQRCode = payload;
+        }
     }
 });
 
 export const {
     loginPending,
+    userFullAuthenticated,
     loginSuccess,
     loginError,
     setUsername,
+    verification2fa,
+    leave2fa,
     stopIsConnectedLoading,
     logoutPending,
     logoutSuccess,
@@ -89,4 +112,6 @@ export const {
     copyFriendListArray,
     changeFriendListUserStatus,
     setUserAvatar,
+    change2faStatus,
+    changeQRCodeStatus,
 } = authSlice.actions;

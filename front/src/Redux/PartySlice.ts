@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { PlayersGameData } from '../Components/Game/game/types/shared.types';
 import { PartyInterface, GameMode, PartyMessage, QueueTimerInterface } from '../Types/Lobby-Types';
 import { NotificationInterface } from '../Types/Notification-Types';
 
@@ -8,7 +9,8 @@ interface PartyState {
     chatIsOpen: boolean,
     isInQueue: boolean,
     queueTimer: QueueTimerInterface,
-    partyInvite: NotificationInterface[];
+    partyInvite: NotificationInterface[],
+    gameFound: {showGameFound: boolean, gameDatas: PlayersGameData} | undefined,
 }
 
 const defaultQueueTimer: QueueTimerInterface = {
@@ -23,6 +25,7 @@ const defaultState: PartyState = {
     isInQueue: false,
     chatIsOpen: false,
     partyInvite: [],
+    gameFound: undefined,
 }
 
 export const partySlice = createSlice({
@@ -76,15 +79,25 @@ export const partySlice = createSlice({
         incrementQueueTimer: (state) => {
             if (state.isInQueue) {
                 if (state.queueTimer.seconds === 59)
-                state.queueTimer = {seconds: 0, minutes: state.queueTimer.minutes + 1};
+                    state.queueTimer = {seconds: 0, minutes: state.queueTimer.minutes + 1};
                 else
-                state.queueTimer = {...state.queueTimer, seconds: state.queueTimer.seconds + 1};
+                    state.queueTimer = {...state.queueTimer, seconds: state.queueTimer.seconds + 1};
             } else
                 state.queueTimer = defaultQueueTimer;
         },
         resetQueueTimer: (state) => {
             state.queueTimer = defaultQueueTimer;
         },
+        newGameFound: (state, { payload }: PayloadAction<PlayersGameData>) => {
+            state.gameFound = {showGameFound: true, gameDatas: payload};
+        },
+        stopShowGameFound: (state) => {
+            if (state.gameFound)
+                state.gameFound = {...state.gameFound, showGameFound: false};
+        },
+        unsetGameFound: (state) => {
+            state.gameFound = undefined;
+        }
     }
 });
 
@@ -102,4 +115,7 @@ export const {
     removePartyInvite,
     incrementQueueTimer,
     resetQueueTimer,
+    newGameFound,
+    stopShowGameFound,
+    unsetGameFound,
 } = partySlice.actions;

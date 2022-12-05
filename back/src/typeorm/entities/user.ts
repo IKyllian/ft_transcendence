@@ -25,7 +25,7 @@ export class User {
 	@Column({ type: 'enum', enum: UserStatus, default: UserStatus.OFFLINE })
 	status: UserStatus;
 
-	@Column({ unique: true })
+	@Column({ unique: true, select: false })
   	email: string;
 
 	@Column({ nullable: true })
@@ -52,32 +52,9 @@ export class User {
 	@OneToOne(() => UserAccount, (account) => account.user, { cascade: true })
 	account: UserAccount;
 
-	// @Exclude()
-	// @Column({ nullable: true, select: false })
-	// hash?: string
-
-	// @Exclude()
-	// @Column({ nullable: true, select: false })
-	// refresh_hash?: string
-
-	// @Exclude()
-	// @Column({ nullable: true, select: false })
-	// two_factor_secret?: string
-
-	@Column({ default: false })
-	register: boolean;
-
 	@Column({ default: false })
 	two_factor_enabled: boolean;
 
-	@Exclude()
-	@Column({ default: false, select: false })
-	two_factor_authenticated: boolean;
-
 	@CreateDateColumn({ type: 'timestamptz' })
 	created_at: Date;
-
-	// @Exclude()
-	// @Column({ nullable: true, select: false })
-	// forgot_code?: string
 } 

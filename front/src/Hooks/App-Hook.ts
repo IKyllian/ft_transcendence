@@ -8,27 +8,23 @@ import { addNotification, deleteNotification } from "../Redux/NotificationSlice"
 import { addChannel, addPrivateConv, removeChannel } from "../Redux/ChatSlice";
 import { Channel, ChannelUpdateType, ChannelUser, Conversation, UserTimeout } from "../Types/Chat-Types";
 import { UserInterface } from "../Types/User-Types";
-import { copyFriendListArray, logoutSuccess, stopIsConnectedLoading } from "../Redux/AuthSlice";
+import { copyFriendListArray, logoutSuccess, stopIsConnectedLoading, userFullAuthenticated } from "../Redux/AuthSlice";
 import { GameMode, PartyInterface, PartyMessage } from "../Types/Lobby-Types";
 import { copyNotificationArray } from "../Redux/NotificationSlice";
 import { addParty, addPartyInvite, addPartyMessage, cancelQueue, changePartyGameMode, changeQueueStatus, incrementQueueTimer, leaveParty, removePartyInvite, resetQueueTimer } from "../Redux/PartySlice";
 import { fetchVerifyToken } from "../Api/Sign/Sign-Fetch";
 import { addChannelUser, banChannelUser, muteChannelUser, removeTimeoutChannelUser, removeChannelUser, setChannelDatas, updateChannelUser, unsetChannelDatas, unsetChannelId } from "../Redux/ChannelSlice";
+import { addAlert, AlertType } from "../Redux/AlertSlice";
 
 export function useAppHook() {
     const [socket, setSocket] = useState<Socket | undefined>(undefined);
     const [cache, setCache] = useState<Cache | undefined | null>(undefined);
-	const [eventError, setEventError] = useState<string | undefined>(undefined);
-    const { token, isAuthenticated, currentUser } = useAppSelector((state) => state.auth);
+    const { token, isAuthenticated, currentUser, displayQRCode, isSign } = useAppSelector((state) => state.auth);
 	const { party, chatIsOpen, isInQueue } = useAppSelector(state => state.party);
 	const { currentChannelId } = useAppSelector((state) => state.channel);
 
 	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
-
-	const closeEventError = () => {
-		setEventError(undefined);
-	}
 
 	const connectSocket = () => {
 		const newSocket: Socket = io(`${socketUrl}`, {extraHeaders: {
@@ -83,13 +79,13 @@ export function useAppHook() {
     }, [isInQueue])
 
 	useEffect(() => {
-		if (isAuthenticated && socket === undefined) {
+		if (!isAuthenticated && isSign && socket === undefined) {
 			localStorage.setItem("userToken", token);
 			connectSocket();
 			// deleteCache();
 			openCache();
 		}
-	}, [isAuthenticated])
+	}, [isSign])
 
 	useEffect(() => {
 		if (currentUser && currentChannelId !== undefined) {
@@ -150,7 +146,8 @@ export function useAppHook() {
 				dispatch(copyFriendListArray(data.friendList));
 				if (data.party) {
 					dispatch(addParty(data.party));
-				}	
+				}
+				dispatch(userFullAuthenticated());
 			});
 
 			socket.on("PartyUpdate", (data: {party: PartyInterface, cancelQueue: boolean}) => {
@@ -195,7 +192,7 @@ export function useAppHook() {
 
 			socket.on("exception", (data) => {
 				console.log(data);
-				setEventError(data.message);
+				dispatch(addAlert({message: data.message, type: AlertType.ERROR}));
 			});
 
 			socket.on("FriendListUpdate", (data: UserInterface[]) => {
@@ -255,9 +252,9 @@ export function useAppHook() {
     return {
         socket,
 		cache,
-        eventError,
-        closeEventError,
+		displayQRCode,
 		isAuthenticated,
+		isSign,
 		partyState: {
 			party,
 			chatIsOpen,

@@ -86,6 +86,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
 			const payload = this.authService.decodeJwt(socket.handshake.headers.authorization.split(' ')[1]) as JwtPayload;
 			// get usersocket instance instead of call db ?
 			const user = await this.userService.findOneBy({ id: payload?.sub });
+			console.log("socket disco", socket.user.username, socket.multi_tab)
 			if (user && socket.multi_tab === false) {
 				this.userSession.removeUser(user.id)
 				// console.log("Game Gateway Deconnection: ", user.username) 

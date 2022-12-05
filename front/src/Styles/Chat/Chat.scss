@@ -220,7 +220,6 @@
                     // }
                 }
 
-
                 .message-server {
                     margin: 0 auto;
                 }
@@ -239,7 +238,8 @@
                 }
                 
                 .message-item-container {
-                    @include flex-row-alignCenter();
+                    display: flex;
+                    flex-direction: row;
                     gap: 15px;
                     padding: 3px 0 3px 20px;
                     width: 100%;
@@ -354,17 +354,25 @@
                     list-style-type: none;
                     padding: 0;
                     li {
-                        &:not(&:first-child) {
-                            margin-top: 10px;
-                        }
+                        border-radius: 5px;
                         display: flex;
                         align-items: center;
-                        gap: 5px;
+                        gap: 10px;
+                        padding: 8px;
                         @include avatar-status-container();
 
                         .username-wrapper {
                             cursor: pointer;
                             position: relative;
+                        }
+
+                        &:hover {
+                            background-color: $LightDarkPalette;
+                            .avatar-container {
+                                .user-status {
+                                    background-color: $LightDarkPalette;
+                                }
+                            }
                         }
                     }
                 }

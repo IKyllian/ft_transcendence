@@ -1,4 +1,4 @@
-import { Body, ClassSerializerInterceptor, Controller, Delete, FileTypeValidator, ForbiddenException, Get, HttpStatus, MaxFileSizeValidator, NotFoundException, Param, ParseFilePipe, ParseFilePipeBuilder, ParseIntPipe, Patch, Post, Req, Request, Res, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
+import { BadRequestException, Body, ClassSerializerInterceptor, Controller, Delete, FileTypeValidator, ForbiddenException, Get, HttpStatus, MaxFileSizeValidator, NotFoundException, Param, ParseFilePipe, ParseFilePipeBuilder, ParseIntPipe, Patch, Post, Req, Request, Res, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { NotFoundError, Observable, of } from "rxjs";
 import { JwtGuard } from "src/auth/guard/jwt.guard";
@@ -16,6 +16,10 @@ import { EditUsernameDto } from "./dto/edit-username.dto";
 import { EditPasswordDto } from "./dto/edit-password.dto";
 
 export const avatarStorage = {
+	limits: {
+		files: 1,
+		fileSize: 10485760, // 10 mo
+	},
 	storage: diskStorage({
 		destination: './uploads/',
 		filename: (_req, file, cb) => {
@@ -26,12 +30,12 @@ export const avatarStorage = {
 		},
 	}),
 	fileFilter: (_req, file, cb) => {
-		if (file.mimetype.match(/\/(jpg|jpeg|png)$/)) {
+		if (file.mimetype.match(/\/(jpg|jpeg|png|gif)$/)) {
 			cb(null, true);
 		} else {
 			cb(null, false)
 		}
-	}
+	},
 }
 
 @Controller('users')
@@ -44,19 +48,51 @@ export class UserController {
 		console.log('me')
 		const match_history = await this.userService.getMatchHistory(user.id);
 		return {
-			user,
+			user: user,
 			match_history,
 		}
 	}
 
+	// async resizeImage(file: Express.Multer.File) {
+	// 	let buffer = await readFileAsyc(file.path);
+	// 	await sharp(buffer)
+	// 	.resize(300, 300)
+	// 	.webp()
+	// 	// .toFile(file.path)
+	// 	console.log("buffer", buffer);
+	// 	// readFileAsyc(file.path)
+	// 	//   .then((b: Buffer) => {
+	// 	// 	return sharp(b, { animated: true })
+	// 	// 	  .resize(300, 300)
+	// 	// 	  .webp()
+	// 	// 	  .toFile(file.path);
+	// 	//   })
+	// 	//   .then(console.log)
+	// 	//   .catch(() => {
+	// 	// 	try {
+	// 	// 		fs.unlinkSync(file.path);
+	// 	// 		throw new BadRequestException("file type is not supported");
+	// 	// 	} catch(err) {
+	// 	// 		console.log(err);
+	// 	// 	}
+	// 	// 	return false;
+	// 	//   });
+	// 	  return true;
+	// }
+
 	@UseGuards(JwtGuard)
 	@Post('avatar/upload')
 	@UseInterceptors(FileInterceptor('image', avatarStorage))
-	uploadFile(@UploadedFile() file: Express.Multer.File, @GetUser() user: User, @Req() req: any) : Observable<Object> {
-		// TODO use file-type to check magic number?
+	async uploadFile(@UploadedFile() file: Express.Multer.File, @GetUser() user: User, @Req() req: any) : Promise<Observable<Object>> {
 		console.log(req.file);
+		if (!file) {
+			throw new BadRequestException("file does not match valid extention");
+		}
+		if (!await this.userService.resizeImage(file)) {
+			throw new BadRequestException("Error occured in file upload");
+		}
 
-		if (!file) return of ({error: 'file does not match valid extention'})
+		// if (!file) return of ({error: 'file does not match valid extention'})
 		this.userService.updateAvatar(user, file.filename);
 		return of({imagePath: file.path})
 	}
@@ -74,7 +110,6 @@ export class UserController {
 			console.log("avatar path ", user.avatar)
 			if (!user.avatar) { return undefined; }
 			res.sendFile(user.avatar, { root: 'uploads', headers: {"Content-Disposition": user.avatar}});
-			// return of(res.sendFile(join(process.cwd(), 'uploads/' + user.avatar)));
 	}
 
 	@UseGuards(JwtGuard)

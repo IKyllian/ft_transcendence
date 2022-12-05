@@ -1,4 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit'
+import { alertSlice } from './AlertSlice'
 import { authSlice } from './AuthSlice'
 import { channelSlice } from './ChannelSlice'
 import { chatSlice } from './ChatSlice'
@@ -12,6 +13,7 @@ export const store = configureStore({
         channel: channelSlice.reducer,
         notification: notificationSlice.reducer,
         party: partySlice.reducer,
+        alerts: alertSlice.reducer,
     }
 })
 

@@ -20,14 +20,12 @@ export function useProfileHook() {
         { title: "Friends", isActive: "false" }
     ]);
     const [userState, setUserState] = useState<ProfileState | undefined>(undefined);
-    const [friendRequestSent, setFriendRequestSent] = useState<number>(0);
     const [statsMode, setStatsMode] = useState<Modes>(Modes.Singles); 
 
+    let { currentUser, token, friendList } = useAppSelector(state => state.auth);
     const params = useParams();
     const modalStatus = useContext(ModalContext);
-    let {currentUser, token, friendList} = useAppSelector(state => state.auth);
-    let {notifications} = useAppSelector(state => state.notification);
-    const {socket} = useContext(SocketContext);
+    const { socket } = useContext(SocketContext);
 
     const handleClick = (index: number) => {
         let newArray = [...attributes];
@@ -35,7 +33,7 @@ export function useProfileHook() {
         newArray.find(elem => {
             if (elem.isActive === "true")
                 elem.isActive = "false"
-       })
+        })
         newArray[index].isActive = "true";
         setAttributes(newArray);
     }
@@ -68,14 +66,18 @@ export function useProfileHook() {
 
     useEffect(() => {
         if (params.username === currentUser?.username) {
-            setUserState((prev: any) => { return {...prev, friendList: friendList}});
+            setUserState((prev: ProfileState | undefined) => { return prev ? {...prev, friendList: friendList} : prev});
         }
-    }, [friendList, notifications, friendRequestSent])
+    }, [friendList])
 
     useEffect(() => {
-        socket?.on("RequestValidation", (() => {
-            setFriendRequestSent(prev => {return prev + 1});
-        }))
+        socket?.on("RelationUpdate", (data: {id: number, relation: string}) => {
+            setUserState((prev: ProfileState | undefined) => {
+                return prev && data.id === prev.user.id ? {
+                    ...prev,
+                    relationStatus: data.relation
+                } : prev});
+        });
 
         socket?.on("StatusUpdate", (data: {id: number, status: UserStatus}) => {
             console.log("StatusUpdate", data);
@@ -87,7 +89,7 @@ export function useProfileHook() {
         });
 
         return () => {
-            socket?.off("RequestValidation");
+            socket?.off("RelationUpdate");
             socket?.off("StatusUpdate");
         }
     }, [socket])

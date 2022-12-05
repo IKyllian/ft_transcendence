@@ -13,6 +13,7 @@ export class GatewayExceptionFilter extends BaseWsExceptionFilter {
 		} else {
 			console.log(exception.message);
 			console.log("unknown exception");
+			// TODO
 		}
 	}
 }
