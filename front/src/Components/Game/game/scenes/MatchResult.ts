@@ -17,6 +17,7 @@ import AssetRankChampion from '../../../../Images-Icons/Ranks/champion.png';
 import AssetRankLegend from '../../../../Images-Icons/Ranks/legend.png';
 
 
+
 export default class MatchResult extends Phaser.Scene
 {
 	constructor ()
@@ -63,46 +64,50 @@ export default class MatchResult extends Phaser.Scene
 
 	preload ()
 	{
-		loadAvatar(
-			this.game.registry.get('players_data').TeamBlue_Back.user,
-			'TeamBlue_back_avatar',
-			this.registry.get('token'),
-			this.registry.get('cache'),
-			this);
+		// loadAvatar(
+		// 	this.game.registry.get('players_data').TeamBlue_Back.user,
+		// 	'TeamBlue_back_avatar',
+		// 	this.registry.get('token'),
+		// 	this.registry.get('cache'),
+		// 	this);
 
-		loadAvatar(
-			this.game.registry.get('players_data').TeamRed_Back.user,
-			'TeamRed_back_avatar',
-			this.registry.get('token'),
-			this.registry.get('cache'),
-			 this);
+		// loadAvatar(
+		// 	this.game.registry.get('players_data').TeamRed_Back.user,
+		// 	'TeamRed_back_avatar',
+		// 	this.registry.get('token'),
+		// 	this.registry.get('cache'),
+		// 	 this);
 
 		this.game_type = this.game.registry.get('players_data').game_settings.game_type;
 
-		if (this.game_type === GameType.Doubles)
-		{
-			loadAvatar(
-				this.game.registry.get('players_data').TeamBlue_Front.user,
-				'TeamBlue_front_avatar',
-				this.registry.get('token'),
-				this.registry.get('cache'),
-				 this);
-			loadAvatar(
-				this.game.registry.get('players_data').TeamBlue_Front.user,
-				'TeamBlue_front_avatar',this.registry.get('token'),
-				this.registry.get('cache'),
-				 this);
-		}
+		// if (this.game_type === GameType.Doubles)
+		// {
+		// 	loadAvatar(
+		// 		this.game.registry.get('players_data').TeamBlue_Front.user,
+		// 		'TeamBlue_front_avatar',
+		// 		this.registry.get('token'),
+		// 		this.registry.get('cache'),
+		// 		 this);
+		// 	loadAvatar(
+		// 		this.game.registry.get('players_data').TeamBlue_Front.user,
+		// 		'TeamBlue_front_avatar',this.registry.get('token'),
+		// 		this.registry.get('cache'),
+		// 		 this);
+		// }
 
-		await_load_base64(AssetRankSilver, "Silver", this);
-		await_load_base64(AssetRankGold, "Gold", this);
-		await_load_base64(AssetRankPlatine, "Platine", this);
-		await_load_base64(AssetRankDiamond, "Diamond", this);
-		await_load_base64(AssetRankChampion, "Champion", this);
-		await_load_base64(AssetRankLegend, "Legend", this);
+		// await_load_base64(AssetRankSilver, "Silver", this);
+		// await_load_base64(AssetRankGold, "Gold", this);
+		// await_load_base64(AssetRankPlatine, "Platine", this);
+		// await_load_base64(AssetRankDiamond, "Diamond", this);
+		// await_load_base64(AssetRankChampion, "Champion", this);
+		// await_load_base64(AssetRankLegend, "Legend", this);
 
-		await_load_base64(AssetRankUP, "rank_UP", this);
-		await_load_base64(AssetRankDOWN, "rank_DOWN", this);
+		// await_load_base64(AssetRankUP, "rank_UP", this);
+		// await_load_base64(AssetRankDOWN, "rank_DOWN", this);
+
+		this.load.image("rank_UP", AssetRankUP);
+		this.load.image("rank_DOWN", AssetRankDOWN);
+
 		this.scene.remove('Pong');
 	}
 
@@ -111,9 +116,23 @@ export default class MatchResult extends Phaser.Scene
 		this.me = this.game.registry.get('players_data').player_type;
 		this.winner = this.game.registry.get('winner');
 
-		this.TeamBlue_Back_name = this.game.registry.get('players_data').TeamBlue_Back.name;
-		this.TeamRed_Back_name = this.game.registry.get('players_data').TeamRed_Back.name;
-		
+		// this.TeamBlue_Back_name = this.game.registry.get('players_data').TeamBlue_Back.name;
+		// this.TeamRed_Back_name = this.game.registry.get('players_data').TeamRed_Back.name;
+	
+		let style: Phaser.Types.GameObjects.Text.TextStyle = 
+		{
+			fontSize: '32px',
+			color: '#000000',
+			fontFamily: 'Arial'
+		}
+
+		this.TeamBlue_Back_name = this.add.text(100, 360, "" +
+								this.game.registry.get('players_data').TeamBlue_Back.user.username, style);
+		this.TeamRed_Back_name = this.add.text(700, 360, "" +
+								this.game.registry.get('players_data').TeamRed_Back.user.username, style);
+
+
+
 		this.TeamBlue_Back_avatar = this.add.image(130, 130, 'TeamBlue_back_avatar')
 								.setOrigin(0.5,0.5)
 								.setDisplaySize(150, 150);
@@ -122,8 +141,10 @@ export default class MatchResult extends Phaser.Scene
 								.setDisplaySize(150, 150);
 		if (this.game_type === GameType.Doubles)
 		{
-			this.TeamBlue_Front_name = this.game.registry.get('players_data').TeamBlue_Front.name;
-			this.TeamRed_Front_name = this.game.registry.get('players_data').TeamRed_Front.name;
+			this.TeamBlue_Front_name = this.add.text(300, 360, "" +
+					this.game.registry.get('players_data').TeamBlue_Front.user.username, style);
+			this.TeamRed_Front_name = this.add.text(500, 360, "" +
+					this.game.registry.get('players_data').TeamRed_Front.user.username, style);
 			this.TeamBlue_Front_avatar = this.add.image(260, 130, 'TeamBlue_front_avatar')
 								.setOrigin(0.5,0.5)
 								.setDisplaySize(150, 150);
@@ -138,13 +159,6 @@ export default class MatchResult extends Phaser.Scene
 								.setName('close')
 								.setInteractive();
 
-		let style: Phaser.Types.GameObjects.Text.TextStyle = 
-		{
-			fontSize: '32px',
-			color: '#000000',
-			fontFamily: 'Arial'
-		}
-
 		let text: string;
 
 		if(this.game_type === GameType.Singles)
@@ -153,11 +167,11 @@ export default class MatchResult extends Phaser.Scene
 			{
 				if (this.winner === EndResult.TeamBlue_Win)
 				{
-					text = this.TeamBlue_Back_name + " Wins";
+					text = this.game.registry.get('players_data').TeamBlue_Back.user.username + " Wins";
 				}
 				else
 				{
-					text = this.TeamRed_Back_name + " Wins";
+					text = this.game.registry.get('players_data').TeamRed_Back.user.username + " Wins";
 				}
 			}
 			else if ((this.me === PlayerType.TeamBlue_Back && this.winner === EndResult.TeamBlue_Win)
@@ -176,11 +190,17 @@ export default class MatchResult extends Phaser.Scene
 			{
 				if (this.winner === EndResult.TeamBlue_Win)
 				{
-					text = "Team" + this.TeamBlue_Back_name + " and " + this.TeamBlue_Front_name + " Wins";
+					text = "Team"
+						+ this.game.registry.get('players_data').TeamBlue_Back.user.username
+						+ " and " + this.game.registry.get('players_data').TeamBlue_Front.user.username
+						+ " Wins";
 				}
 				else
 				{
-					text = "Team" + this.TeamRed_Back_name + " and " + this.TeamRed_Front_name + " Wins";
+					text = "Team"
+					+ this.game.registry.get('players_data').TeamRed_Back.user.username
+					+ " and " + this.game.registry.get('players_data').TeamRed_Front.user.username
+					+ " Wins";
 				}
 			}
 			else if (((this.me === PlayerType.TeamBlue_Back || this.me === PlayerType.TeamBlue_Front)
