@@ -19,6 +19,7 @@ import { addAlert, AlertType } from "../Redux/AlertSlice";
 export function useAppHook() {
     const [socket, setSocket] = useState<Socket | undefined>(undefined);
     const [cache, setCache] = useState<Cache | undefined | null>(undefined);
+	const [intervalId, setIntervalId] = useState<ReturnType<typeof setInterval> | undefined>(undefined)
     const { token, isAuthenticated, currentUser, displayQRCode, isSign } = useAppSelector((state) => state.auth);
 	const { party, chatIsOpen, isInQueue } = useAppSelector(state => state.party);
 	const { currentChannelId } = useAppSelector((state) => state.channel);
@@ -70,12 +71,20 @@ export function useAppHook() {
 
 	useEffect(() => {
         if (isInQueue) {
-            setInterval(() => {
+            setIntervalId(setInterval(() => {
                 dispatch(incrementQueueTimer());
-            }, 1000)
+            }, 1000))
         } else {
+			if (intervalId) {
+				clearInterval(intervalId);
+				setIntervalId(undefined);
+			}
             dispatch(resetQueueTimer());
         }
+
+		return () => {
+			clearInterval(intervalId);
+		}
     }, [isInQueue])
 
 	useEffect(() => {
