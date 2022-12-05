@@ -15,6 +15,7 @@ import { EditPasswordDto } from "./dto/edit-password.dto";
 import * as sharp from 'sharp';
 import * as fs from "fs";
 import { promisify } from "util";
+import * as path from 'path';
 const readFileAsyc = promisify(fs.readFile);
 
 @Injectable()
@@ -87,11 +88,6 @@ export class UserService {
 			throw new ForbiddenException('Username taken');
 		user.username = name;
 		return this.userRepo.save(user);
-		//TODO return user
-		return {
-			access_token: ((await this.authService.signTokens(user.id, user.username)).access_token),
-			user: user,
-		}
 	}
 
 	async editPassword(user: User, dto: EditPasswordDto) {
@@ -137,8 +133,20 @@ export class UserService {
 	}
 
 	async updateAvatar(user: User, fileName: string) {
-		user.avatar = fileName;
-		await this.userRepo.save(user);
+		if (user.avatar) {
+			try {
+				// console.log("update avatar", user.avatar)
+				fs.unlinkSync(path.join('uploads', user.avatar));
+			} catch(e) {
+				console.error(e);
+			}
+		}
+		this.userRepo.createQueryBuilder('user')
+			.update()
+			.where('id = :id', { id: user.id })
+			.set({ avatar: () => ":avatar"})
+			.setParameter('avatar', fileName)
+			.execute()
 	}
 
 	logout(user: User) {

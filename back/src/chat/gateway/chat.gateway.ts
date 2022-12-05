@@ -72,6 +72,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		
 		if (!user) {
 			socket.emit('Logout');
+			return;
 		}
 		socket.user = user;
 		console.log(user.username, 'connected')
