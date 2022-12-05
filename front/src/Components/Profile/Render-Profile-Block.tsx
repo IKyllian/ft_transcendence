@@ -13,7 +13,7 @@ function RenderProfileBlock(props: {blockTitle: string, userDatas: UserInterface
         );
     } else if (blockTitle === "Matches") {
         return (
-            <BlockMatchHistory userDatas={userDatas} matchHistory={matchHistory} />
+            <BlockMatchHistory matchHistory={matchHistory} />
         );
     } else {
         return (

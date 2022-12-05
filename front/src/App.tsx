@@ -88,7 +88,7 @@ const routes: RouteProps[] = [
 				<Profile />
 			</PrivateRoute>,
 	}, {
-		path: '/profile/:username/settings',
+		path: '/profile/settings',
 		element:
 			<PrivateRoute>
 				<ProfileSettings />

@@ -70,8 +70,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			user = await this.authService.verify(token);
 		}
 		
-		if (!user) {
+		if (user === null) {
 			socket.emit('Logout');
+			return ;
 		}
 		socket.user = user;
 		console.log(user.username, 'connected')

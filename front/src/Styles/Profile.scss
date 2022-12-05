@@ -235,9 +235,16 @@ $FontSizeTextResponsive: 15px;
                 position: relative;
                 justify-content: center;
                 gap: 10px;
-                height: 50px;
+                padding: 5px;
                 background-color: $LightDarkPalette;
                 border-radius: 10px;
+                overflow-x: scroll;
+
+                .wrapper-2v2 {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 7px
+                }
 
                 .player-container {
                     @include flex-row-alignCenter();
@@ -246,6 +253,12 @@ $FontSizeTextResponsive: 15px;
                     .avatar-player {  
                         @include avatar-player(40px);
                     }
+                }
+
+                .side-reverse {
+                    display: flex;
+                    flex-direction: row-reverse;
+                    align-items: center;
                 }
         
                 .history-score {
@@ -420,7 +433,7 @@ $FontSizeTextResponsive: 15px;
                     gap: 0;
                     .player-container {
                         font-size: 13px;   
-                        @include overflowScroll("x");
+                        // @include overflowScroll("x");
                         .avatar-player {  
                             @include avatar-player(30px);
                         }

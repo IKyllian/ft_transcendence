@@ -3,7 +3,7 @@ import { useContext, useState } from "react";
 import { fetchUploadAvatar } from "../../../Api/Profile/Profile-Fetch";
 import { CacheContext } from "../../../App";
 import { addAlert, AlertType } from "../../../Redux/AlertSlice";
-import { setUserAvatar } from "../../../Redux/AuthSlice";
+import { addAvatar, setUserAvatar } from "../../../Redux/AuthSlice";
 import { useAppDispatch, useAppSelector } from "../../../Redux/Hooks";
 import { updatePlayerAvatar } from "../../../Utils/Utils-User";
 import ExternalImage from "../../External-Image";
@@ -20,14 +20,22 @@ function SettingsCardAvatar() {
         if (inputFile) {
             let formData = new FormData();
             formData.append("image", inputFile);
-            fetchUploadAvatar(token, formData);
-            if (cache && currentUser) {
-                const newUrl: string | undefined = await updatePlayerAvatar(cache, token, currentUser?.id);
-                console.log("newUrl", newUrl);
-                if (newUrl)
-                    dispatch(setUserAvatar(newUrl));
-            }
-            dispatch(addAlert({message: "New Avatar Uploaded", type: AlertType.SUCCESS}));
+            fetchUploadAvatar(token, formData).then(async (response) => {
+                console.log("Response Upload", response);
+                if (cache && currentUser) {
+                    const newUrl: string | undefined = await updatePlayerAvatar(cache, token, currentUser?.id);
+                    console.log("newUrl", newUrl);
+                    if (newUrl) {
+                        dispatch(setUserAvatar(newUrl));
+                    }
+                    // dispatch(addAvatar(response.data.filename))
+                }
+                dispatch(addAlert({message: "New Avatar Uploaded", type: AlertType.SUCCESS}));
+            })  
+            .catch(err => {
+                dispatch(addAlert({message: "Failed To Upload", type: AlertType.ERROR}));
+                console.log(err);
+            })
         }
     }
     
@@ -51,7 +59,6 @@ function SettingsCardAvatar() {
                 {inputFile && <img className='profile-avatar' src={urlFile} alt="New Avatar" />  }
                 <form onSubmit={(e) => onSubmit(e)}>
                     <label>
-                        {/* <button>  Upload </button> */}
                         <IconUpload />
                         Upload
                         <input type="file" onChange={(e) => onFileChange(e)} />

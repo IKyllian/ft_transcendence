@@ -1,5 +1,5 @@
 import { useContext } from 'react';
-import { IconEdit, IconMessage, IconBrandAppleArcade, IconSettings } from '@tabler/icons';
+import { IconMessage, IconBrandAppleArcade, IconSettings } from '@tabler/icons';
 import { ProfileState, UserStatus } from '../../Types/User-Types';
 import { Link } from "react-router-dom";
 import FriendButton from '../Buttons/Friend-Button';
@@ -25,12 +25,9 @@ function CardInfo(props: {userState: ProfileState}) {
             <p> {userState.user.username} </p>
             {
                 userState.isLoggedUser ? 
-                <>
-                    {/* <IconEdit /> */}
-                    <Link to={`/profile/${userState.user.username}/settings`}>
-                        <IconSettings className='settings-icon' />
-                    </Link>
-                </>
+                <Link to={`/profile/settings`}>
+                    <IconSettings className='settings-icon' />
+                </Link>
                 : 
                 <>
                     <FriendButton secondUserId={userState.user.id} relationStatus={userState.relationStatus!} />
