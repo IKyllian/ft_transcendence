@@ -3,9 +3,9 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useForm } from "react-hook-form";
 import { useAppDispatch, useAppSelector } from '../../Redux/Hooks'
 import { uid } from "../../env";
-import { fetchSignIn, fetchSignUp, fetchLogin42 } from '../../Api/Sign/Sign-Fetch';
+import { fetchSignIn, fetchSignUp, fetchLogin42, fetchVerifyToken } from '../../Api/Sign/Sign-Fetch';
 
-import { loginError, loginPending, loginSuccess, setUsername, verification2fa } from "../../Redux/AuthSlice";
+import { loginError, loginPending, loginSuccess, setUsername, stopIsConnectedLoading, verification2fa } from "../../Redux/AuthSlice";
 import { LoginPayload } from '../../Types/User-Types';
 
 type FormValues = {
@@ -27,6 +27,15 @@ export function useSignHook() {
         setIsSignIn(!isSignIn);
         reset();
     }
+
+    const verifyToken = () => {
+		const localToken: string | null = localStorage.getItem("userToken");
+		if (localToken !== null) {
+			fetchVerifyToken(localToken, dispatch);
+		} else {
+			dispatch(stopIsConnectedLoading());
+		}
+	}
     
     const onSignIn = handleSubmit((data, e) => {
         e?.preventDefault();
@@ -57,6 +66,7 @@ export function useSignHook() {
     });
 
     useEffect(() => {
+        window.addEventListener('storage', () => verifyToken());
         const authorizationCode = searchParams.get('code');
         if (authorizationCode) {
             if (authDatas.setUsersame || authDatas.error || !authDatas.loading)
@@ -84,6 +94,10 @@ export function useSignHook() {
                 dispatch(loginError("Error while login with 42"));
             });
         }
+
+        return () => {
+            window.removeEventListener('storage', () => {});
+        }
     }, []);
 
     const sign42 = (e: any) => {
@@ -91,7 +105,6 @@ export function useSignHook() {
         const url: string = "https://api.intra.42.fr/oauth/authorize";
         const params: string = `?client_id=${uid}&redirect_uri=http://localhost:3000/sign&response_type=code`;
         const ret = window.location.replace(url+params);
-        // const ret = window.open(url+params, "", "popup");
     }
 
     return {

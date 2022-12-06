@@ -11,10 +11,11 @@ import { UserInterface } from "../Types/User-Types";
 import { copyFriendListArray, logoutSuccess, stopIsConnectedLoading, userFullAuthenticated } from "../Redux/AuthSlice";
 import { GameMode, PartyInterface, PartyMessage } from "../Types/Lobby-Types";
 import { copyNotificationArray } from "../Redux/NotificationSlice";
-import { addParty, addPartyInvite, addPartyMessage, cancelQueue, changePartyGameMode, changeQueueStatus, incrementQueueTimer, leaveParty, removePartyInvite, resetQueueTimer } from "../Redux/PartySlice";
+import { addParty, addPartyInvite, addPartyMessage, cancelQueue, changePartyGameMode, changeQueueStatus, incrementQueueTimer, leaveParty, newGameFound, removePartyInvite, resetQueueTimer } from "../Redux/PartySlice";
 import { fetchVerifyToken } from "../Api/Sign/Sign-Fetch";
 import { addChannelUser, banChannelUser, muteChannelUser, removeTimeoutChannelUser, removeChannelUser, setChannelDatas, updateChannelUser, unsetChannelDatas, unsetChannelId } from "../Redux/ChannelSlice";
 import { addAlert, AlertType } from "../Redux/AlertSlice";
+import { PlayersGameData } from "../Components/Game/game/types/shared.types";
 
 export function useAppHook() {
     const [socket, setSocket] = useState<Socket | undefined>(undefined);
@@ -58,7 +59,7 @@ export function useAppHook() {
 			console.log("ERR", err);
 		})
 	}
-
+	
 	useEffect(() => {
 		console.log("GET ITEM");
 		const localToken: string | null = localStorage.getItem("userToken");
@@ -233,6 +234,13 @@ export function useAppHook() {
                 dispatch(removeChannel(data.id));
             });
 
+			socket?.on("newgame_data", (data: PlayersGameData) => {
+				console.log("new_game_data", data);
+				dispatch(changeQueueStatus(false));
+				dispatch(newGameFound(data));
+				// navigate("/game", {state: data});
+			});
+
 			socket.on("Logout", () => {
 				socket.disconnect();
 				setSocket(undefined);
@@ -254,6 +262,7 @@ export function useAppHook() {
 			socket?.off("exception");
 			socket?.off("OnJoin");
 			socket?.off("OnLeave");
+			socket?.off("newgame_data");
 			socket?.off("Logout");
 		}
 	}, [socket])

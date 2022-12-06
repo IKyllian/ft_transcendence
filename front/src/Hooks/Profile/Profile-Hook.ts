@@ -2,7 +2,7 @@ import { useState, useContext, useEffect } from "react";
 import { ModalContext } from "../../Components/Utils/ModalProvider";
 import { ProfileState, UserStatus } from "../../Types/User-Types";
 import { useAppSelector } from '../../Redux/Hooks';
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { SocketContext } from "../../App";
 import { fetchProfile, fetchMe } from "../../Api/Profile/Profile-Fetch";
 import { Modes } from "../../Types/Utils-Types";
@@ -26,6 +26,7 @@ export function useProfileHook() {
     const params = useParams();
     const modalStatus = useContext(ModalContext);
     const { socket } = useContext(SocketContext);
+    const navigate = useNavigate();
 
     const handleClick = (index: number) => {
         let newArray = [...attributes];
@@ -60,7 +61,11 @@ export function useProfileHook() {
                         relationStatus: fetchResponse.data.relationStatus ? fetchResponse.data.relationStatus : undefined,
                     });
                 }
-            });
+            })
+            .catch((err) => {
+                console.log(err);
+                navigate("*");
+            })
         }
     }, [params.username])
 

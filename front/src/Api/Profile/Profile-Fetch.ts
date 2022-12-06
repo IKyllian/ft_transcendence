@@ -17,13 +17,22 @@ export async function fetchMe(token: string): Promise<AxiosResponse<any, any>> {
     });
 }
 
-export async function fetchUploadAvatar(token: string, file: FormData): Promise<AxiosResponse<any, any>> {
-    return await axios.post(`${baseUrl}/users/avatar/upload`, {image: file.get("image")}, {
+
+// export async function fetchUploadAvatar(token: string, file: FormData): Promise<AxiosResponse<any, any>> {
+export async function fetchUploadAvatar(token: string, file: FormData): Promise<Response> {
+    return await fetch(`${baseUrl}/users/avatar/upload`, {
+        method: 'POST',
+        body: file, 
         headers: {
             "Authorization": `Bearer ${token}`,
-            'Content-Type': 'multipart/form-data',
         }
-    })
+    });
+    // return await axios.post(`${baseUrl}/users/avatar/upload`, {image: file.get("image")}, {
+    //     headers: {
+    //         "Authorization": `Bearer ${token}`,
+    //         'Content-Type': 'multipart/form-data',
+    //     }
+    // })
 }
 
 export async function fetchResponseAvatar(req: Request): Promise<Response> {

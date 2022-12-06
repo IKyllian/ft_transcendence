@@ -1,5 +1,5 @@
 import { IconX } from "@tabler/icons";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../Redux/Hooks";
 import { stopShowGameFound, unsetGameFound } from "../../Redux/PartySlice";
@@ -8,15 +8,22 @@ function MatchFound() {
     const { gameFound } = useAppSelector(state => state.party);
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
+    const [timeoutId, setTimeoutId] = useState<ReturnType<typeof setTimeout> | undefined>(undefined);
 
     useEffect(() => {
-        setTimeout(() => {
-            dispatch(unsetGameFound());
-        }, 10000)
-    }, []);
+        if (gameFound && gameFound.showGameFound) {
+            setTimeoutId(setTimeout(() => {
+                dispatch(unsetGameFound());
+            }, 10000))
+        }
+    }, [gameFound?.showGameFound]);
 
     const handleClick = () => {
         if (gameFound) {
+            if (timeoutId) {
+                clearTimeout(timeoutId);
+                setTimeoutId(undefined);
+            }
             dispatch(stopShowGameFound());
             navigate("/game", {state: gameFound.gameDatas});
         }

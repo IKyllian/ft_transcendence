@@ -2,10 +2,10 @@ import { IconUpload } from "@tabler/icons";
 import { useContext, useState } from "react";
 import { fetchUploadAvatar } from "../../../Api/Profile/Profile-Fetch";
 import { CacheContext } from "../../../App";
+import { baseUrl } from "../../../env";
 import { addAlert, AlertType } from "../../../Redux/AlertSlice";
-import { addAvatar, setUserAvatar } from "../../../Redux/AuthSlice";
+import { setUserAvatar } from "../../../Redux/AuthSlice";
 import { useAppDispatch, useAppSelector } from "../../../Redux/Hooks";
-import { updatePlayerAvatar } from "../../../Utils/Utils-User";
 import ExternalImage from "../../External-Image";
 
 function SettingsCardAvatar() {
@@ -23,14 +23,17 @@ function SettingsCardAvatar() {
             fetchUploadAvatar(token, formData).then(async (response) => {
                 console.log("Response Upload", response);
                 if (cache && currentUser) {
-                    const newUrl: string | undefined = await updatePlayerAvatar(cache, token, currentUser?.id);
-                    console.log("newUrl", newUrl);
-                    if (newUrl) {
-                        dispatch(setUserAvatar(newUrl));
+                    const req = new Request(`${baseUrl}/users/${currentUser.id}/avatar`, {method: 'GET', headers: {"Authorization": `Bearer ${token}`}});
+                    if (!response.ok)
+                        dispatch(addAlert({message: "Failed To Upload", type: AlertType.ERROR}));
+                    else {
+                        cache.put(req, response.clone());
+                        const avatarBlob = await response.blob();
+                        if (avatarBlob)
+                            dispatch(setUserAvatar(URL.createObjectURL(avatarBlob)));    
+                        dispatch(addAlert({message: "New Avatar Uploaded", type: AlertType.SUCCESS}));
                     }
-                    // dispatch(addAvatar(response.data.filename))
-                }
-                dispatch(addAlert({message: "New Avatar Uploaded", type: AlertType.SUCCESS}));
+                }  
             })  
             .catch(err => {
                 dispatch(addAlert({message: "Failed To Upload", type: AlertType.ERROR}));

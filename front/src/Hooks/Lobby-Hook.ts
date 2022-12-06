@@ -209,21 +209,21 @@ export function useLobbyHook() {
         const checkGame = async () => {
             await fetchIsAlreadyInGame(token).then(result => { 
                 if (!result) {
-                    socket?.on("newgame_data", (data: PlayersGameData) => {
-                        console.log("new_game_data", data);
-                        dispatch(changeQueueStatus(false));
-                        dispatch(newGameFound(data));
-                        // navigate("/game", {state: data});
-                    });
+                    // socket?.on("newgame_data", (data: PlayersGameData) => {
+                    //     console.log("new_game_data", data);
+                    //     dispatch(changeQueueStatus(false));
+                    //     dispatch(newGameFound(data));
+                    //     // navigate("/game", {state: data});
+                    // });
                 } else
                     navigate("/");
                 return result
             });
         }
         checkGame();     
-        return () => {
-            socket?.off("newgame_data");
-        }
+        // return () => {
+        //     socket?.off("newgame_data");
+        // }
     }, [])
 
     return {
