@@ -10,7 +10,7 @@ import { Auth42Dto } from "./dto/auth42.dto";
 import { User } from "src/typeorm";
 import { SignupDto } from "./dto/signup.dto";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { IsNull, Repository } from "typeorm";
 import * as nodemailer from 'nodemailer';
 import { ForgotPasswordDto } from "./dto/forgot-password.dto";
 import { v4 as uuidv4 } from "uuid";
@@ -76,7 +76,7 @@ export class AuthService {
 			.leftJoinAndSelect("user.blocked", "Blocked")
 			.getOne();
 
-		if (!user || !user.account.hash) {
+		if (!user || user.id42 || !user.account.hash) {
 			throw new NotFoundException('invalid credentials')
 		}
 
@@ -85,7 +85,7 @@ export class AuthService {
 			dto.password,
 		);
 		if (!pwdMatches)
-			throw new UnauthorizedException('invalid credentials');
+			throw new BadRequestException('invalid credentials');
 
 		if (user.two_factor_enabled) {
 			return {
@@ -169,7 +169,7 @@ export class AuthService {
 		const [access_token, refresh_token] = await Promise.all([
 			this.jwt.signAsync(
 				{ sub: userId, username },
-				{ expiresIn: '200m', secret: this.config.get('ACCESS_SECRET') }
+				{ expiresIn: '15m', secret: this.config.get('ACCESS_SECRET') }
 			),
 			this.jwt.signAsync(
 				{ sub: userId, username },
@@ -198,7 +198,7 @@ export class AuthService {
 
 		const tokensMatches = await argon.verify(user_account.refresh_hash, refreshToken);
 		if (!tokensMatches)
-			throw new UnauthorizedException('invalid token')
+			throw new BadRequestException('invalid token')
 		
 		const tokens = await this.signTokens(user_account.user.id, user_account.user.username);
 		this.updateRefreshHash(user_account, tokens.refresh_token);
@@ -250,7 +250,10 @@ export class AuthService {
 	async forgotPassword(dto: ForgotPasswordDto) {	
 		const user = await this.userService.findOne({
 			select: ['username', 'email', 'id'],
-			where: { email: dto.email }
+			where: { 
+				email: dto.email,
+				id42: IsNull()
+			}
 		})
 
 		if (!user)

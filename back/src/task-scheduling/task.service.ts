@@ -135,23 +135,19 @@ export class TaskService {
 					}
 					if (potentialLobby.length > 1 && potentialLobby[0].players.length === 2) {
 						for (const lobby of potentialLobby) {
+							// console.log('potential lobby', lobby)
 							if (lobby.id !== potentialLobby[0].id && lobby.players.length === 2) {
 								lobby.players.forEach((player) => this.queueService.leaveQueue(player.user));
 								potentialLobby[0].players.forEach((player) => this.queueService.leaveQueue(player.user));
-								matchesFound.push(new MatchmakingLobby(potentialLobby[0], lobby, new SettingsFactory().defaultSetting(GameType.Doubles)));
-								matchFound = true;
+								this.lobbyFactory.lobby_create(new MatchmakingLobby(potentialLobby[0], lobby, new SettingsFactory().defaultSetting(GameType.Doubles)));
+								console.log("GAME FOUND")
 								break;
 							}
 						}
-						console.log("GAME FOUND")
 					}
-				}
-				if (matchFound) {
-					break;
 				}
 			}
 		}
-		matchesFound.forEach((match) => this.lobbyFactory.lobby_create(match));
 	}
 
 	@Interval('timedout-user', 30000)

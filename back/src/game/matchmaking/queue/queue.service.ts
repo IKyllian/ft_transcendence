@@ -29,12 +29,12 @@ export class QueueService {
 			queueLobby.addPlayer(new Player(user));
 		} else {
 			this.partyService.partyIsReady(party);
-			if (party.players.length !== nbOfPayersRequired) {
+			if (party.players.length > nbOfPayersRequired) {
 				throw new BadRequestException("Number of players does not fit this mode");
-			} else if (nbOfPayersRequired === 2 && party.players[0].pos === party.players[1].pos) {
+			} else if (party.players.length === 2 && party.players[0].pos === party.players[1].pos) {
 				throw new BadRequestException("Team can't be at the same position");
-			} else if (nbOfPayersRequired === 1 && party.players[0].pos !== PlayerPosition.BACK) {
-				throw new BadRequestException("Player must be at Back position");
+			} else if (party.players.length === 1 && party.players[0].pos !== PlayerPosition.BACK) {
+				party.players[0].pos = PlayerPosition.BACK
 			}
 			const player = this.partyService.getPlayerInParty(user.id, party.players)
 			if (!player.isLeader) {

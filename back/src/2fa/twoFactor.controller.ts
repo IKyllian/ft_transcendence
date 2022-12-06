@@ -61,12 +61,12 @@ export class TwoFactorController {
 	@UseGuards(Jwt1faGuard)
 	async authenticate(@GetUser() user: User, @Body() body: TwoFactorDto) {
 		if (!user.two_factor_enabled)
-			throw new UnauthorizedException('2FA is not enabled for this user');
+			throw new BadRequestException('2FA is not enabled for this user');
 
 		const isValid = this.twoFactorService.verify(body.code, user.account);
 
 		if (!isValid)
-			throw new UnauthorizedException('Invalid 2FA code');
+			throw new BadRequestException('Invalid 2FA code');
 	
 		const tokens = await this.authService.signTokens(user.id, user.username);
 		this.authService.updateRefreshHash(user.account, tokens.refresh_token);

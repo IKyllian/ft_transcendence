@@ -1,4 +1,4 @@
-import { BadRequestException, Body, ClassSerializerInterceptor, Controller, Delete, FileTypeValidator, ForbiddenException, Get, HttpStatus, MaxFileSizeValidator, NotFoundException, Param, ParseFilePipe, ParseFilePipeBuilder, ParseIntPipe, Patch, Post, Req, Request, Res, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
+import { BadRequestException, Body, ClassSerializerInterceptor, Controller, Delete, FileTypeValidator, ForbiddenException, Get, HttpStatus, MaxFileSizeValidator, NotFoundException, Param, ParseFilePipe, ParseFilePipeBuilder, ParseIntPipe, Patch, Post, Req, Res, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { Observable, of } from "rxjs";
 import { JwtGuard } from "src/auth/guard/jwt.guard";
@@ -9,7 +9,7 @@ import * as path from 'path';
 import { UserService } from "./user.service";
 import { GetUser } from "src/utils/decorators";
 import { SearchDto } from "./dto/search.dto";
-import { Response } from "express";
+import { Request, Response } from "express";
 import { EditUsernameDto } from "./dto/edit-username.dto";
 import { EditPasswordDto } from "./dto/edit-password.dto";
 
@@ -42,7 +42,7 @@ export class UserController {
 
 	@UseGuards(JwtGuard)
 	@Get('me')
-	async getMe(@GetUser() user: User, @Req() req) {
+	async getMe(@GetUser() user: User) {
 		console.log('me')
 		const match_history = await this.userService.getMatchHistory(user.id);
 		return {
@@ -54,7 +54,8 @@ export class UserController {
 	@UseGuards(JwtGuard)
 	@Post('avatar/upload')
 	@UseInterceptors(FileInterceptor('image', avatarStorage))
-	async uploadFile(@UploadedFile() file: Express.Multer.File, @GetUser() user: User, @Req() req: any) : Promise<Observable<Object>> {
+	async uploadFile(@UploadedFile() file: Express.Multer.File, @GetUser() user: User, @Res() res: Response, @Req() req: Request) {
+		console.log('file', file);
 		if (!file) {
 			throw new BadRequestException("file does not match valid extention");
 		}
@@ -63,12 +64,13 @@ export class UserController {
 		}
 		console.log("Upload Avatar", file.filename)
 		await this.userService.updateAvatar(user, file.filename);
-		return of({imagePath: file.path})
+		// return of({imagePath: file.path})
+		res.sendFile(file.filename, { root: 'uploads', headers: {"Content-Disposition": file.filename}});
 	}
 
 	@UseGuards(JwtGuard)
 	@Get(':id/avatar')
-	async serveAvatar(
+	async getAvatar(
 		@Res() res: Response,
 		@Param('id', ParseIntPipe) id: number,
 		) {
@@ -76,9 +78,9 @@ export class UserController {
 			if (!user) {
 				throw new NotFoundException('User not found');
 			}
-			console.log("Get Avatar", user.avatar)
 			if (!user.avatar) { return undefined; }
 			res.sendFile(user.avatar, { root: 'uploads', headers: {"Content-Disposition": user.avatar}});
+			console.log("Get Avatar", user.avatar)
 	}
 
 	@UseGuards(JwtGuard)
@@ -124,6 +126,9 @@ export class UserController {
 			},
 			where: { username },
 		});
+		if (!user2) {
+			throw new BadRequestException('User not found');
+		}
 		return await this.userService.getUserInfo(user, user2);
 	}
 
