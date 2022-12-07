@@ -27,30 +27,7 @@ export class Lobby
 	{
 		this.game_type = lobby_data.game_settings.game_type;
 
-
-	//	this.test();
 	}
-
-	// test()
-	// {
-
-
-	// 	setTimeout( () => {
-	// 		console.log("oops");
-	// 	//this.lobby.factory.lobby_delete(this.lobby.game_id);
-	// 	}, 2000);
-
-
-	// 	setTimeout( () => {
-	// 		console.log("oops");
-	// 	//this.lobby.factory.lobby_delete(this.lobby.game_id);
-	// 	}, 2000);
-
-	// 	// setTimeout( () => {
-	// 	// 	console.log("oops");
-	// 	// //this.lobby.factory.lobby_delete(this.lobby.game_id);
-	// 	// }, 2000);
-	// }
 
 	game_set_finished()
 	{
