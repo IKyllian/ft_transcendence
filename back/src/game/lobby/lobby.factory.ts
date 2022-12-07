@@ -193,7 +193,7 @@ export class LobbyFactory
 				}
 			});
 		});
-
+		console.log("get client info")
 		client.emit('user_gameinfo', dataToFront);
 	}
 

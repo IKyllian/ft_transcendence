@@ -11,7 +11,6 @@ import { Notification } from "./entities/notification"
 import { UserTimeout } from "./entities/userTimeout"
 import { MatchResult } from "./entities/matchResult"
 import { UserAccount } from "./entities/userAccount"
-import { Achievement } from "./entities/achievement"
 
 const entities = [
 	User,
@@ -27,7 +26,6 @@ const entities = [
 	UserTimeout,
 	MatchResult,
 	UserAccount,
-	Achievement,
 ];
 
 export default entities;
@@ -46,5 +44,4 @@ export {
 	UserTimeout,
 	MatchResult,
 	UserAccount,
-	Achievement,
 }

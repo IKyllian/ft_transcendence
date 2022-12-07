@@ -128,11 +128,11 @@ export class UserService {
 		}
 	}
 
-	async setInGameId(userId: number, game_id: string) {
+	setInGameId(userId: number, game_id: string) {
 		this.userRepo.createQueryBuilder()
 			.update(User)
 			.where("id = :userId", {userId: userId})
-			.set({ in_game_id: () => "in_game_id = :game_id" })
+			.set({ in_game_id: () => ":game_id" })
 			.setParameter("game_id", game_id)
 			.execute();
 	}
@@ -150,8 +150,8 @@ export class UserService {
 				console.error(e);
 			}
 		}
-		this.userRepo.createQueryBuilder('user')
-			.update()
+		this.userRepo.createQueryBuilder()
+			.update(User)
 			.where('id = :id', { id: user.id })
 			.set({ avatar: () => ":avatar"})
 			.setParameter('avatar', fileName)
