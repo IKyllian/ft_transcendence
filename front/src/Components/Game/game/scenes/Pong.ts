@@ -3,6 +3,14 @@ import ClientSocketManager from '../client.socket.manager';
 import PongCore from '../pong.core';
 import { GameState, Goal, Movement, PlayerInput, PlayerType, EndResult, RoundSetup, GameType, GameSettings } from '../types/shared.types';
 
+import AssetSoundA from '../../../../Assets/sound/8bit_effect_a.ogg'
+import AssetSoundB from '../../../../Assets/sound/8bit_effect_b.ogg'
+import AssetSoundClapping from '../../../../Assets/sound/clapping.ogg'
+
+//lagicon not working
+import AssetImageLagIcon from '../../../../Assets/images/button.png'
+//import AssetImageLagIcon from '../../../../Assets/images/lagicon.png'
+
 export default class Pong extends Phaser.Scene
 {
 	constructor ()
@@ -16,26 +24,26 @@ export default class Pong extends Phaser.Scene
 	game_settings: GameSettings | undefined = undefined;
 	game_type: GameType = GameType.Singles;
 
-	// sound_a?: any;
-	// sound_b?: any;
-	// sound_clapping?: any;
+	sound_a?: Phaser.Sound.BaseSound;
+	sound_b?: Phaser.Sound.BaseSound;
+	sound_clapping?: Phaser.Sound.BaseSound;
 
 	core?: PongCore;
 	game_id?: string;
 
 	//Displayed elements
 	//Images
-	//asset_lag_icon?: Phaser.GameObjects.Image;
+	asset_lag_icon?: Phaser.GameObjects.Image;
 	//Texts
 	asset_scoreboard?: Phaser.GameObjects.Text;
 	//Shapes
 	upper_limit?: Phaser.GameObjects.Shape;
 	lower_limit?: Phaser.GameObjects.Shape;
 	asset_ball?: Phaser.GameObjects.Shape;
-	asset_Player_A_Back?: Phaser.GameObjects.Shape;
-	asset_Player_A_Front?: Phaser.GameObjects.Shape;
-	asset_Player_B_Front?: Phaser.GameObjects.Shape;
-	asset_Player_B_Back?: Phaser.GameObjects.Shape;
+	asset_TeamBlue_Back?: Phaser.GameObjects.Shape;
+	asset_TeamBlue_Front?: Phaser.GameObjects.Shape;
+	asset_TeamRed_Front?: Phaser.GameObjects.Shape;
+	asset_TeamRed_Back?: Phaser.GameObjects.Shape;
 
 	//Input Keys
 	key_UP?: any;
@@ -57,8 +65,8 @@ export default class Pong extends Phaser.Scene
 		goal: Goal.None,
 		score:
 		{
-			Team_A: 0,
-			Team_B: 0
+			TeamBlue: 0,
+			TeamRed: 0
 		},
 		balldata:
 		{
@@ -66,32 +74,26 @@ export default class Pong extends Phaser.Scene
 			velocity: 0,
 			vector: { x: 0, y: 0  }
 		},
-		Player_A_Back: { x: 0, y: 300 },
-		Player_A_Front: { x: 0, y: 300 },
-		Player_B_Front: { x: 0, y: 300 },
-		Player_B_Back: { x: 0, y: 300 },
+		TeamBlue_Back: { x: 0, y: 300 },
+		TeamBlue_Front: { x: 0, y: 300 },
+		TeamRed_Front: { x: 0, y: 300 },
+		TeamRed_Back: { x: 0, y: 300 },
 		last_processed_id_A_Back: 0,
 		last_processed_id_A_Front: 0,
 		last_processed_id_B_Front: 0,
 		last_processed_id_B_Back: 0,
 		send_date: new Date()
 	};
-
-
 	update_interval: any;
 	is_lagging: boolean = true;
 	lag_count: number = 0;
 
-//test
-	frame_count: number = 0;
-
 	preload ()
 	{
-	//	this.load.image('lag_icon', 'assets/lag_icon.png');
-
-		// this.load.audio('sound_a', 'assets/sound/8bit_effect_a.ogg');
-		// this.load.audio('sound_b', 'assets/sound/8bit_effect_b.ogg');
-		// this.load.audio('clapping', 'assets/sound/clapping.ogg');
+		this.load.image('lag_icon', AssetImageLagIcon);
+		this.load.audio('sound_a', AssetSoundA);
+		this.load.audio('sound_b', AssetSoundB);
+		this.load.audio('clapping', AssetSoundClapping);
 	}
 
 	create ()
@@ -101,12 +103,12 @@ export default class Pong extends Phaser.Scene
 		this.game_id = this.registry.get('players_data').game_id;
 		this.game_settings = this.game.registry.get('players_data').game_settings;
 		this.game_type = this.game.registry.get('players_data').game_settings.game_type;
+
 		this.me = this.game.registry.get('players_data').player_type;
 	
-
-		// this.sound_a = this.sound.add('sound_a');
-		// this.sound_b = this.sound.add('sound_b');
-		// this.sound_clapping = this.sound.add('clapping');
+		this.sound_a = this.sound.add('sound_a');
+		this.sound_b = this.sound.add('sound_b');
+		this.sound_clapping = this.sound.add('clapping');
 	
 		if (this.socketmanager !== undefined)
 		{
@@ -119,30 +121,32 @@ export default class Pong extends Phaser.Scene
 
 		}
 
-		//placing visual elements outside of board for their first instanciation to prevent ghosted visuals
-		// this.asset_lag_icon = this.add.image(10400, 300, 'lag_icon');
-		// this.asset_lag_icon.setAlpha(1);
+
+		this.asset_lag_icon = this.add.image(400, 300, 'lag_icon');
+		this.asset_lag_icon.setAlpha(0);
 
 		if (this.game_settings)
 		{
 			this.core = new PongCore(this.game_settings);
 
-			this.game_state.game_type = this.game.registry.get('players_data').game_settings.game_type;
-			this.game_state.Player_A_Back.x = this.game_settings.player_back_advance;
-			this.game_state.Player_A_Front.x = this.game_settings.player_front_advance;
-			this.game_state.Player_B_Back.x = 800 - this.game_settings.player_back_advance;
-			this.game_state.Player_B_Front.x = 800 - this.game_settings.player_front_advance;
-			this.asset_ball = this.add.circle(10400, 300, 5, 0x000000);
-			this.upper_limit = this.add.rectangle(10000, 0, 800, this.game_settings.up_down_border , 0x000000).setOrigin(0,0);
-			this.lower_limit = this.add.rectangle(10000, (600 - (this.game_settings.up_down_border)), 800, this.game_settings.up_down_border, 0x000000).setOrigin(0,0);
+			//???
+		//	this.game_state.game_type = this.game.registry.get('players_data').game_settings.game_type;
+
+			this.game_state.TeamBlue_Back.x = this.game_settings.player_back_advance;
+			this.game_state.TeamBlue_Front.x = this.game_settings.player_front_advance;
+			this.game_state.TeamRed_Back.x = 800 - this.game_settings.player_back_advance;
+			this.game_state.TeamRed_Front.x = 800 - this.game_settings.player_front_advance;
+			this.asset_ball = this.add.circle(400, 300, 5, 0x000000);
+			this.upper_limit = this.add.rectangle(0, 0, 800, this.game_settings.up_down_border , 0x000000).setOrigin(0,0);
+			this.lower_limit = this.add.rectangle(0, (600 - (this.game_settings.up_down_border)), 800, this.game_settings.up_down_border, 0x000000).setOrigin(0,0);
 	
-			this.asset_Player_A_Back = this.add.rectangle(10000, 300, 10, this.game_settings.paddle_size_h, 0x000000).setOrigin(1,0.5);
-			this.asset_Player_B_Back = this.add.rectangle((10000), 300, 10, this.game_settings.paddle_size_h, 0x000000).setOrigin(0,0.5);
+			this.asset_TeamBlue_Back = this.add.rectangle(this.game_settings.player_back_advance, 300, 10, this.game_settings.paddle_size_h, 0x000000).setOrigin(1,0.5);
+			this.asset_TeamRed_Back = this.add.rectangle((800 - this.game_settings.player_back_advance), 300, 10, this.game_settings.paddle_size_h, 0x000000).setOrigin(0,0.5);
 	
 			if (this.game_type === GameType.Doubles)
 			{
-				this.asset_Player_A_Front = this.add.rectangle(10000, 300, 10, this.game_settings.paddle_size_h, 0x000000).setOrigin(1,0.5);
-				this.asset_Player_B_Front = this.add.rectangle((10000), 300, 10, this.game_settings.paddle_size_h, 0x000000).setOrigin(0,0.5);
+				this.asset_TeamBlue_Front = this.add.rectangle(this.game_settings.player_front_advance, 300, 10, this.game_settings.paddle_size_h, 0x000000).setOrigin(1,0.5);
+				this.asset_TeamRed_Front = this.add.rectangle((800 - this.game_settings.player_front_advance), 300, 10, this.game_settings.paddle_size_h, 0x000000).setOrigin(0,0.5);
 			
 			}
 			
@@ -156,8 +160,8 @@ export default class Pong extends Phaser.Scene
 		}
 
 		let text: string;
-		text = this.game_state.score.Team_A.toString() + " - " + this.game_state.score.Team_B.toString();
-		this.asset_scoreboard = this.add.text(10000, 100, text, style);
+		text = this.game_state.score.TeamBlue.toString() + " - " + this.game_state.score.TeamRed.toString();
+		this.asset_scoreboard = this.add.text(400, 100, text, style);
 
 
 		if (this.me !== PlayerType.Spectator)
@@ -170,75 +174,26 @@ export default class Pong extends Phaser.Scene
 
 		if (this.core !== undefined)
 		{
-			// this.core.set_pong_triggers({
-			// 	sound_event_wall: this.sound_event_wall.bind(this),
-			// 	sound_event_paddle: this.sound_event_paddle.bind(this),
-			// 	sound_event_goal: this.sound_event_goal.bind(this)
-			// });
+			this.core.set_pong_triggers({
+				sound_event_wall: this.sound_event_wall.bind(this),
+				sound_event_paddle: this.sound_event_paddle.bind(this),
+				sound_event_goal: this.sound_event_goal.bind(this)
+			});
 		}
 
-		this.place_assets();
-
-		clearInterval(this.update_interval);
-		this.update_interval = setInterval(
-		  (function(self) { return function()
-			{
-				self.frame_advance();
-			}; })(this),
-		  1000 / 60);
-	}
-
-
-	place_assets()
-	{
-		if (this.game_settings)
-		{
-			// this.asset_lag_icon!.x = 400;
-			this.asset_ball!.x = 400;
-			this.upper_limit!.x = 0;
-			this.lower_limit!.x = 0;
-
-			this.asset_Player_A_Back!.x = this.game_settings.player_back_advance;
-			this.asset_Player_B_Back!.x = (600 - this.game_settings.player_back_advance); 
-			this.asset_scoreboard!.x = 400;
-			if (this.game_type === GameType.Doubles)
-			{
-				this.asset_Player_A_Front!.x = this.game_settings.player_front_advance;
-				this.asset_Player_B_Front!.x = (600 - this.game_settings.player_front_advance);
-			}
-		}
+		setTimeout(() => {
+			clearInterval(this.update_interval);
+			this.update_interval = setInterval(
+			  (function(self) { return function()
+				{
+					self.frame_advance();
+				}; })(this),
+			  1000 / 60);
+		}, 50);
 	}
 
 	frame_advance()
 	{
-
-		if (this.frame_count === 0)
-		{
-			this.frame_count++;
-		//	this.place_assets();
-			return;
-		}
-		else if (this.frame_count === 1)
-		{
-			this.asset_Player_A_Back!.x = this.game_state.Player_A_Back.x;
-			this.asset_Player_A_Back!.y = this.game_state.Player_A_Back.y;
-			this.asset_Player_B_Back!.x = this.game_state.Player_B_Back.x;
-			this.asset_Player_B_Back!.y = this.game_state.Player_B_Back.y;
-			this.asset_ball!.x = this.game_state.balldata.position.x;
-			this.asset_ball!.y = this.game_state.balldata.position.y;
-
-			if (this.game_type === GameType.Doubles)
-			{
-				this.asset_Player_A_Front!.x = this.game_state.Player_A_Front.x;
-				this.asset_Player_A_Front!.y = this.game_state.Player_A_Front.y;
-				this.asset_Player_B_Front!.x = this.game_state.Player_B_Front.x;
-				this.asset_Player_B_Front!.y = this.game_state.Player_B_Front.y;
-			}
-			this.frame_count++;
-			return;
-		}
-
-
 		if (this.next_round_setup === undefined)
 		{
 			this.socketmanager?.game_get_round_setup(this.game_id!);
@@ -291,7 +246,7 @@ export default class Pong extends Phaser.Scene
 		{
 			if (this.core) {
 				if (this.me !== PlayerType.Spectator)
-				this.core.apply_input(this.input_stock[(this.input_stock.length - 1)]);
+					this.core.apply_input(this.input_stock[(this.input_stock.length - 1)]);
 
 				this.core.move_ball();
 				this.core.client_check_goal();
@@ -305,21 +260,21 @@ export default class Pong extends Phaser.Scene
 					this.core.apply_gamestate(elem);
 				let last_serv;
 	
-				if (this.me === PlayerType.Player_A_Back)
+				if (this.me === PlayerType.TeamBlue_Back)
 				{
 					last_serv = elem.last_processed_id_A_Back;
 				}
-				else if (this.me === PlayerType.Player_B_Back)
+				else if (this.me === PlayerType.TeamRed_Back)
 				{
 					last_serv = elem.last_processed_id_B_Back;
 				}
 				else if (this.game_type === GameType.Doubles)
 				{
-					if (this.me === PlayerType.Player_A_Front)
+					if (this.me === PlayerType.TeamBlue_Front)
 					{
 						last_serv = elem.last_processed_id_A_Front;
 					}
-					else if (this.me === PlayerType.Player_B_Front)
+					else if (this.me === PlayerType.TeamRed_Front)
 					{
 						last_serv = elem.last_processed_id_B_Front;
 					}
@@ -350,7 +305,7 @@ export default class Pong extends Phaser.Scene
 		{
 			//no response from server
 			this.lag_count++;
-			if (this.lag_count >= 15)
+			if (this.lag_count >= 20)
 			{
 				this.is_lagging = true;
 			}
@@ -375,11 +330,11 @@ export default class Pong extends Phaser.Scene
 		if (this.asset_scoreboard !== undefined)
 		{
 			let text: string;
-			text = this.game_state.score.Team_A.toString() + " - " + this.game_state.score.Team_B.toString();
+			text = this.game_state.score.TeamBlue.toString() + " - " + this.game_state.score.TeamRed.toString();
 			this.asset_scoreboard?.setText(text);
 		}
 
-//		this.lag_check();
+		this.lag_check();
 	}
 
 
@@ -393,13 +348,13 @@ export default class Pong extends Phaser.Scene
 		this.server_stock.push(gamestate);
 	}
 
-	// lag_check = () =>
-	// {
-	// 	if (this.is_lagging && this.game_state.result === EndResult.Undecided)
-	// 		this.asset_lag_icon!.setAlpha(1);
-	// 	else
-	// 		this.asset_lag_icon!.setAlpha(0);
-	// }
+	lag_check = () =>
+	{
+		if (this.is_lagging && this.game_state.result === EndResult.Undecided)
+			this.asset_lag_icon!.setAlpha(1);
+		else
+			this.asset_lag_icon!.setAlpha(0);
+	}
 
 	game_end = (winner: EndResult) =>
 	{
@@ -427,43 +382,43 @@ export default class Pong extends Phaser.Scene
 		past_date.setMilliseconds(past_date.getMilliseconds() - 100);
 		let used_past: boolean = false;
 
-		if ( this.asset_Player_A_Back !== undefined
-			&& this.asset_Player_B_Back !== undefined
+		if ( this.asset_TeamBlue_Back !== undefined
+			&& this.asset_TeamRed_Back !== undefined
 			&& this.asset_ball !== undefined )
 		{
-			if (this.me === PlayerType.Player_A_Back)
+			if (this.me === PlayerType.TeamBlue_Back)
 			{
-				this.asset_Player_A_Back.x = this.game_state.Player_A_Back.x;
-				this.asset_Player_A_Back.y = this.game_state.Player_A_Back.y;
+				this.asset_TeamBlue_Back.x = this.game_state.TeamBlue_Back.x;
+				this.asset_TeamBlue_Back.y = this.game_state.TeamBlue_Back.y;
 			}
 			else if (new Date(this.past_stock[0].send_date).getTime() > past_date.getTime())
 			{
-				this.asset_Player_A_Back.x = this.past_stock[0].Player_A_Back.x;
-				this.asset_Player_A_Back.y = this.past_stock[0].Player_A_Back.y;
+				this.asset_TeamBlue_Back.x = this.past_stock[0].TeamBlue_Back.x;
+				this.asset_TeamBlue_Back.y = this.past_stock[0].TeamBlue_Back.y;
 				used_past = true;
 			}
 			else
 			{
-				this.asset_Player_A_Back.x = this.game_state.Player_A_Back.x;
-				this.asset_Player_A_Back.y = this.game_state.Player_A_Back.y;
+				this.asset_TeamBlue_Back.x = this.game_state.TeamBlue_Back.x;
+				this.asset_TeamBlue_Back.y = this.game_state.TeamBlue_Back.y;
 			}
 
 
-			if (this.me === PlayerType.Player_B_Back)
+			if (this.me === PlayerType.TeamRed_Back)
 			{
-				this.asset_Player_B_Back.x = this.game_state.Player_B_Back.x;
-				this.asset_Player_B_Back.y = this.game_state.Player_B_Back.y;
+				this.asset_TeamRed_Back.x = this.game_state.TeamRed_Back.x;
+				this.asset_TeamRed_Back.y = this.game_state.TeamRed_Back.y;
 			}
 			else if (new Date(this.past_stock[0].send_date).getTime() > past_date.getTime())
 			{
-				this.asset_Player_B_Back.x = this.past_stock[0].Player_B_Back.x;
-				this.asset_Player_B_Back.y = this.past_stock[0].Player_B_Back.y;
+				this.asset_TeamRed_Back.x = this.past_stock[0].TeamRed_Back.x;
+				this.asset_TeamRed_Back.y = this.past_stock[0].TeamRed_Back.y;
 				used_past = true;
 			}
 			else
 			{
-				this.asset_Player_B_Back.x = this.game_state.Player_B_Back.x;
-				this.asset_Player_B_Back.y = this.game_state.Player_B_Back.y;
+				this.asset_TeamRed_Back.x = this.game_state.TeamRed_Back.x;
+				this.asset_TeamRed_Back.y = this.game_state.TeamRed_Back.y;
 			}
 
 			if (this.me === PlayerType.Spectator 
@@ -492,81 +447,81 @@ export default class Pong extends Phaser.Scene
 		past_date.setMilliseconds(past_date.getMilliseconds() - 100);
 		let used_past: boolean = false;
 		
-		if ( this.asset_Player_A_Back !== undefined
-			&& this.asset_Player_B_Back !== undefined
-			&& this.asset_Player_A_Front !== undefined
-			&& this.asset_Player_B_Front !== undefined
+		if ( this.asset_TeamBlue_Back !== undefined
+			&& this.asset_TeamRed_Back !== undefined
+			&& this.asset_TeamBlue_Front !== undefined
+			&& this.asset_TeamRed_Front !== undefined
 			&& this.asset_ball !== undefined )
 		{
 		
-			if (this.me === PlayerType.Player_A_Back)
+			if (this.me === PlayerType.TeamBlue_Back)
 			{
-				this.asset_Player_A_Back.x = this.game_state.Player_A_Back.x;
-				this.asset_Player_A_Back.y = this.game_state.Player_A_Back.y;
+				this.asset_TeamBlue_Back.x = this.game_state.TeamBlue_Back.x;
+				this.asset_TeamBlue_Back.y = this.game_state.TeamBlue_Back.y;
 			}
 			else if (new Date(this.past_stock[0].send_date).getTime() > past_date.getTime())
 			{
-				this.asset_Player_A_Back.x = this.past_stock[0].Player_A_Back.x;
-				this.asset_Player_A_Back.y = this.past_stock[0].Player_A_Back.y;
+				this.asset_TeamBlue_Back.x = this.past_stock[0].TeamBlue_Back.x;
+				this.asset_TeamBlue_Back.y = this.past_stock[0].TeamBlue_Back.y;
 				used_past = true;
 			}
 			else
 			{
-				this.asset_Player_A_Back.x = this.game_state.Player_A_Back.x;
-				this.asset_Player_A_Back.y = this.game_state.Player_A_Back.y;
+				this.asset_TeamBlue_Back.x = this.game_state.TeamBlue_Back.x;
+				this.asset_TeamBlue_Back.y = this.game_state.TeamBlue_Back.y;
 			}
 
 
-			if (this.me === PlayerType.Player_B_Back)
+			if (this.me === PlayerType.TeamRed_Back)
 			{
-				this.asset_Player_B_Back.x = this.game_state.Player_B_Back.x;
-				this.asset_Player_B_Back.y = this.game_state.Player_B_Back.y;
+				this.asset_TeamRed_Back.x = this.game_state.TeamRed_Back.x;
+				this.asset_TeamRed_Back.y = this.game_state.TeamRed_Back.y;
 			}
 			else if (new Date(this.past_stock[0].send_date).getTime() > past_date.getTime())
 			{
-				this.asset_Player_B_Back.x = this.past_stock[0].Player_B_Back.x;
-				this.asset_Player_B_Back.y = this.past_stock[0].Player_B_Back.y;
+				this.asset_TeamRed_Back.x = this.past_stock[0].TeamRed_Back.x;
+				this.asset_TeamRed_Back.y = this.past_stock[0].TeamRed_Back.y;
 				used_past = true;
 			}
 			else
 			{
-				this.asset_Player_B_Back.x = this.game_state.Player_B_Back.x;
-				this.asset_Player_B_Back.y = this.game_state.Player_B_Back.y;
+				this.asset_TeamRed_Back.x = this.game_state.TeamRed_Back.x;
+				this.asset_TeamRed_Back.y = this.game_state.TeamRed_Back.y;
 			}
 
-			if (this.me === PlayerType.Player_A_Front)
+			if (this.me === PlayerType.TeamBlue_Front)
 			{
-				this.asset_Player_A_Front.x = this.game_state.Player_A_Front.x;
-				this.asset_Player_A_Front.y = this.game_state.Player_A_Front.y;
+				this.asset_TeamBlue_Front.x = this.game_state.TeamBlue_Front.x;
+				this.asset_TeamBlue_Front.y = this.game_state.TeamBlue_Front.y;
 			}
 			else if (new Date(this.past_stock[0].send_date).getTime() > past_date.getTime())
 			{
-				this.asset_Player_A_Front.x = this.past_stock[0].Player_A_Front.x;
-				this.asset_Player_A_Front.y = this.past_stock[0].Player_A_Front.y;
+				this.asset_TeamBlue_Front.x = this.past_stock[0].TeamBlue_Front.x;
+				this.asset_TeamBlue_Front.y = this.past_stock[0].TeamBlue_Front.y;
 				used_past = true;
 			}
 			else
 			{
-				this.asset_Player_A_Front.x = this.game_state.Player_A_Front.x;
-				this.asset_Player_A_Front.y = this.game_state.Player_A_Front.y;
+				this.asset_TeamBlue_Front.x = this.game_state.TeamBlue_Front.x;
+				this.asset_TeamBlue_Front.y = this.game_state.TeamBlue_Front.y;
 			}
 
 
-			if (this.me === PlayerType.Player_B_Front)
+			if (this.me === PlayerType.TeamRed_Front)
 			{
-				this.asset_Player_B_Front.x = this.game_state.Player_B_Front.x;
-				this.asset_Player_B_Front.y = this.game_state.Player_B_Front.y;
+				this.asset_TeamRed_Front.x = this.game_state.TeamRed_Front.x;
+				this.asset_TeamRed_Front.y = this.game_state.TeamRed_Front.y;
 			}
 			else if (new Date(this.past_stock[0].send_date).getTime() > past_date.getTime())
 			{
-				this.asset_Player_B_Front.x = this.past_stock[0].Player_B_Front.x;
-				this.asset_Player_B_Front.y = this.past_stock[0].Player_B_Front.y;
+				this.asset_TeamRed_Front.x = this.past_stock[0].TeamRed_Front.x;
+				this.asset_TeamRed_Front.y = this.past_stock[0].TeamRed_Front.y;
 				used_past = true;
 			}
 			else
 			{
-				this.asset_Player_B_Front.x = this.game_state.Player_B_Front.x;
-				this.asset_Player_B_Front.y = this.game_state.Player_B_Front.y;
+				this.asset_TeamRed_Front.x = this.game_state.TeamRed_Front.x;
+				this.asset_TeamRed_Front.y = this.game_state.TeamRed_Front.y;
 			}
 
 			if (this.me === PlayerType.Spectator 
@@ -591,21 +546,22 @@ export default class Pong extends Phaser.Scene
 
 	}
 
-	// sound_event_wall = () =>
-	// {
-	// 	this.sound.stopAll();
-	// 	this.sound_a.play();
-	// }
+	sound_event_wall = () =>
+	{
+		this.sound.stopAll();
+		this.sound_a!.play();
+	}
 
-	// sound_event_paddle = () =>
-	// {
-	// 	this.sound.stopAll();
-	// 	this.sound_b.play();
-	// }
+	sound_event_paddle = () =>
+	{
+		this.sound.stopAll();
+		this.sound_b!.play();
+	}
 
-	// sound_event_goal = () =>
-	// {
-	// 	this.sound.stopAll();
-	// 	this.sound_clapping.play();
-	// }
+	sound_event_goal = () =>
+	{
+		this.sound.stopAll();
+		this.sound_clapping!.play();
+		this.cameras.main.flash(250, 0 , 0, 0);
+	}
 }

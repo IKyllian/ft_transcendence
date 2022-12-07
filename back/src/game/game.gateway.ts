@@ -97,81 +97,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
 		this.lobbyfactory.lobby_quit(socket);
 		console.log("Game Gateway Deconnection: ", socket.user.username) 
 	}
-
-	@SubscribeMessage('ping')
-	async onPing(client: Socket)
-	{
-		client.emit('pong');
-	}
-
-	/* ----- Administration ----- */
-
-// 	@SubscribeMessage('admin_authenticate')
-// 	async onAdminAuthenticate(@ConnectedSocket() client: Socket,
-// 	@MessageBody() data: string)
-// 	{
-// 		if (data == this.admin_secret)
-// 		{
-// 			this.admin = client;
-// 			console.log("admin has logged in");
-// 			client.emit('admin_connection', true);
-// 		}
-// 		else
-// 		{
-// 			client.emit('admin_connection', false);
-// 			//log the incident somewhere
-// 		}
-// 	}
-
-// 	@SubscribeMessage('admin_newgame')
-// 	async onAdminNewGame(@ConnectedSocket() client: Socket,
-// 	@MessageBody() data: LobbyRequest)
-// 	{
-// 		// if (client['id'] == this.admin['id'])
-// 		// {
-			// const gamedata: NewGameData = this.lobbyfactory.lobby_create(data);
-// 			console.log(gamedata);
-
-// //TODO
-// //preparer les PlayersGameData de chaque joueur avec le NewGameData
-// //envoyer les PlayersGameData au joeuurs concerne
-// //-->NEED identification des sockets
-
-// 			client.emit('newgame_data', gamedata);
-// 		// }
-// 		// else
-// 		// {
-// 		// 	//log the event somewhere
-// 		// }	
-// 	}
-
-	// @SubscribeMessage('admin_lobby_quantity')
-	// async onAdminLobbyQuantity(@ConnectedSocket() client: Socket)
-	// {
-	// 	if (client['id'] == this.admin['id'])
-	// 	{
-	// 		client.emit('lobby_quantity', this.lobbyfactory.get_lobby_quantity());
-	// 	}
-	// 	else
-	// 	{
-	// 		//log the event somewhere
-	// 	}	
-	// }
-
-	// @SubscribeMessage('admin_lobby_list')
-	// async onAdminLobbyList(@ConnectedSocket() client: Socket,
-	// @MessageBody() data: {player_A: string, player_B: string})
-	// {
-	// 	if (client['id'] == this.admin['id'])
-	// 	{
-	// 		client.emit('lobby_list', this.lobbyfactory.get_lobby_list());
-	// 	}
-	// 	else
-	// 	{
-		// 		//log the event somewhere
-		// 	}	
-		// }
-		
 		
 		/* ----- Users Lobby Management ----- */
 		
@@ -180,12 +105,17 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
 	@MessageBody() game_id: string)
 	{
 		console.log("joining lobby, ", client.user)
-	//	console.log("user join lobby", data);
 		this.lobbyfactory.lobby_join(client, game_id);
 	}
 
 
-
+	@SubscribeMessage('get_user_gameinfo')
+	async onGetUserGameInfo(@ConnectedSocket() client: AuthenticatedSocket,
+	@MessageBody() user_id: number)
+	{
+		console.log("get_user_gameinfo, ", user_id)
+		this.lobbyfactory.get_client_info(client, user_id);
+	}
 //Irrelevant with waitingroom
 	// @SubscribeMessage('user_is_ready')
 	// async onUserisReady(@ConnectedSocket() client: Socket,
@@ -217,7 +147,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
 	async onUserGameGetRoundSetup(@ConnectedSocket() client: AuthenticatedSocket,
 	@MessageBody() game_id: string)
 	{
-		//this.lobbyfactory.lobby_game_input(data);
 		this.lobbyfactory.lobby_game_get_round_setup(client, game_id);
 	}
 

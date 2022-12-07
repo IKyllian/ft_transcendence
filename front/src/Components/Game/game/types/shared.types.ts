@@ -1,10 +1,10 @@
 import { Player } from "../../../../Types/Lobby-Types"
 
 export enum PlayerType {
-	Player_A_Back,
-	Player_A_Front,
-	Player_B_Front,
-	Player_B_Back,
+	TeamBlue_Back,
+	TeamBlue_Front,
+	TeamRed_Front,
+	TeamRed_Back,
 	Spectator
 }
 
@@ -12,83 +12,39 @@ export enum GameType {
 	Singles,
 	Doubles
 }
-
-// export type Player = {
-// 	name: string,
-// 	win: number,
-// 	loss: number,
-// 	avatar: string
-// }
-
 //data sent to each player before the game
 export type PlayersGameData = {
-	Player_A_Back: Player,
-	Player_A_Front?: Player,
-	Player_B_Front?: Player,
-	Player_B_Back: Player,
+	TeamBlue_Back: Player,
+	TeamBlue_Front?: Player,
+	TeamRed_Front?: Player,
+	TeamRed_Back: Player,
 	player_type: PlayerType,
-	// player_secret: string,
 	game_id: string,
 	game_settings: GameSettings
 }
-
-//data sent from player to join lobby
-// export type PlayersLobbyData = 
-// {
-// 	player_secret: string,
-// 	game_id: string
-// }
-
-//data sent to lobby factory to request a new lobby
-// export type LobbyRequest =
-// {
-// 	Player_A_Back: string,
-// 	Player_A_Front: string,
-// 	Player_B_Front: string,
-// 	Player_B_Back: string,
-// 	game_settings: GameSettings
-// }
 
 //data sent to lobby factory to request a new lobby
 
 export type MatchmakingLobby =
 {
-	Player_A_Back: Player,
-	Player_A_Front?: Player,
-	Player_B_Back: Player,
-	Player_B_Front?: Player,
+	TeamBlue_Back: Player,
+	TeamBlue_Front?: Player,
+	TeamRed_Back: Player,
+	TeamRed_Front?: Player,
 	game_settings?: GameSettings
 }
-
-//data sent from back to front with data for the players
-// export type NewGameData =
-// {
-// 	Player_A_Back: string,
-// 	Player_A_Back_secret: string,
-// 	Player_A_Front: string,
-// 	Player_A_Front_secret: string,
-// 	Player_B_Front: string,
-// 	Player_B_Front_secret: string,
-// 	Player_B_Back: string,
-// 	Player_B_Back_secret: string,
-// 	game_id: string,
-// 	game_settings: GameSettings
-// }
 
 
 // data sent from back to front with data for the players
 export type NewGameData =
 {
-	Player_A_Back: Player,
-	Player_A_Front?: Player,
-	Player_B_Back: Player,
-	Player_B_Front?: Player,
-//	player_type: PlayerType,
+	TeamBlue_Back: Player,
+	TeamBlue_Front?: Player,
+	TeamRed_Back: Player,
+	TeamRed_Front?: Player,
 	game_id: string,
 	game_settings: GameSettings
 }
-
-
 
 export enum PlayerStatus
 {
@@ -99,16 +55,16 @@ export enum PlayerStatus
 
 export type LobbyStatus =
 {
-	Player_A_Back: PlayerStatus,
-	Player_A_Front: PlayerStatus,
-	Player_B_Front: PlayerStatus,
-	Player_B_Back: PlayerStatus,
+	TeamBlue_Back: PlayerStatus,
+	TeamBlue_Front: PlayerStatus,
+	TeamRed_Front: PlayerStatus,
+	TeamRed_Back: PlayerStatus,
 }
 
 export type ScoreBoard = 
 {
-	Team_A: number,
-	Team_B: number
+	TeamBlue: number,
+	TeamRed: number
 }
 
 export type Coordinates = 
@@ -134,8 +90,8 @@ export enum Movement
 export enum Goal
 {
 	None,
-	Team_A,
-	Team_B
+	TeamBlue,
+	TeamRed
 }
 
 export type PlayerInput =
@@ -156,17 +112,16 @@ export type GameState =
 	goal: Goal,
 	score: ScoreBoard,
 	balldata: BallData,
-	Player_A_Back: Coordinates,
-	Player_A_Front: Coordinates,
-	Player_B_Front: Coordinates,
-	Player_B_Back: Coordinates,
+	TeamBlue_Back: Coordinates,
+	TeamBlue_Front: Coordinates,
+	TeamRed_Front: Coordinates,
+	TeamRed_Back: Coordinates,
 	last_processed_id_A_Back: number,
 	last_processed_id_A_Front: number,
 	last_processed_id_B_Front: number,
 	last_processed_id_B_Back: number,
 	send_date: Date
 }
-
 
 //data for next round to ensure sync
 export type RoundSetup =
@@ -178,14 +133,14 @@ export type RoundSetup =
 export enum EndResult
 {
 	Undecided,
-	Team_A_Win,
-	Team_B_Win
+	TeamBlue_Win,
+	TeamRed_Win
 }
 
 //game settings for the core
 export type GameSettings =
 {
-	ranked: boolean,
+	is_ranked: boolean,
 	game_type: GameType,
 	up_down_border: number,
 	player_back_advance: number,
@@ -197,21 +152,19 @@ export type GameSettings =
 	point_for_victory: number
 }
 
-// export enum GameMode {
-// 	OneVsOne,
-// 	TwoVsTwo,
-// 	Custom
-
-// }
-
-// }
-
 export enum TeamSide {
 	BLUE,
 	RED,
 }
 
 export enum PlayerPosition {
-	FRONT,
 	BACK,
+	FRONT,
+}
+
+export enum RankChange
+{
+	None,
+	Up,
+	Down
 }

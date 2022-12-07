@@ -5,12 +5,15 @@ import { PlayersGameData } from "./game/types/shared.types";
 import { useAppSelector } from "../../Redux/Hooks";
 import { io } from "socket.io-client";
 import { socketUrl } from "../../env";
+import { CacheContext } from "../../App"
+import { useContext } from 'react';
 
 function Game() {
     const [gameDatas, setGameDatas] = useState<PlayersGameData | undefined>(undefined);
     const location = useLocation();
     const navigate = useNavigate();
     const {token} = useAppSelector(state => state.auth);
+    const cache = useContext(CacheContext).cache;
 
     useEffect(() => {
         if (location && location.state) {
@@ -25,7 +28,7 @@ function Game() {
             });
             gameSocket.on("Connected", () => {
                 setGameDatas(locationState);
-                launch_game(locationState, gameSocket);
+                    launch_game(locationState, gameSocket, token, cache);
             })
         }
     }, [])
