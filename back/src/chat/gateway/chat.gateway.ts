@@ -82,10 +82,16 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			console.log('user status: ' + user.status)
 			this.server.emit('StatusUpdate', { id: user.id, status: UserStatus.ONLINE });
 		}
+		let party = this.partyService.partyJoined.getParty(user.id);
+		if (party) {
+			party.players.forEach(async player => {
+				player.user = await this.userService.findOne({ where: { id: player.user.id }});
+			});
+		}
 		socket.emit('Connection', {
 			friendList: await this.friendshipService.getFriendlist(user),
 			notification: await this.notificationService.getNotifications(user),
-			party: this.partyService.partyJoined.getParty(user.id),
+			party: party,
 		});
 	}
 

@@ -50,12 +50,9 @@ export class MatchmakingGateway implements OnGatewayDisconnect {
 		@ConnectedSocket() socket: Socket,
 		@MessageBody() dto: UserIdDto,
 	) {
-		console.log("party invite")
 		if (!this.partyService.partyJoined.getParty(user.id)) {
 			const party = this.partyService.createParty(user);
-			// socket.emit("PartyCreated", party);
 			this.server.to(`user-${user.id}`).emit("PartyUpdate", { party, cancelQueue: true });
-			// socket.join(`party-${party.id}`)
 		}
 		const notif = await this.notifService.createPartyInviteNotif(user, dto.id);
 		socket.to(`user-${dto.id}`).emit('NewPartyInvite', notif);

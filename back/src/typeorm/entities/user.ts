@@ -25,7 +25,7 @@ export class User {
 	@Column({ type: 'enum', enum: UserStatus, default: UserStatus.OFFLINE })
 	status: UserStatus;
 
-	@Column({ unique: true })
+	@Column({ unique: true, select: false })
   	email: string;
 
 	@Column({ nullable: true })
