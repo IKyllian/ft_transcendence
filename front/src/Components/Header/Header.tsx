@@ -1,5 +1,5 @@
 import { useState, useContext, useEffect } from 'react';
-import { IconLogout, IconMessages, IconUserPlus, IconChevronDown, IconBell } from '@tabler/icons';
+import { IconLogout, IconMessages, IconUsers, IconChevronDown, IconBell } from '@tabler/icons';
 
 import { ModalContext } from '../Utils/ModalProvider';
 import ProfilPic from "../../Images-Icons/pp.jpg"
@@ -72,7 +72,7 @@ function Header() {
                 <div className='icons-header'>
                     <PartyButton />
                     <NotifIcon notifications={notifications} handleNotifDropdownClick={handleNotifDropdownClick} />
-                    <IconUserPlus onClick={() => modalStatus.setStatus()} />
+                    <IconUsers onClick={() => modalStatus.setStatus()} />
                     <Link to="/chat" aria-label="Link to the chat">
                         <div className='badge-wrapper'>
                             {
