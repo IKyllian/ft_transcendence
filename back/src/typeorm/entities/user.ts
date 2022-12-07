@@ -55,6 +55,9 @@ export class User {
 	@Column({ default: false })
 	two_factor_enabled: boolean;
 
+	@Column({ default: null, nullable: true })
+	in_game_id: string;
+
 	@CreateDateColumn({ type: 'timestamptz' })
 	created_at: Date;
 } 

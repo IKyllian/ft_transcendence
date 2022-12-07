@@ -104,7 +104,6 @@ export class QueueLobby {
 export enum UserStatus {
 	ONLINE,
 	OFFLINE,
-	IN_GAME,
 }
 
 export type PartyMessage = {
