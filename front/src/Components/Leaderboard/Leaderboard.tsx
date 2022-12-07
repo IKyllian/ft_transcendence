@@ -35,6 +35,14 @@ function Leaderboard() {
     useEffect(() => {
         fetchSinglesLeaderBoardDatas(0, token, setLeaderboardState);
 
+        socket?.on("InGameStatusUpdate", (data: {id: number, in_game_id: string | null}) => {
+            setLeaderboardState(prev => { return {...prev, users: [...prev.users.map((elem: UserInterface) => {
+                if (elem.id === data.id)
+                    return {...elem, in_game_id: data.in_game_id};
+                return elem;
+            })]}});
+        });
+
         socket?.on("StatusUpdate", (data: {id: number, status: UserStatus}) => {
             setLeaderboardState(prev => { return {...prev, users: [...prev.users.map((elem: UserInterface) => {
                 if (elem.id === data.id)
@@ -44,7 +52,8 @@ function Leaderboard() {
         });
 
         return () => {
-            socket?.off("StatusUpdate")
+            socket?.off("InGameStatusUpdate");
+            socket?.off("StatusUpdate");
         }
     }, [])
 

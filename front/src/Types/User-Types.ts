@@ -4,7 +4,6 @@ import { GameType } from "./Lobby-Types";
 export enum UserStatus {
     ONLINE,
     OFFLINE,
-    IN_GAME
 }
 
 export interface ExampleUser {
@@ -50,6 +49,7 @@ export interface UserInterface {
     singles_elo: number,
 	doubles_elo: number,
     two_factor_enabled: boolean,
+    in_game_id: string | null,
 }
 
 interface Statistic {

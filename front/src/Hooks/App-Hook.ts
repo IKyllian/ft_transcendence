@@ -237,7 +237,7 @@ export function useAppHook() {
 			socket?.on("newgame_data", (data: PlayersGameData) => {
 				console.log("new_game_data", data);
 				dispatch(changeQueueStatus(false));
-				dispatch(newGameFound(data));
+				dispatch(newGameFound({gameDatas: data, showGameFound: true}));
 				// navigate("/game", {state: data});
 			});
 

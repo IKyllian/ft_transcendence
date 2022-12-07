@@ -2,6 +2,7 @@ import { Socket } from "socket.io";
 import { AuthenticatedSocket } from "src/utils/types/auth-socket";
 import { GameType, TeamSide, PlayerPosition, PlayerStatus, GameSettings, GameState, LobbyStatus, PlayerInput, PlayerType, RoundSetup } from "src/utils/types/game.types";
 import { setTimeout } from "timers/promises";
+import { UserStatus } from "src/utils/types/types";
 import { MatchmakingLobby } from "../matchmaking/matchmakingLobby";
 import { PongGame } from "../pong/pong.game";
 import { LobbyFactory } from "./lobby.factory";
@@ -54,6 +55,11 @@ export class Lobby
 
 	game_set_finished()
 	{
+		this.lobby_data.players.forEach(async (player) => {
+			await this.factory.userService.setStatus(player.user.id, UserStatus.ONLINE);
+			this.factory.globalService.server.to(`user-${player.user.id}`).emit('StatusUpdate', { id: player.user.id, status: UserStatus.ONLINE });
+
+		})
 		this.already_finished = true;
 	}
 
@@ -82,6 +88,11 @@ export class Lobby
 			this.lobby_broadcast_message('lobby_all_ready');
 			if (!this.already_started)
 			{
+				this.lobby_data.players.forEach(async (player) => {
+					await this.factory.userService.setStatus(player.user.id, UserStatus.IN_GAME);
+					this.factory.globalService.server.to(`user-${player.user.id}`).emit('StatusUpdate', { id: player.user.id, status: UserStatus.IN_GAME });
+
+				})
 				this.game.start();
 				this.already_started = true;
 				//cancel timeout vu que tout le monde est la

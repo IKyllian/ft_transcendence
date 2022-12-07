@@ -1,5 +1,5 @@
 import { useContext } from 'react';
-import { IconMessage, IconBrandAppleArcade, IconSettings } from '@tabler/icons';
+import { IconMessage, IconBrandAppleArcade, IconSettings, IconEye } from '@tabler/icons';
 import { ProfileState, UserStatus } from '../../Types/User-Types';
 import { Link } from "react-router-dom";
 import FriendButton from '../Buttons/Friend-Button';
@@ -11,9 +11,13 @@ function CardInfo(props: {userState: ProfileState}) {
 
     const {socket} = useContext(SocketContext);
 
-    const invitePlayer = () => {
-        if (userState.user)
-            socket?.emit("GameInvite", {id: userState.user.id});
+    // const invitePlayer = () => {
+    //     if (userState.user)
+    //         socket?.emit("GameInvite", {id: userState.user.id});
+    // }
+
+    const spectateClick = () => {
+        socket?.emit("get_user_gameinfo", {user_id: userState.user.in_game_id});
     }
 
     return userState.user ? (
@@ -32,10 +36,11 @@ function CardInfo(props: {userState: ProfileState}) {
                     <Link className="send-message-icon" to="/chat" state={{userIdToSend: userState.user.id}}>
                         <IconMessage />
                     </Link>
-                    <Link onClick={() => invitePlayer()} className="fight-button" to="/lobby">
+                    {/* <Link onClick={() => invitePlayer()} className="fight-button" to="/lobby">
                         Play
                         <IconBrandAppleArcade />
-                    </Link>
+                    </Link> */}
+                    { userState.user.in_game_id !== null && <IconEye onClick={() => spectateClick()} className='spectate-icon' /> }
                 </>
             }
         </div>

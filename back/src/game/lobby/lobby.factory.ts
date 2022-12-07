@@ -10,6 +10,9 @@ import { Injectable } from '@nestjs/common';
 import { Player } from '../player';
 import { GameService } from '../game.service';
 import { User } from 'src/typeorm';
+import { UserService } from 'src/user/user.service';
+//import  * as Defaultgame_settings from '../game-settings';
+
 
 //TODO
 //rework client handling
@@ -17,8 +20,9 @@ import { User } from 'src/typeorm';
 export class LobbyFactory
 {
 	constructor(
-		private globalService: GlobalService,
+		public globalService: GlobalService,
 		private gameService: GameService,
+		public userService: UserService,
 	) {}
 
 	private lobby_list: Map<Lobby['game_id'], Lobby> = new Map<Lobby['game_id'], Lobby>();

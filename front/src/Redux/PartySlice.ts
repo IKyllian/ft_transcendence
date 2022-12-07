@@ -88,8 +88,8 @@ export const partySlice = createSlice({
         resetQueueTimer: (state) => {
             state.queueTimer = defaultQueueTimer;
         },
-        newGameFound: (state, { payload }: PayloadAction<PlayersGameData>) => {
-            state.gameFound = {showGameFound: true, gameDatas: payload};
+        newGameFound: (state, { payload }: PayloadAction<{gameDatas: PlayersGameData, showGameFound: boolean}>) => {
+            state.gameFound = {showGameFound: payload.showGameFound, gameDatas: payload.gameDatas};
         },
         stopShowGameFound: (state) => {
             if (state.gameFound)

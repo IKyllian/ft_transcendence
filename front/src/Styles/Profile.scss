@@ -103,6 +103,11 @@ $FontSizeTextResponsive: 15px;
                 cursor: pointer;
             }
 
+            .spectate-icon {
+                @include width-height(20px, 20px);
+                margin-left: 20px;
+            }
+
             .settings-icon {
                 @include width-height(20px, 20px);
                 cursor: pointer;

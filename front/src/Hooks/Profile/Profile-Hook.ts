@@ -1,12 +1,14 @@
 import { useState, useContext, useEffect } from "react";
 import { ModalContext } from "../../Components/Utils/ModalProvider";
 import { ProfileState, UserStatus } from "../../Types/User-Types";
-import { useAppSelector } from '../../Redux/Hooks';
+import { useAppDispatch, useAppSelector } from '../../Redux/Hooks';
 import { useNavigate, useParams } from "react-router-dom";
 import { SocketContext } from "../../App";
 import { fetchProfile, fetchMe } from "../../Api/Profile/Profile-Fetch";
 import { Modes } from "../../Types/Utils-Types";
 import { AxiosResponse } from "axios";
+import { PlayersGameData } from "../../Components/Game/game/types/shared.types";
+import { newGameFound } from "../../Redux/PartySlice";
 
 interface ProfileMenuButtons {
     title: string;
@@ -27,6 +29,7 @@ export function useProfileHook() {
     const modalStatus = useContext(ModalContext);
     const { socket } = useContext(SocketContext);
     const navigate = useNavigate();
+    const dispatch = useAppDispatch();
 
     const handleClick = (index: number) => {
         let newArray = [...attributes];
@@ -76,12 +79,27 @@ export function useProfileHook() {
     }, [friendList])
 
     useEffect(() => {
+        socket?.on('user_gameinfo', (data: PlayersGameData | null) => {
+            if (data !== null) {
+				dispatch(newGameFound({gameDatas: data, showGameFound: false}));
+                navigate("/game", {state: data});
+            }
+        })
+
         socket?.on("RelationUpdate", (data: {id: number, relation: string}) => {
             setUserState((prev: ProfileState | undefined) => {
                 return prev && data.id === prev.user.id ? {
                     ...prev,
                     relationStatus: data.relation
                 } : prev});
+        });
+
+        socket?.on("InGameStatusUpdate", (data: {id: number, in_game_id: string | null}) => {
+            setUserState(prev => {
+                if (prev && prev.user)
+                    return {...prev, user: {...prev.user, in_game_id: data.in_game_id}};
+                return prev;
+            });
         });
 
         socket?.on("StatusUpdate", (data: {id: number, status: UserStatus}) => {
@@ -95,6 +113,7 @@ export function useProfileHook() {
 
         return () => {
             socket?.off("RelationUpdate");
+            socket?.off("InGameStatusUpdate");
             socket?.off("StatusUpdate");
         }
     }, [socket])
