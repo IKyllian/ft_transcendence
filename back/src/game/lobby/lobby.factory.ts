@@ -121,6 +121,43 @@ export class LobbyFactory
 		return this.client_list.get(client['id']);
 	}
 
+	get_client_info(client: AuthenticatedSocket, id: number)
+	{
+		let dataToFront: PlayersGameData = null;
+
+		this.lobby_list.forEach((lobby) => {
+			lobby.playerSockets.forEach((playersocket) => {
+				if (playersocket.user.id === id)
+				{
+				
+					dataToFront =
+					{
+						game_id: lobby.game_id,
+						player_type: PlayerType.Spectator,
+						game_settings: lobby.lobby_data.game_settings,
+					}
+					lobby.lobby_data.players.forEach((player) => {
+						if (player.team === TeamSide.BLUE) {
+							if (player.pos === PlayerPosition.BACK) {
+								dataToFront.TeamBlue_Back = player;
+							} else {
+								dataToFront.TeamBlue_Front = player;
+							}
+						} else {
+							if (player.pos === PlayerPosition.BACK) {
+								dataToFront.TeamRed_Back = player;
+							} else {
+								dataToFront.TeamRed_Front = player;
+							}
+						}
+					});
+				}
+			});
+		});
+
+		client.emit('user_gameinfo', dataToFront);
+	}
+
 	lobby_request_status(client: AuthenticatedSocket, game_id: string)
 	{
 		this.lobby_list.get(game_id)?.lobby_send_lobby_status(client);

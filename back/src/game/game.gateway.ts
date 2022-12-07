@@ -109,7 +109,13 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
 	}
 
 
-
+	@SubscribeMessage('get_user_gameinfo')
+	async onGetUserGameInfo(@ConnectedSocket() client: AuthenticatedSocket,
+	@MessageBody() user_id: number)
+	{
+		console.log("get_user_gameinfo, ", user_id)
+		this.lobbyfactory.get_client_info(client, user_id);
+	}
 //Irrelevant with waitingroom
 	// @SubscribeMessage('user_is_ready')
 	// async onUserisReady(@ConnectedSocket() client: Socket,
