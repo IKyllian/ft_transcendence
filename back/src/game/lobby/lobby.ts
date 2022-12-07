@@ -1,7 +1,6 @@
 import { Socket } from "socket.io";
 import { AuthenticatedSocket } from "src/utils/types/auth-socket";
 import { GameType, TeamSide, PlayerPosition, PlayerStatus, GameSettings, GameState, LobbyStatus, PlayerInput, PlayerType, RoundSetup } from "src/utils/types/game.types";
-import { setTimeout } from "timers/promises";
 import { MatchmakingLobby } from "../matchmaking/matchmakingLobby";
 import { PongGame } from "../pong/pong.game";
 import { LobbyFactory } from "./lobby.factory";
@@ -26,7 +25,10 @@ export class Lobby
 		)
 	{
 		this.game_type = lobby_data.game_settings.game_type;
-
+		this.timeout = setTimeout( () => {
+			this.lobby_broadcast_message('lobby_game_abort');
+			this.factory.lobby_delete(this.game_id);
+		}, 20000);
 	}
 
 	game_set_finished()
@@ -61,6 +63,7 @@ export class Lobby
 			{
 				this.game.start();
 				this.already_started = true;
+				clearTimeout(this.timeout);
 				//cancel timeout vu que tout le monde est la
 			}
 		}
