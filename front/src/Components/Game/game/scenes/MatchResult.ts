@@ -145,10 +145,10 @@ export default class MatchResult extends Phaser.Scene
 					this.game.registry.get('players_data').TeamBlue_Front.user.username, style);
 			this.TeamRed_Front_name = this.add.text(500, 360, "" +
 					this.game.registry.get('players_data').TeamRed_Front.user.username, style);
-			this.TeamBlue_Front_avatar = this.add.image(260, 130, 'TeamBlue_front_avatar')
+			this.TeamBlue_Front_avatar = this.add.image(280, 130, 'TeamBlue_front_avatar')
 								.setOrigin(0.5,0.5)
 								.setDisplaySize(150, 150);
-			this.TeamRed_Front_avatar = this.add.image(670, 130, 'TeamRed_front_avatar')
+			this.TeamRed_Front_avatar = this.add.image(520, 130, 'TeamRed_front_avatar')
 								.setOrigin(0.5,0.5)
 								.setDisplaySize(150, 150);
 		}
@@ -364,13 +364,13 @@ export default class MatchResult extends Phaser.Scene
 		{
 			if (this.TeamRed_Back_newElo > this.TeamRed_Back_oldElo)
 			{
-				this.add.image(260, 130, 'rank_UP')
+				this.add.image(670, 130, 'rank_UP')
 								.setOrigin(0.5,0.5)
 								.setDisplaySize(50, 50);
 			}
 			else
 			{
-				this.add.image(260, 130, 'rank_DOWN')
+				this.add.image(670, 130, 'rank_DOWN')
 								.setOrigin(0.5,0.5)
 								.setDisplaySize(50, 50);
 			}
@@ -384,13 +384,13 @@ export default class MatchResult extends Phaser.Scene
 			{
 				if (this.TeamBlue_Front_newElo > this.TeamBlue_Front_oldElo)
 				{
-					this.add.image(260, 130, 'rank_UP')
+					this.add.image(280, 130, 'rank_UP')
 									.setOrigin(0.5,0.5)
 									.setDisplaySize(50, 50);
 				}
 				else
 				{
-					this.add.image(260, 130, 'rank_DOWN')
+					this.add.image(280, 130, 'rank_DOWN')
 									.setOrigin(0.5,0.5)
 									.setDisplaySize(50, 50);
 				}
@@ -404,13 +404,13 @@ export default class MatchResult extends Phaser.Scene
 			{
 				if (this.TeamRed_Front_newElo > this.TeamRed_Front_oldElo)
 				{
-					this.add.image(260, 130, 'rank_UP')
+					this.add.image(520, 130, 'rank_UP')
 									.setOrigin(0.5,0.5)
 									.setDisplaySize(50, 50);
 				}
 				else
 				{
-					this.add.image(260, 130, 'rank_DOWN')
+					this.add.image(520, 130, 'rank_DOWN')
 									.setOrigin(0.5,0.5)
 									.setDisplaySize(50, 50);
 				}
