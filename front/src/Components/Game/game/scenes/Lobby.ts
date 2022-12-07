@@ -102,6 +102,8 @@ export default class Lobby extends Phaser.Scene
 
 	create ()
 	{
+		this.cameras.main.setBackgroundColor("#415A77");
+
 		this.me = this.game.registry.get('players_data').player_type;
 		this.socketmanager = new ClientSocketManager(this.game.registry.get('socket'));
 		this.game.registry.set('socketmanager', this.socketmanager);
