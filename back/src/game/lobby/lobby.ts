@@ -69,8 +69,8 @@ export class Lobby
 	game_set_finished()
 	{
 		this.lobby_data.players.forEach(async (player) => {
-			await this.factory.userService.setStatus(player.user.id, UserStatus.ONLINE);
-			this.factory.globalService.server.to(`user-${player.user.id}`).emit('StatusUpdate', { id: player.user.id, status: UserStatus.ONLINE });
+			await this.factory.userService.setInGameId(player.user.id, null);
+			this.factory.globalService.server.to(`user-${player.user.id}`).emit('InGameStatusUpdate', { id: player.user.id, in_game_id: null });
 
 		})
 		this.already_finished = true;
@@ -124,8 +124,8 @@ export class Lobby
 			if (!this.already_started)
 			{
 				this.lobby_data.players.forEach(async (player) => {
-					await this.factory.userService.setStatus(player.user.id, UserStatus.IN_GAME);
-					this.factory.globalService.server.to(`user-${player.user.id}`).emit('StatusUpdate', { id: player.user.id, status: UserStatus.IN_GAME });
+					await this.factory.userService.setInGameId(player.user.id, this.game_id);
+					this.factory.globalService.server.to(`user-${player.user.id}`).emit('InGameStatusUpdate', { id: player.user.id, in_game_id: this.game_id });
 
 				})
 				this.game.start();
