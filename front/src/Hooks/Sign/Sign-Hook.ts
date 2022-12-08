@@ -7,6 +7,7 @@ import { fetchSignIn, fetchSignUp, fetchLogin42, fetchVerifyToken } from '../../
 
 import { loginError, loginPending, loginSuccess, setUsername, stopIsConnectedLoading, verification2fa } from "../../Redux/AuthSlice";
 import { LoginPayload } from '../../Types/User-Types';
+import { TokenStorageInterface } from '../../Types/Utils-Types';
 
 type FormValues = {
     username: string,
@@ -31,7 +32,8 @@ export function useSignHook() {
     const verifyToken = () => {
 		const localToken: string | null = localStorage.getItem("userToken");
 		if (localToken !== null) {
-			fetchVerifyToken(localToken, dispatch);
+            const localTokenParse: TokenStorageInterface = JSON.parse(localToken);
+			fetchVerifyToken(localTokenParse.access_token, dispatch);
 		} else {
 			dispatch(stopIsConnectedLoading());
 		}
@@ -50,6 +52,11 @@ export function useSignHook() {
                     token: response.data.access_token,
                     user: response.data.user,
                 }
+                const tokenStorage: TokenStorageInterface = {
+                    access_token: response.data.access_token,
+                    refresh_token: response.data.refresh_token,
+                }
+                localStorage.setItem("userToken", JSON.stringify(tokenStorage));
                 dispatch(loginSuccess(payload));
             }
         })

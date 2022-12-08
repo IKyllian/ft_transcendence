@@ -16,6 +16,7 @@ import { fetchVerifyToken } from "../Api/Sign/Sign-Fetch";
 import { addChannelUser, banChannelUser, muteChannelUser, removeTimeoutChannelUser, removeChannelUser, setChannelDatas, updateChannelUser, unsetChannelDatas, unsetChannelId } from "../Redux/ChannelSlice";
 import { addAlert, AlertType } from "../Redux/AlertSlice";
 import { PlayersGameData } from "../Components/Game/game/types/shared.types";
+import { TokenStorageInterface } from "../Types/Utils-Types";
 
 export function useAppHook() {
     const [socket, setSocket] = useState<Socket | undefined>(undefined);
@@ -62,9 +63,11 @@ export function useAppHook() {
 	
 	useEffect(() => {
 		console.log("GET ITEM");
+		// localStorage.removeItem("userToken");
 		const localToken: string | null = localStorage.getItem("userToken");
 		if (localToken !== null) {
-			fetchVerifyToken(localToken, dispatch);
+			const localTokenParse: TokenStorageInterface = JSON.parse(localToken);
+			fetchVerifyToken(localTokenParse.access_token, dispatch);
 		} else {
 			dispatch(stopIsConnectedLoading());
 		}
@@ -90,7 +93,7 @@ export function useAppHook() {
 
 	useEffect(() => {
 		if (!isAuthenticated && isSign && socket === undefined) {
-			localStorage.setItem("userToken", token);
+			// localStorage.setItem("userToken", token);
 			connectSocket();
 			// deleteCache();
 			openCache();

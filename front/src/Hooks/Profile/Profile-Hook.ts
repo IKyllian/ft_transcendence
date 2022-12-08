@@ -17,7 +17,7 @@ interface ProfileMenuButtons {
 
 export function useProfileHook() {
     const [attributes, setAttributes] = useState<ProfileMenuButtons[]>([
-        { title: "Achievements", isActive: "true" },
+        // { title: "Achievements", isActive: "true" },
         { title: "Matches", isActive: "false" },
         { title: "Friends", isActive: "false" }
     ]);

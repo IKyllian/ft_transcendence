@@ -3,6 +3,7 @@ import axios from "axios";
 import { baseUrl } from "../../env";
 import { LoginPayload } from "../../Types/User-Types";
 import { loginSuccess, loginError, stopIsConnectedLoading } from "../../Redux/AuthSlice";
+import api from "../Api";
 
 interface SignParameter {
     readonly username: string,
@@ -54,11 +55,8 @@ export function fetchSetUsername(username: string, token: string, dispatch: Disp
 }
 
 export function fetchVerifyToken(token: string, dispatch: Dispatch<AnyAction>) {
-    axios.post(`${baseUrl}/auth/verify-token`, {}, {
-        headers: {
-            "Authorization": `Bearer ${token}`,
-        }
-    })
+
+    api.post(`${baseUrl}/auth/verify-token`, {})
     .then((response) => {
         console.log("Response VerifyToken", response);
         dispatch(loginSuccess({user: response.data, token: token}));
@@ -67,4 +65,18 @@ export function fetchVerifyToken(token: string, dispatch: Dispatch<AnyAction>) {
         console.log(err);
         dispatch(stopIsConnectedLoading());
     })
+
+    // axios.post(`${baseUrl}/auth/verify-token`, {}, {
+    //     headers: {
+    //         "Authorization": `Bearer ${token}`,
+    //     }
+    // })
+    // .then((response) => {
+    //     console.log("Response VerifyToken", response);
+    //     dispatch(loginSuccess({user: response.data, token: token}));
+    // })
+    // .catch((err) => {
+    //     console.log(err);
+    //     dispatch(stopIsConnectedLoading());
+    // })
 }

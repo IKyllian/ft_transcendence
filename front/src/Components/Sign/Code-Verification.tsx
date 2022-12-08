@@ -1,11 +1,12 @@
 import axios from "axios";
-import { useEffect, useMemo } from "react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useLocation, useNavigate } from "react-router-dom";
 import { baseUrl } from "../../env";
 import { leave2fa, loginSuccess } from "../../Redux/AuthSlice";
 import { useAppDispatch, useAppSelector } from "../../Redux/Hooks";
 import { LoginPayload } from "../../Types/User-Types";
+import { TokenStorageInterface } from "../../Types/Utils-Types";
 
 function CodeVerification() {
     const {register, handleSubmit, setError, formState: {errors}, watch} = useForm<{code: string}>();
@@ -37,6 +38,11 @@ function CodeVerification() {
                     token: response.data.access_token,
                     user: response.data.user,
                 }
+                const tokenStorage: TokenStorageInterface = {
+                    access_token: response.data.access_token,
+                    refresh_token: response.data.refresh_token,
+                }
+                localStorage.setItem("userToken", JSON.stringify(tokenStorage));
                 dispatch(loginSuccess(payload));
             })
             .catch(err => {
@@ -50,23 +56,6 @@ function CodeVerification() {
     
     const codeSubmmit = handleSubmit((data, e) => {
         e?.preventDefault();
-        // axios.post(`${baseUrl}/2fa/authenticate`, {code: data.code}, {
-        //     headers: {
-        //         "Authorization": `Bearer ${locationState.access_2fa_token}`,
-        //     }
-        // })
-        // .then(response => {
-        //     console.log("Response Authenticate", response);
-        //     const payload: LoginPayload = {
-        //         token: response.data.access_token,
-        //         user: response.data.user,
-        //     }
-        //     dispatch(loginSuccess(payload));
-        // })
-        // .catch(err => {
-        //     console.log("ERR Authenticate", err);
-        //     setError("code", {message: "Code Incorrect"});
-        // });
     })
 
     return (

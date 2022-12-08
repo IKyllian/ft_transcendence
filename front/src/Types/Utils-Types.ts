@@ -9,6 +9,11 @@ export interface SearchBarButtonsProps {
     userFromList?: UsersListInterface,
 }
 
+export interface TokenStorageInterface {
+    access_token: string,
+    refresh_token: string,
+}
+
 export enum SearchBarFunctionality {
     SEND_MESSAGE,
     ADD_FRIEND,

@@ -26,13 +26,17 @@ function SettingsCardAvatar() {
                 console.log("Response Upload", response);
                 if (cache && currentUser) {
                     const req = new Request(`${baseUrl}/users/${currentUser.id}/avatar`, {method: 'GET', headers: {"Authorization": `Bearer ${token}`}});
-                    if (!response.ok)
+                    if (!response.ok) {
+                        console.log("Error");
                         dispatch(addAlert({message: "Failed To Upload", type: AlertType.ERROR}));
+                    }
                     else {
+                        console.log("TEST");
                         cache.put(req, response.clone());
                         const avatarBlob = await response.blob();
-                        if (avatarBlob)
-                            dispatch(setUserAvatar(URL.createObjectURL(avatarBlob)));    
+                        if (avatarBlob) 
+                            dispatch(setUserAvatar(URL.createObjectURL(avatarBlob))); 
+                        console.log("TEST2");   
                         dispatch(addAlert({message: "New Avatar Uploaded", type: AlertType.SUCCESS}));
                     }
                 }  
