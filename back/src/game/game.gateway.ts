@@ -107,34 +107,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
 		console.log("joining lobby, ", client.user)
 		this.lobbyfactory.lobby_join(client, game_id);
 	}
-
-
-	@SubscribeMessage('get_user_gameinfo')
-	async onGetUserGameInfo(@ConnectedSocket() client: AuthenticatedSocket,
-	@MessageBody() user_id: number)
-	{
-		console.log("get_user_gameinfo, ", user_id)
-		this.lobbyfactory.get_client_info(client, user_id);
-	}
-
-
-	@SubscribeMessage('get_gameinfo')
-	async onGetGameInfo(@ConnectedSocket() client: AuthenticatedSocket,
-	@MessageBody() game_id: string)
-	{
-		console.log("get_user_gameinfo, ", game_id)
-		this.lobbyfactory.get_game_info(client, game_id);
-	}
-
-
-//Irrelevant with waitingroom
-	// @SubscribeMessage('user_is_ready')
-	// async onUserisReady(@ConnectedSocket() client: Socket,
-	// @MessageBody() game_id: string)
-	// {
-	// 	this.lobbyfactory.lobby_player_ready(client, game_id);
-	// }
-
+	
 	@SubscribeMessage('user_lobby_request_status')
 	async onUserLobbyRequestStatus(@ConnectedSocket() client: AuthenticatedSocket,
 	@MessageBody() game_id: string)

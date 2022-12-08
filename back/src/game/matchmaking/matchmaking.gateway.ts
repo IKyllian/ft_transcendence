@@ -13,6 +13,7 @@ import { GatewayExceptionFilter } from "src/utils/exceptions/filter/Gateway.filt
 import { AuthenticatedSocket } from "src/utils/types/auth-socket";
 import { GameMode, GameType, PlayerPosition, TeamSide } from "src/utils/types/game.types";
 import { notificationType } from "src/utils/types/types";
+import { LobbyFactory } from "../lobby/lobby.factory";
 import { IsReadyDto } from "./dto/boolean.dto";
 import { SettingDto } from "./dto/game-settings.dto";
 import { PartyMessageDto } from "./dto/party-message.dto";
@@ -30,6 +31,7 @@ export class MatchmakingGateway implements OnGatewayDisconnect {
 		private partyService: PartyService,
 		private queueService: QueueService,
 		private notifService: NotificationService,
+		private lobbyFactory: LobbyFactory,
 	) {}
 
 	handleDisconnect(socket: AuthenticatedSocket) {
@@ -181,5 +183,14 @@ export class MatchmakingGateway implements OnGatewayDisconnect {
 		@GetUser() user: User,
 	) {
 		this.queueService.leaveQueue(user);
+	}
+
+	@SubscribeMessage('get_gameinfo')
+	async onGetGameInfo(
+		@ConnectedSocket() client: AuthenticatedSocket,
+		@MessageBody() game_id: string
+	) {
+		console.log("get_user_gameinfo, ", game_id)
+		this.lobbyFactory.get_game_info(client, game_id);
 	}
 }

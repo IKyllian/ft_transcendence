@@ -42,7 +42,7 @@ export class Lobby
 		this.already_finished = true;
 	}
 
-	lobby_add(client: AuthenticatedSocket)
+	async lobby_add(client: AuthenticatedSocket)
 	{
 		let is_player: boolean = false;
 		this.lobby_data.players.forEach((player) => {
@@ -67,15 +67,14 @@ export class Lobby
 			this.lobby_broadcast_message('lobby_all_ready');
 			if (!this.already_started)
 			{
-				this.lobby_data.players.forEach(async (player) => {
-					await this.factory.userService.setInGameId(player.user.id, this.game_id);
-					this.factory.globalService.server.to(`user-${player.user.id}`).emit('InGameStatusUpdate', { id: player.user.id, in_game_id: this.game_id });
+				for (const player of this.lobby_data.players) {
+					this.factory.userService.setInGameId(player.user.id, this.game_id);
+					this.factory.globalService.server.emit('InGameStatusUpdate', { id: player.user.id, in_game_id: this.game_id });
 
-				})
+				}
 				this.game.start();
 				this.already_started = true;
 				clearTimeout(this.timeout);
-				//cancel timeout vu que tout le monde est la
 			}
 		}
 	}
