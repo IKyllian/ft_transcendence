@@ -187,18 +187,15 @@ export class AuthService {
 		);
 	}
 
-	async refreshTokens(userId: number, refreshToken: string) {
-		// const user = await this.userService.findOneBy({ id: userId })
-		const user_account = await this.accountRepo.findOne({
-			relations: { user: true },
-			where: { user: { id: userId } }
-		})
-		if (!user_account || !user_account.refresh_hash) // user doesn't exists OR user is logged out
-			throw new NotFoundException('user not found')
+	async refreshTokens(data: {account: UserAccount, refresh_token: string}) {
+		const user_account = data.account;
+		const refresh_token = data.refresh_token;
+		if (!user_account.refresh_hash)
+			throw new NotFoundException('User logged out');
 
-		const tokensMatches = await argon.verify(user_account.refresh_hash, refreshToken);
+		const tokensMatches = await argon.verify(user_account.refresh_hash, refresh_token);
 		if (!tokensMatches)
-			throw new BadRequestException('invalid token')
+			throw new BadRequestException('invalid token');
 		
 		const tokens = await this.signTokens(user_account.user.id, user_account.user.username);
 		this.updateRefreshHash(user_account, tokens.refresh_token);
@@ -286,8 +283,7 @@ export class AuthService {
 	async resetPassword(dto: ResetPasswordDto) {
 		const user_account = await this.accountRepo.findOne({
 			where: { forgot_code: dto.code }
-		})
-		console.log('reset pass', user_account, dto.code)
+		});
 		if (!user_account)
 			throw new NotFoundException("Invalid code");
 

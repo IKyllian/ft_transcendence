@@ -1,4 +1,4 @@
-import { Body, Controller, HttpCode, HttpStatus, Post, UseGuards } from "@nestjs/common";
+import { Body, Controller, HttpCode, HttpStatus, Post, Req, UseGuards } from "@nestjs/common";
 import { User } from "src/typeorm";
 import { GetUser } from "src/utils/decorators";
 import { AuthService } from "./auth.service";
@@ -9,6 +9,7 @@ import { JwtGuard } from "./guard/jwt.guard";
 import { RefreshGuard } from "./guard/refresh.guard";
 import { ForgotPasswordDto } from "./dto/forgot-password.dto";
 import { ResetPasswordDto } from "./dto/reset-password.dto";
+import { Request } from "express";
 
 @Controller('auth')
 export class AuthController {
@@ -42,8 +43,8 @@ export class AuthController {
 	@UseGuards(RefreshGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('refresh')
-	refresh(@GetUser() user: User) {
-		return this.authService.refreshTokens(user["id"], user["refreshToken"]);
+	refresh(@Req() req: Request) {
+		return this.authService.refreshTokens(req.body);
 	}
 
 	@UseGuards(JwtGuard)
