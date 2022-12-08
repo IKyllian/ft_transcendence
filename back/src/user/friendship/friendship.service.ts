@@ -33,7 +33,6 @@ export class FriendshipService {
 
 	getRelationStatus(user: User, relation: Friendship) {
 		let relationStatus: RelationStatus = RelationStatus.NONE;
-		//TODO declined?
 		if (relation) {
 			switch(relation.status) {
 				case 'accepted':

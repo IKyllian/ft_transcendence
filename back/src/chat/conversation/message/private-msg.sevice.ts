@@ -1,7 +1,6 @@
-import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { PrivateMessage, User } from "src/typeorm";
-import { FriendshipService } from "src/user/friendship/friendship.service";
 import { UserService } from "src/user/user.service";
 import { Repository } from "typeorm";
 import { ConversationService } from "../conversation.service";

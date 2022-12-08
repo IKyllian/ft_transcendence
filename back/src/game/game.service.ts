@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { MatchResult, Statistic, User } from "src/typeorm";
-import { EndResult, GameSettings, GameState, GameType, Leaderboard, ScoreBoard, TeamSide } from "src/utils/types/game.types";
+import { EndResult, GameType, Leaderboard, ScoreBoard, TeamSide } from "src/utils/types/game.types";
 import { Repository } from "typeorm";
 import { Player } from "./player";
 import { UserSessionManager } from "./user.session";
@@ -91,18 +91,10 @@ export class GameService {
 		blueTeamAverage /= blueTeamIds.length;
 		redTeamAverage /= redTeamIds.length;
 
-		console.log("blue average: " + blueTeamAverage);
-		console.log("red average: " + redTeamAverage);
-
 		const blueEloWon: number = Math.round(50 / (1 + Math.pow(10, (blueTeamAverage - redTeamAverage) / 400)));
 		const blueEloLost: number = blueEloWon - 50;
 		const redEloWon: number = Math.abs(blueEloLost);
 		const redEloLost: number = redEloWon - 50;
-
-		// console.log("blue elo if win: " + blueEloWon);
-		// console.log("blue elo if lose: " + blueEloLost);
-		// console.log("red elo if win: " + redEloWon);
-		// console.log("red elo if lose: " + redEloLost);
 
 		if (result === EndResult.TeamBlue_Win) {
 			console.log("elo result blue: " + blueEloWon);

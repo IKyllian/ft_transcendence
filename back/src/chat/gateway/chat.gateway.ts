@@ -2,7 +2,6 @@ import { BadRequestException, NotFoundException, UseFilters, UseGuards, UsePipes
 import { WebSocketGateway, MessageBody, WebSocketServer, ConnectedSocket, OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { AuthService } from 'src/auth/auth.service';
-import { WsJwtGuard } from 'src/auth/guard/ws-jwt.guard';
 import { ChannelUser, Friendship, Notification, User, UserTimeout } from 'src/typeorm';
 import { ChannelService } from '../channel/channel.service';
 import { UserService } from 'src/user/user.service';
@@ -17,7 +16,6 @@ import { UserIdDto } from './dto/user-id.dto';
 import { FriendshipService } from 'src/user/friendship/friendship.service';
 import { NotificationService } from 'src/notification/notification.service';
 import { ResponseDto } from './dto/response.dto';
-import { ChannelPasswordDto } from '../channel/dto/channel-pwd.dto';
 import { ChannelInviteDto } from './dto/channel-invite.dto';
 import { BanUserDto } from '../channel/dto/ban-user.dto';
 import { ChannelPermissionGuard } from '../channel/guards';
@@ -59,7 +57,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		) {}
 
 	afterInit(server: Server) {
-			// console.log(this.server)
 			this.globalService.server = server;
 	}
 
@@ -98,23 +95,19 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	async handleDisconnect(socket: Socket) {
 		if (socket.handshake.headers.authorization) {
 			const payload = this.authService.decodeJwt(socket.handshake.headers.authorization.split(' ')[1]) as JwtPayload;
-			// const user = await this.userService.findOneBy({ id: payload?.sub });
 			if (payload) {
 				if ((await this.server.in(`user-${payload.sub}`).fetchSockets()).length === 0) {
 					this.userService.setStatus(payload.sub, UserStatus.OFFLINE);
 					this.server.emit('StatusUpdate', { id: payload.sub, status: UserStatus.OFFLINE});
 				}
-				// socket.emit('statusUpdate', { user, status: 'offline' });
 				console.log(payload?.username, 'disconnected');
 			}
 			} else
 				console.log(socket.id, 'disconnected');
-			// TODO emit disconnected for front retry to reconnect ?
 	}
 
 	@SubscribeMessage('Logout')
 	async logout(@GetUser() user: User) {
-		console.log("logout")
 		await this.authService.logout(user);
 		this.server.to(`user-${user.id}`).emit('Logout');
 	}
@@ -167,7 +160,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		@GetUser() user: User,
 		@MessageBody() room: RoomDto,
 	) {
-		console.log(socket.user.username + ' joined room')
 		const chanInfo = await this.channelService.getChannelById(user.id, room.id);
 		socket.emit('roomData', chanInfo);
 		socket.join(`channel-${ chanInfo.id }`);
@@ -182,7 +174,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		@ConnectedSocket() socket: AuthenticatedSocket,
 		@MessageBody() room: RoomDto) {
 		socket.leave(`channel-${ room.id }`);
-		console.log(socket.user.username + ' left room')
 	}
 
 	@UseGuards(WsInChannelGuard)
@@ -226,7 +217,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		@GetChannelUser() chanUser: ChannelUser,
 		@MessageBody() dto: BanUserDto,
 	) {
-		console.log("banning", dto)
 		const bannedUser: UserTimeout = await this.channelService.banUser(chanUser, dto);
 		this.server.to(`channel-${bannedUser.channel.id}`).emit('ChannelUpdate', { type: ChannelUpdateType.BAN, data: bannedUser });
 		this.server.to(`user-${dto.userId}`).emit('OnLeave', bannedUser.channel);
@@ -247,7 +237,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		@GetChannelUser() chanUser: ChannelUser,
 		@MessageBody() dto: MuteUserDto,
 	) {
-		console.log("in mute", dto)
 		const user = await this.channelService.muteUser(chanUser, dto);
 		this.server.to(`channel-${dto.chanId}`).emit('ChannelUpdate', { type: ChannelUpdateType.MUTE, data: user });
 	}
@@ -292,12 +281,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		@ConnectedSocket() socket: AuthenticatedSocket,
 		@MessageBody() data: PrivateMessageDto,
 	) {
-		console.log("create conv", data)
 		const conv = await this.convService.create(socket.user, data.adresseeId, data.content);
 		this.server
-		.to(`user-${socket.user.id}`)
-		.to(`user-${data.adresseeId}`)
-		.emit('NewConversation', { conv, socketId: socket.id });
+			.to(`user-${socket.user.id}`)
+			.to(`user-${data.adresseeId}`)
+			.emit('NewConversation', { conv, socketId: socket.id });
 
 		this.notificationService.sendPrivateMessageNotif(socket.user.id, conv);
 	}
@@ -307,7 +295,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		@ConnectedSocket() socket: AuthenticatedSocket,
 		@MessageBody() room: RoomDto,
 	) {
-		console.log(socket.user.username + " joining conversation room");
 		const conv = await this.convService.getConversation(socket.user, room.id);
 		if (!conv) {
 			throw new BadRequestException('Conversation not found');
@@ -325,7 +312,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		@ConnectedSocket() socket: AuthenticatedSocket,
 		@MessageBody() room: RoomDto,
 	) {
-		console.log(socket.user.username + " leaving conversation room");
 		socket.leave(`conversation-${room.id}`);
 	}
 
@@ -336,8 +322,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		) {
 			const message = await this.privateMsgService.create(socket.user, data);
 			this.server
-			.to(`conversation-${message.conversation.id}`)
-			.emit('NewPrivateMessage', message);
+				.to(`conversation-${message.conversation.id}`)
+				.emit('NewPrivateMessage', message);
 			this.notificationService.sendPrivateMessageNotif(socket.user.id, message.conversation);
 	}
 
@@ -347,7 +333,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		@ConnectedSocket() socket: Socket,
 		@MessageBody() dto: OnTypingPrivateDto,
 	) {
-		//check if in conv
+		// TODO check if in conv
 		socket.to(`conversation-${dto.convId}`).emit('OnTypingPrivate', { user: {id: user.id, username: user.username}, isTyping: dto.isTyping, convId: dto.convId });
 	}
 
@@ -364,7 +350,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		if (!addressee)
 			throw new NotFoundException('User not found');
 		const friendship: Friendship = await this.friendshipService.sendFriendRequest(socket.user, addressee);
-		// this.server.to(`user-${socket.user.id}`).emit("RequestValidation", { id: addressee.id, relation: this.friendshipService.getRelationStatus(socket.user, friendship)});
 		this.server.to(`user-${addressee.id}`).emit("RelationUpdate", { id: socket.user.id, relation: this.friendshipService.getRelationStatus(socket.user, friendship)});
 		this.server.to(`user-${socket.user.id}`).emit("RelationUpdate", { id: addressee.id, relation: this.friendshipService.getRelationStatus(addressee, friendship)});
 		const notif = await this.notificationService.createFriendRequestNotif(addressee, socket.user);

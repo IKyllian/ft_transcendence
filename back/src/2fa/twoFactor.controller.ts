@@ -1,4 +1,4 @@
-import { BadRequestException, Body, ClassSerializerInterceptor, Controller, Post, Req, Res, UnauthorizedException, UseGuards, UseInterceptors } from "@nestjs/common";
+import { BadRequestException, Body, ClassSerializerInterceptor, Controller, Post, Res, UseGuards, UseInterceptors } from "@nestjs/common";
 import { User } from "src/typeorm";
 import { GetUser } from "src/utils/decorators";
 import { TwoFactorService } from "./twoFactor.service";

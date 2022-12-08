@@ -36,9 +36,8 @@ import { TwoFactorModule } from './2fa/twoFactor.module';
       password: process.env.POSTGRES_PASSWORD,
       database: process.env.POSTGRES_NAME,
       entities,
-      synchronize: true, // Setting synchronize: true shouldn't be used in production - otherwise you can lose production data.
-    //   dropSchema: true,
-      // logging: true,
+      synchronize: true,
+      // dropSchema: true,
     }),
   ],
   controllers: [AppController],

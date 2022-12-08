@@ -1,12 +1,7 @@
 
-import { Exclude } from "class-transformer";
 import { UserStatus } from "src/utils/types/types";
-import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn, Unique, ManyToMany, JoinTable, ManyToOne, BaseEntity, CreateDateColumn } from "typeorm";
-import { Avatar } from "./avatar";
+import { Column, Entity, OneToMany, OneToOne, PrimaryGeneratedColumn, ManyToMany, JoinTable, CreateDateColumn } from "typeorm";
 import { ChannelUser } from "./channelUser";
-import { Conversation } from "./conversation";
-import { Friendship } from "./friendship";
-import { MatchResult } from "./matchResult";
 import { Statistic } from "./statistic";
 import { UserAccount } from "./userAccount";
 

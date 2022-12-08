@@ -1,4 +1,3 @@
-import { Avatar } from "./entities/avatar"
 import { Channel } from "./entities/channel"
 import { ChannelMessage } from "./entities/channelMessage"
 import { ChannelUser } from "./entities/channelUser"
@@ -19,7 +18,6 @@ const entities = [
 	ChannelMessage,
 	Statistic,
 	ChannelUser,
-	Avatar,
 	Conversation,
 	PrivateMessage,
 	Notification,
@@ -37,7 +35,6 @@ export {
 	ChannelMessage,
 	Statistic,
 	ChannelUser,
-	Avatar,
 	Conversation,
 	PrivateMessage,
 	Notification,

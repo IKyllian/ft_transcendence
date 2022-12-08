@@ -1,6 +1,5 @@
-import { BadRequestException, Body, ClassSerializerInterceptor, Controller, Delete, FileTypeValidator, ForbiddenException, Get, HttpStatus, MaxFileSizeValidator, NotFoundException, Param, ParseFilePipe, ParseFilePipeBuilder, ParseIntPipe, Patch, Post, Req, Res, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
+import { BadRequestException, Body, Controller, Delete, Get, NotFoundException, Param, ParseIntPipe, Patch, Post, Req, Res, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
-import { Observable, of } from "rxjs";
 import { JwtGuard } from "src/auth/guard/jwt.guard";
 import { User } from "src/typeorm";
 import { diskStorage } from "multer";
@@ -62,9 +61,7 @@ export class UserController {
 		if (!await this.userService.resizeImage(file)) {
 			throw new BadRequestException("Error occured in file upload");
 		}
-		console.log("Upload Avatar", file.filename)
 		await this.userService.updateAvatar(user, file.filename);
-		// return of({imagePath: file.path})
 		res.sendFile(file.filename, { root: 'uploads', headers: {"Content-Disposition": file.filename}});
 	}
 
@@ -80,7 +77,6 @@ export class UserController {
 			}
 			if (!user.avatar) { return undefined; }
 			res.sendFile(user.avatar, { root: 'uploads', headers: {"Content-Disposition": user.avatar}});
-			console.log("Get Avatar", user.avatar)
 	}
 
 	@UseGuards(JwtGuard)
@@ -157,13 +153,5 @@ export class UserController {
 		@Body() searchDto: SearchDto,
 	) {
 		return await this.userService.search(user, searchDto);
-	}
-
-	//test
-	// @UseGuards(JwtGuard)
-	@Delete(':id')
-	deleteUser(@Param('id', ParseIntPipe) id: number) {
-		this.userService.deleteUser(id);
-		console.log('deleting user')
 	}
 }

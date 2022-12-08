@@ -1,4 +1,4 @@
-import { GameSettings, GameType, PlayerPosition, TeamSide } from "src/utils/types/game.types";
+import { GameSettings, PlayerPosition, TeamSide } from "src/utils/types/game.types";
 import { QueueLobby } from "src/utils/types/types";
 import { Player } from "../player";
 

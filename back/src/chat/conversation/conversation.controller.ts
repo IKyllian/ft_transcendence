@@ -2,7 +2,6 @@ import { Body, Controller, Get, Param, ParseIntPipe, Post, UseGuards } from "@ne
 import { JwtGuard } from "src/auth/guard/jwt.guard";
 import { User } from "src/typeorm";
 import { GetUser } from "src/utils/decorators";
-import { InChannelGuard } from "../channel/guards";
 import { SkipDto } from "../channel/message/dto/channelMessage.dto";
 import { ConversationService } from "./conversation.service";
 

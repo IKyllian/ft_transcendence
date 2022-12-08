@@ -57,7 +57,6 @@ export class TaskService {
 	adjustLobbyEloRange(queue: QueueLobby[], serverRange: EloRange) {
 		queue.forEach((party) => {
 			const timeInQueue: number = (Date.now() - party.timeInQueue) / 1000;
-			// console.log(timeInQueue, this.queueService.queue1v1.length);
 			if (timeInQueue > 120)
 				party.range = serverRange.max;
 			else if (timeInQueue > 60)
@@ -69,9 +68,8 @@ export class TaskService {
 		});
 	}
 
-	@Interval('singles-queue', 3000)
+	@Interval('singles-queue', 5000)
 	async handleSinglesQueue() {
-		// console.log("nb of players in 1v1 queue: " + this.queueService.queue1v1.length);
 		if (this.queueService.queue1v1.length < 2) { return; }
 		let matchFound: MatchmakingLobby[] = [];
 		this.queueService.queue1v1.sort((a, b) => a.averageMmr - b.averageMmr);
@@ -93,10 +91,9 @@ export class TaskService {
 		matchFound.forEach((match) => this.lobbyFactory.lobby_create(match));
 	}
 
-	@Interval('doubles-queue', 3000)
+	@Interval('doubles-queue', 5000)
 	async handleDoublesQueue() {
 		if (this.queueService.queue2v2.length < 2) { return; }
-		let matchesFound: MatchmakingLobby[] = [];
 		let potentialLobby: QueueLobby[] = [];
 		let matchFound: boolean;
 
@@ -135,7 +132,6 @@ export class TaskService {
 					}
 					if (potentialLobby.length > 1 && potentialLobby[0].players.length === 2) {
 						for (const lobby of potentialLobby) {
-							// console.log('potential lobby', lobby)
 							if (lobby.id !== potentialLobby[0].id && lobby.players.length === 2) {
 								lobby.players.forEach((player) => this.queueService.leaveQueue(player.user));
 								potentialLobby[0].players.forEach((player) => this.queueService.leaveQueue(player.user));

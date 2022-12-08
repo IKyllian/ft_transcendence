@@ -1,11 +1,10 @@
 import {
-	IsAlphanumeric,
 	IsNotEmpty,
 	IsString,
 	MaxLength,
 	MinLength,
-  Matches,
-  IsEmail
+  	Matches,
+  	IsEmail
 } from 'class-validator'
 
 export class SignupDto {

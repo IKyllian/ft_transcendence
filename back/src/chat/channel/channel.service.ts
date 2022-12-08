@@ -1,12 +1,11 @@
-import { BadRequestException, ForbiddenException, forwardRef, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, forwardRef, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Channel, User, ChannelUser, UserTimeout, ChannelMessage } from 'src/typeorm';
-import { FindManyOptions, FindOneOptions, FindOptionsWhere, In, Like, Not, Repository } from 'typeorm';
-import { ChannelExistException, ChannelNotFoundException, NotInChannelException, UnauthorizedActionException } from 'src/utils/exceptions';
+import { FindManyOptions, FindOneOptions, FindOptionsWhere, Repository } from 'typeorm';
+import { ChannelExistException, ChannelNotFoundException, NotInChannelException } from 'src/utils/exceptions';
 import * as argon from 'argon2';
 import { CreateChannelDto } from './dto/create-channel.dto';
-import { ChannelPasswordDto } from './dto/channel-pwd.dto';
-import { channelOption, channelRole, ChannelUpdateType, FindChannelParams, ResponseType, TimeoutType } from 'src/utils/types/types';
+import { channelOption, channelRole, ChannelUpdateType, ResponseType, TimeoutType } from 'src/utils/types/types';
 import { BanUserDto } from './dto/ban-user.dto';
 import { UserService } from 'src/user/user.service';
 import { NotificationService } from 'src/notification/notification.service';
@@ -14,8 +13,6 @@ import { ResponseDto } from '../gateway/dto/response.dto';
 import { SearchToInviteInChanDto } from './dto/search-user-to-invite.dto';
 import { MuteUserDto } from './dto/mute-user.dto';
 import { ChangeRoleDto } from '../gateway/dto/change-role.dto';
-import { ChannelInviteDto } from '../gateway/dto/channel-invite.dto';
-import { Server } from 'socket.io';
 import { GlobalService } from 'src/utils/global/global.service';
 import { EditChannelNameDto } from './dto/edit-channel-name.dto';
 import { EditChannelOptionDto } from './dto/edit-channel-option.dto';
@@ -23,7 +20,6 @@ import { EditChannelOptionDto } from './dto/edit-channel-option.dto';
 @Injectable()
 export class ChannelService {
 	constructor(
-		private userService: UserService,
 		@Inject(forwardRef(() => NotificationService))
 		private notifService: NotificationService,
 		private globalService: GlobalService,
@@ -40,8 +36,7 @@ export class ChannelService {
 		private messageRepo: Repository<ChannelMessage>,
 	) {}
 	/**
-	 * TODO C PAS FOU
-	 * @param user_id 
+	 * @param user 
 	 * @returns All the channel that the user did not joined and that is visible
 	 */
 	async searchChannel(user: User) {
@@ -149,7 +144,6 @@ export class ChannelService {
 		return this.channelUserRepo.save(channelUser);
 	}
 
-	// TODO Change getchannelinvite to find by id
 	async respondInvite(user: User, dto: ResponseDto): Promise<ChannelUser | null> {
 		const invite = await this.notifService.getChannelInvite(user, dto.id);
 		if (!invite)
@@ -162,11 +156,7 @@ export class ChannelService {
 	}
 
 	async leave(chanUser: ChannelUser) {
-		// console.log('before leave', channel.channelUsers);
-		// channel.channelUsers = channel.channelUsers.filter((chanUser) => chanUser.user.id !== user.id);
-		// console.log('after leave', channel.channelUsers);
 		await this.channelUserRepo.delete({id: chanUser.id});
-		// return this.channelRepo.save(channel);
 	}
 
 	async getChannelById(userId: number, id: number): Promise<Channel> {
@@ -295,7 +285,6 @@ export class ChannelService {
 			if (isMuted.until) {
 				if (isMuted.until.getTime() < new Date().getTime()) {
 					await this.timeoutRepo.delete(isMuted.id);
-					// console.log("is muted", chanUser, this.globalService.server);
 					this.globalService.server.to(`channel-${chanUser.channelId}`).emit('ChannelUpdate', { type: ChannelUpdateType.UNTIMEOUT, data: isMuted.id })
 					return false;
 				} else {
