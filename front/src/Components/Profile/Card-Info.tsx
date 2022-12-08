@@ -17,7 +17,7 @@ function CardInfo(props: {userState: ProfileState}) {
     // }
 
     const spectateClick = () => {
-        socket?.emit("get_user_gameinfo", {user_id: userState.user.in_game_id});
+        socket?.emit("get_gameinfo", userState.user.in_game_id);
     }
 
     return userState.user ? (

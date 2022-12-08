@@ -79,7 +79,8 @@ export function useProfileHook() {
     }, [friendList])
 
     useEffect(() => {
-        socket?.on('user_gameinfo', (data: PlayersGameData | null) => {
+        socket?.on('gameinfo', (data: PlayersGameData | null) => {
+            console.log("gameinfo", data);
             if (data !== null) {
 				dispatch(newGameFound({gameDatas: data, showGameFound: false}));
                 navigate("/game", {state: data});
@@ -95,6 +96,7 @@ export function useProfileHook() {
         });
 
         socket?.on("InGameStatusUpdate", (data: {id: number, in_game_id: string | null}) => {
+            console.log("InGameStatusUpdate", data);
             setUserState(prev => {
                 if (prev && prev.user)
                     return {...prev, user: {...prev.user, in_game_id: data.in_game_id}};
@@ -112,6 +114,7 @@ export function useProfileHook() {
         });
 
         return () => {
+            socket?.off("user_gameinfo");
             socket?.off("RelationUpdate");
             socket?.off("InGameStatusUpdate");
             socket?.off("StatusUpdate");
