@@ -1,6 +1,5 @@
 import { useForm } from "react-hook-form";
 import api from "../../../Api/Api";
-import { baseUrl } from "../../../env";
 import { changeChannelSettings } from "../../../Redux/ChannelSlice";
 import { useAppDispatch } from "../../../Redux/Hooks";
 import { Channel, ChannelModes, ChannelModesArray } from "../../../Types/Chat-Types";
@@ -40,7 +39,7 @@ function GlobalSettings(props: {chanDatas: Channel}) {
         }
         if (data.chanOption.chanMode === "protected")
             payload = {...payload, password: data.chanOption.password};
-        api.patch(`${baseUrl}/channel/edit-option`, payload)
+        api.patch(`/channel/edit-option`, payload)
         .then(response => {
             console.log("RESPONSE ", response.data);
             dispatch(changeChannelSettings({chanName: response.data.name, option: response.data.option}));
@@ -52,7 +51,7 @@ function GlobalSettings(props: {chanDatas: Channel}) {
 
     const formChanName = handleSubmit((data, e) => {
         e?.preventDefault();
-        api.patch(`${baseUrl}/channel/edit-name`, {chanId: chanDatas.id, name: data.nameForm.chanName})
+        api.patch(`/channel/edit-name`, {chanId: chanDatas.id, name: data.nameForm.chanName})
         .then(response => {
             console.log(response);
             dispatch(changeChannelSettings({chanName: response.data.name, option: response.data.option}));

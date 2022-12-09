@@ -1,4 +1,3 @@
-import { baseUrl } from "../env";
 import { replaceUserObject } from "../Redux/AuthSlice";
 import { AnyAction, Dispatch } from "@reduxjs/toolkit";
 import { copyNotificationArray } from "../Redux/NotificationSlice";
@@ -19,7 +18,7 @@ interface UsersListInterface {
 
 
 export function fetchOnBlockUser({senderId, dispatch, time}: BlockParameters) {
-    api.post(`${baseUrl}/users/${senderId}/block`, {})
+    api.post(`/users/${senderId}/block`, {})
     .then((response) => {
         dispatch(replaceUserObject(response.data));
     })
@@ -29,7 +28,7 @@ export function fetchOnBlockUser({senderId, dispatch, time}: BlockParameters) {
 }
 
 export function fetchOnUnblockUser({senderId, dispatch}: BlockParameters) {
-    api.post(`${baseUrl}/users/${senderId}/deblock`, {})
+    api.post(`/users/${senderId}/deblock`, {})
     .then((response) => {
         dispatch(replaceUserObject(response.data));
     })
@@ -39,7 +38,7 @@ export function fetchOnUnblockUser({senderId, dispatch}: BlockParameters) {
 }
 
 export function fetchNotifications(dispatch: Dispatch<AnyAction>) {
-    api.get(`${baseUrl}/notification`)
+    api.get(`/notification`)
     .then(response => {
         console.log("Notification", response);
         dispatch(copyNotificationArray(response.data));
@@ -50,7 +49,7 @@ export function fetchNotifications(dispatch: Dispatch<AnyAction>) {
 }
 
 export function fetchFriendList(dispatch: Dispatch<AnyAction>) {
-    api.get(`${baseUrl}/friend`)
+    api.get(`/friend`)
     .then(response => {
         console.log(response);
         dispatch(copyFriendListArray(response.data));
@@ -61,7 +60,7 @@ export function fetchFriendList(dispatch: Dispatch<AnyAction>) {
 }
 
 export function fetchSearchAllUsers(inputText: string, setUsersList: Function) {
-    api.post(`${baseUrl}/users/search`, {str: inputText})
+    api.post(`/users/search`, {str: inputText})
     .then((response) => {
         const newArray: UsersListInterface[] = response.data.map((elem: UserInterface) => { return {user: elem}});
         setUsersList(newArray);
@@ -72,7 +71,7 @@ export function fetchSearchAllUsers(inputText: string, setUsersList: Function) {
 }
 
 export function fetchSearchUsersToAdd(inputText: string, setUsersList: Function) {
-    api.post(`${baseUrl}/friend/search`, {str: inputText})
+    api.post(`/friend/search`, {str: inputText})
     .then(response => {
         const newArray: UsersListInterface[] = response.data.map((elem: any) => { return {user: elem.user, relationStatus: elem.relationStatus}});
         setUsersList(newArray);

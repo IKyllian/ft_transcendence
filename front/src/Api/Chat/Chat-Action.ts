@@ -2,7 +2,6 @@ import { AnyAction, Dispatch } from "@reduxjs/toolkit";
 import { UseFormSetError } from "react-hook-form";
 import { NavigateFunction } from "react-router-dom";
 import { Socket } from "socket.io-client";
-import { baseUrl } from "../../env";
 import { replaceChannelMessages } from "../../Redux/ChannelSlice";
 import { addChannel } from "../../Redux/ChatSlice";
 import { ChatMessage, CreateChanBodyRequest, PrivateMessage, ConversationState } from "../../Types/Chat-Types";
@@ -25,7 +24,7 @@ export function fetchCreateChannel(
     socket: Socket,
     setError: UseFormSetError<FormValues>) {
     
-    api.post(`${baseUrl}/channel`, body)
+    api.post(`/channel`, body)
     .then((response) => {
         console.log(response);
         dispatch(addChannel({channel: response.data, isActive: "true"}));
@@ -46,7 +45,7 @@ export function fetchCreateChannel(
 }
 
 export function fetchLeaveChannel(channelId: number, navigate: NavigateFunction) {
-    api.post(`${baseUrl}/channel/${channelId}/leave`, {})
+    api.post(`/channel/${channelId}/leave`, {})
     .then((response) => {
         navigate("/chat");
     })
@@ -56,7 +55,7 @@ export function fetchLeaveChannel(channelId: number, navigate: NavigateFunction)
 }
 
 export function fetchLoadPrevChatMessages(channelId: number, dispatch: Dispatch<AnyAction>, currentMessages: ChatMessage[], setPreviousMessages: Function) {
-    api.post(`${baseUrl}/channel/${channelId}/messages`, {skip: currentMessages.length})
+    api.post(`/channel/${channelId}/messages`, {skip: currentMessages.length})
     .then((response) => {
         console.log("response", response.data);
         if (response.data.length > 0) {
@@ -72,7 +71,7 @@ export function fetchLoadPrevChatMessages(channelId: number, dispatch: Dispatch<
 }
 
 export function fetchLoadPrevConvMessages(convId: number, setConvDatas: Function, currentMessages: PrivateMessage[], setPreviousMessages: Function) {
-    api.post(`${baseUrl}/conversation/${convId}/messages`, {skip: currentMessages.length})
+    api.post(`/conversation/${convId}/messages`, {skip: currentMessages.length})
     .then((response) => {
         console.log("response", response.data);
         if (response.data.length > 0) {

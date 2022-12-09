@@ -56,7 +56,6 @@ export function useSignHook() {
         .catch(err => {
             dispatch(loginError("username or password incorect"));
         })
-        // fetchSignIn({username: data.username, password: data.password, dispatch: dispatch});
     });
 
     const onSignUp = handleSubmit((data, e) => {
@@ -73,15 +72,21 @@ export function useSignHook() {
                 navigate("/sign");
             dispatch(loginPending());
             fetchLogin42(authorizationCode).then(response => {
+                console.log("Response Sign in 42", response);
                 if (response.data.access_2fa_token) {
                     dispatch(verification2fa());
                     navigate("/2fa-verification", {state: {access_2fa_token: response.data.access_2fa_token}});
                 } else {
                     if (response.data.usernameSet) {
+                        const tokenStorage: TokenStorageInterface = {
+                            access_token: response.data.access_token,
+                            refresh_token: response.data.refresh_token,
+                        }
+                        localStorage.setItem("userToken", JSON.stringify(tokenStorage));
                         dispatch(loginSuccess(response.data.user));
                     } else {
                         dispatch(setUsername());
-                        navigate("/set-username", {state:{token: response.data.access_token}});
+                        navigate("/set-username", {state:{access_token: response.data.access_token, refresh_token: response.data.refresh_token}});
                     }
                 }
             })

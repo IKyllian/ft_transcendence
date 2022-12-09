@@ -31,7 +31,7 @@ const onResponse = (response: AxiosResponse): AxiosResponse => {
 };
 
 const onResponseError = async (error: AxiosError): Promise<AxiosError | AxiosInstance> => {
-    const originalConfig = error.config;
+    const originalConfig: AxiosRequestConfig<any> = error.config;
     if (error.response) {
         const errorData: ErrorDataInterface = error.response.data as ErrorDataInterface ;
         if (error.response.status === 401 && errorData.message === "Unauthorized") {
@@ -39,16 +39,17 @@ const onResponseError = async (error: AxiosError): Promise<AxiosError | AxiosIns
             if (localToken) {
                 const storedToken: TokenStorageInterface = JSON.parse(localToken);  
                 try {
-                    const rs = await axios.post(`${baseUrl}/auth/refresh`, {}, {
+                    const refreshResponse = await axios.post(`${baseUrl}/auth/refresh`, {}, {
                         headers: {
                             "Authorization": `Bearer ${storedToken.refresh_token}`,
                         }
                     });
-
-                    localStorage.setItem("userToken", JSON.stringify(rs.data));
-                    if (originalConfig.headers)
-                        originalConfig.headers['Authorization'] = `Bearer ${rs.data.access_token}`;
-                    return axios.create().request(originalConfig);
+                    if (refreshResponse && refreshResponse.data) {
+                        localStorage.setItem("userToken", JSON.stringify(refreshResponse.data));
+                        if (originalConfig.headers)
+                            originalConfig.headers['Authorization'] = `Bearer ${refreshResponse.data.access_token}`;
+                        return axios.create().request(originalConfig);
+                    }
                 } catch (_error) {
                     return Promise.reject(_error);
                 }

@@ -1,8 +1,8 @@
 import { IconLock } from "@tabler/icons";
-import axios from "axios";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import api from "../../../Api/Api";
+import { fetchInterceptor } from "../../../Api/Interceptor-Fetch";
 import { baseUrl } from "../../../env";
 import { addAlert, AlertType } from "../../../Redux/AlertSlice";
 import { change2faStatus, replaceUserObject } from "../../../Redux/AuthSlice";
@@ -30,7 +30,7 @@ function SettingsCardInfos(props: {currentUser: UserInterface }) {
 
     const usernameSubmit = handleSubmit((data, e) => {
         e?.preventDefault();
-        api.patch(`${baseUrl}/users/edit-username`, {username: data.usernameForm.username})
+        api.patch(`/users/edit-username`, {username: data.usernameForm.username})
         .then(response => {
             console.log("response Edit username", response.data);
             dispatch(replaceUserObject(response.data));
@@ -44,7 +44,7 @@ function SettingsCardInfos(props: {currentUser: UserInterface }) {
 
     const passwordSubmit = handleSubmit((data, e) => {
         e?.preventDefault();
-        api.patch(`${baseUrl}/users/edit-password`, {old: data.passwordForm.oldPassword, new: data.passwordForm.newPassword})
+        api.patch(`/users/edit-password`, {old: data.passwordForm.oldPassword, new: data.passwordForm.newPassword})
         .then(response => {
             console.log("Response Edit PAssword", response);
             resetField("passwordForm.oldPassword");
@@ -62,6 +62,7 @@ function SettingsCardInfos(props: {currentUser: UserInterface }) {
 		if (localToken !== null) {
 			const localTokenParse: TokenStorageInterface = JSON.parse(localToken);
             const req = new Request(`${baseUrl}/2fa/generate`, {method: 'POST', body: undefined ,headers: {"Authorization": `Bearer ${localTokenParse.access_token}`}});
+            fetchInterceptor();
             fetch(req)
             .then(async (response) => {
                 const avatarBlob = await response.blob();
@@ -158,7 +159,7 @@ function Disable2fa() {
 
     const codeSubmit = handleSubmit((data, e) => {
         e?.preventDefault();
-        api.post(`${baseUrl}/2fa/disable`, {code: data.code})
+        api.post(`/2fa/disable`, {code: data.code})
         .then((response) => {
             console.log("response 2fa enable", response);
             dispatch(addAlert({message: "Two-Factor Authentication Disabled", type: AlertType.SUCCESS}));
@@ -196,7 +197,7 @@ function QRCodeValidation(props: {qrcode: string, setDisplayQRCode: Function}) {
 
     const codeSubmit = handleSubmit((data, e) => {
         e?.preventDefault();
-        api.post(`${baseUrl}/2fa/enable`, {code: data.code})
+        api.post(`/2fa/enable`, {code: data.code})
         .then((response) => {
             console.log("response 2fa enable", response);
             dispatch(addAlert({message: "Two-Factor Authentication Activated", type: AlertType.SUCCESS}));

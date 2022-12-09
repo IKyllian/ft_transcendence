@@ -1,8 +1,7 @@
-import { baseUrl } from "../env";
 import api from "./Api";
 
 export function fetchSinglesLeaderBoardDatas(skip: number, setLeaderboardState: Function) {
-    api.post(`${baseUrl}/game/singles-leaderboard`, {skip: skip})
+    api.post(`/game/singles-leaderboard`, {skip: skip})
     .then(response => {
         console.log("response", response);
         setLeaderboardState((prev: any) => {return {...response.data, loading: false, page: prev.page, mode: prev.mode}});
@@ -13,7 +12,7 @@ export function fetchSinglesLeaderBoardDatas(skip: number, setLeaderboardState: 
 }
 
 export function fetchDoublesLeaderBoardDatas(skip: number, setLeaderboardState: Function) {
-    api.post(`${baseUrl}/game/doubles-leaderboard`, {skip: skip})
+    api.post(`/game/doubles-leaderboard`, {skip: skip})
     .then(response => {
         console.log("response", response);
         setLeaderboardState((prev: any) => {return {...response.data, loading: false, page: prev.page, mode: prev.mode}});
