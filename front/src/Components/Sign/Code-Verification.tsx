@@ -5,7 +5,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { baseUrl } from "../../env";
 import { leave2fa, loginSuccess } from "../../Redux/AuthSlice";
 import { useAppDispatch, useAppSelector } from "../../Redux/Hooks";
-import { LoginPayload } from "../../Types/User-Types";
 import { TokenStorageInterface } from "../../Types/Utils-Types";
 
 function CodeVerification() {
@@ -15,6 +14,7 @@ function CodeVerification() {
     const dispatch = useAppDispatch();
     const location = useLocation();
     const codeWatch = watch("code");
+    const locationState = location.state as {access_2fa_token: string};
 
     useEffect(() => {
         if (!location.state || !verification2FA)
@@ -34,16 +34,12 @@ function CodeVerification() {
             })
             .then(response => {
                 console.log("Response Authenticate", response);
-                const payload: LoginPayload = {
-                    token: response.data.access_token,
-                    user: response.data.user,
-                }
                 const tokenStorage: TokenStorageInterface = {
                     access_token: response.data.access_token,
                     refresh_token: response.data.refresh_token,
                 }
                 localStorage.setItem("userToken", JSON.stringify(tokenStorage));
-                dispatch(loginSuccess(payload));
+                dispatch(loginSuccess(response.data.user));
             })
             .catch(err => {
                 console.log("ERR Authenticate", err);
@@ -51,8 +47,6 @@ function CodeVerification() {
             });
         }
     }, [codeWatch])
-    
-    const locationState = location.state as {access_2fa_token: string};
     
     const codeSubmmit = handleSubmit((data, e) => {
         e?.preventDefault();

@@ -24,7 +24,7 @@ export function useProfileHook() {
     const [userState, setUserState] = useState<ProfileState | undefined>(undefined);
     const [statsMode, setStatsMode] = useState<Modes>(Modes.Singles); 
 
-    let { currentUser, token, friendList } = useAppSelector(state => state.auth);
+    const { currentUser, friendList } = useAppSelector(state => state.auth);
     const params = useParams();
     const modalStatus = useContext(ModalContext);
     const { socket } = useContext(SocketContext);
@@ -52,7 +52,7 @@ export function useProfileHook() {
         setUserState(undefined);
         if (params.username && currentUser) {
             const isLoggedUser: boolean = params.username === currentUser.username ? true : false;
-            const promiseProfileFetch: Promise<AxiosResponse<any, any>> = isLoggedUser ? fetchMe(token) : fetchProfile(params.username, token);
+            const promiseProfileFetch: Promise<AxiosResponse<any, any>> = isLoggedUser ? fetchMe() : fetchProfile(params.username);
             promiseProfileFetch.then(fetchResponse => {
                 if (fetchResponse) {
                     console.log("fetchResponse", fetchResponse);

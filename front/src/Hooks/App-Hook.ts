@@ -22,16 +22,16 @@ export function useAppHook() {
     const [socket, setSocket] = useState<Socket | undefined>(undefined);
     const [cache, setCache] = useState<Cache | undefined | null>(undefined);
 	const [intervalId, setIntervalId] = useState<ReturnType<typeof setInterval> | undefined>(undefined)
-    const { token, isAuthenticated, currentUser, displayQRCode, isSign } = useAppSelector((state) => state.auth);
+    const { isAuthenticated, currentUser, displayQRCode, isSign } = useAppSelector((state) => state.auth);
 	const { party, chatIsOpen, isInQueue } = useAppSelector(state => state.party);
 	const { currentChannelId } = useAppSelector((state) => state.channel);
 
 	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
 
-	const connectSocket = () => {
+	const connectSocket = (access_token: string) => {
 		const newSocket: Socket = io(`${socketUrl}`, {extraHeaders: {
-			"Authorization": `Bearer ${token}`,
+			"Authorization": `Bearer ${access_token}`,
 		}});
 		setSocket(newSocket);
 	}
@@ -64,10 +64,8 @@ export function useAppHook() {
 	useEffect(() => {
 		console.log("GET ITEM");
 		// localStorage.removeItem("userToken");
-		const localToken: string | null = localStorage.getItem("userToken");
-		if (localToken !== null) {
-			const localTokenParse: TokenStorageInterface = JSON.parse(localToken);
-			fetchVerifyToken(localTokenParse.access_token, dispatch);
+		if (localStorage.getItem("userToken") !== null) {
+			fetchVerifyToken(dispatch);
 		} else {
 			dispatch(stopIsConnectedLoading());
 		}
@@ -94,9 +92,13 @@ export function useAppHook() {
 	useEffect(() => {
 		if (!isAuthenticated && isSign && socket === undefined) {
 			// localStorage.setItem("userToken", token);
-			connectSocket();
-			// deleteCache();
-			openCache();
+			const localToken: string | null = localStorage.getItem("userToken");
+			if (localToken !== null) {
+				const localTokenParse: TokenStorageInterface = JSON.parse(localToken);
+				connectSocket(localTokenParse.access_token);
+				// deleteCache();
+				openCache();
+			}
 		}
 	}, [isSign])
 

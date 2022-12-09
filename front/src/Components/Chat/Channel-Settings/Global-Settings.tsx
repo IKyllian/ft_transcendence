@@ -1,8 +1,8 @@
-import axios from "axios";
 import { useForm } from "react-hook-form";
+import api from "../../../Api/Api";
 import { baseUrl } from "../../../env";
 import { changeChannelSettings } from "../../../Redux/ChannelSlice";
-import { useAppDispatch, useAppSelector } from "../../../Redux/Hooks";
+import { useAppDispatch } from "../../../Redux/Hooks";
 import { Channel, ChannelModes, ChannelModesArray } from "../../../Types/Chat-Types";
 import { ChanModeToString, selectChanMode } from "../../../Utils/Utils-Chat";
 
@@ -30,7 +30,6 @@ function GlobalSettings(props: {chanDatas: Channel}) {
     });
     const channelMode = watch('chanOption.chanMode');
     const watchChannelName = watch('nameForm.chanName');
-    const {token} = useAppSelector(state => state.auth);
     const dispatch = useAppDispatch();
 
     const formOptionSubmit = handleSubmit((data, e) => {
@@ -41,11 +40,7 @@ function GlobalSettings(props: {chanDatas: Channel}) {
         }
         if (data.chanOption.chanMode === "protected")
             payload = {...payload, password: data.chanOption.password};
-        axios.patch(`${baseUrl}/channel/edit-option`, payload, {
-            headers: {
-                "Authorization": `Bearer ${token}`,
-            }
-        })
+        api.patch(`${baseUrl}/channel/edit-option`, payload)
         .then(response => {
             console.log("RESPONSE ", response.data);
             dispatch(changeChannelSettings({chanName: response.data.name, option: response.data.option}));
@@ -57,11 +52,7 @@ function GlobalSettings(props: {chanDatas: Channel}) {
 
     const formChanName = handleSubmit((data, e) => {
         e?.preventDefault();
-        axios.patch(`${baseUrl}/channel/edit-name`, {chanId: chanDatas.id, name: data.nameForm.chanName}, {
-            headers: {
-                "Authorization": `Bearer ${token}`,
-            }
-        })
+        api.patch(`${baseUrl}/channel/edit-name`, {chanId: chanDatas.id, name: data.nameForm.chanName})
         .then(response => {
             console.log(response);
             dispatch(changeChannelSettings({chanName: response.data.name, option: response.data.option}));

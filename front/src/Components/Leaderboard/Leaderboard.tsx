@@ -1,7 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { fetchSinglesLeaderBoardDatas, fetchDoublesLeaderBoardDatas } from "../../Api/Leaderboard";
 import { SocketContext } from "../../App";
-import { useAppSelector } from "../../Redux/Hooks";
 import { UserInterface, UserStatus } from "../../Types/User-Types";
 import { Modes } from "../../Types/Utils-Types";
 import { getDoublesWinRate, getMatchPlayed, getSinglesWinRate } from "../../Utils/Utils-User";
@@ -29,11 +28,10 @@ const defaultState: LeaderboardState = {
 function Leaderboard() {
     const modalStatus = useContext(ModalContext);
     const [leaderboardState, setLeaderboardState] = useState<LeaderboardState>(defaultState);
-    const {token} = useAppSelector(state => state.auth);
     const {socket} = useContext(SocketContext);
 
     useEffect(() => {
-        fetchSinglesLeaderBoardDatas(0, token, setLeaderboardState);
+        fetchSinglesLeaderBoardDatas(0, setLeaderboardState);
 
         socket?.on("InGameStatusUpdate", (data: {id: number, in_game_id: string | null}) => {
             setLeaderboardState(prev => { return {...prev, users: [...prev.users.map((elem: UserInterface) => {
@@ -60,9 +58,9 @@ function Leaderboard() {
     const changePage = (index: number) => {
         if (index + 1 !== leaderboardState.page) {
             if (leaderboardState.mode === Modes.Singles)
-                fetchSinglesLeaderBoardDatas(index, token, setLeaderboardState);
+                fetchSinglesLeaderBoardDatas(index, setLeaderboardState);
             else
-                fetchDoublesLeaderBoardDatas(index, token, setLeaderboardState);
+                fetchDoublesLeaderBoardDatas(index, setLeaderboardState);
             setLeaderboardState((prev) => { return {...prev, page: index + 1} })
         }
     }
@@ -71,9 +69,9 @@ function Leaderboard() {
         const mode: Modes = e.target.value;
         setLeaderboardState(() => { return {...defaultState, mode: mode}})
         if (mode === Modes.Singles)
-            fetchSinglesLeaderBoardDatas(0, token, setLeaderboardState);
+            fetchSinglesLeaderBoardDatas(0, setLeaderboardState);
         else
-            fetchDoublesLeaderBoardDatas(0, token, setLeaderboardState);
+            fetchDoublesLeaderBoardDatas(0, setLeaderboardState);
     }
 
     return (!leaderboardState.loading) ? (

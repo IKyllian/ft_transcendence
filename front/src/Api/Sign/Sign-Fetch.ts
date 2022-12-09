@@ -1,7 +1,6 @@
 import { Dispatch, AnyAction } from "@reduxjs/toolkit";
 import axios from "axios";
 import { baseUrl } from "../../env";
-import { LoginPayload } from "../../Types/User-Types";
 import { loginSuccess, loginError, stopIsConnectedLoading } from "../../Redux/AuthSlice";
 import api from "../Api";
 
@@ -20,11 +19,7 @@ export function fetchSignUp({username, email, password, dispatch}: SignParameter
     axios.post(`${baseUrl}/auth/signup`, {username: username, email: email, password: password})
     .then((response) => {
         console.log('JWT =>', response.data);
-        const payload: LoginPayload = {
-            token: response.data.access_token,
-            user: {...response.data.user, blocked: [], channelUser: []},
-        }
-        dispatch(loginSuccess(payload));
+        dispatch(loginSuccess({...response.data.user, blocked: [], channelUser: []}));
     }).catch(err => {
         dispatch(loginError("username or password incorect"));
     })
@@ -41,12 +36,8 @@ export function fetchSetUsername(username: string, token: string, dispatch: Disp
         }
     })
     .then((response) => {
-        const payload: LoginPayload = {
-            user: response.data,
-            token: token,
-        }
 		console.log("response,", response);
-        dispatch(loginSuccess(payload));
+        dispatch(loginSuccess(response.data));
     })
     .catch(err => {
         console.log(err);
@@ -54,12 +45,11 @@ export function fetchSetUsername(username: string, token: string, dispatch: Disp
     });
 }
 
-export function fetchVerifyToken(token: string, dispatch: Dispatch<AnyAction>) {
-
+export function fetchVerifyToken(dispatch: Dispatch<AnyAction>) {
     api.post(`${baseUrl}/auth/verify-token`, {})
     .then((response) => {
         console.log("Response VerifyToken", response);
-        dispatch(loginSuccess({user: response.data, token: token}));
+        dispatch(loginSuccess(response.data));
     })
     .catch((err) => {
         console.log(err);

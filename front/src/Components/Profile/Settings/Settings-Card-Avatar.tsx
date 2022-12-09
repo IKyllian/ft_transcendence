@@ -6,11 +6,12 @@ import { baseUrl } from "../../../env";
 import { addAlert, AlertType } from "../../../Redux/AlertSlice";
 import { setUserAvatar } from "../../../Redux/AuthSlice";
 import { useAppDispatch, useAppSelector } from "../../../Redux/Hooks";
+import { TokenStorageInterface } from "../../../Types/Utils-Types";
 import ExternalImage from "../../External-Image";
 // import Resizer from "react-image-file-resizer";
 
 function SettingsCardAvatar() {
-    const { token, currentUser } = useAppSelector(state => state.auth);
+    const { currentUser } = useAppSelector(state => state.auth);
     const [inputFile, setInputFile] = useState<File | undefined>(undefined);
     const [fileError, setFileError] = useState<string | undefined>();
     const [urlFile, setUrlFile] = useState<string>("");
@@ -19,13 +20,16 @@ function SettingsCardAvatar() {
 
     const onSubmit = async (e: any) => {
         e?.preventDefault();
-        if (inputFile) {
+        const localToken: string | null = localStorage.getItem("userToken");			
+        if (localToken !== null && inputFile) {
+            const localTokenParse: TokenStorageInterface = JSON.parse(localToken);
             let formData = new FormData();
+            
             formData.append("image", inputFile);
-            fetchUploadAvatar(token, formData).then(async (response) => {
+            fetchUploadAvatar(localTokenParse.access_token, formData).then(async (response) => {
                 console.log("Response Upload", response);
                 if (cache && currentUser) {
-                    const req = new Request(`${baseUrl}/users/${currentUser.id}/avatar`, {method: 'GET', headers: {"Authorization": `Bearer ${token}`}});
+                    const req = new Request(`${baseUrl}/users/${currentUser.id}/avatar`, {method: 'GET', headers: {"Authorization": `Bearer ${localTokenParse.access_token}`}});
                     if (!response.ok) {
                         console.log("Error");
                         dispatch(addAlert({message: "Failed To Upload", type: AlertType.ERROR}));

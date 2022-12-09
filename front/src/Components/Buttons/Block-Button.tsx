@@ -10,11 +10,11 @@ function BlockButton(props: {senderId: number}) {
     const dispatch = useAppDispatch();
 
     const onBlock = () => {
-        fetchOnBlockUser({senderId: senderId, token: authDatas.token, dispatch: dispatch});
+        fetchOnBlockUser({senderId: senderId, dispatch: dispatch});
     }
 
     const onUnblock = () => {
-        fetchOnUnblockUser({senderId: senderId, token: authDatas.token, dispatch: dispatch});
+        fetchOnUnblockUser({senderId: senderId, dispatch: dispatch});
     }
 
     return (

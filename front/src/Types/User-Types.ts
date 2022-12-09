@@ -24,17 +24,11 @@ export interface AuthState {
     error?: string,
     loading: boolean,
     loadingIsConnected: boolean,
-    token: string,
     setUsersame: boolean,
     friendList: UserInterface[],
     loggedUserAvatar: string | undefined,
     displayQRCode: boolean,
     verification2FA: boolean,
-}
-
-export interface LoginPayload {
-    user: UserInterface,
-    token: string,
 }
 
 export interface UserInterface {

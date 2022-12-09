@@ -1,11 +1,9 @@
 import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { SocketContext } from "../App";
-import { useAppDispatch, useAppSelector } from "../Redux/Hooks";
-import { PlayersGameData } from "../Components/Game/game/types/shared.types";
+import { useAppSelector } from "../Redux/Hooks";
 import { GameModeState, GameMode, Player, GameType, TeamSide, PlayerPosition, GameSettings } from "../Types/Lobby-Types";
 import { useForm } from "react-hook-form";
-import { changeQueueStatus, newGameFound } from "../Redux/PartySlice";
 import { partyIsReady } from "../Utils/Utils-Party";
 import { fetchIsAlreadyInGame } from "../Api/Lobby";
 
@@ -39,13 +37,12 @@ const defaultSettings: GameSettings = {
 
 export function useLobbyHook() {
     const {party, isInQueue, queueTimer} = useAppSelector(state => state.party);
-    const {currentUser, token} = useAppSelector(state => state.auth)
+    const {currentUser} = useAppSelector(state => state.auth)
     const [loggedUserIsLeader, setLoggedUserIsLeader] = useState<boolean>(false);
     const { handleSubmit, control, watch, setValue, getValues, reset } = useForm<GameSettings>({defaultValues: !party ? defaultSettings : party.game_settings});
     const [gameMode, setGameMode] = useState<GameModeState>(defaultGameModeState);
     const {socket} = useContext(SocketContext);
     const navigate = useNavigate();
-    const dispatch = useAppDispatch();
     const partyReady: boolean = (!party || (party && partyIsReady(party?.players))) ? true : false; 
     
     useEffect(() => {
@@ -207,7 +204,7 @@ export function useLobbyHook() {
 
     useEffect(() => {
         const checkGame = async () => {
-            await fetchIsAlreadyInGame(token).then(result => { 
+            await fetchIsAlreadyInGame().then(result => { 
                 if (!result) {
                     // socket?.on("newgame_data", (data: PlayersGameData) => {
                     //     console.log("new_game_data", data);

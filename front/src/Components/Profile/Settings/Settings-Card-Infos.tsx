@@ -2,11 +2,13 @@ import { IconLock } from "@tabler/icons";
 import axios from "axios";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import api from "../../../Api/Api";
 import { baseUrl } from "../../../env";
 import { addAlert, AlertType } from "../../../Redux/AlertSlice";
 import { change2faStatus, replaceUserObject } from "../../../Redux/AuthSlice";
-import { useAppDispatch, useAppSelector } from "../../../Redux/Hooks";
+import { useAppDispatch } from "../../../Redux/Hooks";
 import { UserInterface } from "../../../Types/User-Types";
+import { TokenStorageInterface } from "../../../Types/Utils-Types";
 
 interface FormState {
     usernameForm: {
@@ -22,18 +24,13 @@ function SettingsCardInfos(props: {currentUser: UserInterface }) {
     const { currentUser } = props;
     const [displayQRCode, setDisplayQRCode] = useState<{show: boolean, qrcode: string | undefined}>({show: false, qrcode: undefined});
     const [disable2fa, setDisable2fa] = useState<boolean>(false);
-    const { token } = useAppSelector(state => state.auth);
     const {register, watch, handleSubmit, formState: {errors}, setError, resetField} = useForm<FormState>({defaultValues: {usernameForm: {username: currentUser?.username}}});
     const dispatch = useAppDispatch();
     const watchUsersame = watch("usernameForm.username");
 
     const usernameSubmit = handleSubmit((data, e) => {
         e?.preventDefault();
-        axios.patch(`${baseUrl}/users/edit-username`, {username: data.usernameForm.username}, {
-            headers: {
-                "Authorization": `Bearer ${token}`,
-            }
-        })
+        api.patch(`${baseUrl}/users/edit-username`, {username: data.usernameForm.username})
         .then(response => {
             console.log("response Edit username", response.data);
             dispatch(replaceUserObject(response.data));
@@ -47,11 +44,7 @@ function SettingsCardInfos(props: {currentUser: UserInterface }) {
 
     const passwordSubmit = handleSubmit((data, e) => {
         e?.preventDefault();
-        axios.patch(`${baseUrl}/users/edit-password`, {old: data.passwordForm.oldPassword, new: data.passwordForm.newPassword}, {
-            headers: {
-                "Authorization": `Bearer ${token}`,
-            }
-        })
+        api.patch(`${baseUrl}/users/edit-password`, {old: data.passwordForm.oldPassword, new: data.passwordForm.newPassword})
         .then(response => {
             console.log("Response Edit PAssword", response);
             resetField("passwordForm.oldPassword");
@@ -65,16 +58,20 @@ function SettingsCardInfos(props: {currentUser: UserInterface }) {
     })
 
     const enableTwoFactor = () => {
-        const req = new Request(`${baseUrl}/2fa/generate`, {method: 'POST', body: undefined ,headers: {"Authorization": `Bearer ${token}`}});
-        fetch(req)
-        .then(async (response) => {
-            const avatarBlob = await response.blob();
-            const qrCodeUrl = URL.createObjectURL(avatarBlob)
-            setDisplayQRCode({show: true, qrcode: qrCodeUrl});
-        }) 
-        .catch(err => {
-            console.log("err", err);
-        })
+        const localToken: string | null = localStorage.getItem("userToken");
+		if (localToken !== null) {
+			const localTokenParse: TokenStorageInterface = JSON.parse(localToken);
+            const req = new Request(`${baseUrl}/2fa/generate`, {method: 'POST', body: undefined ,headers: {"Authorization": `Bearer ${localTokenParse.access_token}`}});
+            fetch(req)
+            .then(async (response) => {
+                const avatarBlob = await response.blob();
+                const qrCodeUrl = URL.createObjectURL(avatarBlob)
+                setDisplayQRCode({show: true, qrcode: qrCodeUrl});
+            }) 
+            .catch(err => {
+                console.log("err", err);
+            })
+        }
     }
 
     return (
@@ -147,26 +144,21 @@ function SettingsCardInfos(props: {currentUser: UserInterface }) {
                 { !displayQRCode.show && currentUser.two_factor_enabled && !disable2fa && <button onClick={() => setDisable2fa(true)}> Disable Two-Factor Authentication </button> }
                 {
                     displayQRCode.show && displayQRCode.qrcode &&
-                    <QRCodeValidation qrcode={displayQRCode.qrcode} token={token} setDisplayQRCode={setDisplayQRCode} />
+                    <QRCodeValidation qrcode={displayQRCode.qrcode} setDisplayQRCode={setDisplayQRCode} />
                 }
-                { !displayQRCode.show && currentUser.two_factor_enabled && disable2fa && <Disable2fa token={token} /> }
+                { !displayQRCode.show && currentUser.two_factor_enabled && disable2fa && <Disable2fa /> }
             </div>
         </div>
     );
 }
 
-function Disable2fa(props: {token: string}) {
-    const { token } = props
+function Disable2fa() {
     const {register, handleSubmit, formState: {errors}, setError} = useForm<{code: string}>();
     const dispatch = useAppDispatch();
 
     const codeSubmit = handleSubmit((data, e) => {
         e?.preventDefault();
-        axios.post(`${baseUrl}/2fa/disable`, {code: data.code}, {
-            headers: {
-                "Authorization": `Bearer ${token}`,
-            }
-        })
+        api.post(`${baseUrl}/2fa/disable`, {code: data.code})
         .then((response) => {
             console.log("response 2fa enable", response);
             dispatch(addAlert({message: "Two-Factor Authentication Disabled", type: AlertType.SUCCESS}));
@@ -197,18 +189,14 @@ function Disable2fa(props: {token: string}) {
     );
 }
 
-function QRCodeValidation(props: {qrcode: string, token: string, setDisplayQRCode: Function}) {
-    const { qrcode, token, setDisplayQRCode } = props
+function QRCodeValidation(props: {qrcode: string, setDisplayQRCode: Function}) {
+    const { qrcode, setDisplayQRCode } = props
     const {register, handleSubmit, formState: {errors}, setError} = useForm<{code: string}>();
     const dispatch = useAppDispatch();
 
     const codeSubmit = handleSubmit((data, e) => {
         e?.preventDefault();
-        axios.post(`${baseUrl}/2fa/enable`, {code: data.code}, {
-            headers: {
-                "Authorization": `Bearer ${token}`,
-            }
-        })
+        api.post(`${baseUrl}/2fa/enable`, {code: data.code})
         .then((response) => {
             console.log("response 2fa enable", response);
             dispatch(addAlert({message: "Two-Factor Authentication Activated", type: AlertType.SUCCESS}));

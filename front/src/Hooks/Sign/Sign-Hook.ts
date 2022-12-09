@@ -6,7 +6,6 @@ import { uid } from "../../env";
 import { fetchSignIn, fetchSignUp, fetchLogin42, fetchVerifyToken } from '../../Api/Sign/Sign-Fetch';
 
 import { loginError, loginPending, loginSuccess, setUsername, stopIsConnectedLoading, verification2fa } from "../../Redux/AuthSlice";
-import { LoginPayload } from '../../Types/User-Types';
 import { TokenStorageInterface } from '../../Types/Utils-Types';
 
 type FormValues = {
@@ -30,10 +29,8 @@ export function useSignHook() {
     }
 
     const verifyToken = () => {
-		const localToken: string | null = localStorage.getItem("userToken");
-		if (localToken !== null) {
-            const localTokenParse: TokenStorageInterface = JSON.parse(localToken);
-			fetchVerifyToken(localTokenParse.access_token, dispatch);
+		if (localStorage.getItem("userToken") !== null) {
+			fetchVerifyToken(dispatch);
 		} else {
 			dispatch(stopIsConnectedLoading());
 		}
@@ -48,16 +45,12 @@ export function useSignHook() {
                 dispatch(verification2fa());
                 navigate("/2fa-verification", {state: {access_2fa_token: response.data.access_2fa_token}});
             } else {
-                const payload: LoginPayload = {
-                    token: response.data.access_token,
-                    user: response.data.user,
-                }
                 const tokenStorage: TokenStorageInterface = {
                     access_token: response.data.access_token,
                     refresh_token: response.data.refresh_token,
                 }
                 localStorage.setItem("userToken", JSON.stringify(tokenStorage));
-                dispatch(loginSuccess(payload));
+                dispatch(loginSuccess(response.data.user));
             }
         })
         .catch(err => {
@@ -85,11 +78,7 @@ export function useSignHook() {
                     navigate("/2fa-verification", {state: {access_2fa_token: response.data.access_2fa_token}});
                 } else {
                     if (response.data.usernameSet) {
-                        const payload: LoginPayload = {
-                            token: response.data.access_token,
-                            user: response.data.user,
-                        }
-                        dispatch(loginSuccess(payload));
+                        dispatch(loginSuccess(response.data.user));
                     } else {
                         dispatch(setUsername());
                         navigate("/set-username", {state:{token: response.data.access_token}});

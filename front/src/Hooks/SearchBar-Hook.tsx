@@ -15,7 +15,7 @@ export function useSearchBarHook(props: {functionality: SearchBarFunctionality, 
     const { register, formState: {errors}, getValues } = useForm<{textInput: string}>();
     const [usersList, setUsersList] = useState<UsersListInterface[] | undefined>(undefined);
 
-    const {token, currentUser} = useAppSelector(state => state.auth);
+    const {currentUser} = useAppSelector(state => state.auth);
     const {privateConv} = useAppSelector(state => state.chat);
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
@@ -23,7 +23,7 @@ export function useSearchBarHook(props: {functionality: SearchBarFunctionality, 
     const {socket} = useContext(SocketContext);
  
     const handleSendMessage = (userIdToSend: number) => {
-        fetchConvAndRedirect(currentUser!, userIdToSend, token, privateConv, dispatch, navigate);
+        fetchConvAndRedirect(currentUser!, userIdToSend, privateConv, dispatch, navigate);
     }
 
     useEffect(() => {
@@ -48,10 +48,10 @@ export function useSearchBarHook(props: {functionality: SearchBarFunctionality, 
     const endOfTyping = () => {
         if (getValues('textInput') && getValues('textInput').length > 0) {
             if (functionality !== SearchBarFunctionality.CHAN_INVITE)
-                fetchUserFunction(getValues('textInput'), token, setUsersList);
+                fetchUserFunction(getValues('textInput'), setUsersList);
             else {
                 if (params.channelId)
-                    fetchUserFunction(getValues('textInput'), token, setUsersList, parseInt(params.channelId));
+                    fetchUserFunction(getValues('textInput'), setUsersList, parseInt(params.channelId));
             }
         } else {
             setUsersList([]);

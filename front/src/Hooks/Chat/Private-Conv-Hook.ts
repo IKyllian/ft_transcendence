@@ -32,7 +32,7 @@ export function usePrivateConvHook() {
         if (div.length > 0){
             var hasVerticalScrollbar = div[0].scrollHeight > div[0].clientHeight;
             if (!hasVerticalScrollbar && convId && convDatas) {
-                fetchLoadPrevConvMessages(convId, authDatas.token, setConvDatas, convDatas.conv.messages, setPreviousMessages);
+                fetchLoadPrevConvMessages(convId, setConvDatas, convDatas.conv.messages, setPreviousMessages);
             }
         } 
         messagesEndRef.current?.scrollIntoView();
@@ -69,7 +69,7 @@ export function usePrivateConvHook() {
     useEffect(() => {
         if (haveToLoad && convId && convDatas && !previousMessages.loadPreviousMessages && !previousMessages.reachedMax) {
             setPreviousMessages(prev => { return {...prev, loadPreviousMessages: true}});
-            fetchLoadPrevConvMessages(convId, authDatas.token, setConvDatas, convDatas.conv.messages, setPreviousMessages);
+            fetchLoadPrevConvMessages(convId, setConvDatas, convDatas.conv.messages, setPreviousMessages);
         }
     }, [haveToLoad])
 

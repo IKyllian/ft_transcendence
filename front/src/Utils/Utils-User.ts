@@ -1,6 +1,7 @@
 import { UserInterface } from "../Types/User-Types";
 import { fetchResponseAvatar } from "../Api/Profile/Profile-Fetch";
 import { baseUrl } from "../env";
+import axios from "axios";
 
 export function getMatchPlayed(match_won: number, match_lost: number): number {
     return (match_won + match_lost);

@@ -1,6 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { AuthState, UserStatus } from '../Types/User-Types';
-import { LoginPayload } from '../Types/User-Types';
 import { UserInterface } from '../Types/User-Types';
 
 const defaultState: AuthState = {
@@ -11,7 +10,6 @@ const defaultState: AuthState = {
     error: undefined,
     loading: false,
     loadingIsConnected: true,
-    token:'',
     setUsersame: false,
     loggedUserAvatar: undefined,
     displayQRCode: false,
@@ -30,10 +28,9 @@ export const authSlice = createSlice({
         userFullAuthenticated: (state) => {
             state.isAuthenticated = true;
         },
-        loginSuccess: (state, {payload}: PayloadAction<LoginPayload>) => {
+        loginSuccess: (state, {payload}: PayloadAction<UserInterface>) => {
 			console.log("payload", payload);
-            state.currentUser = payload.user;
-            state.token = payload.token;
+            state.currentUser = payload;
             state.isSign = true;
             state.loading = false;
             state.loadingIsConnected = false,

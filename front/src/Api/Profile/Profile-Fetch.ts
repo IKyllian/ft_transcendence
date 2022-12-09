@@ -1,20 +1,13 @@
-import axios, { AxiosResponse } from "axios";
+import { AxiosResponse } from "axios";
 import { baseUrl } from "../../env";
+import api from "../Api";
 
-export async function fetchProfile(username: string, token: string): Promise<AxiosResponse<any, any>> {
-    return await axios.get(`${baseUrl}/users/name/${username}`, {
-        headers: {
-            "Authorization": `Bearer ${token}`,
-        }
-    })
+export async function fetchProfile(username: string): Promise<AxiosResponse<any, any>> {
+    return await api.get(`${baseUrl}/users/name/${username}`)
 }
 
-export async function fetchMe(token: string): Promise<AxiosResponse<any, any>> {
-    return await axios.get(`${baseUrl}/users/me`, {
-        headers: {
-            "Authorization": `Bearer ${token}`,
-        }
-    });
+export async function fetchMe(): Promise<AxiosResponse<any, any>> {
+    return await api.get(`${baseUrl}/users/me`);
 }
 
 

@@ -83,11 +83,9 @@ export function useLoadChatDatas() {
             const convResolve: ConversationInterfaceFront[] = await convsUser.then(result => { return result });
             dispatch(copyChannelsAndConvs({channels: channelResolve, convs: convResolve}));
         }
-        console.log("UseEffect Fetch");
-        const channelsUser = fetchUserChannels(authDatas.token, channelId, dispatch); //Recupere les channels d'un user
-        const convsUser = fetchUserConvs(authDatas.token, dispatch); //Recupere les convs d'un user
+        const channelsUser = fetchUserChannels(channelId); //Recupere les channels d'un user
+        const convsUser = fetchUserConvs(); //Recupere les convs d'un user
         resolvePromises(channelsUser, convsUser);
-
 
         //Permet de redirect sur une conv (et de la créer si besoin) dans le cas où un user click quelque part pour dm quelqu'un
         if (location && location.state) {
@@ -95,7 +93,6 @@ export function useLoadChatDatas() {
             fetchConvAndRedirect(
                 authDatas.currentUser!,
                 locationState.userIdToSend,
-                authDatas.token,
                 chatDatas.privateConv!,
                 dispatch,
                 navigate

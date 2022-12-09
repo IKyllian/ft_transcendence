@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import SearchBarPlayers from "../Search-Bar/SearchBarPlayers";
 import { useForm } from 'react-hook-form';
-import { useAppSelector, useAppDispatch } from '../../Redux/Hooks'
+import { useAppDispatch } from '../../Redux/Hooks'
 import { IconX } from '@tabler/icons';
 import { useNavigate, useParams } from "react-router-dom";
 import { fetchCreateChannel } from "../../Api/Chat/Chat-Action";
@@ -28,7 +28,6 @@ function ChatModal(props: {onCloseModal: Function, showModal: number}) {
 
     const channelMode = watch('chanMode');
     const navigate = useNavigate();
-    const authDatas = useAppSelector((state) => state.auth);
     const dispatch = useAppDispatch();
     const {socket} = useContext(SocketContext);
     const params = useParams();
@@ -49,7 +48,7 @@ function ChatModal(props: {onCloseModal: Function, showModal: number}) {
             }
             if (body.option === ChannelModes.PROTECTED)
                 body = {...body, password: data.password}
-            fetchCreateChannel(body, usersInvited, authDatas.token, dispatch, navigate, onCloseModal, socket!, setError);
+            fetchCreateChannel(body, usersInvited, dispatch, navigate, onCloseModal, socket!, setError);
         } else {
             if (usersInvited.length > 0 && params.channelId) {
                 usersInvited.forEach(element => {

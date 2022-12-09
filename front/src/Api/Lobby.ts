@@ -1,13 +1,9 @@
-import axios from "axios";
 import { baseUrl } from "../env";
+import api from "./Api";
 
-export async function fetchIsAlreadyInGame(token: string): Promise<boolean> {
+export async function fetchIsAlreadyInGame(): Promise<boolean> {
     let isInGame: boolean = false;
-   await axios.get(`${baseUrl}/game/is-playing`, {
-        headers: {
-            "Authorization": `Bearer ${token}`,
-        }
-    })
+   await api.get(`${baseUrl}/game/is-playing`)
     .then(response => {
         console.log("response", response.data);
         isInGame = response.data;

@@ -19,7 +19,6 @@ export function useChannelHook() {
     const [prevLength, setPrevLength] = useState<number>(0);
 
     const messagesEndRef = useRef<null | HTMLDivElement>(null);
-    const authDatas = useAppSelector((state) => state.auth);
     const {channelDatas, loggedUserIsOwner} = useAppSelector((state) => state.channel);
     const params = useParams();
     const {socket} = useContext(SocketContext);
@@ -61,7 +60,7 @@ export function useChannelHook() {
     useEffect(() => {
         if (haveToLoad && channelId && channelDatas && !previousMessages.loadPreviousMessages && !previousMessages.reachedMax) {
             setPreviousMessages(prev => { return {...prev, loadPreviousMessages: true}});
-            fetchLoadPrevChatMessages(channelId, authDatas.token, dispatch, channelDatas?.messages, setPreviousMessages);
+            fetchLoadPrevChatMessages(channelId, dispatch, channelDatas?.messages, setPreviousMessages);
         }
     }, [haveToLoad])
 
@@ -71,7 +70,7 @@ export function useChannelHook() {
         if (div.length > 0){
             var hasVerticalScrollbar = div[0].scrollHeight > div[0].clientHeight;
             if (!hasVerticalScrollbar && channelId && channelDatas) {
-                fetchLoadPrevChatMessages(channelId, authDatas.token, dispatch, channelDatas?.messages, setPreviousMessages);
+                fetchLoadPrevChatMessages(channelId, dispatch, channelDatas?.messages, setPreviousMessages);
             }
         } 
         messagesEndRef.current?.scrollIntoView();
@@ -105,7 +104,6 @@ export function useChannelHook() {
             socket?.on('NewChannelMessage', listener);
     
             socket?.on("OnTypingChannel", (data: {user: UserInterface, isTyping: boolean}) => {
-                console.log("!!!!!!!!!!!!!!! OnTypingChannel !!!!!!!!!!!!!!!", data);
                 setUsersTyping(prev => [...prev.filter(elem => elem.id !== data.user.id)]);
                 if (data.isTyping)
                     setUsersTyping(prev => [...prev, data.user]);

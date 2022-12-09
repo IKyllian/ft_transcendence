@@ -1,14 +1,13 @@
-import axios from "axios";
 import { baseUrl } from "../env";
 import { replaceUserObject } from "../Redux/AuthSlice";
 import { AnyAction, Dispatch } from "@reduxjs/toolkit";
 import { copyNotificationArray } from "../Redux/NotificationSlice";
 import { copyFriendListArray } from "../Redux/AuthSlice";
 import { UserInterface } from "../Types/User-Types";
+import api from "./Api";
 
 interface BlockParameters {
     readonly senderId: number,
-    readonly token: string,
     dispatch: Dispatch<AnyAction>
     time?: number,
 }
@@ -19,12 +18,8 @@ interface UsersListInterface {
 }
 
 
-export function fetchOnBlockUser({senderId, token, dispatch, time}: BlockParameters) {
-    axios.post(`${baseUrl}/users/${senderId}/block`, {}, {
-        headers: {
-            "Authorization": `Bearer ${token}`,
-        }
-    })
+export function fetchOnBlockUser({senderId, dispatch, time}: BlockParameters) {
+    api.post(`${baseUrl}/users/${senderId}/block`, {})
     .then((response) => {
         dispatch(replaceUserObject(response.data));
     })
@@ -33,12 +28,8 @@ export function fetchOnBlockUser({senderId, token, dispatch, time}: BlockParamet
     })
 }
 
-export function fetchOnUnblockUser({senderId, token, dispatch}: BlockParameters) {
-    axios.post(`${baseUrl}/users/${senderId}/deblock`, {}, {
-        headers: {
-            "Authorization": `Bearer ${token}`,
-        }
-    })
+export function fetchOnUnblockUser({senderId, dispatch}: BlockParameters) {
+    api.post(`${baseUrl}/users/${senderId}/deblock`, {})
     .then((response) => {
         dispatch(replaceUserObject(response.data));
     })
@@ -47,12 +38,8 @@ export function fetchOnUnblockUser({senderId, token, dispatch}: BlockParameters)
     })
 }
 
-export function fetchNotifications(token: string, dispatch: Dispatch<AnyAction>) {
-    axios.get(`${baseUrl}/notification`, {
-        headers: {
-            "Authorization": `Bearer ${token}`,
-        }
-    })
+export function fetchNotifications(dispatch: Dispatch<AnyAction>) {
+    api.get(`${baseUrl}/notification`)
     .then(response => {
         console.log("Notification", response);
         dispatch(copyNotificationArray(response.data));
@@ -62,12 +49,8 @@ export function fetchNotifications(token: string, dispatch: Dispatch<AnyAction>)
     })
 }
 
-export function fetchFriendList(token: string, dispatch: Dispatch<AnyAction>) {
-    axios.get(`${baseUrl}/friend`, {
-        headers: {
-            "Authorization": `Bearer ${token}`,
-        }
-    })
+export function fetchFriendList(dispatch: Dispatch<AnyAction>) {
+    api.get(`${baseUrl}/friend`)
     .then(response => {
         console.log(response);
         dispatch(copyFriendListArray(response.data));
@@ -77,12 +60,8 @@ export function fetchFriendList(token: string, dispatch: Dispatch<AnyAction>) {
     })
 }
 
-export function fetchSearchAllUsers(inputText: string, token :string, setUsersList: Function) {
-    axios.post(`${baseUrl}/users/search`, {str: inputText}, {
-        headers: {
-            "Authorization": `Bearer ${token}`,
-        }
-    })
+export function fetchSearchAllUsers(inputText: string, setUsersList: Function) {
+    api.post(`${baseUrl}/users/search`, {str: inputText})
     .then((response) => {
         const newArray: UsersListInterface[] = response.data.map((elem: UserInterface) => { return {user: elem}});
         setUsersList(newArray);
@@ -92,12 +71,8 @@ export function fetchSearchAllUsers(inputText: string, token :string, setUsersLi
     })
 }
 
-export function fetchSearchUsersToAdd(inputText: string, token :string, setUsersList: Function) {
-    axios.post(`${baseUrl}/friend/search`, {str: inputText}, {
-        headers: {
-            "Authorization": `Bearer ${token}`,
-        }
-    })
+export function fetchSearchUsersToAdd(inputText: string, setUsersList: Function) {
+    api.post(`${baseUrl}/friend/search`, {str: inputText})
     .then(response => {
         const newArray: UsersListInterface[] = response.data.map((elem: any) => { return {user: elem.user, relationStatus: elem.relationStatus}});
         setUsersList(newArray);

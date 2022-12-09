@@ -1,24 +1,21 @@
-import axios from "axios";
 import { baseUrl } from "../../env";
 import { Channel, ChannelsInterfaceFront, Conversation, ConversationInterfaceFront } from "../../Types/Chat-Types";
-import { copyChannelsArray, copyPrivateConvArray, addPrivateConv } from "../../Redux/ChatSlice";
+import { addPrivateConv } from "../../Redux/ChatSlice";
 import { Dispatch, AnyAction } from "@reduxjs/toolkit";
 import { NavigateFunction } from "react-router-dom";
 import { UserInterface } from "../../Types/User-Types";
+import api from "../Api";
 
 interface UsersListInterface {
     user: UserInterface,
     relationStatus?: string,
 }
 
-export async function fetchUserChannels(token: string, channelId: number | undefined, dispatch: Dispatch<AnyAction>): Promise<ChannelsInterfaceFront[]> {
+export async function fetchUserChannels(channelId: number | undefined): Promise<ChannelsInterfaceFront[]> {
     let datasArray: ChannelsInterfaceFront[] = [];
-    await axios.get(`${baseUrl}/channel/my_channels`, {
-        headers: {
-            "Authorization": `Bearer ${token}`,
-        }
-    })
+    await api.get(`${baseUrl}/channel/my_channels`)
     .then((response) => {
+        console.log("fetchUserChannels", response);
         const channelArray: Channel[] = response.data;
 
         channelArray.forEach((elem: Channel) => {
@@ -40,14 +37,11 @@ export async function fetchUserChannels(token: string, channelId: number | undef
     return datasArray;
 }
 
-export async function fetchUserConvs(token: string, dispatch: Dispatch<AnyAction>): Promise<ConversationInterfaceFront[]> {
+export async function fetchUserConvs(): Promise<ConversationInterfaceFront[]> {
     let datasArray: ConversationInterfaceFront[] = [];
-   await axios.get(`${baseUrl}/conversation`, {
-        headers: {
-            "Authorization": `Bearer ${token}`,
-        }
-    })
+   await api.get(`${baseUrl}/conversation`)
     .then((response) => {
+        console.log("fetchUserConvs", response);
         const convArray: Conversation[] = response.data;
         
         convArray.forEach(elem => {
@@ -65,17 +59,12 @@ export async function fetchUserConvs(token: string, dispatch: Dispatch<AnyAction
 export async function fetchConvAndRedirect(
         loggedUser: UserInterface,
         userIdToSend: number,
-        token: string,
         privateConvs: ConversationInterfaceFront[],
         dispatch: Dispatch<AnyAction>,
         navigate: NavigateFunction
     ): Promise<void>{
 
-    await axios.get(`${baseUrl}/conversation/user/${userIdToSend}`, {
-        headers: {
-            "Authorization": `Bearer ${token}`,
-        }
-    })
+    await api.get(`${baseUrl}/conversation/user/${userIdToSend}`)
     .then(response => {
         console.log(response.data);
         const responseDatas: Conversation | UserInterface = response.data;
@@ -99,12 +88,8 @@ export async function fetchConvAndRedirect(
     })
 }
 
-export function fetchVisibleChannels(token: string, setChannelsList: Function) {
-    axios.get(`${baseUrl}/channel/search`, {
-        headers: {
-            "Authorization": `Bearer ${token}`,
-        }
-    })
+export function fetchVisibleChannels(setChannelsList: Function) {
+    api.get(`${baseUrl}/channel/search`)
     .then((response) => {
         console.log(response);
         setChannelsList([...response.data]);
@@ -114,12 +99,8 @@ export function fetchVisibleChannels(token: string, setChannelsList: Function) {
     })
 }
 
-export function fetchPrivateConvDatas(convId: number, token: string, setConvDatas: Function) {
-    axios.get(`${baseUrl}/conversation/${convId}`, {
-        headers: {
-            "Authorization": `Bearer ${token}`,
-        }
-    })
+export function fetchPrivateConvDatas(convId: number, setConvDatas: Function) {
+    api.get(`${baseUrl}/conversation/${convId}`)
     .then(response => {
         console.log(response);
         setConvDatas({temporary: false, conv: response.data});
@@ -129,13 +110,9 @@ export function fetchPrivateConvDatas(convId: number, token: string, setConvData
     })
 }
 
-export function fetchSearchUsersToInvite(inputText: string, token :string, setUsersList: Function, chanId: number) {
+export function fetchSearchUsersToInvite(inputText: string, setUsersList: Function, chanId: number) {
     console.log("chanId", chanId);
-    axios.post(`${baseUrl}/channel/users_to_invite`, {chanId: chanId, str: inputText}, {
-        headers: {
-            "Authorization": `Bearer ${token}`,
-        }
-    })
+    api.post(`${baseUrl}/channel/users_to_invite`, {chanId: chanId, str: inputText})
     .then((response) => {
         const newArray: UsersListInterface[] = response.data.map((elem: UserInterface) => { return {user: elem}});
         setUsersList(newArray);   

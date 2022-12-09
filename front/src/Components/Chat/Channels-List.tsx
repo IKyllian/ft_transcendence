@@ -41,12 +41,10 @@ function ChannelItem(props: {channelData: Channel}) {
 
 function ChannelsList() {
     const [channelsList, setChannelsList] = useState<undefined | Channel[]>(undefined);
-
-    let authDatas = useAppSelector((state) => state.auth);
     const sidebarStatus = useContext(SidebarContext);
 
     useEffect(() => {
-        fetchVisibleChannels(authDatas.token, setChannelsList);
+        fetchVisibleChannels(setChannelsList);
     }, [])
 
     if (!channelsList) {
