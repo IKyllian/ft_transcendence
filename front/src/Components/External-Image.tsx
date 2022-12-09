@@ -1,10 +1,10 @@
 import { useContext, useEffect, useState } from "react";
+import { getPlayerAvatar } from "../Api/User-Fetch";
 import { CacheContext } from "../App";
 import DefaultAvatar from "../Images-Icons/pp.jpg";
 import { setUserAvatar } from "../Redux/AuthSlice";
 import { useAppDispatch, useAppSelector } from "../Redux/Hooks";
 import { TokenStorageInterface } from "../Types/Utils-Types";
-import { getPlayerAvatar } from "../Utils/Utils-User";
 
 function ExternalImage(props: {src: string | null, alt: string, className: string, userId: number}) {
     const {src, alt, className, userId} = props;

@@ -57,12 +57,12 @@ export const ChanModeToString = (mode: ChannelModes): string => {
 export const debounce = (func: Function, debouneTime: number) => {
     let timer: any;
     return function (...args: any) {
-      const context: any = debounce;
-      if (timer)
-        clearTimeout(timer);
-      timer = setTimeout(() => {
-        timer = null;
-        func.apply(context, args);
-      }, debouneTime);
+        const context: any = debounce;
+        if (timer)
+            clearTimeout(timer);
+        timer = setTimeout(() => {
+            timer = null;
+            func.apply(context, args);
+        }, debouneTime);
     };
 };

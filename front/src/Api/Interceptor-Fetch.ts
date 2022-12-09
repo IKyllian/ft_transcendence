@@ -5,9 +5,9 @@ import { TokenStorageInterface } from "../Types/Utils-Types";
 export const fetchInterceptor = () => {
     const { fetch: originalFetch } = window;
 
-    window.fetch = async (...args) => {
+    window.fetch = async (...args): Promise<Response> => {
         let [resource, config] = args;
-        let response = await originalFetch(resource, config);
+        let response: Response = await originalFetch(resource, config);
 
         if (!response.ok && response.status === 401 && response.statusText === "Unauthorized") {
             const localToken: string | null = localStorage.getItem("userToken");

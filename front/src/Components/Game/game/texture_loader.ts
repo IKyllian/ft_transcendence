@@ -1,8 +1,8 @@
 
 import { Scene, Textures } from "phaser";
-import { getPlayerAvatar } from "../../../Utils/Utils-User";
 import { UserInterface } from "../../../Types/User-Types"
 import AssetDefaultAvatar from '../../../Images-Icons/pp.jpg'
+import { getPlayerAvatar } from "../../../Api/User-Fetch";
 //import * as sharp from 'sharp';
 
 const loadBase64Image = (props: {

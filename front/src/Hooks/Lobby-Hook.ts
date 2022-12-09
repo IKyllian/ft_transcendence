@@ -5,7 +5,7 @@ import { useAppSelector } from "../Redux/Hooks";
 import { GameModeState, GameMode, Player, GameType, TeamSide, PlayerPosition, GameSettings } from "../Types/Lobby-Types";
 import { useForm } from "react-hook-form";
 import { partyIsReady } from "../Utils/Utils-Party";
-import { fetchIsAlreadyInGame } from "../Api/Lobby";
+import { fetchIsAlreadyInGame } from "../Api/User-Fetch";
 
 const defaultGameModeState: GameModeState = {
     gameModes: [
