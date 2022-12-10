@@ -39,15 +39,14 @@ function MatchFound() {
 
     return gameFound && gameFound.showGameFound ? (
         <div className="match-found-container">
-            <div className="outside-circle">
-            </div>
+            <div className="outside-circle"> </div>
             <div className="fill-match-found">
                 <div>
                     <p className="found-title"> Game Found </p>
-                    <p> {displayGameMode(gameFound.gameDatas.game_settings.game_type, gameFound.gameDatas.game_settings.is_ranked)} Ranked 1v1 </p>
+                    <p> {displayGameMode(gameFound.gameDatas.game_settings.game_type, gameFound.gameDatas.game_settings.is_ranked)} </p>
                 </div>
                 <button className="accept-button" onClick={() => handleClick()}> Accept </button>
-            </div>
+            </div>            
         </div>
     ) : (
         <></>

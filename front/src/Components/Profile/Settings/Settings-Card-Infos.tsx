@@ -10,52 +10,22 @@ import { useAppDispatch } from "../../../Redux/Hooks";
 import { UserInterface } from "../../../Types/User-Types";
 import { TokenStorageInterface } from "../../../Types/Utils-Types";
 
-interface FormState {
-    usernameForm: {
-        username: string
-    },
-    passwordForm: {
-        oldPassword: string,
-        newPassword: string,
-    }
-}
-
 function SettingsCardInfos(props: {currentUser: UserInterface }) {
     const { currentUser } = props;
+    return (
+        <div className="user-infos-card">
+            <UsernameForm user={currentUser} />
+            <PasswordForm />
+            <TwoFactor user={currentUser} />
+        </div>
+    );
+}
+
+function TwoFactor(props: {user: UserInterface}) {
+    const { user } = props;
     const [displayQRCode, setDisplayQRCode] = useState<{show: boolean, qrcode: string | undefined}>({show: false, qrcode: undefined});
     const [disable2fa, setDisable2fa] = useState<boolean>(false);
-    const {register, watch, handleSubmit, formState: {errors}, setError, resetField} = useForm<FormState>({defaultValues: {usernameForm: {username: currentUser?.username}}});
     const dispatch = useAppDispatch();
-    const watchUsersame = watch("usernameForm.username");
-
-    const usernameSubmit = handleSubmit((data, e) => {
-        e?.preventDefault();
-        api.patch(`/users/edit-username`, {username: data.usernameForm.username})
-        .then(response => {
-            console.log("response Edit username", response.data);
-            dispatch(replaceUserObject(response.data));
-            dispatch(addAlert({message: "Username changed", type: AlertType.SUCCESS}));
-        })
-        .catch(err => {
-            console.log(err);
-            setError("usernameForm.username", {message: "Username already exist"});
-        })
-    })
-
-    const passwordSubmit = handleSubmit((data, e) => {
-        e?.preventDefault();
-        api.patch(`/users/edit-password`, {old: data.passwordForm.oldPassword, new: data.passwordForm.newPassword})
-        .then(response => {
-            console.log("Response Edit PAssword", response);
-            resetField("passwordForm.oldPassword");
-            resetField("passwordForm.newPassword");
-            dispatch(addAlert({message: "Password changed", type: AlertType.SUCCESS}));
-        })
-        .catch(err => {
-            console.log("ERR", err);
-            setError("passwordForm.oldPassword", {message: "Password incorrect"});
-        })
-    })
 
     const enableTwoFactor = () => {
         const localToken: string | null = localStorage.getItem("userToken");
@@ -74,19 +44,111 @@ function SettingsCardInfos(props: {currentUser: UserInterface }) {
             })
         }
     }
+    
+    return (
+        <div>
+            { !displayQRCode.show && !user.two_factor_enabled && <button onClick={() => enableTwoFactor()}> Activate Two-Factor Authentication </button> }
+            { !displayQRCode.show && user.two_factor_enabled && !disable2fa && <button onClick={() => setDisable2fa(true)}> Disable Two-Factor Authentication </button> }
+            {
+                displayQRCode.show && displayQRCode.qrcode &&
+                <QRCodeValidation qrcode={displayQRCode.qrcode} setDisplayQRCode={setDisplayQRCode} />
+            }
+            { !displayQRCode.show && user.two_factor_enabled && disable2fa && <Disable2fa /> }
+        </div>
+
+    );
+}
+
+function PasswordForm() {
+    const {register, handleSubmit, formState: {errors}, setError, resetField} = useForm<{oldPassword: string, newPassword: string}>();
+    const dispatch = useAppDispatch();
+
+    const passwordSubmit = handleSubmit((data, e) => {
+        e?.preventDefault();
+        api.patch(`/users/edit-password`, {old: data.oldPassword, new: data.newPassword})
+        .then(response => {
+            console.log("Response Edit PAssword", response);
+            resetField("oldPassword");
+            resetField("newPassword");
+            dispatch(addAlert({message: "Password changed", type: AlertType.SUCCESS}));
+        })
+        .catch(err => {
+            console.log("ERR", err);
+            setError("oldPassword", {message: "Password incorrect"});
+        })
+    })
 
     return (
-        <div className="user-infos-card">
+        <form onSubmit={passwordSubmit}>
+            <label>
+                Old Password
+                { errors && errors.oldPassword && <p className='txt-form-error'> {errors.oldPassword.message} </p> }
+                <input
+                    type="password"
+                    {...register("oldPassword", {
+                        required: "Old password is required",
+                        minLength: {
+                            value: 5,
+                            message: "Min length is 5",
+                        }
+                    })}
+                />
+            </label>
+            <label>
+                New Password
+                { errors && errors.newPassword && <p className='txt-form-error'> {errors.newPassword.message} </p> }
+                <input
+                    type="password"
+                    {...register("newPassword", {
+                        required: "New password is required",
+                        minLength: {
+                            value: 5,
+                            message: "Min length is 5",
+                        }
+                    })}
+                />
+            </label>
+            <div>
+                <button type="submit"> Change Password </button>
+            </div>
+        </form>
+    );
+
+}
+
+function UsernameForm(props: {user: UserInterface}) {
+    const { user } = props;
+
+    const {register, watch, handleSubmit, formState: {errors}, setError, resetField} = useForm<{username: string}>({defaultValues: {username: user.username}});
+    const dispatch = useAppDispatch();
+
+    const watchUsersame = watch("username");
+
+    const usernameSubmit = handleSubmit((data, e) => {
+        e?.preventDefault();
+        api.patch(`/users/edit-username`, {username: data.username})
+        .then(response => {
+            console.log("response Edit username", response.data);
+            dispatch(replaceUserObject(response.data));
+            dispatch(addAlert({message: "Username changed", type: AlertType.SUCCESS}));
+        })
+        .catch(err => {
+            console.log(err);
+            setError("username", {message: "Username already exist"});
+        })
+    })
+    return (
+        <>
             <h3> Edit Profile </h3>
             <form onSubmit={usernameSubmit}>
                 <div>
                     <label>
                         Username
-                        { errors && errors.usernameForm && errors.usernameForm.username && <p className='txt-form-error'> {errors.usernameForm.username.message} </p> }
+                        { errors && errors.username && <p className='txt-form-error'> {errors.username.message} </p> }
                         <div className="label-input-wrapper">
                             <input
                                 type="text"
-                                {...register("usernameForm.username", {
+                                {...register("username", {
                                     minLength: {
                                         value: 2,
                                         message: "Min length is 2"
@@ -95,61 +157,19 @@ function SettingsCardInfos(props: {currentUser: UserInterface }) {
                                     
                                 })}
                             />
-                            { watchUsersame !== currentUser.username && <button className="username-save" type="submit"> Save </button> }
+                            { watchUsersame !== user.username && <button className="username-save" type="submit"> Save </button> }
                         </div>
                     </label>
                 </div>
                 <label >
                     Email
                     <div className="label-input-wrapper">
-                        <input disabled className="lock-input" type="text" value={currentUser.email} />
+                        <input disabled className="lock-input" type="text" value={user.email} />
                         <IconLock />
                     </div>
                 </label>
             </form>
-            <form onSubmit={passwordSubmit}>
-                <label>
-                    Old Password
-                    { errors && errors.passwordForm && errors.passwordForm.oldPassword && <p className='txt-form-error'> {errors.passwordForm.oldPassword.message} </p> }
-                    <input
-                        type="password"
-                        {...register("passwordForm.oldPassword", {
-                            // required: "Old password is required",
-                            // minLength: {
-                            //     value: 5,
-                            //     message: "Min length is 5",
-                            // }
-                        })}
-                    />
-                </label>
-                <label>
-                    New Password
-                    { errors && errors.passwordForm && errors.passwordForm.newPassword && <p className='txt-form-error'> {errors.passwordForm.newPassword.message} </p> }
-                    <input
-                        type="password"
-                        {...register("passwordForm.newPassword", {
-                            // required: "New password is required",
-                            // minLength: {
-                            //     value: 5,
-                            //     message: "Min length is 5",
-                            // }
-                        })}
-                    />
-                </label>
-                <div>
-                    <button type="submit"> Change Password </button>
-                </div>
-            </form>
-            <div>
-                { !displayQRCode.show && !currentUser.two_factor_enabled && <button onClick={() => enableTwoFactor()}> Activate Two-Factor Authentication </button> }
-                { !displayQRCode.show && currentUser.two_factor_enabled && !disable2fa && <button onClick={() => setDisable2fa(true)}> Disable Two-Factor Authentication </button> }
-                {
-                    displayQRCode.show && displayQRCode.qrcode &&
-                    <QRCodeValidation qrcode={displayQRCode.qrcode} setDisplayQRCode={setDisplayQRCode} />
-                }
-                { !displayQRCode.show && currentUser.two_factor_enabled && disable2fa && <Disable2fa /> }
-            </div>
-        </div>
+        </>
     );
 }
 
