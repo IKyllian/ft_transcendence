@@ -116,6 +116,7 @@ export default class MatchResult extends Phaser.Scene
 		this.me = this.game.registry.get('players_data').player_type;
 		this.winner = this.game.registry.get('winner');
 
+		this.cameras.main.setBackgroundColor("#415A77");
 		// this.TeamBlue_Back_name = this.game.registry.get('players_data').TeamBlue_Back.name;
 		// this.TeamRed_Back_name = this.game.registry.get('players_data').TeamRed_Back.name;
 	
