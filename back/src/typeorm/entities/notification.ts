@@ -12,16 +12,16 @@ export class Notification {
 	@Column()
 	type: notificationType;
 
-	@ManyToOne(() => User, { orphanedRowAction: 'delete' })
+	@ManyToOne(() => User, { onDelete: 'CASCADE' })
 	addressee: User;
 
-	@ManyToOne(() => User, { orphanedRowAction: 'delete' })
+	@ManyToOne(() => User, { onDelete: 'CASCADE' })
 	requester: User;
 
-	@ManyToOne(() => Channel, { orphanedRowAction: 'delete' })
+	@ManyToOne(() => Channel, { onDelete: 'CASCADE' })
 	channel: Channel;
 
-	@ManyToOne(() => Conversation, { orphanedRowAction: 'delete' })
+	@ManyToOne(() => Conversation, { onDelete: 'CASCADE' })
 	conversation: Conversation;
 
 	@Column({ nullable: true, type: 'timestamptz' })

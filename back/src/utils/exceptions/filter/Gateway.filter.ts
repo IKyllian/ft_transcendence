@@ -10,7 +10,7 @@ export class GatewayExceptionFilter extends BaseWsExceptionFilter {
 			const properException = new WsException(exception.getResponse());
 			super.catch(properException, host);
 		} else {
-			throw new WsException('Unknown exception');
+			throw new WsException(exception.message);
 		}
 	}
 }

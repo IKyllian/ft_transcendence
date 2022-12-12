@@ -24,7 +24,7 @@ export class Conversation {
 	})
 	messages: PrivateMessage[];
 
-	@Column({ type: 'timestamptz', default: new Date() })
+	@Column({ type: 'timestamptz' })
 	updated_at: Date;
 
 }
