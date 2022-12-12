@@ -1,4 +1,4 @@
-import { UnauthorizedException, UseFilters, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import { UseFilters, UsePipes, ValidationPipe } from '@nestjs/common';
 import {
 	WebSocketGateway,
 	WebSocketServer,
@@ -8,28 +8,14 @@ import {
 	ConnectedSocket,
 	MessageBody
   } from '@nestjs/websockets';
-import { Socket, Server } from 'socket.io';
+import { Server } from 'socket.io';
 import { AuthService } from 'src/auth/auth.service';
-import { WsJwtGuard } from 'src/auth/guard/ws-jwt.guard';
-import { UserIdDto } from 'src/chat/gateway/dto/user-id.dto';
 import { User } from 'src/typeorm';
 import { UserService } from 'src/user/user.service';
-import { GetUser } from 'src/utils/decorators';
-
-// import { NewGameData, PlayersLobbyData, LobbyRequest } from 'src/utils/types/game.types';
-
-import { JwtPayload, notificationType, UserPayload } from 'src/utils/types/types';
+import { JwtPayload } from 'src/utils/types/types';
 import { UserSessionManager } from './user.session';
 import { LobbyFactory } from './lobby/lobby.factory';
-import { Party } from './matchmaking/party/party';
-import { Player } from './player';
-import { PartyService } from './matchmaking/party/party.service';
-import { SocketReservedEventsMap } from 'socket.io/dist/socket';
-import { RoomDto } from 'src/chat/gateway/dto/room.dto';
-import { threadId } from 'worker_threads';
-import { BlobOptions } from 'buffer';
 import { AuthenticatedSocket } from '../utils/types/auth-socket';
-import { QueueService } from './matchmaking/queue/queue.service';
 import { GatewayExceptionFilter } from 'src/utils/exceptions/filter/Gateway.filter';
 
 
@@ -54,7 +40,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
 
 	async handleConnection(client: AuthenticatedSocket)
 	{
-		console.log(client.id);
 		let user: User = null;
 		client.multi_tab = false;
 		if (client.handshake.headers.authorization) {
@@ -81,21 +66,14 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
   
 	async handleDisconnect(socket: AuthenticatedSocket)
 	{
-		// TODO handle different type of disconnect; Ex: multitab error, lost connection
 		if (socket.handshake.headers.authorization) {
 			const payload = this.authService.decodeJwt(socket.handshake.headers.authorization.split(' ')[1]) as JwtPayload;
-			// get usersocket instance instead of call db ?
 			const user = await this.userService.findOneBy({ id: payload?.sub });
-			console.log("socket disco", socket.user.username, socket.multi_tab)
 			if (user && socket.multi_tab === false) {
 				this.userSession.removeUser(user.id)
-				// console.log("Game Gateway Deconnection: ", user.username) 
 			}
 		}
- 		// } else
-		// 	console.log(socket.id, 'disconnected');
 		this.lobbyfactory.lobby_quit(socket);
-		console.log("Game Gateway Deconnection: ", socket.user.username) 
 	}
 		
 		/* ----- Users Lobby Management ----- */
@@ -104,7 +82,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
 	async onUserJoinLobby(@ConnectedSocket() client: AuthenticatedSocket,
 	@MessageBody() game_id: string)
 	{
-		console.log("joining lobby, ", client.user)
 		this.lobbyfactory.lobby_join(client, game_id);
 	}
 	

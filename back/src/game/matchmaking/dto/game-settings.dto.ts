@@ -1,12 +1,6 @@
 import { Max, Min } from "class-validator";
-import { GameType } from "src/utils/types/game.types"
 
 export class SettingDto {
-
-	// is_ranked: boolean;
-
-	// game_type: GameType;
-
 	@Min(10)
 	@Max(200)
 	up_down_border: number;

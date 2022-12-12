@@ -1,4 +1,4 @@
-import { GameSettings, GameType } from "src/utils/types/game.types";
+import { GameType } from "src/utils/types/game.types";
 import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "./user";
 import { GameState } from "src/utils/types/game.types";

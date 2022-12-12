@@ -1,5 +1,5 @@
 import { User } from "src/typeorm";
-import { PlayerPosition, PlayerType, TeamSide } from "src/utils/types/game.types";
+import { PlayerPosition, TeamSide } from "src/utils/types/game.types";
 
 export class Player {
 	constructor(

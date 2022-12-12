@@ -97,7 +97,8 @@ export class ConversationService {
 			where: [
 				{ user1: { id: user.id } },
 				{ user2: { id: user.id } },
-			]
+			],
+			order: { updated_at: 'DESC' }
 		});
 	}
 

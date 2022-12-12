@@ -1,15 +1,12 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, Patch, Post, UseGuards } from "@nestjs/common";
 import { JwtGuard } from "src/auth/guard/jwt.guard";
 import { User } from "src/typeorm";
 import { GetUser } from "src/utils/decorators";
-import { ChannelPasswordDto } from "./dto/channel-pwd.dto";
 import { ChannelPermissionGuard } from "./guards/channel-permission.guard";
 import { InChannelGuard } from "./guards/in-channel.guard";
 import { ChannelService } from "./channel.service";
-import { BanUserDto } from "./dto/ban-user.dto";
 import { CreateChannelDto } from "./dto/create-channel.dto";
 import { SearchToInviteInChanDto } from "./dto/search-user-to-invite.dto";
-import { MuteUserDto } from "./dto/mute-user.dto";
 import { EditChannelNameDto } from "./dto/edit-channel-name.dto";
 import { EditChannelOptionDto } from "./dto/edit-channel-option.dto";
 
@@ -28,10 +25,7 @@ export class ChannelController {
 	@Get('search')
 	@UseGuards(JwtGuard)
 	async searchChannel(@GetUser() user: User) {
-		console.log('searching channel')
-		const chan =  await this.channelService.searchChannel(user);
-		// console.log(chan)
-		return chan
+		return await this.channelService.searchChannel(user);
 	}
 
 	@Post('users_to_invite')

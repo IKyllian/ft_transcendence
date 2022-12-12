@@ -1,5 +1,5 @@
 import { channelRole } from "src/utils/types/types";
-import { BaseEntity, Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToOne, PrimaryColumn, PrimaryGeneratedColumn, RelationId } from "typeorm";
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn, RelationId } from "typeorm";
 import { Channel } from "./channel";
 import { User } from "./user";
 
@@ -30,7 +30,4 @@ export class ChannelUser  {
 	
 	@Column({ default: channelRole.MEMBER })
 	role: channelRole;
-	
-	// @Column({ default: false })
-	// is_muted: boolean;
 }

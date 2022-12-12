@@ -1,4 +1,4 @@
-import { BadRequestException, forwardRef, Inject, Injectable, NotFoundException, ParseFilePipeBuilder } from "@nestjs/common";
+import { BadRequestException, forwardRef, Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { User } from "src/typeorm";
 import { Player } from "../../player";
 import { PartyJoinedSessionManager } from "./party.session";
@@ -10,7 +10,6 @@ import { LobbyFactory } from "src/game/lobby/lobby.factory";
 import { MatchmakingLobby } from "../matchmakingLobby";
 import { QueueLobby } from "src/utils/types/types";
 import { QueueService } from "../queue/queue.service";
-import { PartyMessageDto } from "../dto/party-message.dto";
 
 @Injectable()
 export class PartyService {
@@ -48,7 +47,6 @@ export class PartyService {
 	}
 
 	joinParty(user: User, requesterId: number) {
-		// this.queueService.leaveQueue(user);
 		this.leaveParty(user);
 		const party = this.partyJoined.getParty(requesterId);
 		if (!party) { throw new NotFoundException('party not found'); }
@@ -167,7 +165,6 @@ export class PartyService {
 			throw new BadRequestException("Team can't be at the same position");
 		}
 		const match = new MatchmakingLobby(blueTeam, redTeam, party.game_settings);
-		// console.log("match", match);
 		this.lobbyFactory.lobby_create(match);
 	}
 

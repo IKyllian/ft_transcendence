@@ -1,7 +1,6 @@
-import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { PrivateMessage, User } from "src/typeorm";
-import { FriendshipService } from "src/user/friendship/friendship.service";
+import { Conversation, PrivateMessage, User } from "src/typeorm";
 import { UserService } from "src/user/user.service";
 import { Repository } from "typeorm";
 import { ConversationService } from "../conversation.service";
@@ -12,6 +11,9 @@ export class PrivateMessageService {
 	constructor(
 		@InjectRepository(PrivateMessage)
 		private privateMsgRepo: Repository<PrivateMessage>,
+		@InjectRepository(Conversation)
+		private convRepo: Repository<Conversation>,
+
 		private convService: ConversationService,
 		private userService: UserService,
 	) {}
@@ -27,6 +29,8 @@ export class PrivateMessageService {
 			content: dto.content,
 			conversation: conv,
 		});
+		conv.updated_at = new Date();
+		await this.convRepo.save(conv);
 		return this.privateMsgRepo.save(msg);
 	}
 }

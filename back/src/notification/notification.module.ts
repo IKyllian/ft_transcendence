@@ -6,13 +6,11 @@ import { NotificationController } from './notification.controller';
 import { UserModule } from 'src/user/user.module';
 import { ChannelModule } from 'src/chat/channel/channel.module';
 import { APP_INTERCEPTOR } from '@nestjs/core';
-import { TaskScheduler } from 'src/task-scheduling/task.module';
 import { GlobalModule } from 'src/utils/global/global.module';
 
 @Module({
   imports: [
     UserModule,
-    // forwardRef(() =>TaskScheduler),
     forwardRef(() => ChannelModule),
     GlobalModule,
     TypeOrmModule.forFeature([ Notification, Channel ]),

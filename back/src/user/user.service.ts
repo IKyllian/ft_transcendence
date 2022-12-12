@@ -1,16 +1,14 @@
 import { BadRequestException, ForbiddenException, forwardRef, Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { FindManyOptions, FindOneOptions, FindOptionsWhere, IsNull, Like, Not, Repository } from "typeorm";
+import { FindManyOptions, FindOneOptions, FindOptionsWhere, Repository } from "typeorm";
 import { AuthService } from "src/auth/auth.service";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { MatchResult, Statistic, User } from "src/typeorm";
-import { EditUserDto } from "./dto/editUser.dto";
 import * as argon from 'argon2';
 import { SearchDto } from "./dto/search.dto";
 import { FriendshipService } from "./friendship/friendship.service";
 import { UserStatus } from "src/utils/types/types";
 import { UserAccount } from "src/typeorm/entities/userAccount";
-import { v4 as uuidv4 } from "uuid";
 import { EditPasswordDto } from "./dto/edit-password.dto";
 import * as sharp from 'sharp';
 import * as fs from "fs";
@@ -21,8 +19,6 @@ const readFileAsyc = promisify(fs.readFile);
 @Injectable()
 export class UserService {
 	constructor(
-		@Inject(forwardRef(() => AuthService))
-		private authService: AuthService,
 		private friendshipService: FriendshipService,
 
 		@InjectRepository(User)
@@ -45,10 +41,6 @@ export class UserService {
 	findOne(options: FindOneOptions<User>): Promise<User | null> {
 		return this.userRepo.findOne(options);
 	}
-
-	// findOnePending(options: FindOneOptions<PendingUser>): Promise<PendingUser | null> {
-	// 	return this.pendingUserRepo.findOne(options);
-	// }
 
 	findOneBy(where: FindOptionsWhere<User> | FindOptionsWhere<User>[]): Promise<User | null> {
 		return this.userRepo.findOneBy(where);
@@ -114,18 +106,12 @@ export class UserService {
 	}
 
 	async setStatus(userId: number, status: UserStatus) {
-		// this.userRepo.createQueryBuilder()
-		// 	.update(User)
-		// 	.where("id = :userId", {userId: userId})
-		// 	.set({ status: () => "status = :status" })
-		// 	.setParameter("status", status)
-		// 	.execute(); // pq ca marche paaas
-
-		let user = await this.userRepo.findOneBy({id: userId});
-		if (user) {
-			user.status = status;
-			this.userRepo.save(user)
-		}
+		this.userRepo.createQueryBuilder()
+			.update(User)
+			.where("id = :userId", {userId: userId})
+			.set({ status: () => ":status" })
+			.setParameter("status", status)
+			.execute();
 	}
 
 	setInGameId(userId: number, game_id: string) {
@@ -144,7 +130,6 @@ export class UserService {
 	async updateAvatar(user: User, fileName: string) {
 		if (user.avatar) {
 			try {
-				// console.log("update avatar", user.avatar)
 				fs.unlinkSync(path.join('uploads', user.avatar));
 			} catch(e) {
 				console.error(e);
@@ -282,7 +267,6 @@ export class UserService {
 			  .webp()
 			  .toFile(file.path);
 		  })
-		//   .then(console.log)
 		  .catch(() => {
 			try {
 				fs.unlinkSync(file.path);

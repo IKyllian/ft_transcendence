@@ -15,10 +15,9 @@ import { RtStrategy } from "./strategy/rt.strategy";
 
 @Module({
 	imports: [
-		forwardRef(() => ChatModule), // TODO pq deja?
+		forwardRef(() => ChatModule),
 		HttpModule,
 		UserModule,
-		// forwardRef(() => UserModule),
 		JwtModule.register({}),
 		TypeOrmModule.forFeature([
 			User,

@@ -17,17 +17,10 @@ export class GameController {
 		return this.gameService.isPlaying(userId);
 	}
 
-	// @UseGuards(JwtGuard)
-	// @Get('match_history')
-	// async getMatchHistory(
-	// 	@GetUser('id') userId: number,
-	// ) {
-	// 	return await this.gameService.getMatchHistory(userId);
-	// }
 	@UseGuards(JwtGuard)
 	@Post('singles-leaderboard')
 	async getSinglesLeaderboard(
-		@GetUser() user: User, //TODO delete
+		@GetUser() user: User,
 		@Body() data: SkipDto,
 	) {
 		return await this.gameService.getSinglesLeaderboard(user, data.skip);
