@@ -29,6 +29,7 @@ export class ConversationService {
 			user1: user,
 			user2: user2,
 			messages: [msg],
+			updated_at: new Date(),
 		 });
 		 return this.convRepo.save(conv);
 	}
