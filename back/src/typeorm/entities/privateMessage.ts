@@ -16,6 +16,8 @@ export class PrivateMessage {
 	@CreateDateColumn({ type: 'timestamptz' })
 	send_at: Date;
 
-	@ManyToOne(() => Conversation, (conv) => conv.messages, { onDelete: 'CASCADE' })
+	@ManyToOne(() => Conversation, (conv) => conv.messages, {
+		onDelete: 'CASCADE'
+	})
 	conversation: Conversation;
 }

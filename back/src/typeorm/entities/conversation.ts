@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, OneToMany, OneToOne, JoinColumn } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, OneToMany, OneToOne, JoinColumn, Column } from "typeorm";
 import { PrivateMessage } from "./privateMessage";
 import { User } from "./user";
 
@@ -23,5 +23,8 @@ export class Conversation {
 		cascade: ['insert', 'remove'],
 	})
 	messages: PrivateMessage[];
+
+	@Column({ type: 'timestamptz', default: new Date() })
+	updated_at: Date;
 
 }
