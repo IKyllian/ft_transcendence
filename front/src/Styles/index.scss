@@ -87,6 +87,11 @@ button {
 	filter: blur(5px);
 }
 
+#game_anchor {
+	@include page-wrapper();
+	background-color: $BlueDarkPalette;
+}
+
 .dropdown-container {
 	background-color: white;
 	position: absolute;

@@ -218,3 +218,15 @@
         }
     }    
 }
+
+
+@media screen and (max-width: $BreakPoint_800) {
+    .profile-settings-container {
+        .settings-wrapper {
+            height: auto;
+            margin: 20px 0;
+            flex-direction: column;
+            justify-content: inherit;
+        }
+    }
+}

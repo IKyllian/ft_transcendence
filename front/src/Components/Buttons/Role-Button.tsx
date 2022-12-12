@@ -17,7 +17,10 @@ function RoleButton(props: {sender: ChannelUser}) {
     }
 
     return (
-        <p onClick={() => handleClick()}> {sender.role === "clampin" ? "Set as administrator" : "Set as normal user"}  </p>
+        <>
+            <p onClick={() => handleClick()}> {sender.role === "clampin" ? "Set as administrator" : "Set as normal user"}  </p>
+            {/* <p onClick={() => handleClick()}> {sender.role === "clampin" ? "Set as Owner"}  </p> */}
+        </>
     );
 }
 

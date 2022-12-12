@@ -1,17 +1,19 @@
 import Avatar from "../../../Images-Icons/pp.jpg";
-import { UserTimeout } from "../../../Types/Chat-Types";
+import { TimeoutType, UserTimeout } from "../../../Types/Chat-Types";
 import { useContext } from "react";
 import { SocketContext } from "../../../App";
 import ExternalImage from "../../External-Image";
+import { useAppSelector } from "../../../Redux/Hooks";
 
-function ChannelBanUser(props: {chanId: number, usersBan: UserTimeout[] | undefined}) {
-    const { usersBan, chanId } = props;
+function ChannelBanUser() {
+    const { channelDatas } = useAppSelector((state) => state.channel);
+    const usersBan = channelDatas?.usersTimeout.filter(elem => elem.type === TimeoutType.BAN);
     const {socket} = useContext(SocketContext);
 
     const handleClick = (userBanId: number) => {
         socket?.emit("Unban", {
             userId: userBanId,
-            chanId: chanId,
+            chanId: channelDatas?.id,
         });
     }
 

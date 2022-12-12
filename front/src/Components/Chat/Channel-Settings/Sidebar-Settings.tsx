@@ -1,12 +1,13 @@
 import { useParams } from "react-router-dom";
-import { useAppDispatch } from '../../../Redux/Hooks'
+import { useAppDispatch, useAppSelector } from '../../../Redux/Hooks'
 import { Channel } from "../../../Types/Chat-Types"
 import { SocketContext } from "../../../App";
 import { useContext } from "react";
 import { removeChannel } from "../../../Redux/ChatSlice";
 
-function SidebarSettings(props: {setSidebarItem: Function, channelDatas: Channel, loggedUserIsOwner: boolean}) {
-    const {setSidebarItem, channelDatas, loggedUserIsOwner} = props;
+function SidebarSettings(props: {setSidebarItem: Function}) {
+    const {setSidebarItem} = props;
+    const {channelDatas, loggedUserIsOwner, loggedUserIsModerator} = useAppSelector((state) => state.channel);
 
     const params = useParams();
     const dispatch = useAppDispatch();
@@ -23,19 +24,21 @@ function SidebarSettings(props: {setSidebarItem: Function, channelDatas: Channel
         }
     }
 
-    return (
+    return channelDatas ? (
         <div className="sidebar-setting">
             <div className="sidebar-wrapper">
                 <p> # {channelDatas!.name} </p>
                 <ul>
                     {loggedUserIsOwner && <li onClick={() => setSidebarItem("Settings")}> Settings </li>}
                     <li onClick={() => setSidebarItem("Users")}> Users ({channelDatas.channelUsers.length}) </li>
-                    {loggedUserIsOwner && <li onClick={() => setSidebarItem("Invitations")}> Banned User </li>}
+                    {loggedUserIsOwner && loggedUserIsModerator && <li onClick={() => setSidebarItem("Invitations")}> Banned User </li>}
                 </ul>
                 <div className="separate-line"> </div>
                 <button onClick={() => leaveChannel()}> Leave Channel </button>
             </div>
         </div>
+    ): (
+        <> </>
     );
 }
 

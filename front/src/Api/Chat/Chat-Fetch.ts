@@ -65,7 +65,7 @@ export async function fetchConvAndRedirect(
 
     await api.get(`/conversation/user/${userIdToSend}`)
     .then(response => {
-        console.log(response.data);
+        console.log("conversation/user", response);
         const responseDatas: Conversation | UserInterface = response.data;
         if ((responseDatas as Conversation).messages) {
             if (!privateConvs?.find(elem => elem.conversation.id === response.data.id))
@@ -74,8 +74,6 @@ export async function fetchConvAndRedirect(
             navigate(`/chat/private-message/${response.data.id}`, {state: {isTemp: false, conv: response.data}});
         } else {
             console.log("User");
-
-            //Check pour l'id temporaire
             const tempId: number = Math.floor(Math.random() * 10000);;
             navigate(`/chat/private-message/${tempId}`, {state: {isTemp: true, conv: {id: tempId, user1: loggedUser, user2: response.data, messages: []}}});
         }

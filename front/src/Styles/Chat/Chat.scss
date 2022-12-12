@@ -361,11 +361,6 @@
                         padding: 8px;
                         @include avatar-status-container();
 
-                        .username-wrapper {
-                            cursor: pointer;
-                            position: relative;
-                        }
-
                         &:hover {
                             background-color: $LightDarkPalette;
                             .avatar-container {

@@ -5,7 +5,7 @@ import { useAppDispatch, useAppSelector } from '../Redux/Hooks'
 import { socketUrl } from "../env";
 import { NotificationInterface } from "../Types/Notification-Types";
 import { addNotification, deleteNotification } from "../Redux/NotificationSlice";
-import { addChannel, addPrivateConv, removeChannel } from "../Redux/ChatSlice";
+import { addChannel, addPrivateConv, changePrivateConvOrder, removeChannel } from "../Redux/ChatSlice";
 import { Channel, ChannelUpdateType, ChannelUser, Conversation, UserTimeout } from "../Types/Chat-Types";
 import { UserInterface } from "../Types/User-Types";
 import { copyFriendListArray, logoutSuccess, stopIsConnectedLoading, userFullAuthenticated } from "../Redux/AuthSlice";
@@ -190,6 +190,9 @@ export function useAppHook() {
 
 			socket.on("NewNotification", (data: NotificationInterface) => {
 				console.log("NewNotification", data);
+				if (data.conversation) {
+					dispatch(changePrivateConvOrder(data.conversation.id));
+				}
 				dispatch(addNotification(data));
 			});
 

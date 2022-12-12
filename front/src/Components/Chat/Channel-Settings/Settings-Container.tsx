@@ -11,7 +11,7 @@ import { setChannelId, unsetChannelDatas, unsetChannelId } from "../../../Redux/
 
 function ChannelSettings() {
     const [sidebarItem, setSidebarItem] = useState<string>("Users");
-    const {channelDatas, loggedUserIsOwner, currentChannelId} = useAppSelector((state) => state.channel);
+    const {channelDatas, currentChannelId} = useAppSelector((state) => state.channel);
     
     const params = useParams();
     const location = useLocation();
@@ -53,10 +53,10 @@ function ChannelSettings() {
     } else {
         return (
             <div className="channel-setting-container">
-                <SidebarSettings setSidebarItem={setSidebarItem} channelDatas={channelDatas} loggedUserIsOwner={loggedUserIsOwner} />
+                <SidebarSettings setSidebarItem={setSidebarItem} />
                 <div className="content-setting-container">
                     <div className="content-wrapper">
-                        <RenderSettingPage item={sidebarItem} channelDatas={channelDatas} loggedUserIsOwner={loggedUserIsOwner} />
+                        <RenderSettingPage item={sidebarItem} />
                     </div>
                 </div>
                 <IconX className="leave-icon" onClick={() => navigate(-1)} />

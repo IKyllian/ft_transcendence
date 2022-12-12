@@ -5,6 +5,7 @@ import { UserStatus } from '../Types/User-Types';
 interface ChannelState {
     channelDatas: Channel | undefined,
     loggedUserIsOwner: boolean,
+    loggedUserIsModerator: boolean
     loading: boolean,
     currentChannelId: number | undefined,
 }
@@ -12,6 +13,7 @@ interface ChannelState {
 const defaultState: ChannelState = {
     channelDatas: undefined,
     loggedUserIsOwner: false,
+    loggedUserIsModerator: false,
     loading: false,
     currentChannelId: undefined,
 }
@@ -24,8 +26,11 @@ export const channelSlice = createSlice({
             state.loading = true;
         },
         setChannelDatas: (state, {payload}: PayloadAction<{channel: Channel, loggedUserId: number}>) => {
-            if (payload.channel.channelUsers.find((elem) => elem.user.id === payload.loggedUserId && (elem.role === "owner" || elem.role === "moderator")))
+            if (payload.channel.channelUsers.find((elem) => elem.user.id === payload.loggedUserId && (elem.role === "owner"))) {
                 state.loggedUserIsOwner = true;
+                state.loggedUserIsModerator = true;
+            } else if (payload.channel.channelUsers.find((elem) => elem.user.id === payload.loggedUserId && (elem.role === "moderator")))
+                state.loggedUserIsModerator = true;
             state.channelDatas =  payload.channel;
             state.loading = false;
         },

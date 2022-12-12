@@ -1,8 +1,8 @@
 import { useForm } from "react-hook-form";
 import api from "../../../Api/Api";
 import { changeChannelSettings } from "../../../Redux/ChannelSlice";
-import { useAppDispatch } from "../../../Redux/Hooks";
-import { Channel, ChannelModes, ChannelModesArray } from "../../../Types/Chat-Types";
+import { useAppDispatch, useAppSelector } from "../../../Redux/Hooks";
+import { ChannelModes, ChannelModesArray } from "../../../Types/Chat-Types";
 import { ChanModeToString, selectChanMode } from "../../../Utils/Utils-Chat";
 
 interface ChanFormState {
@@ -15,15 +15,15 @@ interface ChanFormState {
     },
 }
 
-function GlobalSettings(props: {chanDatas: Channel}) {
-    const {chanDatas} = props;
+function GlobalSettings() {
+    const { channelDatas } = useAppSelector((state) => state.channel);
     const { register, handleSubmit, watch, formState: {errors} } = useForm<ChanFormState>({
         defaultValues: {
             chanOption: {
-                chanMode: ChanModeToString(chanDatas.option),
+                chanMode: ChanModeToString(channelDatas!.option),
             },
             nameForm: {
-                chanName: chanDatas.name,
+                chanName: channelDatas!.name,
             },
         }
     });
@@ -34,7 +34,7 @@ function GlobalSettings(props: {chanDatas: Channel}) {
     const formOptionSubmit = handleSubmit((data, e) => {
         e?.preventDefault();
         let payload: {chanId: number, option: ChannelModes, password?: string} = {
-            chanId: chanDatas.id,
+            chanId: channelDatas!.id,
             option: selectChanMode(data.chanOption.chanMode),
         }
         if (data.chanOption.chanMode === "protected")
@@ -51,7 +51,7 @@ function GlobalSettings(props: {chanDatas: Channel}) {
 
     const formChanName = handleSubmit((data, e) => {
         e?.preventDefault();
-        api.patch(`/channel/edit-name`, {chanId: chanDatas.id, name: data.nameForm.chanName})
+        api.patch(`/channel/edit-name`, {chanId: channelDatas!.id, name: data.nameForm.chanName})
         .then(response => {
             console.log(response);
             dispatch(changeChannelSettings({chanName: response.data.name, option: response.data.option}));
@@ -62,11 +62,11 @@ function GlobalSettings(props: {chanDatas: Channel}) {
     })
 
     const checkMode = (elem: string): boolean => {
-        if (elem === "public" && chanDatas.option === ChannelModes.PUBLIC)
+        if (elem === "public" && channelDatas!.option === ChannelModes.PUBLIC)
             return true;
-        else if (elem === "private" && chanDatas.option === ChannelModes.PRIVATE)
+        else if (elem === "private" && channelDatas!.option === ChannelModes.PRIVATE)
             return true;
-        else if (elem === "protected" && chanDatas.option === ChannelModes.PROTECTED)
+        else if (elem === "protected" && channelDatas!.option === ChannelModes.PROTECTED)
             return true;
         return false;
     }
@@ -87,7 +87,7 @@ function GlobalSettings(props: {chanDatas: Channel}) {
                                 required: "Channel name is required"
                             })}
                         />
-                        { watchChannelName !== chanDatas.name && <button type="submit"> Save </button> }
+                        { watchChannelName !== channelDatas!.name && <button type="submit"> Save </button> }
                     </div>
                 </label>
             </form>

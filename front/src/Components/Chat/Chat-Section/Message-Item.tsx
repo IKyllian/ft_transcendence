@@ -1,5 +1,4 @@
 import { useState } from "react";
-import ProfilPic from "../../../Images-Icons/pp.jpg";
 import { Link } from "react-router-dom";
 
 import DropdownContainer from "../../Utils/Dropdown-Container";

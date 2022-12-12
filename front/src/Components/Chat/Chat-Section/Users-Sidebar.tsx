@@ -28,25 +28,9 @@ function UserSidebarItem(props: {user: ChannelUser, usersTimeout: UserTimeout[],
                     <div className={`${user.user.status === UserStatus.ONLINE ? "online" : "offline"}`}> </div>
                 </div>
             </div>
-            <div className={`${currentUser?.id !== user.user.id ? "username-wrapper" : ""}`} onClick={() => handleClick()}>
+            <Link to={`/profile/${user.user.username}`}>
                 { user.user.username }
-                {
-                    currentUser?.id !== user.user.id &&
-                    <DropdownContainer show={showDropdown} onClickOutside={handleClick}>
-                        <Link to={`/profile/${user.user.username}`}>
-                            <p> profile </p>
-                        </Link>
-                        <BlockButton senderId={user.user.id} />
-                        {
-                            loggedUserIsOwner &&
-                            <>
-                                <MuteButton senderId={user.user.id} chanId={user.channelId} usersTimeout={usersTimeout} />
-                                <BanButton senderId={user.user.id} chanId={user.channelId} />
-                            </>
-                        }
-                    </DropdownContainer>
-                }
-            </div>
+            </Link>
         </li>
     );
 }

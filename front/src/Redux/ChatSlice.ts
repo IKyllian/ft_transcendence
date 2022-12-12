@@ -63,6 +63,12 @@ export const chatSlice = createSlice({
                 state.privateConv = state.privateConv.filter(elem => elem.conversation.id !== payload);
             }
         },
+        changePrivateConvOrder: (state, {payload}: PayloadAction<number>) => {
+            if (state.privateConv.length > 1) {
+                const idx = state.privateConv.findIndex(elem => elem.conversation.id === payload);
+                state.privateConv.splice(0, 0, state.privateConv.splice(idx, 1)[0]);
+            }
+        },
         changeActiveElement: (state, {payload}: PayloadAction<{id: number, isChannel: boolean}>) => {
             if ((payload.isChannel && state.channels)) {
                 state.channels = [...state.channels].map(elem => {
@@ -109,5 +115,6 @@ export const {
     addPrivateConv,
     removeChannel,
     removePrivateConv,
+    changePrivateConvOrder,
     changeActiveElement,
 } = chatSlice.actions;
