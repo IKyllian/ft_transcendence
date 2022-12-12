@@ -2,14 +2,12 @@ import 'phaser';
 import ClientSocketManager from '../client.socket.manager';
 import PongCore from '../pong.core';
 import { GameState, Goal, Movement, PlayerInput, PlayerType, EndResult, RoundSetup, GameType, GameSettings } from '../types/shared.types';
+import { await_load_base64 } from '../texture_loader';
 
 import AssetSoundA from '../../../../Assets/sound/8bit_effect_a.ogg'
 import AssetSoundB from '../../../../Assets/sound/8bit_effect_b.ogg'
 import AssetSoundClapping from '../../../../Assets/sound/clapping.ogg'
-
-//lagicon not working
-import AssetImageLagIcon from '../../../../Assets/images/button.png'
-//import AssetImageLagIcon from '../../../../Assets/images/lagicon.png'
+import AssetImageLagIcon from '../../../../Assets/images/lagicon.png'
 
 export default class Pong extends Phaser.Scene
 {
@@ -90,7 +88,7 @@ export default class Pong extends Phaser.Scene
 
 	preload ()
 	{
-		this.load.image('lag_icon', AssetImageLagIcon);
+		await_load_base64(AssetImageLagIcon, 'lag_icon', this);	
 		this.load.audio('sound_a', AssetSoundA);
 		this.load.audio('sound_b', AssetSoundB);
 		this.load.audio('clapping', AssetSoundClapping);
@@ -140,28 +138,50 @@ export default class Pong extends Phaser.Scene
 			this.upper_limit = this.add.rectangle(0, 0, 800, this.game_settings.up_down_border , 0x000000).setOrigin(0,0);
 			this.lower_limit = this.add.rectangle(0, (600 - (this.game_settings.up_down_border)), 800, this.game_settings.up_down_border, 0x000000).setOrigin(0,0);
 	
-			this.asset_TeamBlue_Back = this.add.rectangle(this.game_settings.player_back_advance, 300, 10, this.game_settings.paddle_size_h, 0x000000).setOrigin(1,0.5);
-			this.asset_TeamRed_Back = this.add.rectangle((800 - this.game_settings.player_back_advance), 300, 10, this.game_settings.paddle_size_h, 0x000000).setOrigin(0,0.5);
+			this.asset_TeamBlue_Back = this.add.rectangle(
+										this.game_settings.player_back_advance,
+										300,
+										10,
+										this.game_settings.paddle_size_h,
+										this.pick_paddle_color(PlayerType.TeamBlue_Back))
+										.setOrigin(1,0.5);
+			this.asset_TeamRed_Back = this.add.rectangle(
+										(800 - this.game_settings.player_back_advance),
+										300,
+										10,
+										this.game_settings.paddle_size_h,
+										this.pick_paddle_color(PlayerType.TeamRed_Back))
+										.setOrigin(0,0.5);
 	
 			if (this.game_type === GameType.Doubles)
 			{
-				this.asset_TeamBlue_Front = this.add.rectangle(this.game_settings.player_front_advance, 300, 10, this.game_settings.paddle_size_h, 0x000000).setOrigin(1,0.5);
-				this.asset_TeamRed_Front = this.add.rectangle((800 - this.game_settings.player_front_advance), 300, 10, this.game_settings.paddle_size_h, 0x000000).setOrigin(0,0.5);
-			
-			}
-			
+				this.asset_TeamBlue_Front = this.add.rectangle(
+											this.game_settings.player_front_advance,
+											300,
+											10,
+											this.game_settings.paddle_size_h,
+											this.pick_paddle_color(PlayerType.TeamBlue_Front))
+											.setOrigin(1,0.5);
+				this.asset_TeamRed_Front = this.add.rectangle(
+											(800 - this.game_settings.player_front_advance),
+											300,
+											10,
+											this.game_settings.paddle_size_h,
+											this.pick_paddle_color(PlayerType.TeamRed_Front))
+											.setOrigin(0,0.5);
+			}	
 		}
 
 		let style: Phaser.Types.GameObjects.Text.TextStyle = 
 		{
 			fontSize: '32px',
 			color: '#000000',
-			fontFamily: 'Arial'
+			fontFamily: 'Silkscreen'
 		}
 
 		let text: string;
 		text = this.game_state.score.TeamBlue.toString() + " - " + this.game_state.score.TeamRed.toString();
-		this.asset_scoreboard = this.add.text(400, 100, text, style);
+		this.asset_scoreboard = this.add.text(400, 100, text, style).setOrigin(0.5,0.5);
 
 
 		if (this.me !== PlayerType.Spectator)
@@ -544,6 +564,14 @@ export default class Pong extends Phaser.Scene
 			this.past_stock.shift();
 		}
 
+	}
+
+
+	pick_paddle_color = (paddle: PlayerType): number =>
+	{
+		if (this.me === paddle)
+			return 0xFF0000;
+		return 0x000000;
 	}
 
 	sound_event_wall = () =>
