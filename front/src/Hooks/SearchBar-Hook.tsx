@@ -51,7 +51,7 @@ export function useSearchBarHook(props: {functionality: SearchBarFunctionality, 
                 fetchUserFunction(getValues('textInput'), setUsersList);
             else {
                 if (params.channelId)
-                    fetchUserFunction(getValues('textInput'), setUsersList, parseInt(params.channelId));
+                    fetchUserFunction(getValues('textInput'), setUsersList, +params.channelId);
             }
         } else {
             setUsersList([]);

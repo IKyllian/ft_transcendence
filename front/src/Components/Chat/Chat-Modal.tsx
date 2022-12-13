@@ -53,7 +53,7 @@ function ChatModal(props: {onCloseModal: Function, showModal: number}) {
             if (usersInvited.length > 0 && params.channelId) {
                 usersInvited.forEach(element => {
                     socket?.emit("ChannelInvite", {
-                        chanId: parseInt(params.channelId!),
+                        chanId: +params.channelId!,
                         userId: element.id,
                     });
                 });

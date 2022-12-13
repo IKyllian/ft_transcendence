@@ -53,6 +53,19 @@ $OfflineColor: rgb(194, 29, 29);
     border-radius: 50%;
 }
 
+@mixin sidebar-button() {
+    position: absolute;
+    top: 25px;
+    border-radius: 50%;
+    @include width-height(45px, 45px);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 7px;
+    background-color: $DarkPalette;
+    cursor: pointer;
+}
+
 @mixin avatar-status-container() {
     .avatar-container {
         position: relative;

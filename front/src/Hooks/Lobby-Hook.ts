@@ -83,7 +83,7 @@ export function useLobbyHook() {
     })
 
     const onInputChange = (e: any, field: any) => {
-        setValue(field, parseInt(e.target.value));
+        setValue(field, +e.target.value);
     }
 
     const startCheck = () : boolean => {
@@ -157,7 +157,7 @@ export function useLobbyHook() {
     const onChangePos = (e: any, player: Player) => {
         let newPos: number | undefined = undefined;
         if (e.target && e.target.value)
-            newPos = parseInt(e.target.value)
+            newPos = +e.target.value
         if (newPos !== undefined && newPos !== player.pos) {
             socket?.emit("SetPlayerPos", {
                 pos: newPos,

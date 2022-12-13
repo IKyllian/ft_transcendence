@@ -12,8 +12,8 @@ function Sidebar(props: {setShowModal: Function, chanDatas: ChannelsInterfaceFro
     const ref = useRef<HTMLHeadingElement>(null);
     const params = useParams();
 
-    const channelId: number | undefined = params.channelId ? parseInt(params.channelId!, 10) : undefined;
-    const convId: number | undefined = params.convId ? parseInt(params.convId!, 10) : undefined;
+    const channelId: number | undefined = params.channelId ? +params.channelId! : undefined;
+    const convId: number | undefined = params.convId ? +params.convId! : undefined;
 
     useEffect(() => {
         const handleClickOutside = (event: any) => {

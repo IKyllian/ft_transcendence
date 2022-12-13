@@ -43,14 +43,12 @@ $FontSizeTextResponsive: 15px;
                 display: flex;
                 flex-direction: column;
                 position: relative;
+                align-items: center;
                 padding-bottom: 20px;
 
                 img {
                     @include width-height(100px, 100px);
                     position: absolute;
-                    left: 0;
-                    right: 0;
-                    margin: 0 auto;
                     bottom: -60px;
                 }
 
@@ -231,9 +229,6 @@ $FontSizeTextResponsive: 15px;
             gap: 10px;
 
             .filter-select {
-                // position: absolute;
-                // left: $HeaderMarge;
-                // top: 10px;
                 width: 100px;
                 padding: 5px;
                 background: transparent;
@@ -394,19 +389,6 @@ $FontSizeTextResponsive: 15px;
                     left: $HeaderResponsive800Marge;
                 }
                 .stat-elem {
-                    p {        
-                        &:first-child {
-                            font-size: 20px;
-                        }
-            
-                        &:last-child {
-                            font-size: 15px;
-                        }
-                    }
-                }
-            }
-            .stats-infos {
-                .stat-elem {
                     p {
                         &:first-child {
                             font-size: 25px;
@@ -416,8 +398,8 @@ $FontSizeTextResponsive: 15px;
                         }
                     }
                 }
+                
             }
-            
             .card-info {
                 margin-left: $HeaderResponsive800Marge;
                 bottom: -33px;
@@ -511,8 +493,28 @@ $FontSizeTextResponsive: 15px;
     .profile-container {
         .profile-header {
             .stats-infos {
+                padding: 27px;
+                gap: 3.5em;
                 .mode-select {
                     left: $HeaderResponsive500Marge;
+                    font-size: 10px;
+                    padding: 2px;
+                    top: 5px;
+                }
+                .stat-elem {
+                    img {
+                        @include width-height(70px, 70px);
+                        bottom: -40px;
+                    }
+                    p {        
+                        &:first-child {
+                            font-size: 15px;
+                        }
+            
+                        &:last-child {
+                            font-size: 15px;
+                        }
+                    }
                 }
             }
             .card-info {
@@ -523,9 +525,22 @@ $FontSizeTextResponsive: 15px;
             margin-top: 20px;
             &-menu {
                 gap: 1em;
+                margin-bottom: 5px;
             }
             .profile-block-wrapper {
                 margin: 0 $HeaderResponsive500Marge;
+            }
+
+            .history-list {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+    
+                .filter-select {
+                    font-size: 12px;
+                    padding: 3px;
+                    width: 80px;
+                }
             }
         }
     }
@@ -536,17 +551,6 @@ $FontSizeTextResponsive: 15px;
         .profile-header {
             .stats-infos {
                 @include width-height(90%, 60%);
-                .stat-elem {
-                    p {        
-                        &:first-child {
-                            font-size: 20px;
-                        }
-            
-                        &:last-child {
-                            font-size: 15px;
-                        }
-                    }
-                }
             }
         }
     }

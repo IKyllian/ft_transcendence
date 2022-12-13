@@ -8,7 +8,6 @@ function RoleButton(props: {sender: ChannelUser}) {
     const {socket} = useContext(SocketContext);
 
     const handleClick = () => {
-        console.log("sender", sender);
         socket?.emit("ChangeRole", {
             userId: sender.user.id,
             chanId: sender.channelId,

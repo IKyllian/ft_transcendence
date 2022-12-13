@@ -63,7 +63,7 @@ function SettingsCardAvatar() {
         const file = e.target.files[0]
         // const image = await resizeFile(file);
         var filesize: string = ((file.size/1024)/1024).toFixed(4);
-        if (parseInt(filesize) < 10) {
+        if (+filesize < 10) {
             if (fileError)
                 setFileError(undefined);
             setInputFile(file);

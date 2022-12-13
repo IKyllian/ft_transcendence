@@ -47,7 +47,7 @@ function AddFriendModal() {
                         showFriendList ?
                         <div className="modal-player-list modal-friend-list">
                             {
-                                friendList.map((elem, index) =>                    
+                                friendList.length > 0 && friendList.map((elem, index) =>                    
                                     <UserFindItem key={index} avatar={elem.avatar} name={elem.username} status={elem.status} userId={elem.id} >
                                         <div className="icons-player-item">
                                             <IconUser />
@@ -56,6 +56,11 @@ function AddFriendModal() {
                                         </div>
                                     </UserFindItem>
                                 )
+                            }
+
+                            {
+                                friendList.length === 0 &&
+                                <p> No friend yet </p>
                             }
                         </div> :
                         <SearchBarPlayers functionality={SearchBarFunctionality.ADD_FRIEND} fetchUserFunction={fetchSearchUsersToAdd} />

@@ -23,7 +23,7 @@ export function usePrivateConvHook() {
     const messagesEndRef = useRef<null | HTMLDivElement>(null);
     const location = useLocation();
     const params = useParams();
-    const convId: number | undefined = params.convId ? parseInt(params.convId!) : undefined;
+    const convId: number | undefined = params.convId ? +params.convId! : undefined;
     const { socket } = useContext(SocketContext);
 
     const scrollToBottom = () => {

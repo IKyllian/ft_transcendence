@@ -18,7 +18,7 @@ function ChannelSettings() {
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
     const {socket} = useContext(SocketContext);
-    const channelId: number | undefined = params.channelId ? parseInt(params.channelId!, 10) : undefined;
+    const channelId: number | undefined = params.channelId ? +params.channelId! : undefined;
 
     useEffect(() => {
         if (socket && currentChannelId !== channelId) {
@@ -58,8 +58,11 @@ function ChannelSettings() {
                     <div className="content-wrapper">
                         <RenderSettingPage item={sidebarItem} />
                     </div>
+                    <div className="leave-icon-wrapper">
+                        <IconX className="leave-icon" onClick={() => navigate(-1)} />
+                    </div>
                 </div>
-                <IconX className="leave-icon" onClick={() => navigate(-1)} />
+                
             </div>
         );
     }

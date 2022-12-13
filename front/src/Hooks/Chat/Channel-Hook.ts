@@ -22,7 +22,7 @@ export function useChannelHook() {
     const {channelDatas, loggedUserIsOwner} = useAppSelector((state) => state.channel);
     const params = useParams();
     const {socket} = useContext(SocketContext);
-    const channelId: number | undefined = params.channelId ? parseInt(params.channelId!, 10) : undefined;
+    const channelId: number | undefined = params.channelId ? +params.channelId! : undefined;
     const dispatch = useAppDispatch();
 
     console.log("Chan Component", params.channelId);

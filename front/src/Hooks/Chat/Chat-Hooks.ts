@@ -25,8 +25,8 @@ export function useLoadChatDatas() {
     const {socket} = useContext(SocketContext);
     const modalStatus = useContext(ModalContext);
 
-    const channelId: number | undefined = params.channelId ? parseInt(params.channelId!, 10) : undefined;
-    const convId: number | undefined = params.convId ? parseInt(params.convId!, 10) : undefined;
+    const channelId: number | undefined = params.channelId ? +params.channelId! : undefined;
+    const convId: number | undefined = params.convId ? +params.convId! : undefined;
 
     const sidebarOnChange = () => {
         setReponsiveSidebar(!responsiveSidebar);
