@@ -4,6 +4,8 @@ import ClientSocketManager from '../client.socket.manager';
 import {  await_load_base64, loadAvatar } from '../texture_loader';
 
 import { elo_to_rank_as_string } from '../elo_tools';
+import { shorten_nickname } from '../text_tools';
+import { make_style } from '../text_tools';
 
 import AssetRankSilver from '../../../../Images-Icons/Ranks/silver.png'
 import AssetRankGold from '../../../../Images-Icons/Ranks/gold.png';
@@ -11,9 +13,7 @@ import AssetRankPlatine from '../../../../Images-Icons/Ranks/platine.png';
 import AssetRankDiamond from '../../../../Images-Icons/Ranks/diamond.png';
 import AssetRankChampion from '../../../../Images-Icons/Ranks/champion.png';
 import AssetRankLegend from '../../../../Images-Icons/Ranks/legend.png';
-
 import AssetButton from '../../../../Assets/images/button.png';
-
 
 export default class Lobby extends Phaser.Scene
 {
@@ -45,8 +45,14 @@ export default class Lobby extends Phaser.Scene
 	TeamRed_Back_elo?: Phaser.GameObjects.Text;
 
 	message_text?: Phaser.GameObjects.Text;
+	message_text_b?: Phaser.GameObjects.Text;
+	game_stakes?: Phaser.GameObjects.Text;
+	close_button?: Phaser.GameObjects.Image;
+
+
 	game_type: GameType = GameType.Singles;
 	me: PlayerType = PlayerType.Spectator;
+
 
 	anti_spam_count :number = 0;
 	wait_delay: number = 0;
@@ -55,9 +61,6 @@ export default class Lobby extends Phaser.Scene
 
 	preload ()
 	{
-
-		// sharp(this.game.registry.get('players_data').TeamBlue_Back.user, { pages: -1 }).toFile("output.png")
-
 		loadAvatar(
 			this.game.registry.get('players_data').TeamBlue_Back.user,
 			'TeamBlue_back_avatar',
@@ -83,8 +86,9 @@ export default class Lobby extends Phaser.Scene
 				this.registry.get('cache'),
 				 this);
 			loadAvatar(
-				this.game.registry.get('players_data').TeamBlue_Front.user,
-				'TeamBlue_front_avatar',this.registry.get('token'),
+				this.game.registry.get('players_data').TeamRed_Front.user,
+				'TeamRed_front_avatar',
+				this.registry.get('token'),
 				this.registry.get('cache'),
 				 this);
 		}
@@ -94,14 +98,14 @@ export default class Lobby extends Phaser.Scene
 		await_load_base64(AssetRankPlatine, "Platine", this);
 		await_load_base64(AssetRankDiamond, "Diamond", this);
 		await_load_base64(AssetRankChampion, "Champion", this);
-		await_load_base64(AssetRankLegend, "Legend", this);
-
-
+		await_load_base64(AssetRankLegend, "Legend", this);	
 		this.load.image('button', AssetButton);
 	}
 
 	create ()
 	{
+		this.cameras.main.setBackgroundColor("#415A77");
+
 		this.me = this.game.registry.get('players_data').player_type;
 		this.socketmanager = new ClientSocketManager(this.game.registry.get('socket'));
 		this.game.registry.set('socketmanager', this.socketmanager);
@@ -114,94 +118,115 @@ export default class Lobby extends Phaser.Scene
 			game_end: this.game_end.bind(this)
         });
 
-		this.TeamBlue_Back_avatar = this.add.image(130, 130,
+		this.message_text = this.add.text(400, 260, "V", make_style(72, "#0062FF")).setOrigin(1,0.5);
+		this.message_text_b = this.add.text(400, 260, "S", make_style(72, "#F71E06")).setOrigin(0,0.5);
+
+		this.TeamBlue_Back_avatar = this.add.image(100, 130,
 								'TeamBlue_back_avatar')
 								.setOrigin(0.5,0.5)
-								.setDisplaySize(150, 150);
-		this.TeamRed_Back_avatar = this.add.image(670, 130,
+								.setDisplaySize(175, 175);
+		this.TeamRed_Back_avatar = this.add.image(700, 130,
 								'TeamRed_back_avatar')
 								.setOrigin(0.5,0.5)
-								.setDisplaySize(150, 150);
+								.setDisplaySize(175, 175);
 
-		let style: Phaser.Types.GameObjects.Text.TextStyle = 
-		{
-			fontSize: '30px',
-			color: '#000000',
-			fontFamily: 'Arial'
-		}
+		this.TeamBlue_Back_name = this.add.text(100, 310,
+								shorten_nickname(this.game.registry.get('players_data').TeamBlue_Back.user.username),
+								make_style(26))
+								.setOrigin(0.5,0.5);
+		this.TeamRed_Back_name = this.add.text(700, 310,
+								shorten_nickname(this.game.registry.get('players_data').TeamRed_Back.user.username),
+								make_style(26))
+								.setOrigin(0.5,0.5);
 
-		this.TeamBlue_Back_name = this.add.text(100, 360, "" +
-								this.game.registry.get('players_data').TeamBlue_Back.user.username, style);
-		this.TeamRed_Back_name = this.add.text(700, 360, "" +
-								this.game.registry.get('players_data').TeamRed_Back.user.username, style);
 
 		if (this.game_type === GameType.Doubles)
 		{
-			
-			this.TeamBlue_Back_rank = this.add.image(75, 420,
-									elo_to_rank_as_string(
-									this.game.registry.get('players_data').TeamBlue_Back.user.doubles_elo))
-									.setOrigin(0.5,0.5)
-									.setDisplaySize(40, 40);
-			this.TeamBlue_Back_elo = this.add.text(100, 420, "" +
-									this.game.registry.get('players_data').TeamBlue_Back.user.doubles_elo, style);
-
-
-			this.TeamBlue_Front_avatar = this.add.image(280, 130, 'TeamBlue_front_avatar')
+			this.TeamBlue_Front_avatar = this.add.image(285, 130, 'TeamBlue_front_avatar')
 										.setOrigin(0.5,0.5)
-										.setDisplaySize(150, 150);
-			this.TeamBlue_Front_rank = this.add.image(275, 420,
-									elo_to_rank_as_string(
-									this.game.registry.get('players_data').TeamBlue_Front.user.doubles_elo))
-									.setOrigin(0.5,0.5)
-									.setDisplaySize(40, 40);
-			this.TeamBlue_Front_name = this.add.text(300, 360, "" +
-									this.game.registry.get('players_data').TeamBlue_Front.user.username, style);
-			this.TeamBlue_Front_elo = this.add.text(300, 420, "" +
-									this.game.registry.get('players_data').TeamBlue_Front.user.doubles_elo, style);
+										.setDisplaySize(175, 175);
+			this.TeamBlue_Front_name = this.add.text(285, 310,
+										shorten_nickname(this.game.registry.get('players_data').TeamBlue_Front.user.username),
+										make_style(26))
+										.setOrigin(0.5,0.5);
 
 
-			this.TeamRed_Front_avatar = this.add.image(520, 130, 'TeamRed_front_avatar')
-									.setOrigin(0.5,0.5)
-									.setDisplaySize(150, 150);
-			this.TeamRed_Front_rank = this.add.image(475, 360,
-									elo_to_rank_as_string(
-									this.game.registry.get('players_data').TeamRed_Front.user.doubles_elo))
-									.setOrigin(0.5,0.5)
-									.setDisplaySize(40, 40);
-			this.TeamRed_Front_name = this.add.text(500, 360, "" +
-									this.game.registry.get('players_data').TeamRed_Front.user.username, style);
-			this.TeamRed_Front_elo = this.add.text(500, 420, "" +
-									this.game.registry.get('players_data').TeamRed_Front.user.doubles_elo, style);
+			this.TeamRed_Front_avatar = this.add.image(515, 130, 'TeamRed_front_avatar')
+										.setOrigin(0.5,0.5)
+										.setDisplaySize(175, 175);
+			this.TeamRed_Front_name = this.add.text(515, 310,
+									shorten_nickname(this.game.registry.get('players_data').TeamRed_Front.user.username),
+									make_style(26))
+									.setOrigin(0.5,0.5);
+		}
 
 
-			this.TeamRed_Back_rank = this.add.image(675, 420,
-									elo_to_rank_as_string(
-									this.game.registry.get('players_data').TeamRed_Back.user.doubles_elo))
-									.setOrigin(0.5,0.5)
-									.setDisplaySize(40, 40);
-			this.TeamRed_Back_elo = this.add.text(700, 420, "" +
-									this.game.registry.get('players_data').TeamRed_Back.user.doubles_elo, style);
+
+		if (this.game.registry.get('players_data').game_settings.is_ranked)
+		{
+			this.game_stakes = this.add.text(400, 550, "Ranked Match", make_style(32)).setOrigin(0.5,0.5);
+			if (this.game_type === GameType.Doubles)
+			{
+				
+				this.TeamBlue_Back_rank = this.add.image(100, 450,
+										elo_to_rank_as_string(
+										this.game.registry.get('players_data').TeamBlue_Back.user.doubles_elo))
+										.setOrigin(0.5,0.5)
+										.setDisplaySize(75, 75);
+				this.TeamBlue_Back_elo = this.add.text(100, 360, "" +
+										this.game.registry.get('players_data').TeamBlue_Back.user.doubles_elo, make_style(22)).setOrigin(0.5,0.5);
+	
+	
+				this.TeamRed_Back_rank = this.add.image(700, 450,
+											elo_to_rank_as_string(
+											this.game.registry.get('players_data').TeamRed_Back.user.doubles_elo))
+											.setOrigin(0.5,0.5)
+											.setDisplaySize(75, 75);
+				this.TeamRed_Back_elo = this.add.text(700, 360, "" +
+											this.game.registry.get('players_data').TeamRed_Back.user.doubles_elo, make_style(22)).setOrigin(0.5,0.5);
+	
+				this.TeamBlue_Front_rank = this.add.image(285, 450,
+										elo_to_rank_as_string(
+										this.game.registry.get('players_data').TeamBlue_Front.user.doubles_elo))
+										.setOrigin(0.5,0.5)
+										.setDisplaySize(75, 75);
+				this.TeamBlue_Front_elo = this.add.text(285, 360, "" +
+										this.game.registry.get('players_data').TeamBlue_Front.user.doubles_elo, make_style(22)).setOrigin(0.5,0.5);
+	
+				this.TeamRed_Front_rank = this.add.image(515, 450,
+										elo_to_rank_as_string(
+										this.game.registry.get('players_data').TeamRed_Front.user.doubles_elo))
+										.setOrigin(0.5,0.5)
+										.setDisplaySize(75, 75);
+				this.TeamRed_Front_elo = this.add.text(515, 360, "" +
+										this.game.registry.get('players_data').TeamRed_Front.user.doubles_elo, make_style(22)).setOrigin(0.5,0.5);
+	
+			}
+			else
+			{
+				this.TeamBlue_Back_rank = this.add.image(100, 450,
+										elo_to_rank_as_string(
+										this.game.registry.get('players_data').TeamBlue_Back.user.singles_elo))
+										.setOrigin(0.5,0.5)
+										.setDisplaySize(75, 75);
+				this.TeamBlue_Back_elo = this.add.text(100, 360, "" +
+										this.game.registry.get('players_data').TeamBlue_Back.user.singles_elo, make_style(22)).setOrigin(0.5,0.5);
+				
+										
+				this.TeamRed_Back_rank = this.add.image(700, 450,
+										elo_to_rank_as_string(
+										this.game.registry.get('players_data').TeamRed_Back.user.singles_elo))
+										.setOrigin(0.5,0.5)
+										.setDisplaySize(75, 75);
+				this.TeamRed_Back_elo = this.add.text(700, 360, "" +
+										this.game.registry.get('players_data').TeamRed_Back.user.singles_elo, make_style(22)).setOrigin(0.5,0.5);
+			}
 		}
 		else
 		{
-			this.TeamBlue_Back_rank = this.add.image(75, 420,
-									elo_to_rank_as_string(
-									this.game.registry.get('players_data').TeamBlue_Back.user.singles_elo))
-									.setOrigin(0.5,0.5)
-									.setDisplaySize(40, 40);
-			this.TeamBlue_Back_elo = this.add.text(100, 420, "" +
-									this.game.registry.get('players_data').TeamBlue_Back.user.singles_elo, style);
-			
-									
-			this.TeamRed_Back_rank = this.add.image(675, 420,
-									elo_to_rank_as_string(
-									this.game.registry.get('players_data').TeamRed_Back.user.singles_elo))
-									.setOrigin(0.5,0.5)
-									.setDisplaySize(40, 40);
-			this.TeamRed_Back_elo = this.add.text(700, 420, "" +
-									this.game.registry.get('players_data').TeamRed_Back.user.singles_elo, style);
+			this.game_stakes = this.add.text(400, 550, "Showmatch", make_style(32)).setOrigin(0.5,0.5);
 		}
+
 
 		this.socketmanager.lobby_send_join(this.game.registry.get('players_data').game_id);
 		this.socketmanager.lobby_send_request_status(this.registry.get('players_data').game_id);
@@ -249,17 +274,14 @@ export default class Lobby extends Phaser.Scene
 	{
 		this.clear_all();
 
-		let style: Phaser.Types.GameObjects.Text.TextStyle = 
-		{
-			fontSize: '30px',
-			color: '#000000',
-			fontFamily: 'Arial'
-		}
-		this.message_text = this.add.text(400, 100, "Game aborted", style);
+		this.message_text = this.add.text(400, 100,
+							"Someone Failed\nto join\nGame aborted",
+							make_style(30))
+							.setOrigin(0.5,0.5);
 
 		setTimeout(() => {
 			this.game.destroy(true, false);
-		}, 10000);
+		}, 5000);
 	}
 
 	store_round_setup = (round_setup: RoundSetup) =>
@@ -269,6 +291,10 @@ export default class Lobby extends Phaser.Scene
 
 	clear_all = () =>
 	{
+		this.message_text?.destroy();
+		this.message_text_b?.destroy();
+		this.game_stakes?.destroy();
+
 		this.TeamBlue_Back_avatar?.destroy();
 		this.TeamBlue_Back_rank?.destroy();
 		this.TeamBlue_Back_name?.destroy();
@@ -297,13 +323,14 @@ export default class Lobby extends Phaser.Scene
 	{
 		this.clear_all();
 
-		let style: Phaser.Types.GameObjects.Text.TextStyle = 
-		{
-			fontSize: '30px',
-			color: '#000000',
-			fontFamily: 'Arial'
-		}
-		this.message_text = this.add.text(400, 100, "Error: Could not connect to server", style);	
+		this.message_text = this.add.text(400, 100,
+			"Error: \nCould not connect to server",
+			 make_style(30))
+			 .setOrigin(0.5,0.5);
+
+		setTimeout(() => {
+			this.game.destroy(true, false);
+		}, 5000);
 	}
 
 	lobby_join = (response: boolean) =>
@@ -313,17 +340,14 @@ export default class Lobby extends Phaser.Scene
 		{
 			this.clear_all();
 			
-			let style: Phaser.Types.GameObjects.Text.TextStyle = 
-			{
-				fontSize: '30px',
-				color: '#000000',
-				fontFamily: 'Arial'
-			}
-			this.message_text = this.add.text(400, 100, "Error: Lobby not found", style);
+			this.message_text = this.add.text(400, 100,
+								"Error: \nLobby not found",
+								make_style(30))
+								.setOrigin(0.5,0.5);
 
 			setTimeout(() => {
 				this.game.destroy(true, false);
-			}, 10000);
+			}, 5000);
 		}
 	}
 
