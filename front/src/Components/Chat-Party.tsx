@@ -33,12 +33,6 @@ function ChatParty() {
                 <div className="message-container-main">
                 <ChatHeader isPartyChat={true} />
                     <ul id="chat-message-wrapper" className="chat-messages-wrapper" >
-                        {/* {
-                            previousMessages.loadPreviousMessages && 
-                            <li className="loader-wrapper">
-                                <span className="prev-messages-loader"></span>
-                            </li>
-                        } */}
                         {
                             party.messages.map((elem, index) => {
                                 const dateMessage = new Date(elem.send_at);

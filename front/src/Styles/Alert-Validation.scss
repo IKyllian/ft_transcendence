@@ -1,0 +1,12 @@
+@use "./Variables.scss" as *;
+
+.alert-validation-container {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    .buttons-container {
+        @include flex-row-alignCenter();
+        margin: 0 auto;
+    }
+}

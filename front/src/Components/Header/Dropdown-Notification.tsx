@@ -44,7 +44,7 @@ function NotifItem(props: {notification: NotificationInterface}){
 function DropdownNotification() {
     const {notifications} = useAppSelector(state => state.notification);
     
-    return notifications && notifications.length > 0 ? (
+    return notifications && notifications.find(elem => elem.type !== notificationType.CHANNEL_MESSAGE && elem.type !== notificationType.PARTY_INVITE  && elem.type !== notificationType.PRIVATE_MESSAGE) ? (
         <div className="notif-dropdown-wrapper">
             {
                 notifications.map((elem) => {

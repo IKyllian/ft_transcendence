@@ -3,7 +3,7 @@ import { Channel, ChannelUser, UserTimeout, ChatMessage, ChannelModes } from '..
 import { UserStatus } from '../Types/User-Types';
 
 interface ChannelState {
-    channelDatas: Channel | undefined,
+    channelDatas: Channel | undefined | null,
     loggedUserIsOwner: boolean,
     loggedUserIsModerator: boolean
     loading: boolean,
@@ -24,6 +24,9 @@ export const channelSlice = createSlice({
     reducers: {
         loadingChannelDatas: (state) => {
             state.loading = true;
+        },
+        channelNotfound: (state) => {
+            state.channelDatas = null;
         },
         setChannelDatas: (state, {payload}: PayloadAction<{channel: Channel, loggedUserId: number}>) => {
             if (payload.channel.channelUsers.find((elem) => elem.user.id === payload.loggedUserId && (elem.role === "owner"))) {
@@ -103,6 +106,7 @@ export const channelSlice = createSlice({
 
 export const {
     loadingChannelDatas,
+    channelNotfound,
     setChannelDatas,
     addChannelUser,
     changeChannelSettings,

@@ -25,11 +25,11 @@ function Sign() {
                 <div className='auth-separator'>
                     <span>ou</span>
                 </div>
-                {authDatas.error && <p className='txt-form-error'> {authDatas.error} </p> }
+                {authDatas.error && <p className='txt-form-error'> { authDatas.error } </p> }
                 <form className='form-wrapper' onSubmit={isSignIn ? onSignIn : onSignUp}>
                     { !isSignIn && <label> Username </label>}
                     { isSignIn && <label> Username or Email </label>}
-                    {hookForm.errors.username && <p className='txt-form-error'> {hookForm.errors.username.message} </p>}
+                    {hookForm.errors.username && <p className='txt-form-error'> { hookForm.errors.username.message } </p>}
                     <input
                         id="username"
                         type="text"
@@ -45,7 +45,7 @@ function Sign() {
                         !isSignIn && 
                         <label> Email </label>
                     }
-                    {!isSignIn && hookForm.errors.email && <p className='txt-form-error'> {hookForm.errors.email.message} </p>}
+                    {!isSignIn && hookForm.errors.email && <p className='txt-form-error'> { hookForm.errors.email.message } </p>}
                     {
                         !isSignIn && 
                         <input
@@ -61,7 +61,7 @@ function Sign() {
                         />
                     }
                     <label> Password </label>
-                    {hookForm.errors.password && <p className='txt-form-error'> {hookForm.errors.password.message} </p>}
+                    {hookForm.errors.password && <p className='txt-form-error'> { hookForm.errors.password.message } </p>}
                     <input
                         id="password"
                         type="password"
@@ -73,9 +73,12 @@ function Sign() {
                             } : 5
                         })}
                     />
-                    <Link to="/forgot-password">
-                        <p className='forgot-password'> Mot de passe oublié ? </p>
-                    </Link>
+                    {
+                        isSignIn && 
+                        <Link to="/forgot-password">
+                            <p className='forgot-password'> Mot de passe oublié ? </p>
+                        </Link>
+                    }
                     <button type='submit'>
                         {isSignIn ? "Login" : "Create Account"}
                     </button>

@@ -22,6 +22,7 @@ export function useProfileHook() {
         { title: "Friends", isActive: "false" }
     ]);
     const [userState, setUserState] = useState<ProfileState | undefined>(undefined);
+    const [loading, setLoading] = useState<boolean>(true);
     const [statsMode, setStatsMode] = useState<Modes>(Modes.Singles); 
 
     const { currentUser, friendList } = useAppSelector(state => state.auth);
@@ -63,11 +64,12 @@ export function useProfileHook() {
                         friendList: isLoggedUser ? friendList : fetchResponse.data.friendList,
                         relationStatus: fetchResponse.data.relationStatus ? fetchResponse.data.relationStatus : undefined,
                     });
+                    setLoading(false);
                 }
             })
             .catch((err) => {
                 console.log(err);
-                navigate("*");
+                setLoading(false);
             })
         }
     }, [params.username])
@@ -128,5 +130,6 @@ export function useProfileHook() {
         attributes,
         statsMode,
         changeMode,
+        loading,
     }
 }

@@ -5,6 +5,7 @@ import LoadingSpin from "../Utils/Loading-Spin";
 import { getDoublesWinRate, getMatchPlayed, getSinglesWinRate } from "../../Utils/Utils-User";
 import { useProfileHook } from "../../Hooks/Profile/Profile-Hook";
 import { Modes } from "../../Types/Utils-Types";
+import Error404 from "../404-Error";
 
 function Profile() {
     const {
@@ -14,12 +15,14 @@ function Profile() {
         attributes,
         statsMode,
         changeMode,
+        loading,
     } = useProfileHook();
 
-    return !userState?.user ? (
-       <LoadingSpin classContainer="profile-container" />
-    ) : (
-        <div className={`profile-container ${modalStatus.modal.isOpen ? modalStatus.modal.blurClass : ""}`}>
+    if (loading)
+        return <LoadingSpin classContainer="profile-container" />;
+
+    return !loading && userState ? (
+            <div className={`profile-container ${modalStatus.modal.isOpen ? modalStatus.modal.blurClass : ""}`}>
             <div className="profile-header">
                 <div className='stats-infos'>
                     <select onChange={(e) => changeMode(e)} value={statsMode} className="mode-select">
@@ -43,6 +46,8 @@ function Profile() {
                 <RenderProfileBlock blockTitle={attributes.find(elem => elem.isActive === "true")!.title} userDatas={userState.user} friendList={userState.friendList} matchHistory={userState.match_history} />
             </div>
         </div>
+    ) : (
+        <Error404 /> 
     );
 }
 

@@ -5,6 +5,7 @@ import UsersSidebar from "./Users-Sidebar";
 import LoadingSpin from "../../Utils/Loading-Spin";
 import { useChannelHook } from "../../../Hooks/Chat/Channel-Hook";
 import { UserInterface } from "../../../Types/User-Types";
+import Error404 from "../../404-Error";
 
 function ChatChannel() {
     const {
@@ -22,11 +23,21 @@ function ChatChannel() {
         previousMessages,
     } = useChannelHook();
 
-    return (channelDatas === undefined) ? (
-        <div style={{width: "100%"}}>
-            <LoadingSpin classContainer="chat-page-container"/>
-        </div>
-    ) : (
+    if (channelDatas === undefined) {
+        return (
+            <div style={{width: "100%"}}>
+                <LoadingSpin classContainer="chat-page-container"/>
+            </div>
+        );
+    } else if (channelDatas === null) {
+        return (
+            <div className="no-target-message">
+                <p> Channel Not Found </p>
+            </div>
+        );
+    }
+
+    return (
         <div className="message-container">
             <div className="message-container-main">
                 <ChatHeader chatItem={channelDatas} showUsersSidebar={showUsersSidebar} changeSidebarStatus={changeSidebarStatus} />

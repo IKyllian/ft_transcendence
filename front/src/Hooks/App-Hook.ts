@@ -13,7 +13,7 @@ import { GameMode, PartyInterface, PartyMessage } from "../Types/Lobby-Types";
 import { copyNotificationArray } from "../Redux/NotificationSlice";
 import { addParty, addPartyInvite, addPartyMessage, cancelQueue, changePartyGameMode, changeQueueStatus, incrementQueueTimer, leaveParty, newGameFound, removePartyInvite, resetQueueTimer } from "../Redux/PartySlice";
 import { fetchVerifyToken } from "../Api/Sign/Sign-Fetch";
-import { addChannelUser, banChannelUser, muteChannelUser, removeTimeoutChannelUser, removeChannelUser, setChannelDatas, updateChannelUser, unsetChannelDatas, unsetChannelId } from "../Redux/ChannelSlice";
+import { addChannelUser, banChannelUser, muteChannelUser, removeTimeoutChannelUser, removeChannelUser, setChannelDatas, updateChannelUser, unsetChannelDatas, unsetChannelId, channelNotfound } from "../Redux/ChannelSlice";
 import { addAlert, AlertType } from "../Redux/AlertSlice";
 import { PlayersGameData } from "../Components/Game/game/types/shared.types";
 import { TokenStorageInterface } from "../Types/Utils-Types";
@@ -208,9 +208,11 @@ export function useAppHook() {
 				dispatch(deleteNotification(data));
 			});
 
-			socket.on("exception", (data) => {
+			socket.on("exception", (data: {message: string, status: string}) => {
 				console.log(data);
 				dispatch(addAlert({message: data.message, type: AlertType.ERROR}));
+				if (data.message === "Channel not found" && data.status === "error")
+					dispatch(channelNotfound());
 			});
 
 			socket.on("FriendListUpdate", (data: UserInterface[]) => {

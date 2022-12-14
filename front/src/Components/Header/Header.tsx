@@ -2,7 +2,6 @@ import { useState, useContext, useEffect } from 'react';
 import { IconLogout, IconMessages, IconUsers, IconChevronDown, IconBell } from '@tabler/icons';
 
 import { ModalContext } from '../Utils/ModalProvider';
-import ProfilPic from "../../Images-Icons/pp.jpg"
 import { Link, useLocation } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../Redux/Hooks';
 import DropdownNotification from './Dropdown-Notification';
@@ -92,9 +91,9 @@ function Header() {
             </div>
             <div className='header-right-responsive'>
                 <NotifIcon notifications={notifications} handleNotifDropdownClick={handleNotifDropdownClick} />
-                <ExternalImage src={ProfilPic} alt="User Avatar" className="header-avatar" userId={currentUser.id} />
+                <ExternalImage src={currentUser.avatar} alt="User Avatar" className="header-avatar" userId={currentUser.id} />
                 <IconChevronDown style={{cursor: "pointer"}} onClick={() => handleMenuClick()} />
-                <ResponsiveMenu show={showMenu} handleClick={handleMenuClick} headerModal={modalStatus.setStatus} />
+                <ResponsiveMenu show={showMenu} handleClick={handleMenuClick} headerModal={modalStatus.setStatus} username={currentUser.username} />
             </div>
         </header>
     );

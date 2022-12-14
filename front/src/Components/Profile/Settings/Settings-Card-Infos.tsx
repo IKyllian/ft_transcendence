@@ -163,10 +163,7 @@ function UsernameForm(props: {user: UserInterface}) {
                 </div>
                 <label >
                     Email
-                    <div className="label-input-wrapper">
-                        <input disabled className="lock-input" type="text" value={user.email} />
-                        <IconLock />
-                    </div>
+                    <input disabled className="lock-input" type="text" value={user.email} />
                 </label>
             </form>
         </>
