@@ -17,13 +17,19 @@ function ChatPrivateMessage() {
         register,
         handleOnScroll,
         previousMessages,
+        loading,
     } = usePrivateConvHook();
 
-    return (convDatas === undefined) ? (
-        <div style={{width: "100%"}}>
-            <LoadingSpin classContainer="chat-page-container"/>
-        </div>
-    ) : (
+
+    if (loading) {
+        return (
+            <div style={{width: "100%"}}>
+                <LoadingSpin classContainer="chat-page-container"/>
+            </div>
+        );
+    }
+
+    return convDatas !== undefined && !loading ? (
         <div className="message-container">
             <div className="message-container-main">
                 <ChatHeader privateConvUser={getSecondUserOfPM(convDatas.conv, loggedUser!.id)} />
@@ -56,6 +62,10 @@ function ChatPrivateMessage() {
                     </form>
                 </div>
             </div>
+        </div>
+    ) : (
+        <div className="no-target-message">
+            <p> Channel Not Found </p>
         </div>
     );
 }

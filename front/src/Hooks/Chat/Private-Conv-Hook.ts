@@ -1,17 +1,17 @@
 import { useState, useRef, useContext, useEffect, useCallback } from "react";
 
-import { Conversation, ConversationState, PreviousMessagesState, PrivateMessage, defaultMessagesState } from "../../Types/Chat-Types";
+import { Conversation, PreviousMessagesState, PrivateMessage, defaultMessagesState } from "../../Types/Chat-Types";
 import { SocketContext } from "../../App";
 import { useLocation, useParams } from "react-router-dom";
-import { useAppSelector } from '../../Redux/Hooks'
+import { useAppDispatch, useAppSelector } from '../../Redux/Hooks'
 import { getSecondUserIdOfPM } from "../../Utils/Utils-Chat";
 import { UserInterface, UserStatus } from "../../Types/User-Types";
 import { debounce } from "../../Utils/Utils-Chat";
 import { useForm } from "react-hook-form";
 import { fetchLoadPrevConvMessages } from "../../Api/Chat/Chat-Action";
+import { addNewMessage, changeUserStatus, resetConvState, setConv } from "../../Redux/PrivateConvSlice";
 
 export function usePrivateConvHook() {
-    const [convDatas, setConvDatas] = useState<ConversationState | undefined>(undefined);
     const [userTyping, setUserTyping] = useState<UserInterface | undefined>(undefined);
     const [hasSendTypingEvent, setHasTypingEvent] = useState<boolean>(false);
     const [previousMessages, setPreviousMessages] = useState<PreviousMessagesState>(defaultMessagesState);
@@ -19,12 +19,14 @@ export function usePrivateConvHook() {
     const [haveToLoad, setHaveToLoad] = useState<boolean>(false);
     const [prevLength, setPrevLength] = useState<number>(0);
 
+    const {convDatas, loading} = useAppSelector(state => state.privateConv);
     const authDatas = useAppSelector((state) => state.auth);
     const messagesEndRef = useRef<null | HTMLDivElement>(null);
     const location = useLocation();
     const params = useParams();
     const convId: number | undefined = params.convId ? +params.convId! : undefined;
     const { socket } = useContext(SocketContext);
+    const dispatch = useAppDispatch();
 
     const scrollToBottom = () => {
         // Permet de check si la div du chat est scrollable. Si elle ne l'est pas, load des datas pour que la div devienne scrollable
@@ -32,7 +34,7 @@ export function usePrivateConvHook() {
         if (div.length > 0){
             var hasVerticalScrollbar = div[0].scrollHeight > div[0].clientHeight;
             if (!hasVerticalScrollbar && convId && convDatas) {
-                fetchLoadPrevConvMessages(convId, setConvDatas, convDatas.conv.messages, setPreviousMessages);
+                fetchLoadPrevConvMessages(convId, dispatch, convDatas.conv.messages, setPreviousMessages);
             }
         } 
         messagesEndRef.current?.scrollIntoView();
@@ -69,7 +71,7 @@ export function usePrivateConvHook() {
     useEffect(() => {
         if (haveToLoad && convId && convDatas && !previousMessages.loadPreviousMessages && !previousMessages.reachedMax) {
             setPreviousMessages(prev => { return {...prev, loadPreviousMessages: true}});
-            fetchLoadPrevConvMessages(convId, setConvDatas, convDatas.conv.messages, setPreviousMessages);
+            fetchLoadPrevConvMessages(convId, dispatch, convDatas.conv.messages, setPreviousMessages);
         }
     }, [haveToLoad])
 
@@ -117,31 +119,19 @@ export function usePrivateConvHook() {
 
     useEffect(() => {
         if (convId) {
-            setConvDatas(undefined);
+            dispatch(resetConvState());
             setUserTyping(undefined);
             setPreviousMessages(defaultMessagesState);
             setHaveToLoad(false);
             setPrevLength(0);
             
-            const listener = (data: PrivateMessage) => {
+            socket?.on('NewPrivateMessage', (data: PrivateMessage) => {
                 console.log("NewPrivateMessage", data);
-                setConvDatas((prev: any) => {
-                    return {...prev, conv: {...prev.conv, messages: [...prev!.conv.messages, {...data}]}}
-                });
-            }
-            
-            socket?.on('NewPrivateMessage', listener);
+                dispatch(addNewMessage(data));
+            });
 
             socket?.on("StatusUpdate", (data: {id: number, status: UserStatus}) => {
-                setConvDatas(prev => { return prev ? {
-                    ...prev, 
-                    conv: {
-                        ...prev.conv,
-                        user1: prev.conv.user1.id === data.id ? {...prev.conv.user1, status: data.status} : {...prev.conv.user1},
-                        user2: prev.conv.user2.id === data.id ? {...prev.conv.user2, status: data.status} : {...prev.conv.user2},
-                    }
-                } : undefined
-                });
+                dispatch(changeUserStatus({id: data.id, status: data.status}))
             });
 
             socket?.on("OnTypingPrivate", (data: {user: UserInterface, isTyping: boolean, convId: number}) => {
@@ -154,12 +144,12 @@ export function usePrivateConvHook() {
             });
 
             socket?.on("ConversationData", (data: Conversation) => {
-                setConvDatas({temporary: false, conv: data});
+                dispatch(setConv({conv: data, temp: false}));
             });
 
             if (location && location.state) {
                 const locationState = location.state as {isTemp: boolean, conv: Conversation};
-                setConvDatas({temporary: true, conv: {...locationState.conv}});
+                dispatch(setConv({conv: {...locationState.conv}, temp: true}));
             } else {
                 socket?.emit('JoinConversationRoom', {
                     id: convId,
@@ -168,6 +158,7 @@ export function usePrivateConvHook() {
         }
 
         return () => {
+            dispatch(resetConvState());
             if (convId) {
                 socket?.emit("LeaveConversationRoom", {
                     id: convId,
@@ -191,5 +182,6 @@ export function usePrivateConvHook() {
         register,
         handleOnScroll,
         previousMessages,
+        loading,
     };
 }
