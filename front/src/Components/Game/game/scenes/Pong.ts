@@ -96,6 +96,9 @@ export default class Pong extends Phaser.Scene
 
 	create ()
 	{
+		this.cameras.main.setBackgroundColor("#0D1B2A");
+		this.cameras.main.fadeIn(1000, 0, 0, 0);
+
 		this.socketmanager = this.registry.get('socketmanager');
 		this.next_round_setup = this.registry.get('round_setup');
 		this.game_id = this.registry.get('players_data').game_id;
@@ -127,14 +130,11 @@ export default class Pong extends Phaser.Scene
 		{
 			this.core = new PongCore(this.game_settings);
 
-			//???
-		//	this.game_state.game_type = this.game.registry.get('players_data').game_settings.game_type;
-
 			this.game_state.TeamBlue_Back.x = this.game_settings.player_back_advance;
 			this.game_state.TeamBlue_Front.x = this.game_settings.player_front_advance;
 			this.game_state.TeamRed_Back.x = 800 - this.game_settings.player_back_advance;
 			this.game_state.TeamRed_Front.x = 800 - this.game_settings.player_front_advance;
-			this.asset_ball = this.add.circle(400, 300, 5, 0x000000);
+			this.asset_ball = this.add.circle(400, 300, 5, 0xE0E1DD);
 			this.upper_limit = this.add.rectangle(0, 0, 800, this.game_settings.up_down_border , 0x000000).setOrigin(0,0);
 			this.lower_limit = this.add.rectangle(0, (600 - (this.game_settings.up_down_border)), 800, this.game_settings.up_down_border, 0x000000).setOrigin(0,0);
 	
@@ -175,14 +175,14 @@ export default class Pong extends Phaser.Scene
 		let style: Phaser.Types.GameObjects.Text.TextStyle = 
 		{
 			fontSize: '32px',
-			color: '#000000',
+		//	color: '#000000',
+			color: '#E0E1DD',
 			fontFamily: 'Silkscreen'
 		}
 
 		let text: string;
 		text = this.game_state.score.TeamBlue.toString() + " - " + this.game_state.score.TeamRed.toString();
 		this.asset_scoreboard = this.add.text(400, 100, text, style).setOrigin(0.5,0.5);
-
 
 		if (this.me !== PlayerType.Spectator)
 		{
@@ -571,7 +571,8 @@ export default class Pong extends Phaser.Scene
 	{
 		if (this.me === paddle)
 			return 0xFF0000;
-		return 0x000000;
+		return 0xE0E1DD;
+		//E0E1DD
 	}
 
 	sound_event_wall = () =>
