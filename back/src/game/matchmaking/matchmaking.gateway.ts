@@ -165,6 +165,7 @@ export class MatchmakingGateway implements OnGatewayDisconnect {
 		@GetUser() user: User,
 		@MessageBody() data: StartQueueDto,
 	) {
+		console.log("start queue data: ", data)
 		if (data.isRanked) {
 			this.queueService.joinQueue(user, data.gameType);
 		} else {

@@ -37,7 +37,7 @@ import { TwoFactorModule } from './2fa/twoFactor.module';
       database: process.env.POSTGRES_NAME,
       entities,
       synchronize: true,
-      // dropSchema: true,
+    //   dropSchema: true,
     }),
   ],
   controllers: [AppController],
