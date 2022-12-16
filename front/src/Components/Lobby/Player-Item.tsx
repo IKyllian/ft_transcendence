@@ -1,5 +1,4 @@
 import { useAppDispatch } from "../../Redux/Hooks";
-import Avatar from "../../Images-Icons/pp.jpg";
 import { IconCheck, IconPlus } from "@tabler/icons";
 import { GameMode, Player, TeamSide, PlayerPosition } from "../../Types/Lobby-Types";
 import { changeModalStatus } from "../../Redux/PartySlice";

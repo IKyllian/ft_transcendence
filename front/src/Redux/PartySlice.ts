@@ -97,7 +97,8 @@ export const partySlice = createSlice({
         },
         unsetGameFound: (state) => {
             state.gameFound = undefined;
-        }
+        },
+        resetParty: () => defaultState,
     }
 });
 
@@ -118,4 +119,5 @@ export const {
     newGameFound,
     stopShowGameFound,
     unsetGameFound,
+    resetParty,
 } = partySlice.actions;

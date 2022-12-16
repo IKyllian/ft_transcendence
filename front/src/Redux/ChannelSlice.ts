@@ -100,7 +100,8 @@ export const channelSlice = createSlice({
         },
         unsetChannelId: (state) => {
             state.currentChannelId = undefined;
-        }
+        },
+        resetChannel: () => defaultState,
     }
 });
 
@@ -121,4 +122,5 @@ export const {
     addChannelMessage,
     replaceChannelMessages,
     unsetChannelId,
+    resetChannel,
 } = channelSlice.actions;

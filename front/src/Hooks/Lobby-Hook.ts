@@ -66,7 +66,6 @@ export function useLobbyHook() {
     const onGameModeChange = (index: number, gameMode: GameMode) => {
         if (party) {
             if (gameMode !== party.game_mode) {
-                console.log("EMIT");
                 socket?.emit("SetGameMode", gameMode);
             }
         } else {
@@ -91,8 +90,11 @@ export function useLobbyHook() {
             if (party.players.length === 1)
                 return true;
             else if (party.players.length === 2) {
-                if (party.game_mode == GameMode.RANKED_2v2)
-                    return true;
+                if (party.game_mode == GameMode.RANKED_2v2) {
+                    if (party.players[0].pos !== party.players[1].pos)
+                        return true;
+                    return false;
+                }   
                 if (party.game_mode == GameMode.PRIVATE_MATCH && party.players[0].team !== party.players[1].team)
                     return true;
             } else if (party.players.length === 4) {
@@ -205,22 +207,12 @@ export function useLobbyHook() {
     useEffect(() => {
         const checkGame = async () => {
             await fetchIsAlreadyInGame().then(result => { 
-                if (!result) {
-                    // socket?.on("newgame_data", (data: PlayersGameData) => {
-                    //     console.log("new_game_data", data);
-                    //     dispatch(changeQueueStatus(false));
-                    //     dispatch(newGameFound(data));
-                    //     // navigate("/game", {state: data});
-                    // });
-                } else
+                if (result)
                     navigate("/");
                 return result
             });
         }
-        checkGame();     
-        // return () => {
-        //     socket?.off("newgame_data");
-        // }
+        checkGame();
     }, [])
 
     return {

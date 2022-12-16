@@ -99,7 +99,8 @@ export const chatSlice = createSlice({
                     });
                 }
             }
-        }
+        },
+        resetChat: () => defaultState,
     }
 });
 
@@ -115,4 +116,5 @@ export const {
     removePrivateConv,
     changePrivateConvOrder,
     changeActiveElement,
+    resetChat,
 } = chatSlice.actions;

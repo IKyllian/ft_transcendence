@@ -40,7 +40,7 @@ function SettingsCardAvatar() {
                             dispatch(setUserAvatar(URL.createObjectURL(avatarBlob))); 
                         dispatch(addAlert({message: "New Avatar Uploaded (Refresh to see it)", type: AlertType.SUCCESS}));
                     }
-                }  
+                }
             })  
             .catch(err => {
                 dispatch(addAlert({message: "Failed To Upload", type: AlertType.ERROR}));

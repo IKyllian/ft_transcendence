@@ -21,22 +21,29 @@ interface Props {
 
 function LobbyButtonsContainer(props: Props) {
     const { party, gameMode, onGameModeChange, user, onReady, partyReady, loggedUserIsLeader, startQueue, isInQueue, queueTimer, cancelQueue } = props;
-    const dispatch = useAppDispatch();
-    const [displayDrop, setDisplayDrop] = useState<boolean>(false);
     
+    return user ? (
+        <div className="lobby-buttons-wrapper">
+            <PartyChatButton party={party} />
+            <StartButton user={user} isInQueue={isInQueue} partyReady={partyReady} cancelQueue={cancelQueue} startQueue={startQueue} onReady={onReady} queueTimer={queueTimer} />
+            <GameModeButton party={party} gameMode={gameMode} onGameModeChange={onGameModeChange} loggedUserIsLeader={loggedUserIsLeader} isInQueue={isInQueue} />
+        </div>
+    ) : (
+        <> </>
+    );
+}
+
+function GameModeButton(props: { party: PartyInterface | undefined, gameMode: GameModeState, onGameModeChange: Function, loggedUserIsLeader: boolean, isInQueue: boolean }) {
+    const { party, gameMode, onGameModeChange, loggedUserIsLeader, isInQueue } = props;
+    const [displayDrop, setDisplayDrop] = useState<boolean>(false);
+
     const gameModeOnclick = () => {
         if (loggedUserIsLeader && !isInQueue)
             setDisplayDrop(!displayDrop)
     }
-    return user ? (
-        <div className="lobby-buttons-wrapper">
-            { !party && <button style={{cursor: "pointer"}} className="lock-button" onClick={() => dispatch(changeSidebarChatStatus())}> <IconLock className="lock-icon" /> Party Chat </button> }
-            { party && <button style={{cursor: "pointer"}} onClick={() => dispatch(changeSidebarChatStatus())}> Party Chat </button> }
-            { user.isLeader && !isInQueue && partyReady && <button className="start-button" onClick={() => startQueue()}> Start Game </button> }
-            { user.isLeader && !isInQueue && !partyReady && <button> Waiting for players </button> }
-            { isInQueue && <button className="queue-button"> <IconX onClick={() => cancelQueue()} /> {partyQueueString(queueTimer)} </button> }
-            { !user.isLeader && !isInQueue && user.isReady && <button className="start-button" onClick={() => onReady(false)}> Not Ready </button> }
-            { !user.isLeader && !isInQueue && !user.isReady && <button className="start-button" onClick={() => onReady(true)}> Ready </button> }
+
+    return (
+        <>
             <button style={loggedUserIsLeader && !isInQueue ? {cursor: "pointer"} : {}} className={`game-modes-button ${displayDrop ? "bos" : ""}`} onClick={() => gameModeOnclick()}>
                 { !party && gameMode.gameModes[gameMode.indexSelected].gameMode }
                 { party && party.game_mode }
@@ -44,9 +51,32 @@ function LobbyButtonsContainer(props: Props) {
                 { !displayDrop && !isInQueue && loggedUserIsLeader && <IconChevronUp className="chevron-icon" /> }
             </button>
             { loggedUserIsLeader && !isInQueue && <DropdownGameModes show={displayDrop} gameMode={gameMode} onGameModeChange={onGameModeChange} setDisplayDrop={setDisplayDrop} /> }
-        </div>
-    ) : (
-        <> </>
+        </>
+    );
+}
+
+function StartButton(props: {user: Player, isInQueue: boolean, partyReady: boolean, cancelQueue: Function, startQueue: Function, onReady: Function, queueTimer: QueueTimerInterface}) {
+    const { user, isInQueue, partyReady, cancelQueue, startQueue, onReady, queueTimer } = props;
+
+    return (
+        <>
+            { user.isLeader && !isInQueue && partyReady && <button className="start-button" onClick={() => startQueue()}> Start Game </button> }
+            { user.isLeader && !isInQueue && !partyReady && <button> Waiting for players </button> }
+            { isInQueue && <button className="queue-button"> <IconX onClick={() => cancelQueue()} /> {partyQueueString(queueTimer)} </button> }
+            { !user.isLeader && !isInQueue && user.isReady && <button className="start-button" onClick={() => onReady(false)}> Not Ready </button> }
+            { !user.isLeader && !isInQueue && !user.isReady && <button className="start-button" onClick={() => onReady(true)}> Ready </button> }
+        </>
+    );
+}
+
+function PartyChatButton(props : { party: PartyInterface | undefined }) {
+    const { party } = props;
+    const dispatch = useAppDispatch();
+    return (
+        <>
+            { !party && <button style={{cursor: "pointer"}} className="lock-button" onClick={() => dispatch(changeSidebarChatStatus())}> <IconLock className="lock-icon" /> Party Chat </button> }
+            { party && <button style={{cursor: "pointer"}} onClick={() => dispatch(changeSidebarChatStatus())}> Party Chat </button> }
+        </>
     );
 }
 

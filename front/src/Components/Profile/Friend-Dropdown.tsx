@@ -1,12 +1,18 @@
+import { Link } from "react-router-dom";
+import { useFriendHook } from "../../Hooks/Friend-Hook";
 import DropdownContainer from "../Utils/Dropdown-Container";
 
-function FriendListModal(props: {show: boolean, onClickOutside: Function}) {
-    const { show, onClickOutside } = props;
+function FriendListModal(props: {show: boolean, onClickOutside: Function, userId: number}) {
+    const { show, onClickOutside, userId } = props;
+    const { handleRemoveFriend } = useFriendHook();
+    
     return (
         <DropdownContainer show={show} onClickOutside={onClickOutside} >
-            <p> Send message </p>
-            <p> Défier </p>
-            <p className="red-item"> Delete friend </p>
+            {/* <p> Send message </p> */}
+            <Link className="send-message-icon" to="/chat" state={{userIdToSend: userId}}>
+                <p> Send Message </p>
+            </Link>
+            <p className="red-item" onClick={() => handleRemoveFriend(userId)}> Delete friend </p>
         </DropdownContainer>
     );
 }
