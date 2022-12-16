@@ -15,7 +15,11 @@ export class SettingDto {
 
 	@Min(10)
 	@Max(200)
-	paddle_size_h: number;
+	paddle_size_back: number;
+
+	@Min(10)
+	@Max(200)
+	paddle_size_front: number;
 
 	@Min(5)
 	@Max(25)
