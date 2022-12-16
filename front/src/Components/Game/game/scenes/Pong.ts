@@ -142,14 +142,14 @@ export default class Pong extends Phaser.Scene
 										this.game_settings.player_back_advance,
 										300,
 										10,
-										this.game_settings.paddle_size_h,
+										this.game_settings.paddle_size_back,
 										this.pick_paddle_color(PlayerType.TeamBlue_Back))
 										.setOrigin(1,0.5);
 			this.asset_TeamRed_Back = this.add.rectangle(
 										(800 - this.game_settings.player_back_advance),
 										300,
 										10,
-										this.game_settings.paddle_size_h,
+										this.game_settings.paddle_size_back,
 										this.pick_paddle_color(PlayerType.TeamRed_Back))
 										.setOrigin(0,0.5);
 	
@@ -159,14 +159,14 @@ export default class Pong extends Phaser.Scene
 											this.game_settings.player_front_advance,
 											300,
 											10,
-											this.game_settings.paddle_size_h,
+											this.game_settings.paddle_size_front,
 											this.pick_paddle_color(PlayerType.TeamBlue_Front))
 											.setOrigin(1,0.5);
 				this.asset_TeamRed_Front = this.add.rectangle(
 											(800 - this.game_settings.player_front_advance),
 											300,
 											10,
-											this.game_settings.paddle_size_h,
+											this.game_settings.paddle_size_front,
 											this.pick_paddle_color(PlayerType.TeamRed_Front))
 											.setOrigin(0,0.5);
 			}	

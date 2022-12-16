@@ -1,4 +1,4 @@
-import { GameType, Goal, ScoreBoard, Coordinates, BallData, PlayerInput, EndResult, RoundSetup, GameSettings, GameState, PlayerType, Movement } from "src/utils/types/game.types";
+import { GameType, Goal, ScoreBoard, Coordinates, BallData, PlayerInput, EndResult, RoundSetup, GameSettings, GameState, PlayerType, Movement, PlayerPosition } from "src/utils/types/game.types";
 
 //paddle designations
 //paddle A_back  ( [I] I    I  I  )
@@ -13,7 +13,8 @@ export default class PongCore
 	up_down_border: number = 20; //pixels
 	player_back_advance: number = 20;
 	player_front_advance: number = 60;
-	paddle_size_h: number = 150; //pixels
+	paddle_size_front: number = 150;
+	paddle_size_back: number = 150;
 	paddle_speed: number = 13; // pixels per update
 	ball_start_speed: number = 5; //pixels per update
 	ball_acceleration: number = 1; //pixels per update per collision
@@ -83,7 +84,8 @@ export default class PongCore
 		this.up_down_border = game_settings.up_down_border;
 		this.player_back_advance = game_settings.player_back_advance;
 		this.player_front_advance = game_settings.player_front_advance;
-		this.paddle_size_h = game_settings.paddle_size_h;
+		this.paddle_size_back = game_settings.paddle_size_back;
+		this.paddle_size_front = game_settings.paddle_size_front;
 		this.paddle_speed = game_settings.paddle_speed;
 		this.ball_start_speed = game_settings.ball_start_speed;
 		this.ball_acceleration = game_settings.ball_acceleration;
@@ -286,14 +288,14 @@ export default class PongCore
 		if (this.ball_data.position.x <= this.player_back_advance 
 			&& this.previous_ball_pos.x > this.player_back_advance)
 		{
-			if (this.ball_data.position.y < (this.TeamBlue_Back_pos.y + (this.paddle_size_h / 2))
-			&& this.ball_data.position.y > (this.TeamBlue_Back_pos.y - (this.paddle_size_h / 2)))
+			if (this.ball_data.position.y < (this.TeamBlue_Back_pos.y + (this.paddle_size_back / 2))
+			&& this.ball_data.position.y > (this.TeamBlue_Back_pos.y - (this.paddle_size_back / 2)))
 			{
 				this.ball_data.position.x = this.player_back_advance;
 				this.ball_data.vector.x *= -1;	
 //TODO
 //do something cool with vectors for bounce
-				this.doctored_rebound(this.TeamBlue_Back_pos.y);
+				this.doctored_rebound(this.TeamBlue_Back_pos.y, PlayerPosition.BACK);
 				this.ball_data.velocity += this.ball_acceleration;
 			}
 		}
@@ -302,14 +304,14 @@ export default class PongCore
 		if (this.ball_data.position.x >= (this.field_width - this.player_back_advance)
 			&& this.previous_ball_pos.x < (this.field_width - this.player_back_advance))
 		{
-			if (this.ball_data.position.y < (this.TeamRed_Back_pos.y + (this.paddle_size_h / 2))
-			&& this.ball_data.position.y > (this.TeamRed_Back_pos.y - (this.paddle_size_h / 2)))
+			if (this.ball_data.position.y < (this.TeamRed_Back_pos.y + (this.paddle_size_back / 2))
+			&& this.ball_data.position.y > (this.TeamRed_Back_pos.y - (this.paddle_size_back / 2)))
 			{
 				this.ball_data.position.x = (this.field_width - this.player_back_advance);
 				this.ball_data.vector.x *= -1;	
 //TODO
 //do something cool with vectors for bounce
-				this.doctored_rebound(this.TeamRed_Back_pos.y);
+				this.doctored_rebound(this.TeamRed_Back_pos.y, PlayerPosition.BACK);
 				this.ball_data.velocity += this.ball_acceleration;
 			}
 		}	
@@ -321,18 +323,13 @@ export default class PongCore
 			if (this.ball_data.position.x <= this.player_front_advance 
 				&& this.previous_ball_pos.x > this.player_front_advance)
 			{
-				if (this.ball_data.position.y < (this.TeamBlue_Front_pos.y + (this.paddle_size_h / 2))
-				&& this.ball_data.position.y > (this.TeamBlue_Front_pos.y - (this.paddle_size_h / 2)))
+				if (this.ball_data.position.y < (this.TeamBlue_Front_pos.y + (this.paddle_size_front / 2))
+				&& this.ball_data.position.y > (this.TeamBlue_Front_pos.y - (this.paddle_size_front / 2)))
 				{
 					this.ball_data.position.x = this.player_front_advance;
 					this.ball_data.vector.x *= -1;	
 
-					//player y
-					//ball y
-					//paddle_size_h
-					this.doctored_rebound(this.TeamBlue_Front_pos.y);
-//TODO
-//do something cool with vectors for bounce
+					this.doctored_rebound(this.TeamBlue_Front_pos.y, PlayerPosition.FRONT);
 					this.ball_data.velocity += this.ball_acceleration;
 				}
 			}
@@ -341,14 +338,14 @@ export default class PongCore
 			if (this.ball_data.position.x >= (this.field_width - this.player_front_advance)
 				&& this.previous_ball_pos.x < (this.field_width - this.player_front_advance))
 			{
-				if (this.ball_data.position.y < (this.TeamRed_Front_pos.y + (this.paddle_size_h / 2))
-				&& this.ball_data.position.y > (this.TeamRed_Front_pos.y - (this.paddle_size_h / 2)))
+				if (this.ball_data.position.y < (this.TeamRed_Front_pos.y + (this.paddle_size_front / 2))
+				&& this.ball_data.position.y > (this.TeamRed_Front_pos.y - (this.paddle_size_front / 2)))
 				{
 					this.ball_data.position.x = (this.field_width - this.player_front_advance);
 					this.ball_data.vector.x *= -1;	
 //TODO
 //do something cool with vectors for bounce
-					this.doctored_rebound(this.TeamRed_Front_pos.y);
+					this.doctored_rebound(this.TeamRed_Front_pos.y, PlayerPosition.FRONT);
 					this.ball_data.velocity += this.ball_acceleration;
 				}
 			}
@@ -361,20 +358,20 @@ export default class PongCore
 		{
 			if (input.movement === Movement.Up)
 			{
-				if (this.TeamBlue_Back_pos.y >= (this.up_down_border + (this.paddle_size_h / 2)))
+				if (this.TeamBlue_Back_pos.y >= (this.up_down_border + (this.paddle_size_back / 2)))
 				{
 					this.TeamBlue_Back_pos.y -= this.paddle_speed;
-					if (this.TeamBlue_Back_pos.y < (this.up_down_border + (this.paddle_size_h / 2)))
-						this.TeamBlue_Back_pos.y = (this.up_down_border + (this.paddle_size_h / 2));
+					if (this.TeamBlue_Back_pos.y < (this.up_down_border + (this.paddle_size_back / 2)))
+						this.TeamBlue_Back_pos.y = (this.up_down_border + (this.paddle_size_back / 2));
 				}
 			}
 			else if (input.movement === Movement.Down)
 			{
-				if (this.TeamBlue_Back_pos.y <= (this.field_height - this.up_down_border - (this.paddle_size_h / 2)))
+				if (this.TeamBlue_Back_pos.y <= (this.field_height - this.up_down_border - (this.paddle_size_back / 2)))
 				{
 					this.TeamBlue_Back_pos.y += this.paddle_speed;
-					if (this.TeamBlue_Back_pos.y > (this.field_height - this.up_down_border - (this.paddle_size_h / 2)))
-						this.TeamBlue_Back_pos.y = (this.field_height - this.up_down_border - (this.paddle_size_h / 2));
+					if (this.TeamBlue_Back_pos.y > (this.field_height - this.up_down_border - (this.paddle_size_back / 2)))
+						this.TeamBlue_Back_pos.y = (this.field_height - this.up_down_border - (this.paddle_size_back / 2));
 				}
 			}
 			this.last_processed_id_A_Back = input.number;
@@ -383,20 +380,20 @@ export default class PongCore
 		{
 			if (input.movement === Movement.Up)
 			{
-				if (this.TeamRed_Back_pos.y >= (this.up_down_border + (this.paddle_size_h / 2)))
+				if (this.TeamRed_Back_pos.y >= (this.up_down_border + (this.paddle_size_back / 2)))
 				{
 					this.TeamRed_Back_pos.y -= this.paddle_speed;
-					if (this.TeamRed_Back_pos.y < (this.up_down_border + (this.paddle_size_h / 2)))
-						this.TeamRed_Back_pos.y = (this.up_down_border + (this.paddle_size_h / 2));
+					if (this.TeamRed_Back_pos.y < (this.up_down_border + (this.paddle_size_back / 2)))
+						this.TeamRed_Back_pos.y = (this.up_down_border + (this.paddle_size_back / 2));
 				}
 			}
 			else if (input.movement === Movement.Down)
 			{
-				if (this.TeamRed_Back_pos.y <= (this.field_height - this.up_down_border - (this.paddle_size_h / 2)))
+				if (this.TeamRed_Back_pos.y <= (this.field_height - this.up_down_border - (this.paddle_size_back / 2)))
 				{
 					this.TeamRed_Back_pos.y += this.paddle_speed;
-					if (this.TeamRed_Back_pos.y > (this.field_height - this.up_down_border - (this.paddle_size_h / 2)))
-						this.TeamRed_Back_pos.y = (this.field_height - this.up_down_border - (this.paddle_size_h / 2));
+					if (this.TeamRed_Back_pos.y > (this.field_height - this.up_down_border - (this.paddle_size_back / 2)))
+						this.TeamRed_Back_pos.y = (this.field_height - this.up_down_border - (this.paddle_size_back / 2));
 				}
 			}
 			this.last_processed_id_B_Back = input.number;
@@ -409,20 +406,20 @@ export default class PongCore
 			{
 				if (input.movement === Movement.Up)
 				{
-					if (this.TeamBlue_Front_pos.y >= (this.up_down_border + (this.paddle_size_h / 2)))
+					if (this.TeamBlue_Front_pos.y >= (this.up_down_border + (this.paddle_size_front / 2)))
 					{
 						this.TeamBlue_Front_pos.y -= this.paddle_speed;
-						if (this.TeamBlue_Front_pos.y < (this.up_down_border + (this.paddle_size_h / 2)))
-							this.TeamBlue_Front_pos.y = (this.up_down_border + (this.paddle_size_h / 2));
+						if (this.TeamBlue_Front_pos.y < (this.up_down_border + (this.paddle_size_front / 2)))
+							this.TeamBlue_Front_pos.y = (this.up_down_border + (this.paddle_size_front / 2));
 					}
 				}
 				else if (input.movement === Movement.Down)
 				{
-					if (this.TeamBlue_Front_pos.y <= (this.field_height - this.up_down_border - (this.paddle_size_h / 2)))
+					if (this.TeamBlue_Front_pos.y <= (this.field_height - this.up_down_border - (this.paddle_size_front / 2)))
 					{
 						this.TeamBlue_Front_pos.y += this.paddle_speed;
-						if (this.TeamBlue_Front_pos.y > (this.field_height - this.up_down_border - (this.paddle_size_h / 2)))
-							this.TeamBlue_Front_pos.y = (this.field_height - this.up_down_border - (this.paddle_size_h / 2));
+						if (this.TeamBlue_Front_pos.y > (this.field_height - this.up_down_border - (this.paddle_size_front / 2)))
+							this.TeamBlue_Front_pos.y = (this.field_height - this.up_down_border - (this.paddle_size_front / 2));
 					}
 				}
 				this.last_processed_id_A_Front = input.number;
@@ -431,20 +428,20 @@ export default class PongCore
 			{
 				if (input.movement === Movement.Up)
 				{
-					if (this.TeamRed_Front_pos.y >= (this.up_down_border + (this.paddle_size_h / 2)))
+					if (this.TeamRed_Front_pos.y >= (this.up_down_border + (this.paddle_size_front / 2)))
 					{
 						this.TeamRed_Front_pos.y -= this.paddle_speed;
-						if (this.TeamRed_Front_pos.y < (this.up_down_border + (this.paddle_size_h / 2)))
-							this.TeamRed_Front_pos.y = (this.up_down_border + (this.paddle_size_h / 2));
+						if (this.TeamRed_Front_pos.y < (this.up_down_border + (this.paddle_size_front / 2)))
+							this.TeamRed_Front_pos.y = (this.up_down_border + (this.paddle_size_front / 2));
 					}
 				}
 				else if (input.movement === Movement.Down)
 				{
-					if (this.TeamRed_Front_pos.y <= (this.field_height - this.up_down_border - (this.paddle_size_h / 2)))
+					if (this.TeamRed_Front_pos.y <= (this.field_height - this.up_down_border - (this.paddle_size_front / 2)))
 					{
 						this.TeamRed_Front_pos.y += this.paddle_speed;
-						if (this.TeamRed_Front_pos.y > (this.field_height - this.up_down_border - (this.paddle_size_h / 2)))
-							this.TeamRed_Front_pos.y = (this.field_height - this.up_down_border - (this.paddle_size_h / 2));
+						if (this.TeamRed_Front_pos.y > (this.field_height - this.up_down_border - (this.paddle_size_front / 2)))
+							this.TeamRed_Front_pos.y = (this.field_height - this.up_down_border - (this.paddle_size_front / 2));
 					}
 				}
 				this.last_processed_id_B_Front = input.number;
@@ -453,7 +450,7 @@ export default class PongCore
 	}
 
 
-	doctored_rebound = (paddle_y: number) =>
+	doctored_rebound = (paddle_y: number, pos: PlayerPosition) =>
 	{
 		if (this.fancy_rebound)
 		{
@@ -462,7 +459,17 @@ export default class PongCore
 			{
 				dist *= -1;
 			}
-			let ratio = dist / (this.paddle_size_h / 2);
+
+			let ratio;// = dist / (this.paddle_size_h / 2);
+			if (pos === PlayerPosition.BACK)
+			{
+				ratio = dist / (this.paddle_size_back / 2);
+			}
+			else
+			{
+				ratio = dist / (this.paddle_size_front / 2)
+			}
+
 			if (ratio > 0.5)
 			{
 				this.ball_data.vector.y += ratio / 1.5;
