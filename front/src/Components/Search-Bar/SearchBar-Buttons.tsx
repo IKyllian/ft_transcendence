@@ -25,7 +25,7 @@ function SearchBarButtons(props: SearchBarButtonsProps) {
         if (userFromList?.relationStatus === "none") {
             return (<button onClick={() => handleAddFriend(userFromList!.user.id)}> Add friend </button>);
         } else if (userFromList?.relationStatus === "pending") {
-            return (<p> pending </p>);
+            return (<p className="pending-button"> pending </p>);
         } else {
             return (
                 <div className="friendship-action-wrapper">

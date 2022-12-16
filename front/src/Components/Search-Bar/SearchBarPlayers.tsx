@@ -1,7 +1,6 @@
 import { IconSearch } from "@tabler/icons";
 import UserFindItem from "./User-Find-Item";
 import { UserInterface } from "../../Types/User-Types";
-import Avatar from "../../Images-Icons/pp.jpg"
 import { useSearchBarHook } from "../../Hooks/SearchBar-Hook";
 import { SearchBarFunctionality } from "../../Types/Utils-Types";
 

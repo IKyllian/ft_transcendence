@@ -205,19 +205,10 @@
                 height: 90%;
                 display: flex;
                 flex-direction: column;
-                // @include overflowScroll("y");
-                // overflow-y: scroll;
                 overflow: hidden;
 
                 &:hover {
                     overflow-y: scroll;
-                    // &::-webkit-scrollbar {
-                        // color: $LightDarkPalette;
-                    // }
-
-                    // &::-webkit-scrollbar-thumb {
-                    //     background: $DarkPalette;
-                    // }
                 }
 
                 .message-server {
@@ -359,7 +350,7 @@
                         align-items: center;
                         gap: 10px;
                         padding: 8px;
-                        @include avatar-status-container();
+                        @include avatar-status-container($DarkPalette);
 
                         &:hover {
                             background-color: $LightDarkPalette;
@@ -375,6 +366,10 @@
         }
     }
 
+    .sidebar-button {
+        display: none;
+    }
+
     .channels-list-wrapper {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
@@ -384,9 +379,6 @@
         height: 100%;
         @include overflowScroll("y");
 
-        .sidebar-button {
-            display: none;
-        }
         .channels-card-wrapper {
             background-color: $DarkPalette;
             @include width-height(300px, 320px);
@@ -463,9 +455,6 @@
 }
 
 @media screen and (max-width: $BreakPoint_800) {
-    .no-target-message {
-        display: none;
-    }
     .chat-page-container {
         .chat-sidebar {
             display: none;
@@ -538,21 +527,19 @@
             } 
         }
 
-        .channels-list-wrapper {
-            .sidebar-button {
-                display: block;
-                position: absolute;
-                left: -24px;
-                top: 25px;
-                z-index: 99;
-                border-radius: 50%;
-                @include width-height(45px, 45px);
-                display: flex;
-                align-items: center;
-                justify-content: flex-end;
-                background-color: $DarkPalette;
-                cursor: pointer;
-            }
+        .sidebar-button {
+            display: block;
+            position: absolute;
+            left: -24px;
+            top: 25px;
+            z-index: 99;
+            border-radius: 50%;
+            @include width-height(45px, 45px);
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            background-color: $DarkPalette;
+            cursor: pointer;
         }
     }
 }

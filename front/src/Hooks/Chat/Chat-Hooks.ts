@@ -8,13 +8,12 @@ import { ModalContext } from "../../Components/Utils/ModalProvider";
 import { ConversationInterfaceFront, ChannelsInterfaceFront } from "../../Types/Chat-Types";
 import { copyChannelsAndConvs } from "../../Redux/ChatSlice";
 import { setChannelId, unsetChannelDatas, unsetChannelId, updateChannelUserStatus } from "../../Redux/ChannelSlice";
+import { getWindowDimensions } from "../../Utils/Utils-Chat";
 
 export function useLoadChatDatas() {
-    //States
     const [showModal, setShowModal] = useState<number>(0);
-    const [responsiveSidebar, setReponsiveSidebar] = useState<boolean>(false);
+    const [responsiveSidebar, setReponsiveSidebar] = useState<boolean>(true);
 
-    // Appels aux hooks
     const authDatas = useAppSelector((state) => state.auth);
     const chatDatas = useAppSelector((state) => state.chat);
     const {currentChannelId} = useAppSelector((state) => state.channel);
@@ -63,21 +62,32 @@ export function useLoadChatDatas() {
         }
     }, [channelId, location.pathname]);
 
-    // Les useEffect pour les call api etc..
     useEffect(() => {
+        function handleResize() {
+            const width = getWindowDimensions().width;
+            if ((channelId === undefined && convId === undefined) && width <= 855 && location.pathname !== "/chat/channels-list" && !responsiveSidebar)
+                setReponsiveSidebar(true);
+            else if ((channelId !== undefined || convId !== undefined) && width <= 855 && responsiveSidebar)
+                setReponsiveSidebar(false);
+        }
+        window.addEventListener('resize', handleResize);
+
         if (showModal !== 0)
             onCloseModal();
-        // Permet d'afficher la sidebar si aucun channel ou aucune conv n'est selectionner (en responsive)
-        if ((channelId === undefined && convId === undefined) && window.innerWidth <= 855 && location.pathname !== "/chat/channels-list")
+        if (!channelId && !convId && !responsiveSidebar)
             setReponsiveSidebar(true);
         // Permet de mettre en couleur le channel ou la conv selectionner
         if (channelId) {
             dispatch(changeActiveElement({id:channelId, isChannel: true}));
         } else if (convId)
             dispatch(changeActiveElement({id:convId, isChannel: false}));
-    }, [channelId, convId, location.pathname, window.innerWidth])
+        return () => window.removeEventListener('resize', handleResize);
+    }, [channelId, convId, location.pathname])
 
     useEffect(() => {
+        if (channelId !== undefined || convId !== undefined)
+            setReponsiveSidebar(false);
+
         const resolvePromises =  async (channelsUser: Promise<ChannelsInterfaceFront[]>, convsUser: Promise<ConversationInterfaceFront[]>) => {
             const channelResolve: ChannelsInterfaceFront[] = await channelsUser.then(result => { return result });
             const convResolve: ConversationInterfaceFront[] = await convsUser.then(result => { return result });

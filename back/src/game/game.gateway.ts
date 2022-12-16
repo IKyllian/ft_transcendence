@@ -43,7 +43,9 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
 		let user: User = null;
 		client.multi_tab = false;
 		if (client.handshake.headers.authorization) {
+			// console.log("Header -> ", client.handshake.headers.authorization);
 			const token = client.handshake.headers.authorization.split(' ')[1];
+			// console.log("token -> ", token);
 			user = await this.authService.verify(token);
 		}
 		if (user) {

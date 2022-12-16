@@ -139,20 +139,7 @@
             }
     
             button {
-                all: unset;
-                cursor: pointer;
-                font-size: 14px;
-                border: 1px solid $LightBlueButton;
-                color: $LightBlueButton;
-                padding: 10px;
-                border-radius: 3px;
-                font-weight: bold;
-                margin-top: 5px;
-    
-                &:hover {
-                    background-color: $LightBlueButton;
-                    color: #0D1B2A;
-                }
+                @include blue-button(14px, 10px);
             }
     
             form {

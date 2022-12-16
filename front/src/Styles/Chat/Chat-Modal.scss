@@ -30,6 +30,10 @@
             .checkbox-container {
                 display: flex;
                 gap: 5px;
+
+                input[type="radio"] {
+                    accent-color: $LightBlueButton;
+                }
             }
             .labelTextInput {
                 display: flex;
@@ -38,7 +42,7 @@
                 font-size: 15px;
                 input {
                     all: unset;
-                    cursor: pointer;
+                    cursor: text;
                     padding: 8px;
                     border: 1px solid $WhitePalette;
                     margin-top: 2px;
@@ -49,45 +53,27 @@
             }
     
             .chat-modal-buttons {
-                // position: absolute;
                 width: 100%;
                 display: flex;
                 flex-direction: row;
                 justify-content: center;
                 gap: 10px;
-                // bottom: 10px;
                 button, input {
-                    // @include width-height(80px, 40px);
-                    border: none;
-                    font-size: 17px;
-                    font-weight: bold;
-                    cursor: pointer;
-                    border-radius: 10px;
-                    padding: 8px;
+                    @include blue-button(14px, 7px);
+                    margin: 0;
         
                     &:first-child {
                         background-color: $DarkPalette;
-                        color: red;
-                    }
-        
-                    &:last-child {
-                        background-color: rgb(255, 123, 0);
-                        color: $WhitePalette;
+                        color: rgb(200, 12, 12);
+                        border: 1px solid rgb(200, 12, 12);
+
+                        &:hover {
+                            background-color: rgb(200, 12, 12);
+                            color: $DarkPalette;
+                        }
                     }
                 }
             }
-        
-            // .search-player-container {
-            //     .modal-player-list {
-            //         height: 250px;
-            //     }
-            // }
         }
     }    
 }
-
-// @media screen and (max-width: $BreakPoint_800) {
-//     .chat-modal {
-//         @include modal-container(600px, 90%, $DarkPalette);
-//     }
-// }

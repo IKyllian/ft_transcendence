@@ -32,6 +32,23 @@ $OfflineColor: rgb(194, 29, 29);
     overflow: auto;
 }
 
+@mixin blue-button($fontSize, $padding) {
+    all: unset;
+    cursor: pointer;
+    font-size: $fontSize;
+    border: 1px solid $LightBlueButton;
+    color: $LightBlueButton;
+    padding: $padding;
+    border-radius: 3px;
+    font-weight: bold;
+    margin-top: 5px;
+
+    &:hover {
+        background-color: $LightBlueButton;
+        color: #0D1B2A;
+    }
+}
+
 @mixin player-status {
     height: 13px;
     width: 13px;
@@ -66,7 +83,7 @@ $OfflineColor: rgb(194, 29, 29);
     cursor: pointer;
 }
 
-@mixin avatar-status-container() {
+@mixin avatar-status-container($background) {
     .avatar-container {
         position: relative;
         .user-avatar {
@@ -75,7 +92,7 @@ $OfflineColor: rgb(194, 29, 29);
         .user-status {
             @include width-height(20px, 20px);
             border-radius: 50%;
-            background-color: $DarkPalette;
+            background-color: $background;
             position: absolute;
             right: -3px;
             top: 25px;

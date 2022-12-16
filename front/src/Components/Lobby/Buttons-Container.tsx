@@ -30,7 +30,8 @@ function LobbyButtonsContainer(props: Props) {
     }
     return user ? (
         <div className="lobby-buttons-wrapper">
-            <button style={{cursor: "pointer"}} onClick={() => dispatch(changeSidebarChatStatus())}> Party Chat </button>
+            { !party && <button style={{cursor: "pointer"}} className="lock-button" onClick={() => dispatch(changeSidebarChatStatus())}> <IconLock className="lock-icon" /> Party Chat </button> }
+            { party && <button style={{cursor: "pointer"}} onClick={() => dispatch(changeSidebarChatStatus())}> Party Chat </button> }
             { user.isLeader && !isInQueue && partyReady && <button className="start-button" onClick={() => startQueue()}> Start Game </button> }
             { user.isLeader && !isInQueue && !partyReady && <button> Waiting for players </button> }
             { isInQueue && <button className="queue-button"> <IconX onClick={() => cancelQueue()} /> {partyQueueString(queueTimer)} </button> }

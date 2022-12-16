@@ -66,3 +66,11 @@ export const debounce = (func: Function, debouneTime: number) => {
         }, debouneTime);
     };
 };
+
+export function getWindowDimensions() {
+    const { innerWidth: width, innerHeight: height } = window;
+    return {
+        width,
+        height
+    };
+}

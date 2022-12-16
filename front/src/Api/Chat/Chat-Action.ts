@@ -5,7 +5,7 @@ import { Socket } from "socket.io-client";
 import { replaceChannelMessages } from "../../Redux/ChannelSlice";
 import { addChannel } from "../../Redux/ChatSlice";
 import { loadNewMessages } from "../../Redux/PrivateConvSlice";
-import { ChatMessage, CreateChanBodyRequest, PrivateMessage, ConversationState } from "../../Types/Chat-Types";
+import { ChatMessage, CreateChanBodyRequest, PrivateMessage } from "../../Types/Chat-Types";
 import { UserInterface } from "../../Types/User-Types";
 import api from "../Api";
 

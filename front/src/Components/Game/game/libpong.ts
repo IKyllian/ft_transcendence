@@ -6,7 +6,7 @@ import Lobby from './scenes/Lobby';
 import MatchResult from './scenes/MatchResult';
 import ReplayPlayer from './scenes/ReplayPlayer';
 
-export function launch_game(players_data: PlayersGameData, socket: Socket, token: string, cache: Cache | null | undefined): void
+export function launch_game(players_data: PlayersGameData, socket: Socket, token: string, cache: Cache | null | undefined, setHasEnded: Function): void
 {
 	const config = {
 		type: Phaser.AUTO,
@@ -28,6 +28,7 @@ export function launch_game(players_data: PlayersGameData, socket: Socket, token
 				game.registry.set('socket', socket);
 				game.registry.set('token', token);
 				game.registry.set('cache', cache);
+				game.registry.set('setHasEnded', setHasEnded);
 			}
 		  },
 		scene: [ Lobby, Pong, MatchResult ]

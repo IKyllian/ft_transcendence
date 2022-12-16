@@ -27,7 +27,12 @@ export function fetchSignUp({username, email, password, dispatch}: SignParameter
         localStorage.setItem("userToken", JSON.stringify(tokenStorage));
         dispatch(loginSuccess({...response.data.user, blocked: [], channelUser: []}));
     }).catch(err => {
-        dispatch(loginError("username or password incorect"));
+        console.log("Error", err);
+        if (err.response.status === 403) {
+            dispatch(loginError("Username or email already use"));
+        } else {
+            dispatch(loginError("Error while Signup"));
+        }
     })
 }
 

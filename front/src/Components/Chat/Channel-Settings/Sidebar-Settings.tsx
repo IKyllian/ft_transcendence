@@ -4,14 +4,7 @@ import { SocketContext } from "../../../App";
 import { useContext, useEffect, useState } from "react";
 import { removeChannel } from "../../../Redux/ChatSlice";
 import { IconChevronLeft, IconChevronRight } from "@tabler/icons";
-
-function getWindowDimensions() {
-    const { innerWidth: width, innerHeight: height } = window;
-    return {
-      width,
-      height
-    };
-  }
+import { getWindowDimensions } from "../../../Utils/Utils-Chat";
 
 function SidebarSettings(props: {setSidebarItem: Function}) {
     const {setSidebarItem} = props;
@@ -38,8 +31,6 @@ function SidebarSettings(props: {setSidebarItem: Function}) {
     useEffect(() => {
         function handleResize() {
             const width = getWindowDimensions().width;
-            console.log("width", width);
-            console.log("showSidebar", showSidebar);
             if (width >= 800)
                 setShowSidebar(prev => !prev ? true : prev);
         }

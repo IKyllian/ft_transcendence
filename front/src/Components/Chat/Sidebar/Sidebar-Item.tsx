@@ -23,7 +23,7 @@ function SidebarItem(props: SidebarItemProps) {
         <li className="ul-wrapper-elem">
             <ItemHeader title={title} sidebarOpen={sidebarOpen} handleClick={handleClick} modalStatus={setShowModal} />           
             {
-               chanDatas !== undefined && sidebarOpen && 
+               chanDatas !== undefined && sidebarOpen &&
                <ItemContent chanDatas={chanDatas} />
             }
             {
