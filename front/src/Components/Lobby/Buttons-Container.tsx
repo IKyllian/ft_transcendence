@@ -11,21 +11,21 @@ interface Props {
     onGameModeChange: Function,
     user: Player | undefined,
     onReady: Function,
-    partyReady: boolean,
     loggedUserIsLeader: boolean,
     startQueue: Function,
     isInQueue: boolean,
     queueTimer: QueueTimerInterface,
-    cancelQueue: Function
+    cancelQueue: Function,
+    lobbyError: String | undefined,
 }
 
 function LobbyButtonsContainer(props: Props) {
-    const { party, gameMode, onGameModeChange, user, onReady, partyReady, loggedUserIsLeader, startQueue, isInQueue, queueTimer, cancelQueue } = props;
+    const { party, gameMode, onGameModeChange, user, onReady, loggedUserIsLeader, startQueue, isInQueue, queueTimer, cancelQueue, lobbyError } = props;
     
     return user ? (
         <div className="lobby-buttons-wrapper">
             <PartyChatButton party={party} />
-            <StartButton user={user} isInQueue={isInQueue} partyReady={partyReady} cancelQueue={cancelQueue} startQueue={startQueue} onReady={onReady} queueTimer={queueTimer} />
+            <StartButton user={user} isInQueue={isInQueue} cancelQueue={cancelQueue} startQueue={startQueue} onReady={onReady} queueTimer={queueTimer} lobbyError={lobbyError} />
             <GameModeButton party={party} gameMode={gameMode} onGameModeChange={onGameModeChange} loggedUserIsLeader={loggedUserIsLeader} isInQueue={isInQueue} />
         </div>
     ) : (
@@ -55,15 +55,14 @@ function GameModeButton(props: { party: PartyInterface | undefined, gameMode: Ga
     );
 }
 
-function StartButton(props: {user: Player, isInQueue: boolean, partyReady: boolean, cancelQueue: Function, startQueue: Function, onReady: Function, queueTimer: QueueTimerInterface}) {
-    const { user, isInQueue, partyReady, cancelQueue, startQueue, onReady, queueTimer } = props;
-
+function StartButton(props: {user: Player, isInQueue: boolean, cancelQueue: Function, startQueue: Function, onReady: Function, queueTimer: QueueTimerInterface, lobbyError: String | undefined}) {
+    const { user, isInQueue, cancelQueue, startQueue, onReady, queueTimer, lobbyError } = props;
     return (
         <>
-            { user.isLeader && !isInQueue && partyReady && <button className="start-button" onClick={() => startQueue()}> Start Game </button> }
-            { user.isLeader && !isInQueue && !partyReady && <button> Waiting for players </button> }
+            { user.isLeader && !isInQueue && !lobbyError && <button className="start-button" onClick={() => startQueue()}> Start Game </button> }
+            { user.isLeader && !isInQueue && lobbyError && <button className="start-button" lobby-error={`${lobbyError}`} > <IconLock className="lock-icon" /> Start Game </button> }
             { isInQueue && <button className="queue-button"> <IconX onClick={() => cancelQueue()} /> {partyQueueString(queueTimer)} </button> }
-            { !user.isLeader && !isInQueue && user.isReady && <button className="start-button" onClick={() => onReady(false)}> Not Ready </button> }
+            { !user.isLeader && !isInQueue && user.isReady && <button className="start-button" onClick={() => onReady(false)}> Unready </button> }
             { !user.isLeader && !isInQueue && !user.isReady && <button className="start-button" onClick={() => onReady(true)}> Ready </button> }
         </>
     );

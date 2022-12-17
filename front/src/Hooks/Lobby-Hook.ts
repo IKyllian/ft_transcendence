@@ -1,10 +1,9 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { SocketContext } from "../App";
 import { useAppSelector } from "../Redux/Hooks";
 import { GameModeState, GameMode, Player, GameType, TeamSide, PlayerPosition, GameSettings } from "../Types/Lobby-Types";
 import { useForm } from "react-hook-form";
-import { partyIsReady } from "../Utils/Utils-Party";
 import { fetchIsAlreadyInGame } from "../Api/User-Fetch";
 
 const defaultGameModeState: GameModeState = {
@@ -37,20 +36,60 @@ const defaultSettings: GameSettings = {
 
 export function useLobbyHook() {
     const {party, isInQueue, queueTimer} = useAppSelector(state => state.party);
-    const {currentUser} = useAppSelector(state => state.auth)
     const [loggedUserIsLeader, setLoggedUserIsLeader] = useState<boolean>(false);
-    const { handleSubmit, control, watch, setValue, getValues, reset } = useForm<GameSettings>({defaultValues: !party ? defaultSettings : party.game_settings});
     const [gameMode, setGameMode] = useState<GameModeState>(defaultGameModeState);
+    const [lobbyError, setLobbyError] = useState<string | undefined>(undefined);
+    const { handleSubmit, control, watch, setValue, getValues, reset } = useForm<GameSettings>({defaultValues: !party ? defaultSettings : party.game_settings});
+    const {currentUser} = useAppSelector(state => state.auth)
     const {socket} = useContext(SocketContext);
     const navigate = useNavigate();
-    const partyReady: boolean = (!party || (party && partyIsReady(party?.players))) ? true : false; 
-    
-    useEffect(() => {
+
+    const startCheck = () : void => {
+        setLobbyError(undefined);
+        if (party && !party.players.find(elem => elem.isLeader === false && elem.isReady === false)) {
+            if (party.players.length === 1)
+                return ;
+            else if (party.players.length === 2) {
+                if (party.game_mode == GameMode.RANKED_2v2) {
+                    if (party.players[0].pos !== party.players[1].pos)
+                        return ;
+                    setLobbyError("Players are on the same position");
+                    return ;
+                }   
+                if (party.game_mode == GameMode.PRIVATE_MATCH && party.players[0].team == party.players[1].team) {
+                    setLobbyError("Players are on the same team");
+                    return ;
+                }
+                return ;
+            } else if (party.players.length === 4) {
+                let team1Count: PlayerPosition[] = [];
+                let team2Count: PlayerPosition[] = [];
+                party.players.forEach(elem => {
+                    if (elem.team === TeamSide.BLUE)
+                        team1Count.push(elem.pos!);
+                    else if (elem.team === TeamSide.RED)
+                        team2Count.push(elem.pos!);
+                })
+                if (team1Count.length !== 2 || team2Count.length !== 2)
+                    setLobbyError("Three or more players are on the same team");
+                else if (team1Count[0] !== team1Count[1] || team2Count[0] !== team2Count[1])
+                    setLobbyError("Players are on the same position");
+                return ;
+            }
+            setLobbyError("Need 2 or 4 player to start the game");
+        } else if (!party)
+            return ;
+        setLobbyError("Player(s) not ready");
+        return ;
+    }
+
+    const checkLobbyError = useMemo(() => {
+        startCheck();
         if (!party || (party && party.players.find(elem => elem.isLeader && elem.user.id === currentUser!.id)))
             setLoggedUserIsLeader(true);
         else
             setLoggedUserIsLeader(false);
-    }, [party])
+    }, [party]);
 
     useEffect(() => {
         if (party)
@@ -84,40 +123,7 @@ export function useLobbyHook() {
     const onInputChange = (e: any, field: any) => {
         setValue(field, +e.target.value);
     }
-
-    const startCheck = () : boolean => {
-        if (party && !party.players.find(elem => elem.isLeader === false && elem.isReady === false)) {
-            if (party.players.length === 1)
-                return true;
-            else if (party.players.length === 2) {
-                if (party.game_mode == GameMode.RANKED_2v2) {
-                    if (party.players[0].pos !== party.players[1].pos)
-                        return true;
-                    return false;
-                }   
-                if (party.game_mode == GameMode.PRIVATE_MATCH && party.players[0].team !== party.players[1].team)
-                    return true;
-            } else if (party.players.length === 4) {
-                let team1Count: PlayerPosition[] = [];
-                let team2Count: PlayerPosition[] = [];
-                party.players.forEach(elem => {
-                    if (elem.team === TeamSide.BLUE)
-                        team1Count.push(elem.pos!);
-                    else if (elem.team === TeamSide.RED)
-                        team2Count.push(elem.pos!);
-                })
-                if (team1Count.length === 2 && team2Count.length === 2
-                    && team1Count[0] !== team1Count[1]
-                    && team2Count[0] !== team2Count[1]) {
-                        return true;
-                }
-            }
-            return false
-        } else if (!party)
-            return true;
-        return false;
-    }
-
+    
     const selectGameMode = (): GameType => {      
         if ((party && party.game_mode === GameMode.RANKED_2v2) || (!party && gameMode.gameModes[gameMode.indexSelected].gameMode === GameMode.RANKED_2v2))
             return GameType.Doubles;
@@ -131,17 +137,13 @@ export function useLobbyHook() {
     }
 
     const startQueue = () => {
-        if (startCheck()) {
-            let isRanked: boolean = true;
-            if ((party && party.game_mode === GameMode.PRIVATE_MATCH) || (!party && gameMode.gameModes[gameMode.indexSelected].gameMode === GameMode.PRIVATE_MATCH))
-                isRanked = false;
-            console.log("isRanked", isRanked);
-            console.log("selectGameMode", selectGameMode());
-            socket?.emit("StartQueue", {
-                gameType: selectGameMode(),
-                isRanked: isRanked,
-            });
-        }
+        let isRanked: boolean = true;
+        if ((party && party.game_mode === GameMode.PRIVATE_MATCH) || (!party && gameMode.gameModes[gameMode.indexSelected].gameMode === GameMode.PRIVATE_MATCH))
+            isRanked = false;
+        socket?.emit("StartQueue", {
+            gameType: selectGameMode(),
+            isRanked: isRanked,
+        });
     }
 
     const cancelQueue = () => {
@@ -221,7 +223,6 @@ export function useLobbyHook() {
         party,
         gameMode,
         loggedUserIsLeader,
-        partyReady,
         queueTimer,
         formHook : {
             watch,
@@ -237,5 +238,6 @@ export function useLobbyHook() {
         cancelQueue,
         onChangeTeam,
         onChangePos,
+        lobbyError,
     }
 }
