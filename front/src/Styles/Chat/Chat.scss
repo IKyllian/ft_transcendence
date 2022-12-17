@@ -352,6 +352,11 @@
                         padding: 8px;
                         @include avatar-status-container($DarkPalette);
 
+                        .spectate-icon {
+                            @include width-height(15px, 15px);
+                            cursor: pointer;
+                        }
+
                         &:hover {
                             background-color: $LightDarkPalette;
                             .avatar-container {

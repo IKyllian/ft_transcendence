@@ -27,7 +27,8 @@ const defaultSettings: GameSettings = {
     up_down_border: 20, 
     player_back_advance: 20,
     player_front_advance: 60,
-    paddle_size_h: 150, 
+    paddle_size_back: 150,
+    paddle_size_front: 150,
     paddle_speed: 13,
     ball_start_speed: 5,
     ball_acceleration: 1,
@@ -72,11 +73,12 @@ export function useLobbyHook() {
                 })
                 if (team1Count.length !== 2 || team2Count.length !== 2)
                     setLobbyError("Three or more players are on the same team");
-                else if (team1Count[0] !== team1Count[1] || team2Count[0] !== team2Count[1])
+                else if (team1Count[0] === team1Count[1] || team2Count[0] === team2Count[1])
                     setLobbyError("Players are on the same position");
                 return ;
             }
             setLobbyError("Need 2 or 4 player to start the game");
+            return ;
         } else if (!party)
             return ;
         setLobbyError("Player(s) not ready");

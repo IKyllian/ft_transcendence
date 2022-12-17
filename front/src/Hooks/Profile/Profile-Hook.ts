@@ -24,6 +24,7 @@ export function useProfileHook() {
     const [userState, setUserState] = useState<ProfileState | undefined>(undefined);
     const [loading, setLoading] = useState<boolean>(true);
     const [statsMode, setStatsMode] = useState<Modes>(Modes.Singles); 
+    const [avatarStored, setAvatarStored] = useState<{id: number, url: string}[]>([]); 
 
     const { currentUser, friendList } = useAppSelector(state => state.auth);
     const params = useParams();
@@ -131,5 +132,7 @@ export function useProfileHook() {
         statsMode,
         changeMode,
         loading,
+        avatarStored,
+        setAvatarStored,
     }
 }

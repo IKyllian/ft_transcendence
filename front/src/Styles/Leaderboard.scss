@@ -69,8 +69,22 @@
                     background-color: #202d45;
                 }
 
-                .leaderboard-status .player-status {
-                    @include player-status;
+                .leaderboard-status {
+                    .player-status {
+                        @include player-status;
+                    }
+
+                    .spec-icon {
+                        position: relative;
+                        margin-left: 50px;
+                        svg {
+                            cursor: pointer;
+                            position: absolute;
+                            top: -12.6px;
+                            bottom: 0;
+                            margin: auto 0;
+                        }
+                    }
                 }
 
                 td {

@@ -6,6 +6,7 @@ import { chatSlice } from './ChatSlice'
 import { notificationSlice } from './NotificationSlice'
 import { partySlice } from './PartySlice'
 import { privateConvSlice } from './PrivateConvSlice'
+import { storeAvatarSlice } from './StoreAvatar'
 
 export const store = configureStore({
     reducer: {
@@ -16,6 +17,7 @@ export const store = configureStore({
         party: partySlice.reducer,
         alerts: alertSlice.reducer,
         privateConv: privateConvSlice.reducer,
+        avatarStored: storeAvatarSlice.reducer,
     }
 })
 

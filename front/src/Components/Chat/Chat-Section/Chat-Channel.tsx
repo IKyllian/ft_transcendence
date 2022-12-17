@@ -5,7 +5,6 @@ import UsersSidebar from "./Users-Sidebar";
 import LoadingSpin from "../../Utils/Loading-Spin";
 import { useChannelHook } from "../../../Hooks/Chat/Channel-Hook";
 import { UserInterface } from "../../../Types/User-Types";
-import Error404 from "../../404-Error";
 
 function ChatChannel() {
     const {
@@ -79,7 +78,7 @@ function ChatChannel() {
                     
                 </div>
             </div>
-            { showUsersSidebar && <UsersSidebar usersList={channelDatas.channelUsers} usersTimeout={channelDatas.usersTimeout} loggedUserIsOwner={loggedUserIsOwner} /> }
+            { showUsersSidebar && <UsersSidebar usersList={channelDatas.channelUsers} /> }
         </div>
     );
 }

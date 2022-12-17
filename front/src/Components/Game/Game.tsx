@@ -14,7 +14,6 @@ import axios from "axios";
 function Game() {
     const [gameDatas, setGameDatas] = useState<PlayersGameData | undefined>(undefined);
     const [gameSocket, setGameSocket] = useState<Socket | undefined>(undefined);
-    const [unauthorized, setUnauthorized] = useState<boolean>(false);
     const [hasEnded, setHasEnded] = useState<boolean>(false);
     const location = useLocation();
     const navigate = useNavigate();
@@ -24,10 +23,7 @@ function Game() {
     useEffect(() => {
         if (hasEnded) {
             dispatch(unsetGameFound());
-            if (gameSocket)
-            gameSocket.disconnect();
             navigate("/lobby");
-
         }
     }, [hasEnded])
 
@@ -71,10 +67,12 @@ function Game() {
 
         return () => {
             if (gameSocket) {
+                console.log("DISCONEECT GAME SOCKET");
                 gameSocket.off("MultiTabError");
                 gameSocket.off("Connected");
                 gameSocket.off("Unauthorized");
                 gameSocket.off("Disconnect");
+                gameSocket.disconnect();
             }
         }
     }, [gameSocket])
