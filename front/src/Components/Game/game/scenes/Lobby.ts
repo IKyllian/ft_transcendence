@@ -59,16 +59,16 @@ export default class Lobby extends Phaser.Scene
 	connected: boolean = false;
 	launching_game: boolean = false;
 
-	preload ()
+	async preload ()
 	{
-		loadAvatar(
+		await loadAvatar(
 			this.game.registry.get('players_data').TeamBlue_Back.user,
 			'TeamBlue_back_avatar',
 			this.registry.get('token'),
 			this.registry.get('cache'),
 			this);
 
-		loadAvatar(
+		await loadAvatar(
 			this.game.registry.get('players_data').TeamRed_Back.user,
 			'TeamRed_back_avatar',
 			this.registry.get('token'),
@@ -79,13 +79,13 @@ export default class Lobby extends Phaser.Scene
 
 		if (this.game_type === GameType.Doubles)
 		{
-			loadAvatar(
+			await loadAvatar(
 				this.game.registry.get('players_data').TeamBlue_Front.user,
 				'TeamBlue_front_avatar',
 				this.registry.get('token'),
 				this.registry.get('cache'),
 				 this);
-			loadAvatar(
+			await loadAvatar(
 				this.game.registry.get('players_data').TeamRed_Front.user,
 				'TeamRed_front_avatar',
 				this.registry.get('token'),
@@ -93,13 +93,13 @@ export default class Lobby extends Phaser.Scene
 				 this);
 		}
 
-		await_load_base64(AssetRankSilver, "Silver", this);
-		await_load_base64(AssetRankGold, "Gold", this);
-		await_load_base64(AssetRankPlatine, "Platine", this);
-		await_load_base64(AssetRankDiamond, "Diamond", this);
-		await_load_base64(AssetRankChampion, "Champion", this);
-		await_load_base64(AssetRankLegend, "Legend", this);	
-		this.load.image('button', AssetButton);
+		await await_load_base64(AssetRankSilver, "Silver", this);
+		await await_load_base64(AssetRankGold, "Gold", this);
+		await await_load_base64(AssetRankPlatine, "Platine", this);
+		await await_load_base64(AssetRankDiamond, "Diamond", this);
+		await await_load_base64(AssetRankChampion, "Champion", this);
+		await await_load_base64(AssetRankLegend, "Legend", this);	
+	//	this.load.image('button', AssetButton);
 	}
 
 	create ()
