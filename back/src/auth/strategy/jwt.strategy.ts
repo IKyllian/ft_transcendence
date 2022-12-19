@@ -32,6 +32,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
 				"doubles_elo",
 				"two_factor_enabled",
 				"created_at",
+				"in_game_id",
 			],
 			relations: {
 				channelUser: true,
