@@ -165,7 +165,8 @@ export class LobbyFactory
 		let dataToFront: PlayersGameData = null;
 
 		this.lobby_list.forEach((lobby) => {
-			lobby.playerSockets.forEach((playersocket) => {
+			//lobby.playerSockets.forEach((playersocket) => {
+			lobby.lobby_data.players.forEach((playersocket) => {
 				if (playersocket.user.id === id)
 				{
 				
