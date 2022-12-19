@@ -32,9 +32,7 @@ function PartyButton() {
         <div className="header-party-container">
             <div className="header-party-wrapper">
                 {
-                    party.players.map((elem) =>{
-                        console.log("PARTY ELEM", elem);
-                        return (
+                    party.players.map((elem) => 
                             <div key={elem.user.id} className="fill-item">
                                 { elem.isLeader &&
                                     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" height="16" width="16" className="crown-svg">
@@ -46,10 +44,7 @@ function PartyButton() {
                                 <ExternalImage src={elem.user.avatar} alt="User Avatar" className="player-avatar" userId={elem.user.id} />
                             </div>
                         )
-                    }
-                        
-                    )
-                }
+                    }   
                 {
                     Array.from({length: 4 - party.players.length}, (elem, index) => 
                         <div key={index} className="party-item">

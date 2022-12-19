@@ -12,9 +12,9 @@ function Lobby() {
         party,
         gameMode,
         loggedUserIsLeader,
-        partyReady,
         formHook,
         queueTimer,
+        lobbyError,
         onInputChange,
         onReady,
         onGameModeChange,
@@ -71,12 +71,12 @@ function Lobby() {
                     onGameModeChange={onGameModeChange}
                     user={!party ? {isLeader: true, isReady: true, user: currentUser!, team: TeamSide.BLUE} : party?.players.find(elem => elem.user.id === currentUser!.id)}
                     onReady={onReady}
-                    partyReady={partyReady}
                     loggedUserIsLeader={loggedUserIsLeader}
                     startQueue={startQueue}
                     isInQueue={isInQueue}
                     queueTimer={queueTimer}
                     cancelQueue={cancelQueue}
+                    lobbyError={lobbyError}
                 />
             </div>
         </div>

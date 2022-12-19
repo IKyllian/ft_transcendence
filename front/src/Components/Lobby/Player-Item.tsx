@@ -1,5 +1,4 @@
 import { useAppDispatch } from "../../Redux/Hooks";
-import Avatar from "../../Images-Icons/pp.jpg";
 import { IconCheck, IconPlus } from "@tabler/icons";
 import { GameMode, Player, TeamSide, PlayerPosition } from "../../Types/Lobby-Types";
 import { changeModalStatus } from "../../Redux/PartySlice";
@@ -47,8 +46,8 @@ function PlayerListItem(props: PlayerItemProps) {
                 <p className="player-pos"> {user.pos === PlayerPosition.BACK ? "Paddle Back" : "Paddle Front"} </p>
             }
             { user.isLeader && <span style={{marginTop: `${!displaySelectPos || (displaySelectPos && loggedUserId !== user.user.id) ? "10px" : "6px"}`}}> Leader </span> }
-            { !user.isLeader && user.isReady && <span style={{marginTop: `${!displaySelectPos || (displaySelectPos && loggedUserId !== user.user.id) ? "10px" : "6px"}`}}> <IconCheck /> Ready </span> }
-            { !user.isLeader && !user.isReady && <span style={{marginTop: `${!displaySelectPos || (displaySelectPos && loggedUserId !== user.user.id) ? "10px" : "6px"}`}}> Not Ready </span> }
+            { !user.isLeader && user.isReady && <span style={{marginTop: `${!displaySelectPos || (displaySelectPos && loggedUserId !== user.user.id) ? "10px" : "6px"}`, color: 'green', borderColor: 'green'}}> <IconCheck /> Ready </span> }
+            { !user.isLeader && !user.isReady && <span style={{marginTop: `${!displaySelectPos || (displaySelectPos && loggedUserId !== user.user.id) ? "10px" : "6px"}`, color: 'red', borderColor: 'red'}}> Not Ready </span> }
         </li>
     ) : (
         <li className="empty-item">

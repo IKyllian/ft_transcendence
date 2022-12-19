@@ -8,7 +8,6 @@ import { setUserAvatar } from "../../../Redux/AuthSlice";
 import { useAppDispatch, useAppSelector } from "../../../Redux/Hooks";
 import { TokenStorageInterface } from "../../../Types/Utils-Types";
 import ExternalImage from "../../External-Image";
-// import Resizer from "react-image-file-resizer";
 
 function SettingsCardAvatar() {
     const { currentUser } = useAppSelector(state => state.auth);
@@ -35,15 +34,13 @@ function SettingsCardAvatar() {
                         dispatch(addAlert({message: "Failed To Upload", type: AlertType.ERROR}));
                     }
                     else {
-                        console.log("TEST");
                         cache.put(req, response.clone());
                         const avatarBlob = await response.blob();
                         if (avatarBlob) 
                             dispatch(setUserAvatar(URL.createObjectURL(avatarBlob))); 
-                        console.log("TEST2");   
-                        dispatch(addAlert({message: "New Avatar Uploaded", type: AlertType.SUCCESS}));
+                        dispatch(addAlert({message: "New Avatar Uploaded (Refresh to see it)", type: AlertType.SUCCESS}));
                     }
-                }  
+                }
             })  
             .catch(err => {
                 dispatch(addAlert({message: "Failed To Upload", type: AlertType.ERROR}));
@@ -52,16 +49,8 @@ function SettingsCardAvatar() {
         }
     }
 
-    // const resizeFile = (file: File) => new Promise(resolve => {
-    //     Resizer.imageFileResizer(file, 300, 300, 'JPEG', 100, 0,
-    //     uri => {
-    //       resolve(uri);
-    //     }, 'base64' );
-    // });
-    
     const onFileChange = async (e: any) => {
         const file = e.target.files[0]
-        // const image = await resizeFile(file);
         var filesize: string = ((file.size/1024)/1024).toFixed(4);
         if (+filesize < 10) {
             if (fileError)

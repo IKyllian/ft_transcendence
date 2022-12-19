@@ -1,5 +1,5 @@
 import { useEffect, useContext, useRef } from "react";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { ChannelsInterfaceFront, ConversationInterfaceFront } from "../../../Types/Chat-Types";
 import SidebarItem from "./Sidebar-Item";
 import { SidebarContext } from "../Chat";
@@ -11,6 +11,7 @@ function Sidebar(props: {setShowModal: Function, chanDatas: ChannelsInterfaceFro
     const sidebarStatus = useContext(SidebarContext);
     const ref = useRef<HTMLHeadingElement>(null);
     const params = useParams();
+    const location = useLocation();
 
     const channelId: number | undefined = params.channelId ? +params.channelId! : undefined;
     const convId: number | undefined = params.convId ? +params.convId! : undefined;
@@ -18,7 +19,8 @@ function Sidebar(props: {setShowModal: Function, chanDatas: ChannelsInterfaceFro
     useEffect(() => {
         const handleClickOutside = (event: any) => {
             if (ref.current && !ref.current.contains(event.target)) {
-                sidebarStatus.sidebar && sidebarStatus.setSidebarStatus 
+                sidebarStatus.sidebar && sidebarStatus.setSidebarStatus
+                && ((channelId !== undefined || convId !== undefined) || (!channelId && !convId && location.pathname === "/chat/channels-list"))
                 && sidebarStatus.setSidebarStatus();
             }
         };
@@ -27,7 +29,7 @@ function Sidebar(props: {setShowModal: Function, chanDatas: ChannelsInterfaceFro
         return () => {
             document.removeEventListener('click', handleClickOutside, true);
         };
-    }, [sidebarStatus, sidebarStatus.setSidebarStatus, channelId, convId]);
+    }, [sidebarStatus, sidebarStatus.setSidebarStatus, channelId, convId, location.pathname]);
  
     return (
         <div ref={ref} className={`chat-sidebar ${sidebarStatus.sidebar ? "chat-sidebar-responsive" : ""}`}>

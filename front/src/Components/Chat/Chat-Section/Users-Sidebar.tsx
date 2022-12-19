@@ -1,24 +1,15 @@
-import { useState } from "react";
+import { useContext } from "react";
 import { Link } from "react-router-dom";
-import ProfilPic from "../../../Images-Icons/pp.jpg";
 import { ChannelUser, UserTimeout } from "../../../Types/Chat-Types";
-
-import DropdownContainer from "../../Utils/Dropdown-Container";
-import BlockButton from "../../Buttons/Block-Button";
-import MuteButton from "../../Buttons/Mute-Button";
-import BanButton from "../../Buttons/Ban-Button";
 import { useAppSelector } from "../../../Redux/Hooks";
 import { UserStatus } from "../../../Types/User-Types";
 import ExternalImage from "../../External-Image";
+import { IconEye } from "@tabler/icons";
+import { SocketContext } from "../../../App";
 
-function UserSidebarItem(props: {user: ChannelUser, usersTimeout: UserTimeout[], loggedUserIsOwner: boolean}) {
-    const { user, usersTimeout, loggedUserIsOwner } = props;
-    const [showDropdown, setShowDropdown] = useState<boolean>(false);
-    const {currentUser} = useAppSelector(state => state.auth);
-
-    const handleClick = () => {
-        setShowDropdown(!showDropdown);
-    }
+function UserSidebarItem(props: {user: ChannelUser}) {
+    const { user } = props;
+    const {socket} = useContext(SocketContext);
 
     return (
         <li>
@@ -31,12 +22,13 @@ function UserSidebarItem(props: {user: ChannelUser, usersTimeout: UserTimeout[],
             <Link to={`/profile/${user.user.username}`}>
                 { user.user.username }
             </Link>
+            <IconEye onClick={() => socket?.emit("get_gameinfo", user.user.in_game_id)} className='spectate-icon' />
         </li>
     );
 }
 
-function UsersSidebar(props: {usersList: ChannelUser[], usersTimeout: UserTimeout[], loggedUserIsOwner: boolean}) {
-    const { usersList, usersTimeout, loggedUserIsOwner } = props;
+function UsersSidebar(props: {usersList: ChannelUser[]}) {
+    const { usersList } = props;
     return (
         <div className="users-sidebar">
             <div className="users-sidebar-wrapper">
@@ -45,7 +37,7 @@ function UsersSidebar(props: {usersList: ChannelUser[], usersTimeout: UserTimeou
                     {
                         usersList.filter((elem) => elem.role === "owner")
                         .map((elem) =>
-                            <UserSidebarItem key={elem.user.id} user={elem} usersTimeout={usersTimeout} loggedUserIsOwner={loggedUserIsOwner}  />
+                            <UserSidebarItem key={elem.user.id} user={elem}  />
                         )
                     }
                 </ul>
@@ -54,7 +46,7 @@ function UsersSidebar(props: {usersList: ChannelUser[], usersTimeout: UserTimeou
                     {
                         usersList.filter((elem) => elem.role === "moderator")
                         .map((elem) =>
-                            <UserSidebarItem key={elem.user.id} user={elem} usersTimeout={usersTimeout} loggedUserIsOwner={loggedUserIsOwner}  />
+                            <UserSidebarItem key={elem.user.id} user={elem}  />
                         )
                     }
                 </ul>
@@ -63,7 +55,7 @@ function UsersSidebar(props: {usersList: ChannelUser[], usersTimeout: UserTimeou
                     {
                         usersList.filter((elem) => elem.role === "clampin")
                         .map((elem) =>
-                            <UserSidebarItem key={elem.user.id} user={elem} usersTimeout={usersTimeout} loggedUserIsOwner={loggedUserIsOwner} />
+                            <UserSidebarItem key={elem.user.id} user={elem} />
                         )
                     }
                 </ul>

@@ -57,22 +57,24 @@ function ChannelsList() {
 
     return channelsList.length > 0 ? (
         <div className="channels-list-wrapper">
-        {
-            sidebarStatus.sidebar === false &&
-            <div className="sidebar-button" onClick={() => sidebarStatus.setSidebarStatus()}>
-                <IconChevronRight />
-            </div>
-        }
-        {
-            channelsList.map((elem) => 
-                <ChannelItem  key={elem.id} channelData={elem} />
-            )
-        }
-    </div>   
+            {
+                channelsList.map((elem) => 
+                    <ChannelItem  key={elem.id} channelData={elem} />
+                )
+            }
+        </div>   
     ) : (
-        <div className="no-target-message">
-            <p> No Channel created yet </p>
-        </div> 
+        <>
+            {
+                sidebarStatus.sidebar === false &&
+                <div className="sidebar-button" onClick={() => sidebarStatus.setSidebarStatus()}>
+                    <IconChevronRight />
+                </div>
+            }
+            <div className="no-target-message">
+                <p> No Channel created yet </p>
+            </div>
+        </>        
     )
 }
 

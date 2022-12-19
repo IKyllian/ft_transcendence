@@ -75,6 +75,7 @@ export function fetchSearchAllUsers(inputText: string, setUsersList: Function) {
 export function fetchSearchUsersToAdd(inputText: string, setUsersList: Function) {
     api.post(`/friend/search`, {str: inputText})
     .then(response => {
+        console.log("Response Search", response);
         const newArray: UsersListInterface[] = response.data.map((elem: any) => { return {user: elem.user, relationStatus: elem.relationStatus}});
         setUsersList(newArray);
     })

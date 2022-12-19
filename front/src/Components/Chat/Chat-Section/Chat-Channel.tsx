@@ -22,11 +22,21 @@ function ChatChannel() {
         previousMessages,
     } = useChannelHook();
 
-    return (channelDatas === undefined) ? (
-        <div style={{width: "100%"}}>
-            <LoadingSpin classContainer="chat-page-container"/>
-        </div>
-    ) : (
+    if (channelDatas === undefined) {
+        return (
+            <div style={{width: "100%"}}>
+                <LoadingSpin classContainer="chat-page-container"/>
+            </div>
+        );
+    } else if (channelDatas === null) {
+        return (
+            <div className="no-target-message">
+                <p> Channel Not Found </p>
+            </div>
+        );
+    }
+
+    return (
         <div className="message-container">
             <div className="message-container-main">
                 <ChatHeader chatItem={channelDatas} showUsersSidebar={showUsersSidebar} changeSidebarStatus={changeSidebarStatus} />
@@ -68,7 +78,7 @@ function ChatChannel() {
                     
                 </div>
             </div>
-            { showUsersSidebar && <UsersSidebar usersList={channelDatas.channelUsers} usersTimeout={channelDatas.usersTimeout} loggedUserIsOwner={loggedUserIsOwner} /> }
+            { showUsersSidebar && <UsersSidebar usersList={channelDatas.channelUsers} /> }
         </div>
     );
 }

@@ -4,7 +4,8 @@ import { NavigateFunction } from "react-router-dom";
 import { Socket } from "socket.io-client";
 import { replaceChannelMessages } from "../../Redux/ChannelSlice";
 import { addChannel } from "../../Redux/ChatSlice";
-import { ChatMessage, CreateChanBodyRequest, PrivateMessage, ConversationState } from "../../Types/Chat-Types";
+import { loadNewMessages } from "../../Redux/PrivateConvSlice";
+import { ChatMessage, CreateChanBodyRequest, PrivateMessage } from "../../Types/Chat-Types";
 import { UserInterface } from "../../Types/User-Types";
 import api from "../Api";
 
@@ -70,16 +71,15 @@ export function fetchLoadPrevChatMessages(channelId: number, dispatch: Dispatch<
     })
 }
 
-export function fetchLoadPrevConvMessages(convId: number, setConvDatas: Function, currentMessages: PrivateMessage[], setPreviousMessages: Function) {
+export function fetchLoadPrevConvMessages(convId: number, dispatch: Dispatch<AnyAction>, currentMessages: PrivateMessage[], setPreviousMessages: Function) {
     api.post(`/conversation/${convId}/messages`, {skip: currentMessages.length})
     .then((response) => {
         console.log("response", response.data);
         if (response.data.length > 0) {
-            setConvDatas((prev: ConversationState) => { return {...prev, conv: {...prev.conv, messages: [...response.data, ...prev.conv.messages]}}});
+            dispatch(loadNewMessages(response.data));
         } else {
             setPreviousMessages({loadPreviousMessages: false, reachedMax: true});
-        }
-        
+        }  
     })
     .catch((err) => {
         console.log(err);

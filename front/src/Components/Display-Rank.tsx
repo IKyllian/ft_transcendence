@@ -9,17 +9,17 @@ function DisplayRank(props: {elo: number}) {
     const { elo } = props;
 
     if (elo < 1000)
-        return ( <img src={Silver} alt="Rank icone" /> );
+        return ( <img title="Silver" src={Silver} alt="Rank icone" /> );
     else if (elo >= 1000 && elo < 1125)
-        return ( <img src={Gold} alt="Rank icone" /> );
+        return ( <img title="Gold" src={Gold} alt="Rank icone" /> );
     else if (elo >= 1125 && elo < 1250)
-        return ( <img src={Platine} alt="Rank icone" /> );
+        return ( <img title="Platine" src={Platine} alt="Rank icone" /> );
     else if (elo >= 1250 && elo < 1375)
-        return ( <img src={Diamond} alt="Rank icone" /> );
+        return ( <img title="Diamond" src={Diamond} alt="Rank icone" /> );
     else if (elo >= 1375 && elo < 1500)
-        return ( <img src={Champion} alt="Rank icone" /> );
+        return ( <img title="Champion" src={Champion} alt="Rank icone" /> );
     else
-        return ( <img src={Legend} alt="Rank icone" /> );
+        return ( <img title="Legend" src={Legend} alt="Rank icone" /> );
 }
 
 export default DisplayRank;

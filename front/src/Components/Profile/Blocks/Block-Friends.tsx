@@ -30,7 +30,7 @@ function FriendItem(props: {name: string, avatar: string | null, friendId: numbe
                 currentUser?.id === userProfileId && 
                 <div className="friend-item-menu">
                     <IconDotsVertical onClick={() => handleClick()} />
-                    <FriendListModal show={showModal} onClickOutside={() => {setShowModal(false)}}/>
+                    <FriendListModal show={showModal} onClickOutside={() => {setShowModal(false)}} userId={friendId} />
                 </div>
             }
         </div>

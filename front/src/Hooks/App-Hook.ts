@@ -4,25 +4,27 @@ import { io, Socket } from "socket.io-client";
 import { useAppDispatch, useAppSelector } from '../Redux/Hooks'
 import { socketUrl } from "../env";
 import { NotificationInterface } from "../Types/Notification-Types";
-import { addNotification, deleteNotification } from "../Redux/NotificationSlice";
-import { addChannel, addPrivateConv, changePrivateConvOrder, removeChannel } from "../Redux/ChatSlice";
+import { addNotification, deleteNotification, resetNotification } from "../Redux/NotificationSlice";
+import { addChannel, addPrivateConv, changePrivateConvOrder, removeChannel, resetChat } from "../Redux/ChatSlice";
 import { Channel, ChannelUpdateType, ChannelUser, Conversation, UserTimeout } from "../Types/Chat-Types";
 import { UserInterface } from "../Types/User-Types";
 import { copyFriendListArray, logoutSuccess, stopIsConnectedLoading, userFullAuthenticated } from "../Redux/AuthSlice";
 import { GameMode, PartyInterface, PartyMessage } from "../Types/Lobby-Types";
 import { copyNotificationArray } from "../Redux/NotificationSlice";
-import { addParty, addPartyInvite, addPartyMessage, cancelQueue, changePartyGameMode, changeQueueStatus, incrementQueueTimer, leaveParty, newGameFound, removePartyInvite, resetQueueTimer } from "../Redux/PartySlice";
+import { addParty, addPartyInvite, addPartyMessage, cancelQueue, changeModalStatus, changePartyGameMode, changeQueueStatus, incrementQueueTimer, leaveParty, newGameFound, removePartyInvite, resetParty, resetQueueTimer } from "../Redux/PartySlice";
 import { fetchVerifyToken } from "../Api/Sign/Sign-Fetch";
-import { addChannelUser, banChannelUser, muteChannelUser, removeTimeoutChannelUser, removeChannelUser, setChannelDatas, updateChannelUser, unsetChannelDatas, unsetChannelId } from "../Redux/ChannelSlice";
-import { addAlert, AlertType } from "../Redux/AlertSlice";
+import { addChannelUser, banChannelUser, muteChannelUser, removeTimeoutChannelUser, removeChannelUser, setChannelDatas, updateChannelUser, unsetChannelDatas, unsetChannelId, channelNotfound, resetChannel } from "../Redux/ChannelSlice";
+import { addAlert, AlertType, resetAlert } from "../Redux/AlertSlice";
 import { PlayersGameData } from "../Components/Game/game/types/shared.types";
 import { TokenStorageInterface } from "../Types/Utils-Types";
+import { resetConvState } from "../Redux/PrivateConvSlice";
 
 export function useAppHook() {
     const [socket, setSocket] = useState<Socket | undefined>(undefined);
     const [cache, setCache] = useState<Cache | undefined | null>(undefined);
 	const [intervalId, setIntervalId] = useState<ReturnType<typeof setInterval> | undefined>(undefined)
     const { isAuthenticated, currentUser, displayQRCode, isSign } = useAppSelector((state) => state.auth);
+	const { modalIsOpen } = useAppSelector(state => state.party);
 	const { party, chatIsOpen, isInQueue } = useAppSelector(state => state.party);
 	const { currentChannelId } = useAppSelector((state) => state.channel);
 
@@ -150,11 +152,12 @@ export function useAppHook() {
             dispatch(unsetChannelDatas());
 			dispatch(unsetChannelId());
         }
+		if (modalIsOpen)
+			dispatch(changeModalStatus(false));
 	}, [location.pathname, socket])
 
 	useEffect(() => {
 		if (socket !== undefined) {
-			console.log("SOCKET CONDITION");
 			socket.on("Connection", (data: {friendList: UserInterface[], notification: NotificationInterface[], party: PartyInterface}) => {
 				console.log("data connection", data);
 				dispatch(copyNotificationArray(data.notification));
@@ -208,9 +211,11 @@ export function useAppHook() {
 				dispatch(deleteNotification(data));
 			});
 
-			socket.on("exception", (data) => {
+			socket.on("exception", (data: {message: string, status: string}) => {
 				console.log(data);
 				dispatch(addAlert({message: data.message, type: AlertType.ERROR}));
+				if (data.message === "Channel not found" && data.status === "error")
+					dispatch(channelNotfound());
 			});
 
 			socket.on("FriendListUpdate", (data: UserInterface[]) => {
@@ -253,6 +258,12 @@ export function useAppHook() {
 				socket.disconnect();
 				setSocket(undefined);
 				localStorage.removeItem("userToken");
+				dispatch(resetParty());
+				dispatch(resetChannel());
+				dispatch(resetChat());
+				dispatch(resetConvState());
+				dispatch(resetNotification());
+				dispatch(resetAlert());
 				dispatch(logoutSuccess());
 			});
 		}

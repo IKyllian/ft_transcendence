@@ -25,12 +25,24 @@ function GameSettingsWrapper(props: Props) {
                 <form onSubmit={(e) => hookForm.handleSubmit(e)}>
                     <Controller
                         control={hookForm.control}
-                        name="paddle_size_h"
-                        defaultValue={hookForm.getValues("paddle_size_h")}
+                        name="paddle_size_back"
+                        defaultValue={hookForm.getValues("paddle_size_back")}
                         render={({ field: { value }}) => (
                             <label>
-                                Paddle Size
-                                <input disabled={!loggedUserIsLeader} type="range" min={10} max={200} onChange={(e) => onInputChange(e, "paddle_size_h")} value={value} />
+                                Paddle Back Size
+                                <input disabled={!loggedUserIsLeader} type="range" min={10} max={200} onChange={(e) => onInputChange(e, "paddle_size_back")} value={value} />
+                            </label>
+                            
+                        )}
+                    />
+                     <Controller
+                        control={hookForm.control}
+                        name="paddle_size_front"
+                        defaultValue={hookForm.getValues("paddle_size_front")}
+                        render={({ field: { value }}) => (
+                            <label>
+                                Paddle Front Size
+                                <input disabled={!loggedUserIsLeader} type="range" min={10} max={200} onChange={(e) => onInputChange(e, "paddle_size_front")} value={value} />
                             </label>
                             
                         )}
@@ -78,7 +90,7 @@ function GameSettingsWrapper(props: Props) {
                         render={({ field: { value }}) => (
                             <label>
                                 Ball Start Speed
-                                <input disabled={!loggedUserIsLeader} type="range" min={5} max={25} onChange={(e) => onInputChange(e, "ball_start_speed")} value={value} />
+                                <input disabled={!loggedUserIsLeader} type="range" min={5} max={10} onChange={(e) => onInputChange(e, "ball_start_speed")} value={value} />
                             </label>
                             
                         )}

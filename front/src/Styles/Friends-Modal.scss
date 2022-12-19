@@ -16,7 +16,7 @@
             margin-bottom: 20px;
 
             &-selected {
-                color: $OrangeProfile;
+                color: $LightBlueButton;
             }
             div {
                 @include width-height(50%, 100%);
@@ -63,16 +63,18 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            @include avatar-status-container();
+            @include avatar-status-container($LightDarkPalette);
         }
+
         button {
-            cursor: pointer;
-            border: none;
-            min-width: 90px;
-            height: 35px;
-            font-size: 15px;
-            border-radius: 4px;
-            background-color: $LightDarkPalette;
+            @include blue-button(11px, 7px);
+        }
+
+        .pending-button {
+            font-size: 14px;
+            color: $LightBlueButton;
+            padding: 7px;
+            margin-top: 5px;
         }
 
         .friendship-action-wrapper {

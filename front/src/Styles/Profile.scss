@@ -114,6 +114,10 @@ $FontSizeTextResponsive: 15px;
             }
 
             .friend-request-pending {
+                svg {
+                    margin: 0 3px 0 0;
+                }
+                @include flex-row-alignCenter();
                 font-size: 14px;
                 margin-left: 20px;
                 background-color: $LightDarkPalette;
@@ -298,46 +302,46 @@ $FontSizeTextResponsive: 15px;
             }
         }
 
-        .achievement-list {
-            display: flex;
-            flex-direction: row;
-            flex-wrap: wrap;
-            gap: 1em;
+        // .achievement-list {
+        //     display: flex;
+        //     flex-direction: row;
+        //     flex-wrap: wrap;
+        //     gap: 1em;
 
-            .achievement-item {
-                background-color: $LightDarkPalette;
-                @include flex-row-alignCenter();
-                @include width-height(300px, 100px);
+        //     .achievement-item {
+        //         background-color: $LightDarkPalette;
+        //         @include flex-row-alignCenter();
+        //         @include width-height(300px, 100px);
 
-                border-radius: 8px;
+        //         border-radius: 8px;
 
-                svg {
-                    @include width-height(40%, 100%);
-                    color: rgb(211, 210, 210);
-                }
+        //         svg {
+        //             @include width-height(40%, 100%);
+        //             color: rgb(211, 210, 210);
+        //         }
 
-                &-content {
-                    @include width-height(60%, 100%);
-                    margin-right: 5px;
+        //         &-content {
+        //             @include width-height(60%, 100%);
+        //             margin-right: 5px;
 
-                    p {
-                        margin: 0;
-                    }
+        //             p {
+        //                 margin: 0;
+        //             }
                     
-                    p:first-child {
-                        margin-top: 1em;
-                        font-weight: bold;
-                        font-size: $FontSizeText;
-                        color: $OrangeProfile;
-                    }
+        //             p:first-child {
+        //                 margin-top: 1em;
+        //                 font-weight: bold;
+        //                 font-size: $FontSizeText;
+        //                 color: $OrangeProfile;
+        //             }
 
-                    p:last-child {
-                        margin-top: 0.5em;
-                        font-size: 15px;
-                    }
-                }
-            }
-        }
+        //             p:last-child {
+        //                 margin-top: 0.5em;
+        //                 font-size: 15px;
+        //             }
+        //         }
+        //     }
+        // }
 
         .friends-list {
             display: flex;

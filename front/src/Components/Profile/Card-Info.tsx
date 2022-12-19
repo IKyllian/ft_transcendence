@@ -11,11 +11,6 @@ function CardInfo(props: {userState: ProfileState}) {
 
     const {socket} = useContext(SocketContext);
 
-    // const invitePlayer = () => {
-    //     if (userState.user)
-    //         socket?.emit("GameInvite", {id: userState.user.id});
-    // }
-
     const spectateClick = () => {
         socket?.emit("get_gameinfo", userState.user.in_game_id);
     }
@@ -36,10 +31,6 @@ function CardInfo(props: {userState: ProfileState}) {
                     <Link className="send-message-icon" to="/chat" state={{userIdToSend: userState.user.id}}>
                         <IconMessage />
                     </Link>
-                    {/* <Link onClick={() => invitePlayer()} className="fight-button" to="/lobby">
-                        Play
-                        <IconBrandAppleArcade />
-                    </Link> */}
                     { userState.user.in_game_id !== null && <IconEye onClick={() => spectateClick()} className='spectate-icon' /> }
                 </>
             }

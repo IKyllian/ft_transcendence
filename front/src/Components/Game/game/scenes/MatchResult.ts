@@ -203,6 +203,7 @@ export default class MatchResult extends Phaser.Scene
 		this.input.on('gameobjectdown',this.click_event);
 
 		setTimeout(() => {
+			this.game.registry.get('setHasEnded')(true);
 			this.game.destroy(true, false);
 		}, 10000);
 
@@ -216,6 +217,7 @@ export default class MatchResult extends Phaser.Scene
 		if (gameobject.name === 'close')
 		{
 			gameobject.destroy();
+			this.game.registry.get('setHasEnded')(true);
 			this.game.destroy(true, false);
 		}
 	}

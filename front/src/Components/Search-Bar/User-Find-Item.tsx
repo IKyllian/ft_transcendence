@@ -13,6 +13,7 @@ interface Props {
 
 function UserFindItem(props: Props) {
     const {children, avatar, name, status, userId} = props;
+
     return (
         <div className="modal-player-list-item">
             <div className="item-player-info">

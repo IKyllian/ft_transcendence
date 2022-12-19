@@ -1,15 +1,14 @@
 import { Link } from "react-router-dom";
 import { IconEye } from "@tabler/icons";
-import Avatar from "../../Images-Icons/pp.jpg";
 import { UserInterface, UserStatus } from "../../Types/User-Types";
 import ExternalImage from "../External-Image";
 import DisplayRank from "../Display-Rank";
+import { useContext } from "react";
+import { SocketContext } from "../../App";
 
 interface LeaderboardItemProps {
     pos: number,
     user: UserInterface
-    // name: string,
-    // status: UserStatus,
     gamesPlayed: number,
     winRate: string,
     elo: number,
@@ -17,6 +16,7 @@ interface LeaderboardItemProps {
 
 function LeaderboardItem(props: LeaderboardItemProps) {
     const { pos, user, gamesPlayed, winRate, elo } = props;
+    const {socket} = useContext(SocketContext);
 
     return (
         <tr className={`${pos >= 1 && pos <= 3 ? "raw-top3" : ""} `}>
@@ -35,10 +35,13 @@ function LeaderboardItem(props: LeaderboardItemProps) {
             <td> { elo } </td>
             <td className="leaderboard-status responsive-column"> 
                 <div className={`player-status player-status-${user.status === UserStatus.ONLINE ? "online" : "offline"}`}> </div>
+                {
+                    user.in_game_id !== null && 
+                    <div className="spec-icon">
+                        <IconEye onClick={() => socket?.emit("get_gameinfo", user.in_game_id)} />
+                    </div>
+                }
             </td>
-            {/* <td className="leaderboard-spec responsive-column">
-                { isInGame && <Link to="#"> <IconEye /> </Link> }
-            </td> */}
         </tr>
     );
 }

@@ -62,13 +62,7 @@
                         color: #0D1B2A;
                         border: 1px solid;
 
-                        // border: 1px solid $LightBlueButton;
-                        // color: $LightBlueButton;
-
                         &:hover {
-                            // background-color: $LightBlueButton;
-                            // color: #0D1B2A;
-
                             border: 1px solid $LightBlueButton;
                             color: $LightBlueButton;
                             background-color: $DarkPalette;
@@ -145,20 +139,7 @@
             }
     
             button {
-                all: unset;
-                cursor: pointer;
-                font-size: 14px;
-                border: 1px solid $LightBlueButton;
-                color: $LightBlueButton;
-                padding: 10px;
-                border-radius: 3px;
-                font-weight: bold;
-                margin-top: 5px;
-    
-                &:hover {
-                    background-color: $LightBlueButton;
-                    color: #0D1B2A;
-                }
+                @include blue-button(14px, 10px);
             }
     
             form {
@@ -227,6 +208,20 @@
             margin: 20px 0;
             flex-direction: column;
             justify-content: inherit;
+
+            .user-infos-card {
+                align-items: center;
+            }
+        }
+    }
+}
+
+@media screen and (max-width: $BreakPoint_800) {
+    .profile-settings-container {
+        .settings-wrapper {
+            .user-infos-card {
+                width: 400px;
+            }
         }
     }
 }

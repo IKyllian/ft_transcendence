@@ -1,8 +1,8 @@
-import { useContext, createContext } from "react";
+import { createContext } from "react";
 
 import Sidebar from "./Sidebar/Sidebar";
 import ChatModal from "./Chat-Modal";
-import { Outlet, useOutletContext} from "react-router-dom";
+import { Outlet} from "react-router-dom";
 import LoadingSpin from "../Utils/Loading-Spin";
 import { useLoadChatDatas } from "../../Hooks/Chat/Chat-Hooks";
 
@@ -22,8 +22,6 @@ function Chat() {
         locationPathname,
         modalStatus,
     } =  useLoadChatDatas();
-
-
 
     return !channels || !privateConvs ? (
         <LoadingSpin classContainer="chat-page-container" />

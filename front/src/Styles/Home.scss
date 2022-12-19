@@ -35,3 +35,42 @@
         }
     }   
 }
+
+@media screen and (max-width: $BreakPoint_800) {
+    .home-container {
+        .home-menu {
+            h1 {
+                font-size: 70px;
+            }
+            .home-button {
+                @include width-height(25em, 3.5em);
+            }
+        }
+    }
+}
+
+@media screen and (max-width: $BreakPoint_500) {
+    .home-container {
+        .home-menu {
+            h1 {
+                font-size: 50px;
+            }
+            .home-button {
+                @include width-height(20em, 3.5em);
+            }
+        }
+    }
+}
+
+@media screen and (max-width: 330px) {
+    .home-container {
+        .home-menu {
+            h1 {
+                font-size: 35px;
+            }
+            .home-button {
+                @include width-height(15em, 3.5em);
+            }
+        }
+    }
+}

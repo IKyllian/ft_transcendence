@@ -16,7 +16,7 @@ function FriendButton(props: {secondUserId: number, relationStatus: string}) {
         );
     } else if (relationStatus === "pending") {
         return (
-            <p className='friend-request-pending'> Friend Request Pending </p>
+            <p className='friend-request-pending'> <IconUser /> Pending </p>
         );
     } else if (relationStatus === "friend") {
         return (

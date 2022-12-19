@@ -5,7 +5,8 @@ $TeamBlueColor: rgb(0, 98, 255);
 $TeamRedColor: rgb(247, 30, 6);
 
 #root {
-    $PaddleHeight: 150px;
+    $PaddleBackSize: 150px;
+    $PaddleFrontSize: 150px;
     $PlayerBackAdvance: 10px;
     $PlayerFrontAdvance: 40px;
 }
@@ -21,8 +22,10 @@ $TeamRedColor: rgb(247, 30, 6);
         flex-direction: column;
         justify-content: space-between;
         align-items: center;
+        gap: 20px;
         .lobby-player-list {
             @include flex-row-alignCenter();
+            flex-wrap: wrap;
             justify-content: center;
             gap: 10px;
             list-style-type: none;
@@ -116,10 +119,9 @@ $TeamRedColor: rgb(247, 30, 6);
                     @include flex-row-alignCenter();
                     gap: 5px;
                     font-size: 12px;
-                    color: $GreyLobby;
                     svg {
                         @include width-height(12px, 12px);
-                        border: 1px solid $GreyLobby;
+                        border: 1px solid ;
                         border-radius: 50%;
                     }
                 }
@@ -136,7 +138,8 @@ $TeamRedColor: rgb(247, 30, 6);
 
             .game-settings {
                 @include width-height(350px, 350px);
-                padding: 10px;
+                // padding: 10px 20px 10px 10px;
+                padding: 10px ;
                 display: flex;
                 flex-direction: column;
                 justify-content: space-around;
@@ -162,15 +165,26 @@ $TeamRedColor: rgb(247, 30, 6);
                         @include flex-row-alignCenter();
                         justify-content: space-between;
                         font-size: 13px;
+                        position: relative;
+                        margin-right: 25px;
+
+                        input[type="range"] {
+                            accent-color: $LightBlueButton;
+                            
+                        }
+
+                        input:after {
+                            content: attr(value);
+                            position: absolute;
+                            font-size: 15px;
+                            right: -25px;
+                            color: $LightBlueButton;
+                        }
                     }
 
                     .setting-submit {
-                        all: unset;
-                        cursor: pointer;
+                        @include blue-button(14px, 6px);
                         margin: 15px auto 0 auto;
-                        border: 1px solid white;
-                        padding: 5px;
-                        border-radius: 7px;
                     }
                 }
             }
@@ -217,9 +231,17 @@ $TeamRedColor: rgb(247, 30, 6);
                         .paddle-right {
                             background-color: $TeamRedColor;
                         }
+
+                        .paddle-front {
+                            height: var(--PaddleFrontSize);
+                        }
+
+                        .paddle-back {
+                            height: var(--PaddleBackSize);
+                        }
     
                         .paddle {
-                            height: var(--PaddleHeight);
+                            // height: var(--PaddleHeight);
                             width: 2px;
                             position: absolute;
                         }
@@ -245,13 +267,70 @@ $TeamRedColor: rgb(247, 30, 6);
             justify-content: center;
             position: relative;
 
+            button {
+                all: unset;
+                text-align: center;
+                border-radius: 10px;
+                background-color: $DarkPalette;
+                width: 250px;
+                height: 40px;
+                position: relative;
+            }
+
+            .lock-button {
+                cursor: default !important;
+                color: grey;
+                position: relative;
+                background-color: rgb(0 0 0 / 24%);
+                    
+                .lock-icon {
+                    position: absolute;
+                    right: 0;
+                    left: 0;
+                    top: 0;
+                    bottom: 0;
+                    margin: auto;
+                    color: rgba(255, 255, 255, 0.772);
+                }
+            }
+
             .start-button {
                 cursor: pointer;
+                position: relative;
+                text-transform: uppercase;
+                font-size: 14px;
+            }
+
+            .start-button[lobby-error]{
+                cursor: default;
+                background-color: rgb(0 0 0 / 24%);
+                color: grey;
+                .lock-icon {
+                    position: absolute;
+                    right: 0;
+                    left: 0;
+                    top: 0;
+                    bottom: 0;
+                    margin: auto;
+                    color: rgba(255, 255, 255, 0.772);
+                }
+            }
+
+            .start-button[lobby-error]:after {
+                content: attr(lobby-error);
+                text-transform: initial;
+                color: red;
+                font-size: 10px;
+                position: absolute;
+                top: -20px;
+                left: 0;
+                padding: 5px;
+                width: 100%;
             }
 
             .queue-button {
                 position: relative;
-                
+
                 svg {
                     position: absolute;
                     left: 10px;
@@ -319,16 +398,163 @@ $TeamRedColor: rgb(247, 30, 6);
                     right: 10px;
                 }
             }
-
-            button {
-                all: unset;
-                text-align: center;
-                border-radius: 10px;
-                background-color: $DarkPalette;
-                width: 250px;
-                height: 40px;
-                position: relative;
-            }
         }   
     }    
+}
+
+@media screen and (max-width: $BreakPoint_800) {
+    .lobby-container {
+        .lobby-wrapper {
+            .lobby-player-list {
+                li {
+                    @include width-height(150px, 150px);
+                    padding: 25px 10px;
+
+                    .teams-wrapper {
+                        .circle-item {
+                            @include width-height(14px, 14px);
+                        }
+                    }
+
+                    .player-avatar {
+                        @include avatar-player(45px);
+                    }
+
+                    p {
+                        font-size: 12px;
+                    }
+
+                    .team-select {
+                        padding: 3px;
+                        font-size: 8px;
+                    }
+                }
+            }
+            
+            .lobby-settings {
+                flex-direction: column;
+            }
+
+            .lobby-buttons-wrapper {
+                button {
+                    all: unset;
+                    text-align: center;
+                    border-radius: 10px;
+                    background-color: $DarkPalette;
+                    padding: 13px 60px;
+                    font-size: 12px;
+                    position: relative;
+                }
+
+                .game-modes-button {
+                    .chevron-icon {
+                        @include width-height(15px, 15px);
+                    }
+                }
+
+                .game-modes-dropdown {
+                    width: 29.8%;
+                    font-size: 12px;
+                    top: -77px;
+                }
+            }
+        }
+    }
+}
+
+@media screen and (max-width: $BreakPoint_500) {
+    .lobby-container {
+        .lobby-wrapper {
+            .lobby-player-list {
+                li {
+                    @include width-height(130px, 130px);
+                    padding: 20px 10px;
+                    
+                    .player-avatar {
+                        @include avatar-player(35px);
+                    }
+
+                    p {
+                        font-size: 12px;
+                    }
+                }
+            }
+
+            .lobby-settings {
+                flex-direction: column;
+                .board-game-wrapper {
+                    display: none;
+                }
+            }
+
+            .lobby-buttons-wrapper {
+                button {
+                    all: unset;
+                    text-align: center;
+                    border-radius: 10px;
+                    background-color: $DarkPalette;
+                    padding: 12px 40px;
+                    font-size: 10px;
+                    position: relative;
+                }
+
+                .game-modes-button {
+                    .chevron-icon {
+                        @include width-height(15px, 15px);
+                    }
+                }
+
+                .game-modes-dropdown {
+                    width: 29%;
+                    font-size: 10px;
+                    top: -70px;
+                }
+            }
+        }
+    }
+}
+
+@media screen and (max-width: 400px) {
+    .lobby-container {
+        .lobby-wrapper {
+            .lobby-player-list {
+                li {
+                    @include width-height(130px, 130px);
+                    padding: 20px 10px;
+
+                    .player-avatar {
+                        @include avatar-player(35px);
+                    }
+
+                    p {
+                        font-size: 12px;
+                    }
+                }
+            }
+
+            .lobby-buttons-wrapper {
+                button {
+                    all: unset;
+                    text-align: center;
+                    border-radius: 10px;
+                    background-color: $DarkPalette;
+                    padding: 10px 30px;
+                    font-size: 8px;
+                    position: relative;
+                }
+
+                .game-modes-button {
+                    .chevron-icon {
+                        @include width-height(15px, 15px);
+                    }
+                }
+
+                .game-modes-dropdown {
+                    width: 29%;
+                    font-size: 10px;
+                    top: -70px;
+                }
+            }
+        }
+    }
 }

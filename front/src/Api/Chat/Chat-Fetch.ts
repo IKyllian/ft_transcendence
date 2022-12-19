@@ -70,7 +70,6 @@ export async function fetchConvAndRedirect(
         if ((responseDatas as Conversation).messages) {
             if (!privateConvs?.find(elem => elem.conversation.id === response.data.id))
                 dispatch(addPrivateConv({isActive: 'false', conversation: {id: response.data.id, user1: response.data.user1, user2: response.data.user2}}));
-            console.log("new Conv", response.data);
             navigate(`/chat/private-message/${response.data.id}`, {state: {isTemp: false, conv: response.data}});
         } else {
             console.log("User");
@@ -107,7 +106,6 @@ export function fetchPrivateConvDatas(convId: number, setConvDatas: Function) {
 }
 
 export function fetchSearchUsersToInvite(inputText: string, setUsersList: Function, chanId: number) {
-    console.log("chanId", chanId);
     api.post(`/channel/users_to_invite`, {chanId: chanId, str: inputText})
     .then((response) => {
         const newArray: UsersListInterface[] = response.data.map((elem: UserInterface) => { return {user: elem}});

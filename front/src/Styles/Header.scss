@@ -261,6 +261,9 @@
 @media screen and (max-width: $BreakPoint_800) {
     .header {
         padding: 0 $HeaderResponsive800Marge;
+        .header-logo {
+            font-size: 30px;
+        }
         .header-right {
             display: none;
         }
@@ -281,5 +284,8 @@
 @media screen and (max-width: $BreakPoint_500) {
     .header {
         padding: 0 $HeaderResponsive500Marge;
+        .header-logo {
+            font-size: 25px;
+        }
     }
 }

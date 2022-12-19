@@ -2,15 +2,20 @@ import { useEffect } from "react";
 
 function BoardGame(props: {hookForm: {watch: any}}) {
     const { hookForm } = props;
-    const paddleSize = hookForm.watch("paddle_size_h");
+    const paddleBackSize = hookForm.watch("paddle_size_back");
+    const paddleFrontSize = hookForm.watch("paddle_size_front");
     const playerBackAdvance = hookForm.watch("player_back_advance");
     const playerFrontAdvance = hookForm.watch("player_front_advance");
     
     useEffect(() => {
         const root = document.documentElement;
         root?.style.setProperty(
-            "--PaddleHeight",
-            `${paddleSize}px`
+            "--PaddleBackSize",
+            `${paddleBackSize}px`
+        );
+        root?.style.setProperty(
+            "--PaddleFrontSize",
+            `${paddleFrontSize}px`
         );
 
         root?.style.setProperty(
@@ -22,7 +27,7 @@ function BoardGame(props: {hookForm: {watch: any}}) {
             "--PlayerFrontAdvance",
             `${playerFrontAdvance}px`
         );
-    }, [paddleSize, playerBackAdvance, playerFrontAdvance])
+    }, [paddleBackSize, paddleFrontSize, playerBackAdvance, playerFrontAdvance])
 
     return (
         <div className="setting-wrapper board-game-wrapper">

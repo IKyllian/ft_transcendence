@@ -104,6 +104,7 @@ export default class Lobby extends Phaser.Scene
 
 	create ()
 	{
+		// this.game.registry.get('setHasEnded')(true);
 		this.cameras.main.setBackgroundColor("#415A77");
 
 		this.me = this.game.registry.get('players_data').player_type;
@@ -280,6 +281,7 @@ export default class Lobby extends Phaser.Scene
 							.setOrigin(0.5,0.5);
 
 		setTimeout(() => {
+			this.game.registry.get('setHasEnded')(true);
 			this.game.destroy(true, false);
 		}, 5000);
 	}
@@ -329,6 +331,7 @@ export default class Lobby extends Phaser.Scene
 			 .setOrigin(0.5,0.5);
 
 		setTimeout(() => {
+			this.game.registry.get('setHasEnded')(true);
 			this.game.destroy(true, false);
 		}, 5000);
 	}
@@ -346,6 +349,7 @@ export default class Lobby extends Phaser.Scene
 								.setOrigin(0.5,0.5);
 
 			setTimeout(() => {
+				this.game.registry.get('setHasEnded')(true);
 				this.game.destroy(true, false);
 			}, 5000);
 		}
