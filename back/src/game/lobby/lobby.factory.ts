@@ -179,14 +179,18 @@ export class LobbyFactory
 						if (player.team === TeamSide.BLUE) {
 							if (player.pos === PlayerPosition.BACK) {
 								dataToFront.TeamBlue_Back = player;
+								dataToFront.player_type = PlayerType.TeamBlue_Back;
 							} else {
 								dataToFront.TeamBlue_Front = player;
+								dataToFront.player_type = PlayerType.TeamBlue_Front;
 							}
 						} else {
 							if (player.pos === PlayerPosition.BACK) {
 								dataToFront.TeamRed_Back = player;
+								dataToFront.player_type = PlayerType.TeamRed_Back;
 							} else {
 								dataToFront.TeamRed_Front = player;
+								dataToFront.player_type = PlayerType.TeamRed_Front;
 							}
 						}
 					});

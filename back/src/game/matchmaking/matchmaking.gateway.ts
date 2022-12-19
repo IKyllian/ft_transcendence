@@ -187,4 +187,12 @@ export class MatchmakingGateway implements OnGatewayDisconnect {
 	) {
 		this.lobbyFactory.get_game_info(client, game_id);
 	}
+
+	@SubscribeMessage('get_clientinfo')
+	async onGetClientInfo(
+		@ConnectedSocket() client: AuthenticatedSocket,
+		@MessageBody() id: number 
+	) {
+		this.lobbyFactory.get_client_info(client, id);
+	}
 }
