@@ -11,7 +11,7 @@ function BanButton(props: {senderId: number, chanId: number}) {
 
     const handleClick = handleSubmit((data) => {
         const number: number = +data.numberInput;
-        if (number > 10 && number < 3600) {
+        if (number >= 10 && number <= 3600) {
             socket?.emit("Ban", {
                 userId: senderId,
                 chanId: chanId,

@@ -20,12 +20,12 @@ function BoardGame(props: {hookForm: {watch: any}}) {
 
         root?.style.setProperty(
             "--PlayerBackAdvance",
-            `${playerBackAdvance}px`
+            `${playerBackAdvance * 0.6}px`
         );
 
         root?.style.setProperty(
             "--PlayerFrontAdvance",
-            `${playerFrontAdvance}px`
+            `${playerFrontAdvance * 0.6}px`
         );
     }, [paddleBackSize, paddleFrontSize, playerBackAdvance, playerFrontAdvance])
 
