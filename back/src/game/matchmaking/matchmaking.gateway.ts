@@ -1,9 +1,11 @@
-import { ForbiddenException, UseFilters, UsePipes, ValidationPipe } from "@nestjs/common";
+import { ForbiddenException, UseFilters, UseGuards, UsePipes, ValidationPipe } from "@nestjs/common";
 import { ConnectedSocket, MessageBody, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
+import { WsJwtGuard } from "src/auth/guard/ws-jwt.guard";
 import { UserIdDto } from "src/chat/gateway/dto/user-id.dto";
 import { NotificationService } from "src/notification/notification.service";
 import { User } from "src/typeorm";
+import { UserService } from "src/user/user.service";
 import { GetUser } from "src/utils/decorators";
 import { GatewayExceptionFilter } from "src/utils/exceptions/filter/Gateway.filter";
 import { AuthenticatedSocket } from "src/utils/types/auth-socket";
@@ -24,6 +26,7 @@ export class MatchmakingGateway implements OnGatewayDisconnect {
 	@WebSocketServer() server: Server;
 
 	constructor(
+		private userService: UserService,
 		private partyService: PartyService,
 		private queueService: QueueService,
 		private notifService: NotificationService,
@@ -41,7 +44,7 @@ export class MatchmakingGateway implements OnGatewayDisconnect {
 	 * PARTY EVENTS
 	 *
 	 */
-
+	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('PartyInvite')
 	async sendGameInvite(
 		@GetUser() user: User,
@@ -53,9 +56,11 @@ export class MatchmakingGateway implements OnGatewayDisconnect {
 			this.server.to(`user-${user.id}`).emit("PartyUpdate", { party, cancelQueue: true });
 		}
 		const notif = await this.notifService.createPartyInviteNotif(user, dto.id);
+		socket.emit('SendConfirm', "Invitation send");
 		socket.to(`user-${dto.id}`).emit('NewPartyInvite', notif);
 	}
 
+	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('CreateParty')
 	createLobby(
 		@GetUser() user: User,
@@ -66,6 +71,7 @@ export class MatchmakingGateway implements OnGatewayDisconnect {
 		}
 	}
 
+	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('JoinParty')
 	async joinLobby(
 		@GetUser() user: User,
@@ -84,6 +90,7 @@ export class MatchmakingGateway implements OnGatewayDisconnect {
 		this.partyService.joinParty(user, requester.id);
 	}
 
+	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('LeaveParty')
 	leaveLobby(
 		@GetUser() user: User,
@@ -91,6 +98,7 @@ export class MatchmakingGateway implements OnGatewayDisconnect {
 		this.partyService.leaveParty(user);
 	}
 
+	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('KickParty')
 	kickFromLobby(
 		@GetUser() user: User,
@@ -99,6 +107,7 @@ export class MatchmakingGateway implements OnGatewayDisconnect {
 		this.partyService.kickFromParty(user, data.id);
 	}
 
+	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('NewPartyMessage')
 	newPartyMessage(
 		@GetUser() user: User,
@@ -113,7 +122,7 @@ export class MatchmakingGateway implements OnGatewayDisconnect {
 	 * PARTY GAME SETTINGS EVENTS
 	 *
 	 */
-
+	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('SetReadyState')
 	setReadyState(
 		@GetUser() user: User,
@@ -122,6 +131,7 @@ export class MatchmakingGateway implements OnGatewayDisconnect {
 		this.partyService.setReadyState(user, data.isReady);
 	}
 
+	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('SetTeamSide')
 	setTeamSide(
 		@GetUser() user: User,
@@ -130,6 +140,7 @@ export class MatchmakingGateway implements OnGatewayDisconnect {
 		this.partyService.setTeamSide(user, data.team);
 	}
 
+	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('SetPlayerPos')
 	setPlayerPos(
 		@GetUser() user: User,
@@ -138,14 +149,18 @@ export class MatchmakingGateway implements OnGatewayDisconnect {
 		this.partyService.setPlayerPos(user, data.pos);
 	}
 
+	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('SetSettings')
 	setSetting(
 		@GetUser() user: User,
 		@MessageBody() settings: SettingDto,
+		@ConnectedSocket() socket: AuthenticatedSocket,
 	) {
-		this.partyService.setSettings(user, settings)
+		this.partyService.setSettings(user, settings);
+		socket.emit('SendConfirm', "Submitted");
 	}
 
+	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('SetGameMode')
 	setGameMode(
 		@GetUser() user: User,
@@ -160,12 +175,19 @@ export class MatchmakingGateway implements OnGatewayDisconnect {
 	 *
 	 */
 
+	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('StartQueue')
 	startQueue(
 		@GetUser() user: User,
 		@MessageBody() data: StartQueueDto,
 	) {
 		console.log("start queue data: ", data)
+		const party = this.partyService.partyJoined.getParty(user.id);
+		if (party) {
+			party.players.forEach(async player => {
+				player.user = await this.userService.findOne({ where: { id: player.user.id }});
+			});
+		}
 		if (data.isRanked) {
 			this.queueService.joinQueue(user, data.gameType);
 		} else {
@@ -173,6 +195,7 @@ export class MatchmakingGateway implements OnGatewayDisconnect {
 		}
 	}
 
+	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('StopQueue')
 	stopQueue(
 		@GetUser() user: User,
@@ -180,6 +203,7 @@ export class MatchmakingGateway implements OnGatewayDisconnect {
 		this.queueService.leaveQueue(user);
 	}
 
+	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('get_gameinfo')
 	async onGetGameInfo(
 		@ConnectedSocket() client: AuthenticatedSocket,
@@ -188,6 +212,7 @@ export class MatchmakingGateway implements OnGatewayDisconnect {
 		this.lobbyFactory.get_game_info(client, game_id);
 	}
 
+	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('get_clientinfo')
 	async onGetClientInfo(
 		@ConnectedSocket() client: AuthenticatedSocket,

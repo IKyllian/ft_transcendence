@@ -32,6 +32,7 @@ export function useAppHook() {
 	const navigate = useNavigate();
 
 	const connectSocket = (access_token: string) => {
+		console.log("new socket")
 		const newSocket: Socket = io(`${socketUrl}`, {extraHeaders: {
 			"Authorization": `Bearer ${access_token}`,
 		}});
