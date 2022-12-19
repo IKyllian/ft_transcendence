@@ -281,9 +281,12 @@ export default class Lobby extends Phaser.Scene
 	update(): void
 	{
 		this.anti_spam_count++;
-		if (this.anti_spam_count >= 5)
+		if (this.anti_spam_count >= 10)
 		{
-			this.socketmanager!.lobby_send_request_status(this.registry.get('players_data').game_id);
+			if (this.socketmanager instanceof ClientSocketManager)
+			{
+				this.socketmanager.lobby_send_request_status(this.registry.get('players_data').game_id);
+			}
 			this.anti_spam_count = 0;
 		}
 

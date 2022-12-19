@@ -175,7 +175,6 @@ export default class Pong extends Phaser.Scene
 		let style: Phaser.Types.GameObjects.Text.TextStyle = 
 		{
 			fontSize: '32px',
-		//	color: '#000000',
 			color: '#E0E1DD',
 			fontFamily: 'Silkscreen'
 		}

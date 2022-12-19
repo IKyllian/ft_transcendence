@@ -2,10 +2,8 @@ import 'phaser';
 import { EndResult, GameType, PlayerType } from '../types/shared.types';
 import { check_rank_change } from '../utils/elo_tools';
 import { elo_to_rank_as_string } from '../utils/elo_tools';
-import {  await_load_base64, loadAvatar } from '../utils/texture_loader';
 import { make_style } from '../utils/text_tools';
 import { shorten_nickname } from '../utils/text_tools';
-import AssetButton from '../../../../Assets/images/button.png';
 
 import AssetRankUP from '../../../../Assets/images/green_arrow.png';
 import AssetRankDOWN from '../../../../Assets/images/red_arrow.png';
@@ -31,21 +29,16 @@ export default class MatchResult extends Phaser.Scene
 	TeamRed_Back_interval: any;
 	TeamRed_Back_elo_change?: Phaser.GameObjects.Text;
 	TeamRed_Back_change_interval: any;
-	// TeamRed_Back_elo_change?: Phaser.GameObjects.Text;
 
 	TeamBlue_Front_elo?: Phaser.GameObjects.Text;
 	TeamBlue_Front_interval: any;
 	TeamBlue_Front_elo_change?: Phaser.GameObjects.Text;
 	TeamBlue_Front_change_interval: any;
-	// TeamBlue_Front_elo_change?: Phaser.GameObjects.Text;
 
 	TeamRed_Front_elo?: Phaser.GameObjects.Text;
 	TeamRed_Front_interval: any;
 	TeamRed_Front_elo_change?: Phaser.GameObjects.Text;
 	TeamRed_Front_change_interval: any;
-	// TeamRed_Front_elo_change?: Phaser.GameObjects.Text;
-
-
 
 	TeamBlue_Back_oldElo: number = 0;
 	TeamBlue_Front_oldElo: number = 0;
@@ -658,14 +651,6 @@ export default class MatchResult extends Phaser.Scene
 				.setDisplaySize(100, 100);
 		}
 
-
-
-
-
-
-
-
-
 		if (this.game_type === GameType.Doubles)
 		{
 			if (check_rank_change(
@@ -737,14 +722,6 @@ export default class MatchResult extends Phaser.Scene
 					.setDisplaySize(100, 100);
 			}
 
-
 		}
-
-
-
-
-
 	}
-
-
 }
