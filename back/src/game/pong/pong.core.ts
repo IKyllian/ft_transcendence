@@ -84,8 +84,8 @@ export default class PongCore
 		this.up_down_border = game_settings.up_down_border;
 		this.player_back_advance = game_settings.player_back_advance;
 		this.player_front_advance = game_settings.player_front_advance;
-		this.paddle_size_back = game_settings.paddle_size_back;
-		this.paddle_size_front = game_settings.paddle_size_front;
+		this.paddle_size_back = game_settings.paddle_size_back + 5;
+		this.paddle_size_front = game_settings.paddle_size_front + 5;
 		this.paddle_speed = game_settings.paddle_speed;
 		this.ball_start_speed = game_settings.ball_start_speed;
 		this.ball_acceleration = game_settings.ball_acceleration;

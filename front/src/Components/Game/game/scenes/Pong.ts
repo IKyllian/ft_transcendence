@@ -569,10 +569,12 @@ export default class Pong extends Phaser.Scene
 
 	pick_paddle_color = (paddle: PlayerType): number =>
 	{
-		if (this.me === paddle)
-			return 0xFF0000;
-		return 0xE0E1DD;
-		//E0E1DD
+
+		if (paddle === PlayerType.TeamBlue_Back 
+			|| paddle === PlayerType.TeamBlue_Front)
+				return 0x0000FF;
+			else
+				return 0xFF0000;
 	}
 
 	sound_event_wall = () =>
