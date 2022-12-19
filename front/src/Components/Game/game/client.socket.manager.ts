@@ -48,8 +48,6 @@ export default class ClientSocketManager
 			this.socket.on('match_winner', this.onGameGetMatchWinner.bind(this));
 			//Game
 			this.socket.on('game_state', this.onGameGetState.bind(this));
-			//Replay
-			this.socket.on('replay_state', this.onReplayState.bind(this));
 		}
 	}
 
@@ -125,23 +123,6 @@ export default class ClientSocketManager
 		this.pong_triggers?.game_end(result);
 		//remove redirect Lobby->Matchresult
 		this.lobby_triggers?.game_end(result);
-	}
-
-	//Replay Emits
-
-	request_replay = (game_id: string) =>
-	{
-		if (this.socket instanceof Socket)
-		{
-			this.socket.emit('replay_request', game_id);
-		}
-	}
-
-	//Replay Listens
-
-	onReplayState = (gamestate: GameState) =>
-	{
-		this.replay_triggers?.append_server_gamestate(gamestate);
 	}
 
 }

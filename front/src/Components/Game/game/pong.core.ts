@@ -1,10 +1,10 @@
 import { BallData, Coordinates, EndResult, GameSettings, GameState, GameType, Goal, Movement, PlayerInput, PlayerPosition, PlayerType, RoundSetup, ScoreBoard } from "./types/shared.types";
 
 //paddle designations
-//paddle A_back  ( [I] I    I  I  )
-//paddle A_front (  I [I]   I  I  )
-//paddle B_front (  I  I   [I] I  )
-//paddle B_back  (  I  I    I [I] )
+//TeamBlue_Back  ( [I] I    I  I  )
+//TeamBlue_Front (  I [I]   I  I  )
+//TeamRed_Front  (  I  I   [I] I  )
+//TeamRed_Back   (  I  I    I [I] )
 
 export default class PongCore
 {
@@ -304,8 +304,6 @@ export default class PongCore
 			{
 				this.ball_data.position.x = this.player_back_advance;
 				this.ball_data.vector.x *= -1;	
-//TODO
-//do something cool with vectors for bounce
 				this.doctored_rebound(this.TeamBlue_Back_pos.y, PlayerPosition.BACK);
 				this.ball_data.velocity += this.ball_acceleration;
 				this.pong_triggers?.sound_event_paddle();
@@ -321,8 +319,6 @@ export default class PongCore
 			{
 				this.ball_data.position.x = (this.field_width - this.player_back_advance);
 				this.ball_data.vector.x *= -1;	
-//TODO
-//do something cool with vectors for bounce
 				this.doctored_rebound(this.TeamRed_Back_pos.y, PlayerPosition.BACK);
 				this.ball_data.velocity += this.ball_acceleration;		
 				this.pong_triggers?.sound_event_paddle();
@@ -356,9 +352,7 @@ export default class PongCore
 				&& this.ball_data.position.y > (this.TeamRed_Front_pos.y - (this.paddle_size_front / 2)))
 				{
 					this.ball_data.position.x = (this.field_width - this.player_front_advance);
-					this.ball_data.vector.x *= -1;	
-	//TODO
-	//do something cool with vectors for bounce
+					this.ball_data.vector.x *= -1;
 					this.doctored_rebound(this.TeamRed_Front_pos.y, PlayerPosition.FRONT);
 					this.ball_data.velocity += this.ball_acceleration;		
 					this.pong_triggers?.sound_event_paddle();

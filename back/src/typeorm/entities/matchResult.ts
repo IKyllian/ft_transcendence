@@ -1,8 +1,6 @@
 import { GameType } from "src/utils/types/game.types";
 import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "./user";
-import { GameState } from "src/utils/types/game.types";
-
 
 @Entity()
 export class MatchResult {
@@ -35,7 +33,4 @@ export class MatchResult {
 
 	@CreateDateColumn({ type: 'timestamptz' })
 	created_at: Date;
-
-	// @Column({ type: 'jsonb', array: true })
-	// replay: GameState[];
 }

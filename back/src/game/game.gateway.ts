@@ -78,7 +78,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
 		this.lobbyfactory.lobby_quit(socket);
 	}
 		
-		/* ----- Users Lobby Management ----- */
+	/* ----- Users Lobby Management ----- */
 		
 	@SubscribeMessage('user_join_lobby')
 	async onUserJoinLobby(@ConnectedSocket() client: AuthenticatedSocket,
@@ -112,23 +112,4 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
 	{
 		this.lobbyfactory.lobby_game_get_round_setup(client, game_id);
 	}
-
-
-
-
-//commented for now
-
-	/* ----- Replay Handling ----- */
-
-
-	// @SubscribeMessage('replay_request')
-	// async onReplayRequest(@ConnectedSocket() client: Socket,
-	// @MessageBody() game_id: string)
-	// {
-	// 	this.lobbyfactory.send_replay(client, game_id);
-	// }
-
-
-
-
   }
