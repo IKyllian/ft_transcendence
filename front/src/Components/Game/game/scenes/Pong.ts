@@ -2,7 +2,7 @@ import 'phaser';
 import ClientSocketManager from '../client.socket.manager';
 import PongCore from '../pong.core';
 import { GameState, Goal, Movement, PlayerInput, PlayerType, EndResult, RoundSetup, GameType, GameSettings } from '../types/shared.types';
-import { await_load_base64 } from '../texture_loader';
+import { await_load_base64 } from '../utils/texture_loader';
 
 import AssetSoundA from '../../../../Assets/sound/8bit_effect_a.ogg'
 import AssetSoundB from '../../../../Assets/sound/8bit_effect_b.ogg'

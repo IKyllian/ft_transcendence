@@ -1,10 +1,10 @@
 import 'phaser';
 import { EndResult, GameType, PlayerType } from '../types/shared.types';
-import { check_rank_change } from '../elo_tools';
-import { elo_to_rank_as_string } from '../elo_tools';
-import {  await_load_base64, loadAvatar } from '../texture_loader';
-import { make_style } from '../text_tools';
-import { shorten_nickname } from '../text_tools';
+import { check_rank_change } from '../utils/elo_tools';
+import { elo_to_rank_as_string } from '../utils/elo_tools';
+import {  await_load_base64, loadAvatar } from '../utils/texture_loader';
+import { make_style } from '../utils/text_tools';
+import { shorten_nickname } from '../utils/text_tools';
 import AssetButton from '../../../../Assets/images/button.png';
 
 import AssetRankUP from '../../../../Assets/images/green_arrow.png';

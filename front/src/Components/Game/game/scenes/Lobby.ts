@@ -1,11 +1,11 @@
 import 'phaser';
 import {PlayerType, RoundSetup, EndResult, GameType } from '../types/shared.types';
 import ClientSocketManager from '../client.socket.manager';
-import {  await_load_base64, loadAvatar } from '../texture_loader';
+import {  await_load_base64, loadAvatar } from '../utils/texture_loader';
 
-import { elo_to_rank_as_string } from '../elo_tools';
-import { shorten_nickname } from '../text_tools';
-import { make_style } from '../text_tools';
+import { elo_to_rank_as_string } from '../utils/elo_tools';
+import { shorten_nickname } from '../utils/text_tools';
+import { make_style } from '../utils/text_tools';
 
 import AssetRankSilver from '../../../../Images-Icons/Ranks/silver.png'
 import AssetRankGold from '../../../../Images-Icons/Ranks/gold.png';
