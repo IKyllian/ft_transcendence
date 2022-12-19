@@ -59,16 +59,16 @@ export default class Lobby extends Phaser.Scene
 	connected: boolean = false;
 	launching_game: boolean = false;
 
-	async preload ()
+	preload ()
 	{
-		await loadAvatar(
+		loadAvatar(
 			this.game.registry.get('players_data').TeamBlue_Back.user,
 			'TeamBlue_back_avatar',
 			this.registry.get('token'),
 			this.registry.get('cache'),
 			this);
 
-		await loadAvatar(
+		loadAvatar(
 			this.game.registry.get('players_data').TeamRed_Back.user,
 			'TeamRed_back_avatar',
 			this.registry.get('token'),
@@ -79,13 +79,13 @@ export default class Lobby extends Phaser.Scene
 
 		if (this.game_type === GameType.Doubles)
 		{
-			await loadAvatar(
+			loadAvatar(
 				this.game.registry.get('players_data').TeamBlue_Front.user,
 				'TeamBlue_front_avatar',
 				this.registry.get('token'),
 				this.registry.get('cache'),
 				 this);
-			await loadAvatar(
+			loadAvatar(
 				this.game.registry.get('players_data').TeamRed_Front.user,
 				'TeamRed_front_avatar',
 				this.registry.get('token'),
@@ -93,18 +93,124 @@ export default class Lobby extends Phaser.Scene
 				 this);
 		}
 
-		await await_load_base64(AssetRankSilver, "Silver", this);
-		await await_load_base64(AssetRankGold, "Gold", this);
-		await await_load_base64(AssetRankPlatine, "Platine", this);
-		await await_load_base64(AssetRankDiamond, "Diamond", this);
-		await await_load_base64(AssetRankChampion, "Champion", this);
-		await await_load_base64(AssetRankLegend, "Legend", this);	
-	//	this.load.image('button', AssetButton);
+		await_load_base64(AssetRankSilver, "Silver", this);
+		await_load_base64(AssetRankGold, "Gold", this);
+		await_load_base64(AssetRankPlatine, "Platine", this);
+		await_load_base64(AssetRankDiamond, "Diamond", this);
+		await_load_base64(AssetRankChampion, "Champion", this);
+		await_load_base64(AssetRankLegend, "Legend", this);	
+
+
+
+		// while (true)
+		// {
+		// 	if (
+		// 		this.textures.exists('Silver')
+		// 		&& this.textures.exists('Gold')
+		// 		&& this.textures.exists('Platine')
+		// 		&& this.textures.exists('Diamond')
+		// 		&& this.textures.exists('Champion')
+		// 		&& this.textures.exists('Legend')
+		// 	)
+		// 	{
+
+		// 		if (this.game_type === GameType.Doubles)
+		// 		{
+		// 			if (
+		// 				this.textures.exists('TeamBlue_back_avatar')
+		// 				&& this.textures.exists('TeamRed_back_avatar')
+		// 				&& this.textures.exists('TeamBlue_front_avatar')
+		// 				&& this.textures.exists('TeamRed_front_avatar')
+		// 			)
+		// 			{
+		// 				console.log("all loaded");
+		// 				break;
+		// 			}
+		// 		}
+		// 		else
+		// 		{
+		// 			if(
+		// 				this.textures.exists('TeamBlue_back_avatar')
+		// 				&& this.textures.exists('TeamRed_back_avatar')
+		// 			)
+		// 			{
+		// 				console.log("all loaded");
+		// 				break;
+		// 			}
+		// 		}
+		// 	}		
+		// }
+
+
+		let interval: any;
+		interval = setInterval(
+			(function(self) { return function()
+			  {
+
+				if (
+					self.textures.exists('Silver')
+					&& self.textures.exists('Gold')
+					&& self.textures.exists('Platine')
+					&& self.textures.exists('Diamond')
+					&& self.textures.exists('Champion')
+					&& self.textures.exists('Legend')
+				)
+				{
+
+					if (self.game_type === GameType.Doubles)
+					{
+						if (
+							self.textures.exists('TeamBlue_back_avatar')
+							&& self.textures.exists('TeamRed_back_avatar')
+							&& self.textures.exists('TeamBlue_front_avatar')
+							&& self.textures.exists('TeamRed_front_avatar')
+						)
+						{
+							console.log("all loaded");
+							self.createb();
+							clearInterval(interval);
+						}
+					}
+					else
+					{
+						if(
+							self.textures.exists('TeamBlue_back_avatar')
+							&& self.textures.exists('TeamRed_back_avatar')
+						)
+						{
+							console.log("all loaded");
+							self.createb();
+							clearInterval(interval);
+						}
+					}
+				}
+			  }; })(this),
+			50);
 	}
 
-	create ()
+
+		// create()
+		// {
+		// 	setTimeout( () => {
+		// 		this.createb();
+		// 	}, 200);
+		// }
+
+	createb ()
 	{
 		// this.game.registry.get('setHasEnded')(true);
+console.log("silver",this.textures.exists('Silver'));
+console.log("Gold",this.textures.exists('Gold'));
+console.log("Platine",this.textures.exists('Platine'));
+console.log("TeamBlue_back_avatar",this.textures.exists('TeamBlue_back_avatar'));
+console.log("TeamRed_back_avatar",this.textures.exists('TeamRed_back_avatar'));
+// console.log("silver",this.textures.exists('Silver'));
+// console.log("silver",this.textures.exists('Silver'));
+// && this.textures.exists('Gold')
+// && this.textures.exists('Platine')
+// && this.textures.exists('Diamond')
+// && this.textures.exists('Champion')
+// && this.textures.exists('Legend'));
 		this.cameras.main.setBackgroundColor("#415A77");
 
 		this.me = this.game.registry.get('players_data').player_type;

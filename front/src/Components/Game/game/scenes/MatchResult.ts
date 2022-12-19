@@ -21,10 +21,9 @@ export default class MatchResult extends Phaser.Scene
 	me: PlayerType = PlayerType.Spectator;
 	game_type: GameType = GameType.Singles;
 
-	// TeamBlue_Back_avatar?: Phaser.GameObjects.Image;
-	// TeamBlue_Back_rank?: Phaser.GameObjects.Image;
-	// TeamBlue_Back_name?: Phaser.GameObjects.Text;
+
 	// TeamBlue_Back_elo?: Phaser.GameObjects.Text;
+	//TeamBlue_Back_elo?: Phaser.GameObjects.Text;
 
 	// TeamBlue_Front_avatar?: Phaser.GameObjects.Image;
 	// TeamBlue_Front_rank?: Phaser.GameObjects.Image;
