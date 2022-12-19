@@ -82,6 +82,15 @@ export const channelSlice = createSlice({
                 })];
             }
         },
+        updateChannelUserIngameStatus: (state, {payload}: PayloadAction<{id: number, in_game_id: string | null}>) => {
+            if (state.channelDatas) {
+                state.channelDatas.channelUsers = [...state.channelDatas.channelUsers.map((elem: ChannelUser) => {
+                    if (elem.user.id === payload.id)
+                        return {...elem, user: {...elem.user, in_game_id: payload.in_game_id}};
+                    return elem;
+                })];
+            }
+        },
         addChannelMessage: (state, {payload}: PayloadAction<ChatMessage>) => {
             if (state.channelDatas)
                 state.channelDatas.messages = [...state.channelDatas.messages, {...payload}];
@@ -117,6 +126,7 @@ export const {
     removeTimeoutChannelUser,
     updateChannelUser,
     updateChannelUserStatus,
+    updateChannelUserIngameStatus,
     unsetChannelDatas,
     setChannelId,
     addChannelMessage,

@@ -43,7 +43,7 @@ export function useLoadChatDatas() {
         if (socket && currentChannelId === undefined && channelId !== undefined) {
             socket.on("StatusUpdate", (data) => {
                 dispatch(updateChannelUserStatus(data));
-            })
+            });
         }
         if (socket && currentChannelId !== channelId) {
             if (currentChannelId !== undefined && location.pathname.includes("/chat")) {

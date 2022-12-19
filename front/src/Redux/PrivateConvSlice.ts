@@ -45,7 +45,16 @@ export const privateConvSlice = createSlice({
                     state.convDatas.conv.user1 = {...state.convDatas.conv.user2, status: payload.status};
                 }
             }
-        }
+        },
+        changeUserIngameStatus: (state, {payload}: PayloadAction<{id: number, in_game_id: string | null}>) => {
+            if (state.convDatas) {
+                if (state.convDatas.conv.user1.id === payload.id) {
+                    state.convDatas.conv.user1 = {...state.convDatas.conv.user1, in_game_id: payload.in_game_id};
+                } else if (state.convDatas.conv.user2.id === payload.id) {
+                    state.convDatas.conv.user1 = {...state.convDatas.conv.user2, in_game_id: payload.in_game_id};
+                }
+            }
+        },
     }
 });
 
@@ -56,4 +65,5 @@ export const {
     addNewMessage,
     loadNewMessages,
     changeUserStatus,
+    changeUserIngameStatus,
 } = privateConvSlice.actions;

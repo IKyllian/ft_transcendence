@@ -189,6 +189,15 @@
                 }
                 .player-container {
                     @include flex-row-alignCenter;
+                    // gap: 10px;
+
+                    .spectate-icon {
+                        @include width-height(14px, 14px);
+                        margin-left: 10px;
+                        margin-top: 2px;
+                        cursor: pointer;
+                    }
+
                     p {
                         cursor: pointer;
                     }

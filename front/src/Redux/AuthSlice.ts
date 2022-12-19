@@ -84,6 +84,15 @@ export const authSlice = createSlice({
                 })]
             }
         },
+        changeFriendListInGameStatus: (state, {payload}: PayloadAction<{id: number, in_game_id: string | null}>) => {
+            if (state.friendList.length > 0) {
+                state.friendList = [...state.friendList.map((elem: UserInterface) => {
+                    if (elem.id === payload.id)
+                        return {...elem, in_game_id: payload.in_game_id};
+                    return elem;
+                })]
+            }
+        },
         setUserAvatar: (state, {payload}: PayloadAction<string>) => {
             state.loggedUserAvatar = payload;
         },
@@ -102,6 +111,7 @@ export const {
     userFullAuthenticated,
     loginSuccess,
     changeInGameStatus,
+    changeFriendListInGameStatus,
     loginError,
     setUsername,
     verification2fa,

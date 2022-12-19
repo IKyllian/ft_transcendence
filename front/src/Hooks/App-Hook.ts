@@ -8,22 +8,22 @@ import { addNotification, deleteNotification, resetNotification } from "../Redux
 import { addChannel, addPrivateConv, changePrivateConvOrder, removeChannel, resetChat } from "../Redux/ChatSlice";
 import { Channel, ChannelUpdateType, ChannelUser, Conversation, UserTimeout } from "../Types/Chat-Types";
 import { UserInterface } from "../Types/User-Types";
-import { changeInGameStatus, copyFriendListArray, logoutSuccess, stopIsConnectedLoading, userFullAuthenticated } from "../Redux/AuthSlice";
+import { changeFriendListInGameStatus, changeInGameStatus, copyFriendListArray, logoutSuccess, stopIsConnectedLoading, userFullAuthenticated } from "../Redux/AuthSlice";
 import { GameMode, PartyInterface, PartyMessage } from "../Types/Lobby-Types";
 import { copyNotificationArray } from "../Redux/NotificationSlice";
 import { addParty, addPartyInvite, addPartyMessage, cancelQueue, changeModalStatus, changePartyGameMode, changeQueueStatus, incrementQueueTimer, leaveParty, newGameFound, removePartyInvite, resetParty, resetQueueTimer } from "../Redux/PartySlice";
 import { fetchVerifyToken } from "../Api/Sign/Sign-Fetch";
-import { addChannelUser, banChannelUser, muteChannelUser, removeTimeoutChannelUser, removeChannelUser, setChannelDatas, updateChannelUser, unsetChannelDatas, unsetChannelId, channelNotfound, resetChannel } from "../Redux/ChannelSlice";
+import { addChannelUser, banChannelUser, muteChannelUser, removeTimeoutChannelUser, removeChannelUser, setChannelDatas, updateChannelUser, unsetChannelDatas, unsetChannelId, channelNotfound, resetChannel, updateChannelUserIngameStatus } from "../Redux/ChannelSlice";
 import { addAlert, AlertType, resetAlert } from "../Redux/AlertSlice";
 import { PlayersGameData } from "../Components/Game/game/types/shared.types";
 import { TokenStorageInterface } from "../Types/Utils-Types";
-import { resetConvState } from "../Redux/PrivateConvSlice";
+import { changeUserIngameStatus, resetConvState } from "../Redux/PrivateConvSlice";
 
 export function useAppHook() {
     const [socket, setSocket] = useState<Socket | undefined>(undefined);
     const [cache, setCache] = useState<Cache | undefined | null>(undefined);
 	const [intervalId, setIntervalId] = useState<ReturnType<typeof setInterval> | undefined>(undefined)
-    const { isAuthenticated, currentUser, displayQRCode, isSign } = useAppSelector((state) => state.auth);
+    const { isAuthenticated, currentUser, displayQRCode, isSign, friendList} = useAppSelector((state) => state.auth);
 	const { modalIsOpen } = useAppSelector(state => state.party);
 	const { party, chatIsOpen, isInQueue } = useAppSelector(state => state.party);
 	const { currentChannelId } = useAppSelector((state) => state.channel);
@@ -240,6 +240,9 @@ export function useAppHook() {
 				if (currentUser && currentUser.id === data.id) {
 					dispatch(changeInGameStatus(data.in_game_id));
 				}
+				dispatch(changeFriendListInGameStatus({id: data.id, in_game_id: data.in_game_id}));
+				dispatch(updateChannelUserIngameStatus({id: data.id, in_game_id: data.in_game_id}));
+				dispatch(changeUserIngameStatus({id: data.id, in_game_id: data.in_game_id}));				
 			});
 
             socket?.on("OnLeave", (data: Channel) => {
@@ -252,6 +255,10 @@ export function useAppHook() {
                 // }
                 dispatch(removeChannel(data.id));
             });
+
+			socket?.on("SendConfirm", (data: string) => {
+				dispatch(addAlert({message: data, type: AlertType.SUCCESS}));
+			});
 
 			socket?.on("newgame_data", (data: PlayersGameData) => {
 				console.log("new_game_data", data);
@@ -303,6 +310,7 @@ export function useAppHook() {
 			socket?.off("OnJoin");
 			socket?.off("OnLeave");
 			socket?.off("newgame_data");
+			socket?.off("SendConfirm");
 			socket?.off("Logout");
             socket?.off("gameinfo");
 		}

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Link } from "react-router-dom";
 
 import DropdownContainer from "../../Utils/Dropdown-Container";
@@ -12,10 +12,12 @@ import MuteButton from "../../Buttons/Mute-Button";
 import { getMessageDateString, getMessageHour } from "../../../Utils/Utils-Chat";
 import { PartyMessage } from "../../../Types/Lobby-Types";
 import ExternalImage from "../../External-Image";
+import { SocketContext } from "../../../App";
 
 function MessageItem(props: {isFromChan: boolean, message: ChatMessage | PrivateMessage | PartyMessage, loggedUserIsOwner: boolean, chan?: Channel, isNewSender?: boolean, index?: number}) {
     const {isFromChan, message, loggedUserIsOwner, chan, isNewSender, index} = props;
     const [showDropdown, setShowDropdown] = useState<boolean>(false);
+    const {socket} = useContext(SocketContext);
 
     let authDatas = useAppSelector((state) => state.auth);
     const senderIsBlock: boolean | undefined = message.sender ? userIdIsBlocked(authDatas.currentUser!, message.sender.id) : undefined;
@@ -47,6 +49,7 @@ function MessageItem(props: {isFromChan: boolean, message: ChatMessage | Private
                             <Link to={`/profile/${message.sender.username}`}>
                                 <p> profile </p>
                             </Link>
+                            <p onClick={() => socket?.emit("PartyInvite", {id: message.sender?.id})}> invite to party </p>
                             <BlockButton senderId={message.sender.id} />
                             {
                                 isFromChan && chan && loggedUserIsOwner &&
