@@ -22,23 +22,30 @@ export default class MatchResult extends Phaser.Scene
 	game_type: GameType = GameType.Singles;
 
 
-	// TeamBlue_Back_elo?: Phaser.GameObjects.Text;
-	//TeamBlue_Back_elo?: Phaser.GameObjects.Text;
+	TeamBlue_Back_elo?: Phaser.GameObjects.Text;
+	TeamBlue_Back_interval: any;
+	TeamBlue_Back_elo_change?: Phaser.GameObjects.Text;
+	TeamBlue_Back_change_interval: any;
 
-	// TeamBlue_Front_avatar?: Phaser.GameObjects.Image;
-	// TeamBlue_Front_rank?: Phaser.GameObjects.Image;
-	// TeamBlue_Front_name?: Phaser.GameObjects.Text;
-	// TeamBlue_Front_elo?: Phaser.GameObjects.Text;
+	TeamRed_Back_elo?: Phaser.GameObjects.Text;
+	TeamRed_Back_interval: any;
+	TeamRed_Back_elo_change?: Phaser.GameObjects.Text;
+	TeamRed_Back_change_interval: any;
+	// TeamRed_Back_elo_change?: Phaser.GameObjects.Text;
 
-	// TeamRed_Front_avatar?: Phaser.GameObjects.Image;
-	// TeamRed_Front_rank?: Phaser.GameObjects.Image;
-	// TeamRed_Front_name?: Phaser.GameObjects.Text;
-	// TeamRed_Front_elo?: Phaser.GameObjects.Text;
+	TeamBlue_Front_elo?: Phaser.GameObjects.Text;
+	TeamBlue_Front_interval: any;
+	TeamBlue_Front_elo_change?: Phaser.GameObjects.Text;
+	TeamBlue_Front_change_interval: any;
+	// TeamBlue_Front_elo_change?: Phaser.GameObjects.Text;
 
-	// TeamRed_Back_avatar?: Phaser.GameObjects.Image;
-	// TeamRed_Back_rank?: Phaser.GameObjects.Image;
-	// TeamRed_Back_name?: Phaser.GameObjects.Text;
-	// TeamRed_Back_elo?: Phaser.GameObjects.Text;
+	TeamRed_Front_elo?: Phaser.GameObjects.Text;
+	TeamRed_Front_interval: any;
+	TeamRed_Front_elo_change?: Phaser.GameObjects.Text;
+	TeamRed_Front_change_interval: any;
+	// TeamRed_Front_elo_change?: Phaser.GameObjects.Text;
+
+
 
 	TeamBlue_Back_oldElo: number = 0;
 	TeamBlue_Front_oldElo: number = 0;
@@ -81,11 +88,11 @@ export default class MatchResult extends Phaser.Scene
 				.setOrigin(0.5,0.5)
 				.setDisplaySize(175, 175);
 
-		this.add.text(100, 240,
+		this.add.text(100, 290,
 					shorten_nickname(this.game.registry.get('players_data').TeamBlue_Back.user.username),
 					make_style(32))
 					.setOrigin(0.5,0.5);
-		this.add.text(700, 240,
+		this.add.text(700, 290,
 					shorten_nickname(this.game.registry.get('players_data').TeamRed_Back.user.username),
 					make_style(32))
 					.setOrigin(0.5,0.5);
@@ -95,7 +102,7 @@ export default class MatchResult extends Phaser.Scene
 			this.add.image(285, 130, 'TeamBlue_front_avatar')
 						.setOrigin(0.5,0.5)
 						.setDisplaySize(175, 175);
-			this.add.text(285, 240,
+			this.add.text(285, 290,
 						shorten_nickname(this.game.registry.get('players_data').TeamBlue_Front.user.username),
 						make_style(32))
 						.setOrigin(0.5,0.5);
@@ -104,7 +111,7 @@ export default class MatchResult extends Phaser.Scene
 			this.add.image(515, 130, 'TeamRed_front_avatar')
 						.setOrigin(0.5,0.5)
 						.setDisplaySize(175, 175);
-			this.add.text(515, 240,
+			this.add.text(515, 290,
 						shorten_nickname(this.game.registry.get('players_data').TeamRed_Front.user.username),
 						make_style(32))
 						.setOrigin(0.5,0.5);	
@@ -207,14 +214,14 @@ export default class MatchResult extends Phaser.Scene
 	{
 		let style_green: Phaser.Types.GameObjects.Text.TextStyle = 
 		{
-			fontSize: '32px',
+			fontSize: '28px',
 			color: '#00FF00',
 			fontFamily: 'Silkscreen'
 		}
 
 		let style_red: Phaser.Types.GameObjects.Text.TextStyle = 
 		{
-			fontSize: '32px',
+			fontSize: '28px',
 			color: '#FF0000',
 			fontFamily: 'Silkscreen'
 		}
@@ -258,7 +265,16 @@ export default class MatchResult extends Phaser.Scene
 		const blueEloLost: number = blueEloWon - 50;
 		const redEloWon: number = Math.abs(blueEloLost);
 		const redEloLost: number = redEloWon - 50;
+	
 		
+/////////////////////
+
+		this.TeamBlue_Back_elo = this.add.text(100, 380, "", style).setOrigin(0.5,0.5);
+		this.TeamBlue_Front_elo = this.add.text(285, 380, "", style).setOrigin(0.5,0.5);
+		this.TeamRed_Front_elo = this.add.text(515, 380, "", style).setOrigin(0.5,0.5);
+		this.TeamRed_Back_elo = this.add.text(700, 380, "", style).setOrigin(0.5,0.5);
+
+
 		if (this.winner === EndResult.TeamBlue_Win)
 		{
 			this.TeamBlue_Back_newElo += this.TeamBlue_Back_oldElo + blueEloWon;
@@ -266,16 +282,138 @@ export default class MatchResult extends Phaser.Scene
 			this.TeamRed_Front_newElo += this.TeamRed_Front_oldElo + redEloLost;
 			this.TeamRed_Back_newElo += this.TeamRed_Back_oldElo + redEloLost;
 
-			this.add.text(100, 340, "+" + blueEloWon, style_green)
+			this.TeamBlue_Back_elo_change = this.add.text(100, 340, "", style_green)
 								.setOrigin(0.5,0.5);
-			this.add.text(700, 340, "" + redEloLost, style_red)
+			this.TeamRed_Back_elo_change = this.add.text(700, 340, "", style_red)
 								.setOrigin(0.5,0.5);
+
+
+			let display_tmp: number = blueEloWon;
+
+			clearInterval(this.TeamBlue_Back_change_interval);
+			this.TeamBlue_Back_change_interval = setInterval(
+				(function(self) { return function()
+				{
+					self.TeamBlue_Back_elo_change?.setText("+" + display_tmp);
+					display_tmp--;
+					if (display_tmp <= 0)
+					{
+						self.TeamBlue_Back_elo_change?.destroy();
+						clearInterval(self.TeamBlue_Back_change_interval);
+					}
+				}; })(this),
+				60);
+
+			
+			display_tmp = redEloLost;
+			clearInterval(this.TeamRed_Back_change_interval);
+			this.TeamRed_Back_change_interval = setInterval(
+				(function(self) { return function()
+				{
+					self.TeamRed_Back_elo_change?.setText("" + display_tmp);
+					display_tmp++;
+					if (display_tmp >= 0)
+					{
+						self.TeamRed_Back_elo_change?.destroy();
+						clearInterval(self.TeamRed_Back_change_interval);
+					}
+				}; })(this),
+				60);
+
+
+			clearInterval(this.TeamBlue_Back_interval);
+			this.TeamBlue_Back_interval = setInterval(
+				(function(self) { return function()
+				{
+					self.TeamBlue_Back_elo?.setText("" + self.TeamBlue_Back_oldElo);
+					self.TeamBlue_Back_oldElo++;
+					if (self.TeamBlue_Back_oldElo === self.TeamBlue_Back_newElo)
+						clearInterval(self.TeamBlue_Back_interval);
+				}; })(this),
+				60);
+						
+
+			clearInterval(this.TeamRed_Back_interval);
+			this.TeamRed_Back_interval = setInterval(
+				(function(self) { return function()
+				{
+					self.TeamRed_Back_elo?.setText("" + self.TeamRed_Back_oldElo);
+					self.TeamRed_Back_oldElo--;
+					if (self.TeamRed_Back_oldElo === self.TeamRed_Back_newElo)
+						clearInterval(self.TeamRed_Back_interval);
+				}; })(this),
+				60);
+
+
+
+
 			if (this.game_type === GameType.Doubles)
 			{
-				this.add.text(285, 340, "+" + blueEloWon, style_green)
+				this.TeamBlue_Front_elo_change = this.add.text(285, 340, "", style_green)
 								.setOrigin(0.5,0.5);
-				this.add.text(515, 340, "" + redEloLost, style_red)
+				this.TeamRed_Front_elo_change = this.add.text(515, 340, "", style_red)
 								.setOrigin(0.5,0.5);
+
+				display_tmp = blueEloWon;
+				clearInterval(this.TeamBlue_Front_change_interval);
+				this.TeamBlue_Front_change_interval = setInterval(
+					(function(self) { return function()
+					{
+						self.TeamBlue_Front_elo_change?.setText("+" + display_tmp);
+						display_tmp--;
+						if (display_tmp <= 0)
+						{
+							self.TeamBlue_Front_elo_change?.destroy();
+							clearInterval(self.TeamBlue_Front_change_interval);
+						}
+					}; })(this),
+					60);
+	
+				
+				display_tmp = redEloLost;
+				clearInterval(this.TeamRed_Front_change_interval);
+				this.TeamRed_Front_change_interval = setInterval(
+					(function(self) { return function()
+					{
+						self.TeamRed_Front_elo_change?.setText("" + display_tmp);
+						display_tmp++;
+						if (display_tmp >= 0)
+						{
+							self.TeamRed_Front_elo_change?.destroy();
+							clearInterval(self.TeamRed_Front_change_interval);
+						}
+					}; })(this),
+					60);
+
+
+
+
+
+
+
+				clearInterval(this.TeamBlue_Front_interval);
+				this.TeamBlue_Front_interval = setInterval(
+					(function(self) { return function()
+					{
+						self.TeamBlue_Front_elo?.setText("" + self.TeamBlue_Front_oldElo);
+						self.TeamBlue_Front_oldElo++;
+						if (self.TeamBlue_Front_oldElo === self.TeamBlue_Front_newElo)
+						clearInterval(self.TeamBlue_Front_interval);
+					}; })(this),
+					60);
+			
+					
+				clearInterval(this.TeamRed_Front_interval);
+				this.TeamRed_Front_interval = setInterval(
+					(function(self) { return function()
+					{
+						self.TeamRed_Front_elo?.setText("" + self.TeamRed_Front_oldElo);
+						self.TeamRed_Front_oldElo--;
+						if (self.TeamRed_Front_oldElo === self.TeamRed_Front_newElo)
+						clearInterval(self.TeamRed_Front_interval);
+					}; })(this),
+					60);
+
 			}
 
 		}
@@ -286,25 +424,147 @@ export default class MatchResult extends Phaser.Scene
 			this.TeamRed_Front_newElo += this.TeamRed_Front_oldElo + redEloWon;	
 			this.TeamRed_Back_newElo += this.TeamRed_Back_oldElo + redEloWon;
 
-			this.add.text(100, 340, "" + blueEloLost, style_red).setOrigin(0.5,0.5);
-			this.add.text(700, 340, "+" + redEloWon, style_green).setOrigin(0.5,0.5);
+			this.TeamBlue_Back_elo_change = this.add.text(100, 340, "" , style_red).setOrigin(0.5,0.5);
+			this.TeamRed_Back_elo_change = this.add.text(700, 340, "", style_green).setOrigin(0.5,0.5);
+
+
+
+
+			let display_tmp: number = blueEloLost;
+
+			clearInterval(this.TeamBlue_Back_change_interval);
+			this.TeamBlue_Back_change_interval = setInterval(
+				(function(self) { return function()
+				{
+					self.TeamBlue_Back_elo_change?.setText("-" + display_tmp);
+					display_tmp++;
+					if (display_tmp >= 0)
+					{
+						self.TeamBlue_Back_elo_change?.destroy();
+						clearInterval(self.TeamBlue_Back_change_interval);
+					}
+				}; })(this),
+				60);
+
+			
+			display_tmp = redEloWon;
+			clearInterval(this.TeamRed_Back_change_interval);
+			this.TeamRed_Back_change_interval = setInterval(
+				(function(self) { return function()
+				{
+					self.TeamRed_Back_elo_change?.setText("" + display_tmp);
+					display_tmp--;
+					if (display_tmp <= 0)
+					{
+						self.TeamRed_Back_elo_change?.destroy();
+						clearInterval(self.TeamRed_Back_change_interval);
+					}
+				}; })(this),
+				60);
+
+
+
+
+
+			clearInterval(this.TeamBlue_Back_interval);
+			this.TeamBlue_Back_interval = setInterval(
+				(function(self) { return function()
+				{
+					self.TeamBlue_Back_elo?.setText("" + self.TeamBlue_Back_oldElo);
+					self.TeamBlue_Back_oldElo--;
+					if (self.TeamBlue_Back_oldElo === self.TeamBlue_Back_newElo)
+					clearInterval(self.TeamBlue_Back_interval);
+				}; })(this),
+				60);
+						
+
+			clearInterval(this.TeamRed_Back_interval);
+			this.TeamRed_Back_interval = setInterval(
+				(function(self) { return function()
+				{
+					self.TeamRed_Back_elo?.setText("" + self.TeamRed_Back_oldElo);
+					self.TeamRed_Back_oldElo++;
+					if (self.TeamRed_Back_oldElo === self.TeamRed_Back_newElo)
+					clearInterval(self.TeamRed_Back_interval);
+				}; })(this),
+				60);
+	
+
 			if (this.game_type === GameType.Doubles)
 			{
-				this.add.text(285, 340, "" + blueEloLost, style_red).setOrigin(0.5,0.5);
-				this.add.text(515, 340, "+" + redEloWon, style_green).setOrigin(0.5,0.5);
+				this.TeamBlue_Front_elo_change = this.add.text(285, 340, "", style_red).setOrigin(0.5,0.5);
+				this.TeamRed_Front_elo_change = this.add.text(515, 340, "", style_green).setOrigin(0.5,0.5);
+
+
+
+
+				let display_tmp: number = blueEloLost;
+
+				clearInterval(this.TeamBlue_Front_change_interval);
+				this.TeamBlue_Front_change_interval = setInterval(
+					(function(self) { return function()
+					{
+						self.TeamBlue_Front_elo_change?.setText("" + display_tmp);
+						display_tmp++;
+						if (display_tmp >= 0)
+						{
+							self.TeamBlue_Front_elo_change?.destroy();
+							clearInterval(self.TeamBlue_Front_change_interval);
+						}
+					}; })(this),
+					60);
+	
+				
+				display_tmp = redEloWon;
+				clearInterval(this.TeamRed_Front_change_interval);
+				this.TeamRed_Front_change_interval = setInterval(
+					(function(self) { return function()
+					{
+						self.TeamRed_Front_elo_change?.setText("+" + display_tmp);
+						display_tmp--;
+						if (display_tmp <= 0)
+						{
+							self.TeamRed_Front_elo_change?.destroy();
+							clearInterval(self.TeamRed_Front_change_interval);
+						}
+					}; })(this),
+					60);
+
+
+
+
+
+
+				clearInterval(this.TeamBlue_Front_interval);
+				this.TeamBlue_Front_interval = setInterval(
+					(function(self) { return function()
+					{
+						self.TeamBlue_Front_elo?.setText("" + self.TeamBlue_Front_oldElo);
+						self.TeamBlue_Front_oldElo--;
+						if (self.TeamBlue_Front_oldElo === self.TeamBlue_Front_newElo)
+						clearInterval(self.TeamBlue_Front_interval);
+					}; })(this),
+					60);
+			
+					
+				clearInterval(this.TeamRed_Front_interval);
+				this.TeamRed_Front_interval = setInterval(
+					(function(self) { return function()
+					{
+						self.TeamRed_Front_elo?.setText("" + self.TeamRed_Front_oldElo);
+						self.TeamRed_Front_oldElo++;
+						if (self.TeamRed_Front_oldElo === self.TeamRed_Front_newElo)
+						clearInterval(self.TeamRed_Front_interval);
+					}; })(this),
+					60);
+
+
 			}
 
 		}
 
-		this.add.text(100, 380, "" + this.TeamBlue_Back_newElo, style).setOrigin(0.5,0.5);
-		this.add.text(700, 380, "" + this.TeamRed_Back_newElo, style).setOrigin(0.5,0.5);
 
-		if (this.game_type === GameType.Doubles)
-		{
-			this.add.text(285, 380, "" + this.TeamBlue_Front_newElo, style).setOrigin(0.5,0.5);
-			this.add.text(515, 380, "" + this.TeamRed_Front_newElo, style).setOrigin(0.5,0.5);
-		}
-	
+
 
 
 	}
@@ -485,5 +745,6 @@ export default class MatchResult extends Phaser.Scene
 
 
 	}
+
 
 }
