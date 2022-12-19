@@ -28,6 +28,10 @@ export const authSlice = createSlice({
         userFullAuthenticated: (state) => {
             state.isAuthenticated = true;
         },
+        changeInGameStatus: (state, {payload}: PayloadAction<string | null>) => {
+            if (state.currentUser)
+                state.currentUser.in_game_id = payload;
+        },
         loginSuccess: (state, {payload}: PayloadAction<UserInterface>) => {
 			console.log("payload", payload);
             state.currentUser = payload;
@@ -97,6 +101,7 @@ export const {
     loginPending,
     userFullAuthenticated,
     loginSuccess,
+    changeInGameStatus,
     loginError,
     setUsername,
     verification2fa,

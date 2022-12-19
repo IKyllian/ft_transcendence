@@ -8,7 +8,7 @@ import { addNotification, deleteNotification, resetNotification } from "../Redux
 import { addChannel, addPrivateConv, changePrivateConvOrder, removeChannel, resetChat } from "../Redux/ChatSlice";
 import { Channel, ChannelUpdateType, ChannelUser, Conversation, UserTimeout } from "../Types/Chat-Types";
 import { UserInterface } from "../Types/User-Types";
-import { copyFriendListArray, logoutSuccess, stopIsConnectedLoading, userFullAuthenticated } from "../Redux/AuthSlice";
+import { changeInGameStatus, copyFriendListArray, logoutSuccess, stopIsConnectedLoading, userFullAuthenticated } from "../Redux/AuthSlice";
 import { GameMode, PartyInterface, PartyMessage } from "../Types/Lobby-Types";
 import { copyNotificationArray } from "../Redux/NotificationSlice";
 import { addParty, addPartyInvite, addPartyMessage, cancelQueue, changeModalStatus, changePartyGameMode, changeQueueStatus, incrementQueueTimer, leaveParty, newGameFound, removePartyInvite, resetParty, resetQueueTimer } from "../Redux/PartySlice";
@@ -236,6 +236,12 @@ export function useAppHook() {
 				navigate(`/chat/channel/${data.id}`);
 			});
 
+			socket?.on("InGameStatusUpdate", (data: {id: number, in_game_id: string | null}) => {
+				if (currentUser && currentUser.id === data.id) {
+					dispatch(changeInGameStatus(data.in_game_id));
+				}
+			});
+
             socket?.on("OnLeave", (data: Channel) => {
                 console.log("OnLeave");
 				
@@ -255,6 +261,14 @@ export function useAppHook() {
 
 			socket?.on('gameinfo', (data: PlayersGameData | null) => {
 				console.log("gameinfo", data);
+				if (data !== null) {
+					dispatch(newGameFound({gameDatas: data, showGameFound: false}));
+					navigate("/game", {state: data});
+				}
+			})
+
+			socket?.on('user_gameinfo', (data: PlayersGameData | null) => {
+				console.log("user_gameinfo", data);
 				if (data !== null) {
 					dispatch(newGameFound({gameDatas: data, showGameFound: false}));
 					navigate("/game", {state: data});

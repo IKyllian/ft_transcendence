@@ -11,7 +11,7 @@ function ResumeGame() {
     return currentUser && currentUser.in_game_id && location.pathname !== "/game" ? (
         <div className="resume-game-container">
             <p> You are currently in game. </p>
-            <button onClick={() => socket?.emit("get_gameinfo", currentUser.in_game_id)}> Resume game </button>
+            <button onClick={() => socket?.emit("get_clientinfo", currentUser.id)}> Resume game </button>
         </div>
     ) : (
         <> </>
