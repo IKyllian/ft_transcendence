@@ -15,7 +15,7 @@ export async function fetchUploadAvatar(token: string, file: FormData): Promise<
     fetchInterceptor();
     return await fetch(`${baseUrl}/users/avatar/upload`, {
         method: 'POST',
-        body: file, 
+        body: file,
         headers: {
             "Authorization": `Bearer ${token}`,
         }

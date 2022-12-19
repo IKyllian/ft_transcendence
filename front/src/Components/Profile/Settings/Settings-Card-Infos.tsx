@@ -1,4 +1,3 @@
-import { IconLock } from "@tabler/icons";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import api from "../../../Api/Api";
@@ -25,7 +24,6 @@ function TwoFactor(props: {user: UserInterface}) {
     const { user } = props;
     const [displayQRCode, setDisplayQRCode] = useState<{show: boolean, qrcode: string | undefined}>({show: false, qrcode: undefined});
     const [disable2fa, setDisable2fa] = useState<boolean>(false);
-    const dispatch = useAppDispatch();
 
     const enableTwoFactor = () => {
         const localToken: string | null = localStorage.getItem("userToken");

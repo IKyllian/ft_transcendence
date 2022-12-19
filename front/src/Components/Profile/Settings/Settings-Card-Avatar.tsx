@@ -7,6 +7,7 @@ import { addAlert, AlertType } from "../../../Redux/AlertSlice";
 import { setUserAvatar } from "../../../Redux/AuthSlice";
 import { useAppDispatch, useAppSelector } from "../../../Redux/Hooks";
 import { TokenStorageInterface } from "../../../Types/Utils-Types";
+import { createdAccountDate } from "../../../Utils/Utils-User";
 import ExternalImage from "../../External-Image";
 
 function SettingsCardAvatar() {
@@ -26,17 +27,15 @@ function SettingsCardAvatar() {
             
             formData.append("image", inputFile);
             fetchUploadAvatar(localTokenParse.access_token, formData).then(async (response) => {
-                console.log("Response Upload", response);
                 if (cache && currentUser) {
                     const req = new Request(`${baseUrl}/users/${currentUser.id}/avatar`, {method: 'GET', headers: {"Authorization": `Bearer ${localTokenParse.access_token}`}});
                     if (!response.ok) {
-                        console.log("Error");
                         dispatch(addAlert({message: "Failed To Upload", type: AlertType.ERROR}));
                     }
                     else {
                         cache.put(req, response.clone());
                         const avatarBlob = await response.blob();
-                        if (avatarBlob) 
+                        if (avatarBlob)
                             dispatch(setUserAvatar(URL.createObjectURL(avatarBlob))); 
                         dispatch(addAlert({message: "New Avatar Uploaded (Refresh to see it)", type: AlertType.SUCCESS}));
                     }
@@ -50,15 +49,17 @@ function SettingsCardAvatar() {
     }
 
     const onFileChange = async (e: any) => {
-        const file = e.target.files[0]
-        var filesize: string = ((file.size/1024)/1024).toFixed(4);
-        if (+filesize < 10) {
-            if (fileError)
-                setFileError(undefined);
-            setInputFile(file);
-            setUrlFile(URL.createObjectURL(file));
-        } else {
-            setFileError("File is too big. File size must be under 10 Mo");
+        const file = e.target.files[0];
+        if (file) {
+            var filesize: string = ((file.size/1024)/1024).toFixed(4);
+            if (+filesize < 10) {
+                if (fileError)
+                    setFileError(undefined);
+                setInputFile(file);
+                setUrlFile(URL.createObjectURL(file));
+            } else {
+                setFileError("File is too big. File size must be under 10 Mo");
+            }
         }
     }
 
@@ -69,6 +70,7 @@ function SettingsCardAvatar() {
             setInputFile(undefined)
         }
     }
+
     return currentUser ? (
         <div className="avatar-card">
             <p className="card-username"> {currentUser?.username} </p>
@@ -76,20 +78,19 @@ function SettingsCardAvatar() {
                 { inputFile === undefined && <ExternalImage src={currentUser.avatar} alt="User Avatar" className='profile-avatar' userId={currentUser.id} /> }
                 { inputFile && <img className='profile-avatar' src={urlFile} alt="New Avatar" />  }
                 { fileError && <p className="error-file"> {fileError} </p> }
-                <form onSubmit={(e) => onSubmit(e)}>
+                <form id="avatar-form" onReset={() => resetUpload()} onSubmit={(e) => onSubmit(e)}>
                     <label>
                         <IconUpload />
                         Upload
                         <input type="file" onChange={(e) => onFileChange(e)} accept="image/gif, image/jpg, image/jpeg, image/png" />
                     </label>
-                    
                     <div className="buttons-container">
-                        <button onClick={() => resetUpload()} > Reset </button>
+                        <button type="reset"> Reset </button>
                         <button type='submit'> Save </button>
                     </div>
                 </form>
             </div>
-            <p className="member-txt"> Member Since: <span> 12 Novembre 2022 </span> </p>
+            <p className="member-txt"> Member Since: <span> {createdAccountDate(currentUser.created_at)} </span> </p>
         </div>
     ) : (
         <> </>

@@ -251,8 +251,15 @@ export function useAppHook() {
 				console.log("new_game_data", data);
 				dispatch(changeQueueStatus(false));
 				dispatch(newGameFound({gameDatas: data, showGameFound: true}));
-				// navigate("/game", {state: data});
 			});
+
+			socket?.on('gameinfo', (data: PlayersGameData | null) => {
+				console.log("gameinfo", data);
+				if (data !== null) {
+					dispatch(newGameFound({gameDatas: data, showGameFound: false}));
+					navigate("/game", {state: data});
+				}
+			})
 
 			socket.on("Logout", () => {
 				socket.disconnect();
@@ -283,6 +290,7 @@ export function useAppHook() {
 			socket?.off("OnLeave");
 			socket?.off("newgame_data");
 			socket?.off("Logout");
+            socket?.off("gameinfo");
 		}
 	}, [socket])
 

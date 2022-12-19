@@ -62,7 +62,8 @@ export async function fetchConvAndRedirect(
         dispatch: Dispatch<AnyAction>,
         navigate: NavigateFunction
     ): Promise<void>{
-
+    
+    console.log("userIdToSend", userIdToSend);
     await api.get(`/conversation/user/${userIdToSend}`)
     .then(response => {
         console.log("conversation/user", response);

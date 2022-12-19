@@ -162,14 +162,14 @@
                         font-size: 13px;
                         cursor: text;
                     }
+
+                    .lock-input {
+                        cursor: not-allowed;
+                    }
     
                     .label-input-wrapper {
                         @include flex-row-alignCenter();
                         gap: 5px;
-    
-                        .lock-input {
-                            cursor: not-allowed;
-                        }
     
                         .username-save {
                             width: 40px;

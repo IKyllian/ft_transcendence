@@ -37,7 +37,7 @@ export class ConversationService {
 	async conversationExist(userId: number, user2Id: number) {
 		return this.convRepo.createQueryBuilder('conv')
 			.where("conv.user1Id = :user1Id AND conv.user2Id = :user2Id", { user1Id: userId, user2Id: user2Id })
-			.orWhere("conv.user1Id = :user2Id AND conv.user1Id = :user2Id", { user2Id: user2Id, user1Id: userId })
+			.orWhere("conv.user1Id = :user2Id AND conv.user2Id = :user1Id", { user2Id: user2Id, user1Id: userId })
 			.getOne();
 	}
 
@@ -47,7 +47,7 @@ export class ConversationService {
 			.innerJoin("conv.user2", "user2")
 			.addSelect(["user1.id", "user2.id"])
 			.where("conv.user1Id = :user1Id AND conv.user2Id = :user2Id", { user1Id: userId, user2Id: user2Id })
-			.orWhere("conv.user1Id = :user2Id AND conv.user1Id = :user2Id", { user2Id: user2Id, user1Id: userId })
+			.orWhere("conv.user1Id = :user2Id AND conv.user2Id = :user1Id", { user2Id: user2Id, user1Id: userId })
 			.getOne();
 	}
 

@@ -1,14 +1,12 @@
 import { useState, useContext, useEffect } from "react";
 import { ModalContext } from "../../Components/Utils/ModalProvider";
 import { ProfileState, UserStatus } from "../../Types/User-Types";
-import { useAppDispatch, useAppSelector } from '../../Redux/Hooks';
-import { useNavigate, useParams } from "react-router-dom";
+import { useAppSelector } from '../../Redux/Hooks';
+import { useParams } from "react-router-dom";
 import { SocketContext } from "../../App";
 import { fetchProfile, fetchMe } from "../../Api/Profile/Profile-Fetch";
 import { Modes } from "../../Types/Utils-Types";
 import { AxiosResponse } from "axios";
-import { PlayersGameData } from "../../Components/Game/game/types/shared.types";
-import { newGameFound } from "../../Redux/PartySlice";
 
 interface ProfileMenuButtons {
     title: string;
@@ -30,8 +28,6 @@ export function useProfileHook() {
     const params = useParams();
     const modalStatus = useContext(ModalContext);
     const { socket } = useContext(SocketContext);
-    const navigate = useNavigate();
-    const dispatch = useAppDispatch();
 
     const handleClick = (index: number) => {
         let newArray = [...attributes];
@@ -82,14 +78,6 @@ export function useProfileHook() {
     }, [friendList])
 
     useEffect(() => {
-        socket?.on('gameinfo', (data: PlayersGameData | null) => {
-            console.log("gameinfo", data);
-            if (data !== null) {
-				dispatch(newGameFound({gameDatas: data, showGameFound: false}));
-                navigate("/game", {state: data});
-            }
-        })
-
         socket?.on("RelationUpdate", (data: {id: number, relation: string}) => {
             setUserState((prev: ProfileState | undefined) => {
                 return prev && data.id === prev.user.id ? {
@@ -117,7 +105,6 @@ export function useProfileHook() {
         });
 
         return () => {
-            socket?.off("user_gameinfo");
             socket?.off("RelationUpdate");
             socket?.off("InGameStatusUpdate");
             socket?.off("StatusUpdate");

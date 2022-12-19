@@ -12,6 +12,7 @@ import MatchFound from "./Components/Lobby/Match-Found";
 import Alert from "./Components/Alert";
 import LoadingSpin from "./Components/Utils/Loading-Spin";
 import Router from "./Route/Router";
+import ResumeGame from "./Components/Resume-Game";
 
 interface SocketContextType {
 	socket: Socket | undefined;
@@ -48,6 +49,7 @@ function App() {
 					{ isAuthenticated && <NotifGameInvite /> }
 					{ isAuthenticated && <MatchFound /> }
 					{ isAuthenticated && <Header /> }
+					{ isAuthenticated && <ResumeGame /> }
 					<main className="page-container">
 						{ isAuthenticated && partyState.party && partyState.chatIsOpen && <ChatParty />}
 						<Router />

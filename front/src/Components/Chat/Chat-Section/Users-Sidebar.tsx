@@ -1,7 +1,6 @@
 import { useContext } from "react";
 import { Link } from "react-router-dom";
-import { ChannelUser, UserTimeout } from "../../../Types/Chat-Types";
-import { useAppSelector } from "../../../Redux/Hooks";
+import { ChannelUser } from "../../../Types/Chat-Types";
 import { UserStatus } from "../../../Types/User-Types";
 import ExternalImage from "../../External-Image";
 import { IconEye } from "@tabler/icons";
@@ -22,7 +21,7 @@ function UserSidebarItem(props: {user: ChannelUser}) {
             <Link to={`/profile/${user.user.username}`}>
                 { user.user.username }
             </Link>
-            <IconEye onClick={() => socket?.emit("get_gameinfo", user.user.in_game_id)} className='spectate-icon' />
+            { user.user.in_game_id !== null && <IconEye onClick={() => socket?.emit("get_gameinfo", user.user.in_game_id)} className='spectate-icon' /> }
         </li>
     );
 }
