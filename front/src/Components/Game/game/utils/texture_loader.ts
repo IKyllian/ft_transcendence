@@ -36,7 +36,8 @@ export async function loadAvatar (user: UserInterface, key:string, token: string
     let result: string | undefined =  await getPlayerAvatar(cache, token, user.id, user.avatar);
     if (result)
     {
-      scene.load.image(key, result);
+   //   scene.load.image(key, result);
+      await_load_base64(result, key, scene);
     }
     else
     {
