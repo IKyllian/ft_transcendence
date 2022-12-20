@@ -149,9 +149,9 @@ export default class Lobby extends Phaser.Scene
 			  }; })(this),
 			50);
 	}
-
-	create (){}
-	update (){}
+	// preload ()
+	// create (){}
+	// update (){}
 
 	display ()
 	{
@@ -287,7 +287,7 @@ export default class Lobby extends Phaser.Scene
 	check_status()
 	{
 		this.anti_spam_count++;
-		if (this.anti_spam_count >= 10)
+		if (this.anti_spam_count >= 5)
 		{
 			if (this.socketmanager instanceof ClientSocketManager)
 			{
@@ -299,7 +299,7 @@ export default class Lobby extends Phaser.Scene
 		if (!this.connected)
 		{
 			this.wait_delay++;
-			if (this.wait_delay >= 200)
+			if (this.wait_delay >= 300)
 			{
 				clearInterval(this.update_interval);
 				this.server_connect_fail();

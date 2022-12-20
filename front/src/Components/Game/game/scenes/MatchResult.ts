@@ -363,7 +363,7 @@ export default class MatchResult extends Phaser.Scene
 						}
 					}; })(this),
 					60);
-				}, 1000);
+				}, 2000);
 		}
 		else
 		{
@@ -384,7 +384,7 @@ export default class MatchResult extends Phaser.Scene
 						}
 					}; })(this),
 					60);
-				}, 1000);
+				}, 2000);
 		}
 	}
 
