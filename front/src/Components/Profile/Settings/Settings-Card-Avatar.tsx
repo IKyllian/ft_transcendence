@@ -27,13 +27,14 @@ function SettingsCardAvatar() {
             
             formData.append("image", inputFile);
             fetchUploadAvatar(localTokenParse.access_token, formData).then(async (response) => {
-                if (cache && currentUser) {
-                    const req = new Request(`${baseUrl}/users/${currentUser.id}/avatar`, {method: 'GET', headers: {"Authorization": `Bearer ${localTokenParse.access_token}`}});
+				if (currentUser) {
+					const req = new Request(`${baseUrl}/users/${currentUser.id}/avatar`, {method: 'GET', headers: {"Authorization": `Bearer ${localTokenParse.access_token}`}});
                     if (!response.ok) {
                         dispatch(addAlert({message: "Failed To Upload", type: AlertType.ERROR}));
                     }
                     else {
-                        cache.put(req, response.clone());
+						if (cache)
+                        	cache.put(req, response.clone());
                         const avatarBlob = await response.blob();
                         if (avatarBlob)
                             dispatch(setUserAvatar(URL.createObjectURL(avatarBlob))); 

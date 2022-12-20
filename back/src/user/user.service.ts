@@ -82,13 +82,11 @@ export class UserService {
 	}
 
 	async editPassword(user: User, dto: EditPasswordDto) {
-		if (user.id42) { throw new BadRequestException(); }
-
 		let account: UserAccount = await this.accountRepo.findOne({
 			where: { user: { id: user.id } },
 		});
-		if (!account) {
-			throw new NotFoundException("Pas normal");
+		if (!account || !account.hash) {
+			throw new BadRequestException("Account or password not set");
 		}
 		
 		const pwdMatches = await argon.verify(

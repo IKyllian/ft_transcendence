@@ -1,7 +1,6 @@
-import { MESSAGES } from "@nestjs/core/constants";
 import { generate } from "shortid";
 import { Player } from "src/game/player";
-import { ChannelUser, User, UserTimeout } from "src/typeorm";
+import { User } from "src/typeorm";
 import { GameType } from "./game.types";
 
 export type JwtPayload = {
@@ -16,7 +15,6 @@ export type UserPayload = {
 
 export type FindUserParams = Partial<{
 	id: number;
-	id42: number;
 	username: string;
 }>;
 

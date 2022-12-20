@@ -16,10 +16,6 @@ export class CreateUserDto {
 
 	account: UserAccount;
 
-	@IsOptional()
-	@IsNumber()
-	id42?: number;
-
 	@IsEmail()
 	@IsNotEmpty()
 	email: string;

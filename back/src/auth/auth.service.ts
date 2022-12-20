@@ -10,7 +10,7 @@ import { Auth42Dto } from "./dto/auth42.dto";
 import { User } from "src/typeorm";
 import { SignupDto } from "./dto/signup.dto";
 import { InjectRepository } from "@nestjs/typeorm";
-import { IsNull, Repository } from "typeorm";
+import { Repository } from "typeorm";
 import * as nodemailer from 'nodemailer';
 import { ForgotPasswordDto } from "./dto/forgot-password.dto";
 import { v4 as uuidv4 } from "uuid";
@@ -68,6 +68,7 @@ export class AuthService {
 	async login(dto: LoginDto) {
 		const user: User = await this.userRepo
 			.createQueryBuilder("user")
+			.addSelect('user.email')
 			.where("LOWER(user.username) = :name", { name: dto.username.toLowerCase() })
 			.orWhere("LOWER(user.email) = :email", { email: dto.username.toLowerCase() })
 			.leftJoinAndSelect("user.channelUser", "ChannelUser")
@@ -76,7 +77,7 @@ export class AuthService {
 			.leftJoinAndSelect("user.blocked", "Blocked")
 			.getOne();
 
-		if (!user || user.id42 || !user.account.hash) {
+		if (!user || !user.account.hash) {
 			throw new NotFoundException('invalid credentials')
 		}
 
@@ -116,7 +117,7 @@ export class AuthService {
 			));
 			return response.data.access_token;
 		} catch(error) {
-			console.log('error 42 login', error.message, code)
+			console.log(error.message)
 			throw new UnauthorizedException('Failed to retreive 42 token');
 		}
 	}
@@ -124,26 +125,20 @@ export class AuthService {
 	async login42(dto: Auth42Dto) {
 		const token = await this.get42token(dto.authorizationCode);
 		const response = await lastValueFrom(this.httpService.get(`https://api.intra.42.fr/v2/me?access_token=${token}`));
-		let user = await this.userService.findOne({
-			relations: {
-				channelUser: { channel: true },
-				blocked: true,
-				account: true,
-			},
-			where: {
-				id42: response.data.id,
-			}
-		});
+		let user: User = await this.userRepo
+			.createQueryBuilder("user")
+			.addSelect('user.email')
+			.orWhere("LOWER(user.email) = :email", { email: response.data.email.toLowerCase() })
+			.leftJoinAndSelect("user.channelUser", "ChannelUser")
+			.leftJoinAndSelect("ChannelUser.channel", "Channel")
+			.leftJoinAndSelect("user.account", "account")
+			.leftJoinAndSelect("user.blocked", "Blocked")
+			.getOne();
+
 		if (!user) {
-			console.log('user 42 not found, creating a new one');
-			if (await this.userService.mailTaken(response.data.email)) {
-				console.log("mail taken")
-				throw new BadRequestException("Mail is already taken");
-			}
 			const account = this.accountRepo.create();
 			const params = {
 				account: account,
-				id42: response.data.id,
 				email: response.data.email,
 			}
 			user = await this.userService.create(params);
@@ -241,7 +236,6 @@ export class AuthService {
 			select: ['username', 'email', 'id'],
 			where: { 
 				email: dto.email,
-				id42: IsNull()
 			}
 		})
 
@@ -258,15 +252,13 @@ export class AuthService {
             html: `
             <h3>Password Reset</h3>
 			<p>Hi ${user.username}, you have submitted a password reset request on <b>Pong Game</b></p>
-			<p>To set your new password, <a href=http://${process.env.SERVER_IP}:3000/reset-password?code=${validation_code}>Click here</a></p>
+			<p>To set your new password, <a href=http://${process.env.FRONT_IP}:3000/reset-password?code=${validation_code}>Click here</a></p>
             `,
         }
 
         this.transporter.sendMail(message, function(err, info) {
             if (err)
                 console.log('err', err);
-            else
-                console.log('info', info);
         });
 
 		return { success: true }

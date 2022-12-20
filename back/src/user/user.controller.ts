@@ -57,7 +57,6 @@ export class UserController {
 		if (!file) {
 			throw new BadRequestException("file does not match valid extention");
 		}
-		
 		if (!await this.userService.resizeImage(file)) {
 			throw new BadRequestException("Error occured in file upload");
 		}
