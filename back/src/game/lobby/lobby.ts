@@ -35,7 +35,7 @@ export class Lobby
 	{
 		this.lobby_data.players.forEach(async (player) => {
 			this.factory.userService.setInGameId(player.user.id, null);
-			this.factory.globalService.server.to(`user-${player.user.id}`).emit('InGameStatusUpdate', { id: player.user.id, in_game_id: null });
+			this.factory.globalService.server.emit('InGameStatusUpdate', { id: player.user.id, in_game_id: null });
 
 		})
 		this.already_finished = true;

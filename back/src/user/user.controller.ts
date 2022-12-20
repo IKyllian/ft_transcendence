@@ -54,10 +54,10 @@ export class UserController {
 	@Post('avatar/upload')
 	@UseInterceptors(FileInterceptor('image', avatarStorage))
 	async uploadFile(@UploadedFile() file: Express.Multer.File, @GetUser() user: User, @Res() res: Response, @Req() req: Request) {
-		console.log('file', file);
 		if (!file) {
 			throw new BadRequestException("file does not match valid extention");
 		}
+		
 		if (!await this.userService.resizeImage(file)) {
 			throw new BadRequestException("Error occured in file upload");
 		}

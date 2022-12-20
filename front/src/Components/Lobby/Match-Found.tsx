@@ -42,7 +42,7 @@ function MatchFound() {
             <div className="outside-circle"> </div>
             <div className="fill-match-found">
                 <div>
-                    <p className="found-title"> Game Found </p>
+                    <p className="found-title"> {gameFound.gameDatas.game_settings.is_ranked ? "Game Found" : "Match Ready"}  </p>
                     <p> {displayGameMode(gameFound.gameDatas.game_settings.game_type, gameFound.gameDatas.game_settings.is_ranked)} </p>
                 </div>
                 <button className="accept-button" onClick={() => handleClick()}> Accept </button>

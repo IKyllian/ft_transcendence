@@ -21,6 +21,7 @@ $warningDark: rgb(65, 61, 5);
     flex-direction: column;
     align-items: center;
     gap: 10px;
+    width: 0;
 
     .notif-success {
         background-color: $successLight;

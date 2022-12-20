@@ -41,8 +41,8 @@ export function ChannelUserItem(props: {userDatas: ChannelUser}) {
                             (loggedUserIsOwner || (loggedUserIsModerator && userDatas.role !== "owner")) &&
                             <> 
                                 <RoleButton sender={userDatas} />
-                                <MuteButton senderId={userDatas.id} chanId={channelDatas.id} usersTimeout={channelDatas.usersTimeout} />
-                                <BanButton senderId={userDatas.id} chanId={channelDatas.id} />
+                                <MuteButton senderId={userDatas.user.id} chanId={channelDatas.id} usersTimeout={channelDatas.usersTimeout} />
+                                <BanButton senderId={userDatas.user.id} chanId={channelDatas.id} />
                             </>
                         }
                     </DropdownContainer>

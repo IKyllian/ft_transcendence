@@ -194,14 +194,6 @@
             justify-content: space-between;
             position: relative;
 
-            .delete-notif-icon {
-                cursor: pointer;
-                position: absolute;
-                top: 2px;
-                right: 2px;
-                @include width-height(11px, 11px);
-            }
-
             .profile-avatar {
                 @include avatar-player(40px);
             }

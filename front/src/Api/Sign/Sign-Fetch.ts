@@ -67,18 +67,4 @@ export function fetchVerifyToken(dispatch: Dispatch<AnyAction>) {
         console.log(err);
         dispatch(stopIsConnectedLoading());
     })
-
-    // axios.post(`${baseUrl}/auth/verify-token`, {}, {
-    //     headers: {
-    //         "Authorization": `Bearer ${token}`,
-    //     }
-    // })
-    // .then((response) => {
-    //     console.log("Response VerifyToken", response);
-    //     dispatch(loginSuccess({user: response.data, token: token}));
-    // })
-    // .catch((err) => {
-    //     console.log(err);
-    //     dispatch(stopIsConnectedLoading());
-    // })
 }

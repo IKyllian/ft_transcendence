@@ -11,12 +11,12 @@
 @use "./Chat/Channel-Settings.scss";
 @use "./Loading-Spin.scss";
 @use "./Notif-Game-Invite.scss";
-@use "./Notif-Error.scss";
-@use "./Notif-Success.scss";
+@use "./Notif-Alert.scss";
 @use "./Lobby.scss";
 @use "./Chat-Party.scss";
 @use "./Match-Found.scss";
 @use "./Alert-Validation.scss";
+@use "./Resume-Game.scss";
 @use "./Variables.scss" as *;
 
 body {
@@ -94,14 +94,11 @@ button {
 }
 
 .dropdown-container {
-	background-color: white;
 	position: absolute;
-	left: 20px;
-	top: 30px;
 	width: 200px;
 	border-radius: 5px;
 	background-color: $DarkPalette;
-	z-index: 100;
+	z-index: 9999;
 
 	.dropdown-wrapper {
 		margin: 10px;

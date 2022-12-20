@@ -1,4 +1,3 @@
-import { replaceUserObject } from "../Redux/AuthSlice";
 import { AnyAction, Dispatch } from "@reduxjs/toolkit";
 import { copyNotificationArray } from "../Redux/NotificationSlice";
 import { copyFriendListArray } from "../Redux/AuthSlice";
@@ -6,12 +5,7 @@ import { UserInterface } from "../Types/User-Types";
 import api from "./Api";
 import { baseUrl } from "../env";
 import { fetchResponseAvatar } from "./Profile/Profile-Fetch";
-
-interface BlockParameters {
-    readonly senderId: number,
-    dispatch: Dispatch<AnyAction>
-    time?: number,
-}
+import { AxiosResponse } from "axios";
 
 interface UsersListInterface {
     user: UserInterface,
@@ -19,24 +13,12 @@ interface UsersListInterface {
 }
 
 
-export function fetchOnBlockUser({senderId, dispatch, time}: BlockParameters) {
-    api.post(`/users/${senderId}/block`, {})
-    .then((response) => {
-        dispatch(replaceUserObject(response.data));
-    })
-    .catch((err) => {
-        console.log(err);
-    })
+export async function fetchOnBlockUser(senderId: number): Promise<AxiosResponse<any, any>> {
+    return await api.post(`/users/${senderId}/block`, {});
 }
 
-export function fetchOnUnblockUser({senderId, dispatch}: BlockParameters) {
-    api.post(`/users/${senderId}/deblock`, {})
-    .then((response) => {
-        dispatch(replaceUserObject(response.data));
-    })
-    .catch((err) => {
-        console.log(err);
-    })
+export async function fetchOnUnblockUser(senderId: number): Promise<AxiosResponse<any, any>> {
+    return await api.post(`/users/${senderId}/deblock`, {});
 }
 
 export function fetchNotifications(dispatch: Dispatch<AnyAction>) {

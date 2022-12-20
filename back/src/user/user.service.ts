@@ -1,7 +1,6 @@
-import { BadRequestException, ForbiddenException, forwardRef, Inject, Injectable, NotFoundException } from "@nestjs/common";
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { FindManyOptions, FindOneOptions, FindOptionsWhere, Repository } from "typeorm";
-import { AuthService } from "src/auth/auth.service";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { MatchResult, Statistic, User } from "src/typeorm";
 import * as argon from 'argon2';
@@ -260,21 +259,20 @@ export class UserService {
 	}
 
 	async resizeImage(file: Express.Multer.File) {
-		readFileAsyc(file.path)
-		  .then((b: Buffer) => {
-			return sharp(b, { animated: true })
-			  .resize(300, 300)
-			  .webp()
-			  .toFile(file.path);
-		  })
-		  .catch(() => {
+		try {
+			const buf = await readFileAsyc(file.path)
+			await sharp(buf, { animated: true })
+			.resize(300, 300)
+			.webp()
+			.toFile(file.path);
+			return true;
+		} catch {
 			try {
 				fs.unlinkSync(file.path);
-			} catch(err) {
-				console.log(err);
+			} catch(e) {
+				console.log(e.message);
 			}
 			return false;
-		  });
-		  return true;
+		}
 	}
 }

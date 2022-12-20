@@ -13,10 +13,12 @@ function ChatParty() {
     const { socket } = useContext(SocketContext);
 
     const messageSubmit = handleSubmit((data) => {
-        socket?.emit("NewPartyMessage", {
-            content: data.inputMessage,
-        });
-        reset();
+        if (data.inputMessage.length > 0) {
+            socket?.emit("NewPartyMessage", {
+                content: data.inputMessage,
+            });
+            reset();
+        }
     })
 
     const scrollToBottom = () => {
@@ -36,11 +38,10 @@ function ChatParty() {
                         {
                             party.messages.map((elem, index) => {
                                 const dateMessage = new Date(elem.send_at);
-                                console.log("MESSAGE", elem);
                                 if (index === 0 || !elem.sender || party.messages[index - 1].sender?.id !== elem.sender?.id || (dateMessage.getDate() !== (new Date(party.messages[index - 1].send_at).getDate())))
-                                    return <MessageItem key={index} isFromChan={false} message={elem} loggedUserIsOwner={true} isNewSender={true} index={index} />
+                                    return <MessageItem key={index} isFromChan={false} message={elem} isNewSender={true} index={index} />
                                 else
-                                    return <MessageItem key={index} isFromChan={false} message={elem} loggedUserIsOwner={true} isNewSender={false} index={index} />
+                                    return <MessageItem key={index} isFromChan={false} message={elem} isNewSender={false} index={index} />
                             })
                         }
                         <div ref={messagesEndRef} />

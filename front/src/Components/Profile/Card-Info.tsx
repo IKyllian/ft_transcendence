@@ -1,10 +1,11 @@
 import { useContext } from 'react';
-import { IconMessage, IconBrandAppleArcade, IconSettings, IconEye } from '@tabler/icons';
+import { IconMessage, IconSettings, IconEye } from '@tabler/icons';
 import { ProfileState, UserStatus } from '../../Types/User-Types';
 import { Link } from "react-router-dom";
 import FriendButton from '../Buttons/Friend-Button';
 import { SocketContext } from '../../App';
 import ExternalImage from '../External-Image';
+import BlockButton from '../Buttons/Block-Button';
 
 function CardInfo(props: {userState: ProfileState}) {
     const { userState } = props;
@@ -26,13 +27,14 @@ function CardInfo(props: {userState: ProfileState}) {
                     <IconSettings className='settings-icon' />
                 </Link>
                 : 
-                <>
+                <div className='icons-wrapper'>
                     <FriendButton secondUserId={userState.user.id} relationStatus={userState.relationStatus!} />
                     <Link className="send-message-icon" to="/chat" state={{userIdToSend: userState.user.id}}>
                         <IconMessage />
                     </Link>
+                    <BlockButton senderId={userState.user.id} isIconButton={true} />
                     { userState.user.in_game_id !== null && <IconEye onClick={() => spectateClick()} className='spectate-icon' /> }
-                </>
+                </div>
             }
         </div>
     ) : (

@@ -8,7 +8,6 @@ import { UserInterface } from "../../../Types/User-Types";
 
 function ChatChannel() {
     const {
-        loggedUserIsOwner,
         changeSidebarStatus,
         handleSubmit,
         messagesEndRef,
@@ -51,9 +50,9 @@ function ChatChannel() {
                         channelDatas.messages.map((elem, index) => {
                             const dateMessage = new Date(elem.send_at);
                             if (index === 0 || !elem.sender || channelDatas.messages[index - 1].sender?.id !== elem.sender?.id || (dateMessage.getDate() !== (new Date(channelDatas.messages[index - 1].send_at).getDate())))
-                                return <MessageItem key={index} isFromChan={true} message={elem} loggedUserIsOwner={loggedUserIsOwner} chan={channelDatas} isNewSender={true} index={index} />
+                                return <MessageItem key={index} isFromChan={true} message={elem} isNewSender={true} index={index} />
                             else
-                                return <MessageItem key={index} isFromChan={true} message={elem} loggedUserIsOwner={loggedUserIsOwner} chan={channelDatas} isNewSender={false} index={index} />
+                                return <MessageItem key={index} isFromChan={true} message={elem} isNewSender={false} index={index} />
                         }
                         )
                     }

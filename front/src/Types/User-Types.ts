@@ -44,6 +44,7 @@ export interface UserInterface {
 	doubles_elo: number,
     two_factor_enabled: boolean,
     in_game_id: string | null,
+    created_at: string,
 }
 
 interface Statistic {

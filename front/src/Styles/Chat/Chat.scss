@@ -189,6 +189,14 @@
                 }
                 .player-container {
                     @include flex-row-alignCenter;
+
+                    .spectate-icon {
+                        @include width-height(14px, 14px);
+                        margin-left: 10px;
+                        margin-top: 2px;
+                        cursor: pointer;
+                    }
+
                     p {
                         cursor: pointer;
                     }
@@ -208,7 +216,7 @@
                 overflow: hidden;
 
                 &:hover {
-                    overflow-y: scroll;
+                    @include overflowScroll("y");
                 }
 
                 .message-server {
@@ -336,6 +344,7 @@
             @include overflowScroll("y");
             &-wrapper {
                 margin: 10px;
+                position: absolute;
                 h3 {
                     margin: 0;
                     color: #a5abb0;
@@ -351,20 +360,25 @@
                         gap: 10px;
                         padding: 8px;
                         @include avatar-status-container($DarkPalette);
+                        position: relative;
+
+                        p {
+                            cursor: pointer;
+                        }
 
                         .spectate-icon {
                             @include width-height(15px, 15px);
                             cursor: pointer;
                         }
 
-                        &:hover {
-                            background-color: $LightDarkPalette;
-                            .avatar-container {
-                                .user-status {
-                                    background-color: $LightDarkPalette;
-                                }
-                            }
-                        }
+                        // &:hover {
+                        //     background-color: $LightDarkPalette;
+                        //     .avatar-container {
+                        //         .user-status {
+                        //             background-color: $LightDarkPalette;
+                        //         }
+                        //     }
+                        // }
                     }
                 }
             }
