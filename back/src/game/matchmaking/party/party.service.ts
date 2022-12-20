@@ -159,8 +159,9 @@ export class PartyService {
 		if (redTeam.players.length !== blueTeam.players.length) {
 			throw new BadRequestException("You must balance the teams");
 		}
-		if (nbOfPayersRequired === 2 && (redTeam.players[0].pos !== PlayerPosition.BACK || blueTeam.players[0].pos !== PlayerPosition.BACK)) {
-			throw new BadRequestException("Players must be at Back position");
+		if (nbOfPayersRequired === 2) {
+			redTeam.players[0].pos = PlayerPosition.BACK;
+			blueTeam.players[0].pos = PlayerPosition.BACK;
 		} else if (nbOfPayersRequired === 4 && (redTeam.players[0].pos === redTeam.players[1].pos || blueTeam.players[0].pos === blueTeam.players[1].pos)) {
 			throw new BadRequestException("Team can't be at the same position");
 		}

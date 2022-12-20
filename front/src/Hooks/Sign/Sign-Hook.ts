@@ -104,7 +104,8 @@ export function useSignHook() {
     const sign42 = (e: any) => {
         e.preventDefault();
         const url: string = "https://api.intra.42.fr/oauth/authorize";
-        const params: string = `?client_id=${uid}&redirect_uri=http://localhost:3000/sign&response_type=code`;
+		// TODO redirect ip
+        const params: string = `?client_id=${uid}&redirect_uri=http://10.1.8.1:3000/sign&response_type=code`;
         const ret = window.location.replace(url+params);
     }
 
