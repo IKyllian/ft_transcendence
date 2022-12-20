@@ -57,6 +57,7 @@ export default class Lobby extends Phaser.Scene
 	wait_delay: number = 0;
 	connected: boolean = false;
 	launching_game: boolean = false;
+	update_interval: any;
 
 	preload ()
 	{
@@ -123,8 +124,10 @@ export default class Lobby extends Phaser.Scene
 							&& self.textures.exists('TeamRed_front_avatar')
 						)
 						{
-							console.log("all loaded");
 							self.display();
+							self.update_interval = setInterval(() => {
+								self.check_status();
+							}, 1000 / 30);
 							clearInterval(interval);
 						}
 					}
@@ -135,8 +138,10 @@ export default class Lobby extends Phaser.Scene
 							&& self.textures.exists('TeamRed_back_avatar')
 						)
 						{
-							console.log("all loaded");
 							self.display();
+							self.update_interval = setInterval(() => {
+								self.check_status();
+							}, 1000 / 30);
 							clearInterval(interval);
 						}
 					}
@@ -146,6 +151,7 @@ export default class Lobby extends Phaser.Scene
 	}
 
 	create (){}
+	update (){}
 
 	display ()
 	{
@@ -278,7 +284,7 @@ export default class Lobby extends Phaser.Scene
 		this.socketmanager.lobby_send_request_status(this.registry.get('players_data').game_id);
 	}
 
-	update(): void
+	check_status()
 	{
 		this.anti_spam_count++;
 		if (this.anti_spam_count >= 10)
@@ -295,7 +301,7 @@ export default class Lobby extends Phaser.Scene
 			this.wait_delay++;
 			if (this.wait_delay >= 200)
 			{
-	
+				clearInterval(this.update_interval);
 				this.server_connect_fail();
 			}
 		}
@@ -307,11 +313,11 @@ export default class Lobby extends Phaser.Scene
 			return;
 		
 		this.launching_game = true;
-		this.socketmanager!.game_get_round_setup(this.game.registry.get('players_data').game_id);
+		this.socketmanager?.game_get_round_setup(this.game.registry.get('players_data').game_id);
+		clearInterval(this.update_interval);
 
 		setTimeout(() => { 
 			this.cameras.main.fadeOut(1000, 0, 0, 0);
-
 		}, 1500);
 
 		setTimeout(() => { 
@@ -322,6 +328,7 @@ export default class Lobby extends Phaser.Scene
 	game_abort = () =>
 	{
 		this.clear_all();
+		clearInterval(this.update_interval);
 
 		this.message_text = this.add.text(400, 100,
 							"Someone Failed\nto join\nGame aborted",
@@ -372,6 +379,7 @@ export default class Lobby extends Phaser.Scene
 	server_connect_fail = () =>
 	{
 		this.clear_all();
+		clearInterval(this.update_interval);
 
 		this.message_text = this.add.text(400, 100,
 			"Error: \nCould not connect to server",
@@ -390,7 +398,8 @@ export default class Lobby extends Phaser.Scene
 		if(!response)
 		{
 			this.clear_all();
-			
+			clearInterval(this.update_interval);
+
 			this.message_text = this.add.text(400, 100,
 								"Error: \nLobby not found",
 								make_style(30))
@@ -406,6 +415,7 @@ export default class Lobby extends Phaser.Scene
 	game_end = (winner: EndResult) =>
 	{
 		this.game.registry.set('winner', winner);
+		clearInterval(this.update_interval);
 
 		this.scene.start('MatchResult');
 	}
