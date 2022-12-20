@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useAppDispatch } from "../../Redux/Hooks";
 import { IconChevronUp, IconChevronDown, IconX, IconLock } from "@tabler/icons";
-import { GameModeState, Player, PartyInterface, QueueTimerInterface } from "../../Types/Lobby-Types";
+import { GameModeState, Player, PartyInterface, QueueTimerInterface, GameMode } from "../../Types/Lobby-Types";
 import { changeSidebarChatStatus } from "../../Redux/PartySlice";
 import { partyQueueString } from "../../Utils/Utils-Party";
 
@@ -25,7 +25,7 @@ function LobbyButtonsContainer(props: Props) {
     return user ? (
         <div className="lobby-buttons-wrapper">
             <PartyChatButton party={party} />
-            <StartButton user={user} isInQueue={isInQueue} cancelQueue={cancelQueue} startQueue={startQueue} onReady={onReady} queueTimer={queueTimer} lobbyError={lobbyError} />
+            <StartButton user={user} isInQueue={isInQueue} cancelQueue={cancelQueue} startQueue={startQueue} onReady={onReady} queueTimer={queueTimer} lobbyError={lobbyError} gameMode={gameMode} />
             <GameModeButton party={party} gameMode={gameMode} onGameModeChange={onGameModeChange} loggedUserIsLeader={loggedUserIsLeader} isInQueue={isInQueue} />
         </div>
     ) : (
@@ -55,12 +55,13 @@ function GameModeButton(props: { party: PartyInterface | undefined, gameMode: Ga
     );
 }
 
-function StartButton(props: {user: Player, isInQueue: boolean, cancelQueue: Function, startQueue: Function, onReady: Function, queueTimer: QueueTimerInterface, lobbyError: String | undefined}) {
-    const { user, isInQueue, cancelQueue, startQueue, onReady, queueTimer, lobbyError } = props;
+function StartButton(props: {user: Player, isInQueue: boolean, cancelQueue: Function, startQueue: Function, onReady: Function, queueTimer: QueueTimerInterface, lobbyError: String | undefined,  gameMode: GameModeState}) {
+    const { user, isInQueue, cancelQueue, startQueue, onReady, queueTimer, lobbyError, gameMode } = props;
+
     return (
         <>
-            { user.isLeader && !isInQueue && !lobbyError && <button className="start-button" onClick={() => startQueue()}> Start Game </button> }
-            { user.isLeader && !isInQueue && lobbyError && <button className="start-button" lobby-error={`${lobbyError}`} > <IconLock className="lock-icon" /> Start Game </button> }
+            { user.isLeader && !isInQueue && !lobbyError && <button className="start-button" onClick={() => startQueue()}> {gameMode.gameModes[gameMode.indexSelected].gameMode === GameMode.PRIVATE_MATCH ? "Start Game" : "Play"} </button> }
+            { user.isLeader && !isInQueue && lobbyError && <button className="start-button" lobby-error={`${lobbyError}`} > <IconLock className="lock-icon" /> {gameMode.gameModes[gameMode.indexSelected].gameMode === GameMode.PRIVATE_MATCH ? "Start Game" : "Play"} </button> }
             { isInQueue && <button className="queue-button"> <IconX onClick={() => cancelQueue()} /> {partyQueueString(queueTimer)} </button> }
             { !user.isLeader && !isInQueue && user.isReady && <button className="start-button" onClick={() => onReady(false)}> Unready </button> }
             { !user.isLeader && !isInQueue && !user.isReady && <button className="start-button" onClick={() => onReady(true)}> Ready </button> }

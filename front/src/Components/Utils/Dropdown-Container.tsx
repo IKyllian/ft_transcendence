@@ -1,7 +1,7 @@
 import { ReactNode, useEffect, useRef } from "react";
 
-function DropdownContainer(props: {show: boolean, onClickOutside: Function, children?: ReactNode}) {
-    const { show, onClickOutside, children } = props;
+function DropdownContainer(props: {show: boolean, onClickOutside: Function, children?: ReactNode, alignToLeft?: boolean}) {
+    const { show, onClickOutside, children, alignToLeft } = props;
 
     const ref = useRef<HTMLHeadingElement>(null);
 
@@ -19,7 +19,7 @@ function DropdownContainer(props: {show: boolean, onClickOutside: Function, chil
     }, [onClickOutside]);
 
     return show ? (
-        <div ref={ref} className="dropdown-container">
+        <div ref={ref} className="dropdown-container" style={alignToLeft ? {left: '-150px', top: '30px'} : {left: '20px', top: '30px'}} >
             <div className="dropdown-wrapper">
                 {children}
             </div>

@@ -109,11 +109,10 @@ export function useLobbyHook() {
             if (gameMode !== party.game_mode) {
                 socket?.emit("SetGameMode", gameMode);
             }
-        } else {
-            setGameMode((prev: GameModeState) => {
-                return { ...prev, indexSelected: index };
-            });
-        }
+        } 
+        setGameMode((prev: GameModeState) => {
+            return { ...prev, indexSelected: index };
+        });
     }
 
     const settingsFormSubmit = handleSubmit((data: GameSettings, e) => {

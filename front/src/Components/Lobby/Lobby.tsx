@@ -21,8 +21,6 @@ function Lobby() {
         settingsFormSubmit,
         startQueue,
         cancelQueue,
-        onChangeTeam,
-        onChangePos,
     } = useLobbyHook();
 
     return (
@@ -36,9 +34,6 @@ function Lobby() {
                                 user={elem}
                                 lobbyLength={party.players.length}
                                 gameMode={party.game_mode}
-                                onChangeTeam={onChangeTeam}
-                                loggedUserId={currentUser?.id}
-                                onChangePos={onChangePos}
                             />
                         )
                         : <PlayerListItem key={currentUser?.id} user={{isLeader: true, isReady: true, user: currentUser!, team: TeamSide.BLUE}} lobbyLength={1} />

@@ -94,14 +94,11 @@ button {
 }
 
 .dropdown-container {
-	background-color: white;
 	position: absolute;
-	left: 20px;
-	top: 30px;
 	width: 200px;
 	border-radius: 5px;
 	background-color: $DarkPalette;
-	z-index: 100;
+	z-index: 9999;
 
 	.dropdown-wrapper {
 		margin: 10px;

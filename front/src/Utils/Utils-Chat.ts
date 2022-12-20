@@ -1,4 +1,4 @@
-import { ChannelModes, Conversation, ConversationInfoSidebar, TimeoutType, UserTimeout } from "../Types/Chat-Types";
+import { ChannelModes, ChannelUser, Conversation, ConversationInfoSidebar, TimeoutType, UserTimeout } from "../Types/Chat-Types";
 import { UserInterface } from "../Types/User-Types";
 
 export function getSecondUserIdOfPM(conversation: Conversation | ConversationInfoSidebar, userConnectedId: number): number {
@@ -11,6 +11,13 @@ export function getSecondUserOfPM(conversation: Conversation | ConversationInfoS
 
 export function getSecondUsernameOfPM(conversation: Conversation, userConnectedId: number): string {
     return conversation.user1.id !== userConnectedId ? conversation.user1.username : conversation.user2.username;
+}
+
+export function userIdIsOwner(userId: number, channelUsers: ChannelUser[]): boolean {
+    const user: ChannelUser | undefined = channelUsers.find(elem => elem.user.id === userId && elem.role === "owner");
+    if (!user)
+        return false;
+    return true;
 }
 
 export function getMessageDateString(date: string): string {
@@ -26,7 +33,7 @@ export function getMessageDateString(date: string): string {
         && (currentDate.getDate() - 1) === dateMessage.getDate())
         return (`Hier à ${dateMessage.getHours()}:${dateMessage.getMinutes() >= 0 && dateMessage.getMinutes() <= 9 ? '0' : ''}${dateMessage.getMinutes()}`);
     else
-        return (`${dateMessage.getDate()}/${dateMessage.getMonth()}/${dateMessage.getFullYear()}`);
+        return (`${dateMessage.getDate()}/${dateMessage.getMonth() + 1}/${dateMessage.getFullYear()}`);
 }
 
 export function getMessageHour(date: string): string {
