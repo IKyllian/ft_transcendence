@@ -130,7 +130,7 @@ export function useAppHook() {
 					dispatch(removeTimeoutChannelUser(eventData));
                 } else if (data.type === ChannelUpdateType.CHANUSER) {
                     const eventData = data.data as ChannelUser;
-                    dispatch(updateChannelUser(eventData));
+                    dispatch(updateChannelUser({user: eventData, loggedUserId: currentUser.id}));
                 }
             });
 

@@ -36,6 +36,12 @@ export function getMessageDateString(date: string): string {
         return (`${dateMessage.getDate()}/${dateMessage.getMonth() + 1}/${dateMessage.getFullYear()}`);
 }
 
+export function getBanDateString(date: string): string {
+    const dateBan = new Date(date);
+
+    return `${dateBan.getDate()}/${dateBan.getMonth() + 1} à ${dateBan.getHours()}:${dateBan.getMinutes() >= 0 && dateBan.getMinutes() <= 9 ? '0' : ''}${dateBan.getMinutes() }`
+}
+
 export function getMessageHour(date: string): string {
     const dateMessage = new Date(date);
     return (`${dateMessage.getHours()}:${dateMessage.getMinutes() >= 0 && dateMessage.getMinutes() <= 9 ? '0' : ''}${dateMessage.getMinutes()}`)

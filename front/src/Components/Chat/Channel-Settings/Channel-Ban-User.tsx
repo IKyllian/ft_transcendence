@@ -4,6 +4,7 @@ import { SocketContext } from "../../../App";
 import ExternalImage from "../../External-Image";
 import { useAppSelector } from "../../../Redux/Hooks";
 import { Link } from "react-router-dom";
+import { getBanDateString } from "../../../Utils/Utils-Chat";
 
 function ChannelBanUser() {
     const { channelDatas } = useAppSelector((state) => state.channel);
@@ -39,7 +40,7 @@ function ChannelBanUser() {
                             
                             </td>
                             <td>
-                                { !elem.until ? "Perma ban" : elem.until.toString() }
+                                { !elem.until ? "Perma ban" : getBanDateString(elem.until.toString()) }
                             </td>
                             <td>
                                 <button onClick={() => handleClick(elem.user.id)}> Unban </button>
