@@ -42,7 +42,6 @@ export class UserController {
 	@UseGuards(JwtGuard)
 	@Get('me')
 	async getMe(@GetUser() user: User) {
-		console.log('me')
 		const match_history = await this.userService.getMatchHistory(user.id);
 		return {
 			user: user,
@@ -88,25 +87,6 @@ export class UserController {
 	@Patch('edit-password')
 	async editPassword(@GetUser() user: User, @Body() data: EditPasswordDto) {
 		return await this.userService.editPassword(user, data);
-	}
-
-	@UseGuards(JwtGuard)
-	@Get()
-	getUsers() {
-		return this.userService.getUsers();
-	}
-
-	// test TODO del?
- 	// @UseGuards(JwtGuard)
-	@Get(':id')
-	async getUserById(@Param('id', ParseIntPipe) id: number) {
-		console.log('get user by id route')
-		return await this.userService.findOne({
-			relations: {
-				statistic: true,
-			},
-			where: { id },
-		});
 	}
 
 	@UseGuards(JwtGuard)

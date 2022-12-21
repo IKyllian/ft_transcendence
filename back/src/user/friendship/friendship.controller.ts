@@ -10,12 +10,6 @@ export class friendshipController {
 	constructor(private friendshipService: FriendshipService) {}
 
 	@UseGuards(JwtGuard)
-	@Get('request')
-	async getFriendRequest(@GetUser() user: User) {
-		return await this.friendshipService.getFriendRequest(user);
-	}
-
-	@UseGuards(JwtGuard)
 	@Post('search')
 	async searchUserToAdd(
 	@GetUser() user: User,
