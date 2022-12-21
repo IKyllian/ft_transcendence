@@ -5,9 +5,6 @@ import { elo_to_rank_as_string } from '../utils/elo_tools';
 import { make_style } from '../utils/text_tools';
 import { shorten_nickname } from '../utils/text_tools';
 
-import AssetRankUP from '../../../../Assets/images/green_arrow.png';
-import AssetRankDOWN from '../../../../Assets/images/red_arrow.png';
-
 export default class MatchResult extends Phaser.Scene
 {
 	constructor ()
@@ -48,8 +45,6 @@ export default class MatchResult extends Phaser.Scene
 	{
 		this.scene.remove('Pong');
 		this.game_type = this.game.registry.get('players_data').game_settings.game_type;
-		this.load.image("rank_UP", AssetRankUP);
-		this.load.image("rank_DOWN", AssetRankDOWN);
 	}
 
 	create ()

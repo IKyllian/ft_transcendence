@@ -1,9 +1,9 @@
-import Silver from "../Images-Icons/Ranks/silver.png";
-import Gold from "../Images-Icons/Ranks/gold.png";
-import Platine from "../Images-Icons/Ranks/platine.png";
-import Diamond from "../Images-Icons/Ranks/diamond.png";
-import Champion from "../Images-Icons/Ranks/champion.png";
-import Legend from "../Images-Icons/Ranks/legend.png";
+import Silver from "../Assets/Ranks/silver.png";
+import Gold from "../Assets/Ranks/gold.png";
+import Platine from "../Assets/Ranks/platine.png";
+import Diamond from "../Assets/Ranks/diamond.png";
+import Champion from "../Assets/Ranks/champion.png";
+import Legend from "../Assets/Ranks/legend.png";
 
 function DisplayRank(props: {elo: number}) {
     const { elo } = props;

@@ -7,12 +7,12 @@ import { elo_to_rank_as_string } from '../utils/elo_tools';
 import { shorten_nickname } from '../utils/text_tools';
 import { make_style } from '../utils/text_tools';
 
-import AssetRankSilver from '../../../../Images-Icons/Ranks/silver.png'
-import AssetRankGold from '../../../../Images-Icons/Ranks/gold.png';
-import AssetRankPlatine from '../../../../Images-Icons/Ranks/platine.png';
-import AssetRankDiamond from '../../../../Images-Icons/Ranks/diamond.png';
-import AssetRankChampion from '../../../../Images-Icons/Ranks/champion.png';
-import AssetRankLegend from '../../../../Images-Icons/Ranks/legend.png';
+import AssetRankSilver from '../../../../Assets/Ranks/silver.png'
+import AssetRankGold from '../../../../Assets/Ranks/gold.png';
+import AssetRankPlatine from '../../../../Assets/Ranks/platine.png';
+import AssetRankDiamond from '../../../../Assets/Ranks/diamond.png';
+import AssetRankChampion from '../../../../Assets/Ranks/champion.png';
+import AssetRankLegend from '../../../../Assets/Ranks/legend.png';
 
 export default class Lobby extends Phaser.Scene
 {

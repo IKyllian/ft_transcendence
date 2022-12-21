@@ -145,7 +145,7 @@ export class Lobby
 		}
 		else
 		{
-			console.log("input incidend", this.game_id);
+			console.log("input incident", this.game_id,"player:",  input.player_type);
 		}
 	}
 
