@@ -125,17 +125,19 @@ export default class MatchResult extends Phaser.Scene
 			{
 				if (this.winner === EndResult.TeamBlue_Win)
 				{
-					text = "Team"
+					text = "Team "
 						+ this.game.registry.get('players_data').TeamBlue_Back.user.username
 						+ " and " + this.game.registry.get('players_data').TeamBlue_Front.user.username
 						+ " Wins";
+						color = "#0059FF";
 				}
 				else
 				{
-					text = "Team"
+					text = "Team "
 					+ this.game.registry.get('players_data').TeamRed_Back.user.username
 					+ " and " + this.game.registry.get('players_data').TeamRed_Front.user.username
 					+ " Wins";
+					color = "#F91900";
 				}
 			}
 			else if (((this.me === PlayerType.TeamBlue_Back || this.me === PlayerType.TeamBlue_Front)

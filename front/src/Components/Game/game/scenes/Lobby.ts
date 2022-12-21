@@ -170,8 +170,8 @@ export default class Lobby extends Phaser.Scene
 			game_end: this.game_end.bind(this)
         });
 
-		this.message_text = this.add.text(400, 260, "V", make_style(72, "#0062FF")).setOrigin(1,0.5);
-		this.message_text_b = this.add.text(400, 260, "S", make_style(72, "#F71E06")).setOrigin(0,0.5);
+		this.message_text = this.add.text(400, 260, "V", make_style(72, "#0059FF")).setOrigin(1,0.5);
+		this.message_text_b = this.add.text(400, 260, "S", make_style(72, "#F91900")).setOrigin(0,0.5);
 
 		this.TeamBlue_Back_avatar = this.add.image(100, 130,
 								'TeamBlue_back_avatar')
