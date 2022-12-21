@@ -583,16 +583,16 @@ export default class Pong extends Phaser.Scene
 				switch(this.me)
 				{
 					case PlayerType.TeamBlue_Back:
-						this.me_indicator = this.add.circle(this.asset_TeamBlue_Back.x, 300, 5, 0xE0E1DD).setOrigin(1, 0.5);
+						this.me_indicator = this.add.circle(this.asset_TeamBlue_Back.x, 300, 5, 0x01163d).setOrigin(1, 0.5);
 						break;
 					case PlayerType.TeamBlue_Front:
-						this.me_indicator = this.add.circle(this.asset_TeamBlue_Front.x, 300, 5, 0xE0E1DD).setOrigin(1, 0.5);
+						this.me_indicator = this.add.circle(this.asset_TeamBlue_Front.x, 300, 5, 0x01163d).setOrigin(1, 0.5);
 						break;
 					case PlayerType.TeamRed_Front:
-						this.me_indicator = this.add.circle(this.asset_TeamRed_Front.x, 300, 5, 0xE0E1DD).setOrigin(0, 0.5);
+						this.me_indicator = this.add.circle(this.asset_TeamRed_Front.x, 300, 5, 0x4a0a03).setOrigin(0, 0.5);
 						break;
 					case PlayerType.TeamRed_Back:
-						this.me_indicator = this.add.circle(this.asset_TeamRed_Back.x, 300, 5, 0xE0E1DD).setOrigin(0, 0.5);
+						this.me_indicator = this.add.circle(this.asset_TeamRed_Back.x, 300, 5, 0x4a0a03).setOrigin(0, 0.5);
 						break;
 					default:
 						break;
@@ -607,10 +607,10 @@ export default class Pong extends Phaser.Scene
 				switch(this.me)
 				{
 					case PlayerType.TeamBlue_Back:
-						this.me_indicator = this.add.circle(this.asset_TeamBlue_Back.x, 300, 5, 0xE0E1DD).setOrigin(1, 0.5);
+						this.me_indicator = this.add.circle(this.asset_TeamBlue_Back.x, 300, 5, 0x01163d).setOrigin(1, 0.5);
 						break;
 					case PlayerType.TeamRed_Back:
-						this.me_indicator = this.add.circle(this.asset_TeamRed_Back.x, 300, 5, 0xE0E1DD).setOrigin(0, 0.5);
+						this.me_indicator = this.add.circle(this.asset_TeamRed_Back.x, 300, 5, 0x4a0a03).setOrigin(0, 0.5);
 						break;
 					default:
 						break;
