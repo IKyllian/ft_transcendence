@@ -155,8 +155,19 @@ export class ChannelService {
 		return null;
 	}
 
-	async leave(chanUser: ChannelUser) {
-		await this.channelUserRepo.delete({id: chanUser.id});
+	async leave(chanUser: ChannelUser): Promise<Boolean> {
+		const users_in_chan: ChannelUser[] = await this.channelUserRepo.find({
+			where: {
+				channel: { id: chanUser.channelId },
+			}
+		});
+		if (users_in_chan && users_in_chan.length === 1) {
+			await this.channelRepo.delete({ id: chanUser.channelId });
+			return true;
+		} else {
+			await this.channelUserRepo.delete({ id: chanUser.id });
+			return false;
+		}
 	}
 
 	async getChannelById(userId: number, id: number): Promise<Channel> {
@@ -381,24 +392,21 @@ export class ChannelService {
 	async changeUserRole(chanUser: ChannelUser, dto: ChangeRoleDto) {
 		const userToChange = await this.getChannelUser(dto.chanId, dto.userId);
 		if (!userToChange) { throw new NotInChannelException(); }
+		if (chanUser.role !== channelRole.OWNER) {
+			throw new BadRequestException("You need to be owner to perform this action");
+		}
 		let ownerPassed = false;
 		switch (dto.role) {
 			case channelRole.MODERATOR:
-				if (chanUser.role === channelRole.OWNER && userToChange.role === channelRole.MEMBER) {
-					userToChange.role = dto.role;
-				}
+				userToChange.role = dto.role;
 				break;
 			case channelRole.MEMBER:
-				if (chanUser.role === channelRole.OWNER && userToChange.role === channelRole.MODERATOR) {
 					userToChange.role = dto.role;
-				}
 				break;
 			case channelRole.OWNER:
-				if (chanUser.role === channelRole.OWNER) {
 					userToChange.role = dto.role;
 					ownerPassed = true;
 					chanUser.role = channelRole.MODERATOR;
-				}
 				break;
 			default:
 				break;

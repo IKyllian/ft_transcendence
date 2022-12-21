@@ -120,10 +120,6 @@ export class UserService {
 			.execute();
 	}
 
-	async getUsers() {
-		return await this.userRepo.find();
-	}
-
 	async updateAvatar(user: User, fileName: string) {
 		if (user.avatar) {
 			try {
