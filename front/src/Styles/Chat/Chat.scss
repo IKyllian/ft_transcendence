@@ -114,277 +114,270 @@
         }
     }
 
-    // .message-container {
-    //     width: 100%;
-    //     display: flex;
-    //     flex-direction: row;
-        .message-container-main {
-            @include width-height(100%, 100%);
+    .message-container-main {
+        @include width-height(100%, 100%);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        position: relative;
+        list-style-type: none;
+        .message-header {
+            @include width-height(100%, 50px);
+            background-color: $LightDarkPalette;
             display: flex;
-            flex-direction: column;
+            align-items: center;
             justify-content: space-between;
-            position: relative;
-            list-style-type: none;
-            .message-header {
-                @include width-height(100%, 50px);
-                background-color: $LightDarkPalette;
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                border-bottom: 1px solid $WhitePalette;
+            border-bottom: 1px solid $WhitePalette;
 
-                &-right-side {
-                    margin-right: 20px;
-                    @include flex-row-alignCenter();
-                    svg {
-                        @include width-height(23px, 23px);
-                        cursor: pointer;
-                    }
-                    .chat-action-icones {
-                        margin-right: 28px;
-                        @include flex-row-alignCenter();
-                        gap: 10px;
-                        a {
-                            @include width-height(23px, 23px);
-                            margin: 0
-                        }
-                    }
-                    
-                }
-
-                .burger-icon-responsive {
-                    display: none;
+            &-right-side {
+                margin-right: 20px;
+                @include flex-row-alignCenter();
+                svg {
+                    @include width-height(23px, 23px);
                     cursor: pointer;
                 }
-
-                .chan-name {
-                    margin-left: 20px;
+                .chat-action-icones {
+                    margin-right: 28px;
+                    @include flex-row-alignCenter();
+                    gap: 10px;
+                    a {
+                        @include width-height(23px, 23px);
+                        margin: 0
+                    }
                 }
-
-                a {
-                    margin-right: 10px;
-                }
+                
             }
 
-            .header-user-info {
-                @include width-height(100%, 50px);
-                background-color: $LightDarkPalette;
-                border-bottom: 1px solid $WhitePalette;
-                @include flex-row-alignCenter;
-                position: relative;
+            .burger-icon-responsive {
+                display: none;
+                cursor: pointer;
+            }
 
-                .close-party-chat {
-                    position: absolute;
+            .chan-name {
+                margin-left: 20px;
+            }
+
+            a {
+                margin-right: 10px;
+            }
+        }
+
+        .header-user-info {
+            @include width-height(100%, 50px);
+            background-color: $LightDarkPalette;
+            border-bottom: 1px solid $WhitePalette;
+            @include flex-row-alignCenter;
+            position: relative;
+
+            .close-party-chat {
+                position: absolute;
+                cursor: pointer;
+            }
+
+            .p-party-chat {
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .burger-icon-responsive {
+                display: none;
+                cursor: pointer
+            }
+            .player-container {
+                @include flex-row-alignCenter;
+
+                .spectate-icon {
+                    @include width-height(14px, 14px);
+                    margin-left: 10px;
+                    margin-top: 2px;
                     cursor: pointer;
                 }
 
-                .p-party-chat {
-                    margin-left: auto;
-                    margin-right: auto;
+                p {
+                    cursor: pointer;
                 }
-
-                .burger-icon-responsive {
-                    display: none;
-                    cursor: pointer
+                .player-status {
+                    @include player-status;
                 }
-                .player-container {
-                    @include flex-row-alignCenter;
+            }
+        }
 
-                    .spectate-icon {
-                        @include width-height(14px, 14px);
-                        margin-left: 10px;
-                        margin-top: 2px;
-                        cursor: pointer;
+        ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 10px 0 20px 0;
+            height: 90%;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+
+            &:hover {
+                @include overflowScroll("y");
+            }
+
+            .message-server {
+                margin: 0 auto;
+            }
+
+            .loader-wrapper {
+                margin: 0 auto;
+                .prev-messages-loader {
+                    @include width-height(23px, 23px);
+                    border: 3px solid #FFF;
+                    border-bottom-color: transparent;
+                    border-radius: 50%;
+                    display: inline-block;
+                    box-sizing: border-box;
+                    animation: rotation 1s linear infinite;
+                }
+            }
+            
+            .message-item-container {
+                display: flex;
+                flex-direction: row;
+                gap: 15px;
+                padding: 3px 0 3px 20px;
+                position: relative;
+                &:hover {
+                    background-color: $DarkPalette;
+                }
+                img {
+                    @include avatar-player(45px);
+                }
+                .message-content-wrapper {
+                    .message-info-wrapper {
+                        @include flex-row-alignCenter();
+                        gap: 10px;
+                        span {
+                            &:first-child {
+                                color: orange;
+                                cursor: pointer;
+                            }
+                            &:last-child {
+                                margin-top: 2.5px;
+                                font-size: 10px;
+                            }
+                        }
                     }
+                    .message-text {
+                        margin: 0;
+                        font-size: 13px;
+                        margin-top: 5px;
+                    }
+                }
+                
+            }
+
+            .message-item-container-2 {
+                display: flex;
+                align-items: center;
+                padding: 4px 0 4px 80px;
+                position: relative;
+                margin: 0;
+                font-size: 13px;
+                .date-message {
+                    width: 45px;
+                    text-align: center;
+                    display: none;
+                    position: absolute;
+                    font-size: 10px;
+                    left: 18px;
+                }
+                &:hover {
+                    background-color: $DarkPalette;
+                    .date-message {
+                        display: block;
+                    }
+                }
+            }
+        }
+    }
+    
+    .message-input-container {
+        @include flex-row-alignCenter;
+        justify-content: space-between;
+        width: 100%;
+        margin: 0 auto;
+        background-color: $LightDarkPalette;
+        form {
+            border-top: 1px solid $WhitePalette;
+            width: 90%;
+            @include flex-row-alignCenter();
+            margin: auto;
+            position: relative;
+
+            p {
+                position: absolute;
+                margin: 0;
+                top: -20px;
+                font-size: 13px;
+            }
+            
+            input {
+                all: unset;
+                width: 95%;
+                padding: 18px 20px;
+            }
+
+            button {
+                all: unset;
+                svg {
+                    cursor: pointer;
+                    background-color: $OrangeProfile;
+                    border-radius: 50%;
+                    @include width-height(30px, 30px);
+                    padding: 5px;
+                    background: linear-gradient(112deg, rgba(255,94,0,1) 0%, rgba(255,145,0,1) 50%, rgba(255,154,0,1) 100%);
+                }
+            }  
+        }
+    }
+
+    .users-sidebar {
+        @include width-height(300px, 100%);
+        background-color: $DarkPalette;
+        @include overflowScroll("y");
+        &-wrapper {
+            margin: 10px;
+            position: absolute;
+            h3 {
+                margin: 0;
+                color: #a5abb0;
+                font-size: 15px;
+            }
+            ul {
+                list-style-type: none;
+                padding: 0;
+                li {
+                    border-radius: 5px;
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    padding: 8px;
+                    @include avatar-status-container($DarkPalette);
+                    position: relative;
 
                     p {
                         cursor: pointer;
                     }
-                    .player-status {
-                        @include player-status;
-                    }
-                }
-            }
 
-            ul {
-                list-style-type: none;
-                margin: 0;
-                padding: 10px 0 20px 0;
-                height: 90%;
-                display: flex;
-                flex-direction: column;
-                overflow: hidden;
-
-                &:hover {
-                    @include overflowScroll("y");
-                }
-
-                .message-server {
-                    margin: 0 auto;
-                }
-
-                .loader-wrapper {
-                    margin: 0 auto;
-                    .prev-messages-loader {
-                        @include width-height(23px, 23px);
-                        border: 3px solid #FFF;
-                        border-bottom-color: transparent;
-                        border-radius: 50%;
-                        display: inline-block;
-                        box-sizing: border-box;
-                        animation: rotation 1s linear infinite;
-                    }
-                }
-                
-                .message-item-container {
-                    display: flex;
-                    flex-direction: row;
-                    gap: 15px;
-                    padding: 3px 0 3px 20px;
-                    // width: 100%;
-                    position: relative;
-                    &:hover {
-                        background-color: $DarkPalette;
-                    }
-                    img {
-                        @include avatar-player(45px);
-                    }
-                    .message-content-wrapper {
-                        .message-info-wrapper {
-                            @include flex-row-alignCenter();
-                            gap: 10px;
-                            span {
-                                &:first-child {
-                                    color: orange;
-                                    cursor: pointer;
-                                }
-                                &:last-child {
-                                    margin-top: 2.5px;
-                                    font-size: 10px;
-                                }
-                            }
-                        }
-                        .message-text {
-                            margin: 0;
-                            font-size: 13px;
-                            margin-top: 5px;
-                        }
-                    }
-                    
-                }
-
-                .message-item-container-2 {
-                    display: flex;
-                    align-items: center;
-                    padding: 4px 0 4px 80px;
-                    // width: 100%;
-                    position: relative;
-                    margin: 0;
-                    font-size: 13px;
-                    .date-message {
-                        width: 45px;
-                        text-align: center;
-                        display: none;
-                        position: absolute;
-                        font-size: 10px;
-                        left: 18px;
-                    }
-                    &:hover {
-                        background-color: $DarkPalette;
-                        .date-message {
-                            display: block;
-                        }
-                    }
-                }
-            }
-        }
-        
-        .message-input-container {
-            @include flex-row-alignCenter;
-            justify-content: space-between;
-            width: 100%;
-            margin: 0 auto;
-            background-color: $LightDarkPalette;
-            form {
-                border-top: 1px solid $WhitePalette;
-                width: 90%;
-                @include flex-row-alignCenter();
-                margin: auto;
-                position: relative;
-
-                p {
-                    position: absolute;
-                    margin: 0;
-                    top: -20px;
-                    font-size: 13px;
-                }
-                
-                input {
-                    all: unset;
-                    width: 95%;
-                    padding: 18px 20px;
-                }
-
-                button {
-                    all: unset;
-                    svg {
+                    .spectate-icon {
+                        @include width-height(15px, 15px);
                         cursor: pointer;
-                        background-color: $OrangeProfile;
-                        border-radius: 50%;
-                        @include width-height(30px, 30px);
-                        padding: 5px;
-                        background: linear-gradient(112deg, rgba(255,94,0,1) 0%, rgba(255,145,0,1) 50%, rgba(255,154,0,1) 100%);
                     }
-                }  
-            }
-        }
 
-        .users-sidebar {
-            @include width-height(300px, 100%);
-            background-color: $DarkPalette;
-            @include overflowScroll("y");
-            &-wrapper {
-                margin: 10px;
-                position: absolute;
-                h3 {
-                    margin: 0;
-                    color: #a5abb0;
-                    font-size: 15px;
-                }
-                ul {
-                    list-style-type: none;
-                    padding: 0;
-                    li {
-                        border-radius: 5px;
-                        display: flex;
-                        align-items: center;
-                        gap: 10px;
-                        padding: 8px;
-                        @include avatar-status-container($DarkPalette);
-                        position: relative;
-
-                        p {
-                            cursor: pointer;
-                        }
-
-                        .spectate-icon {
-                            @include width-height(15px, 15px);
-                            cursor: pointer;
-                        }
-
-                        // &:hover {
-                        //     background-color: $LightDarkPalette;
-                        //     .avatar-container {
-                        //         .user-status {
-                        //             background-color: $LightDarkPalette;
-                        //         }
-                        //     }
-                        // }
-                    }
+                    // &:hover {
+                    //     background-color: $LightDarkPalette;
+                    //     .avatar-container {
+                    //         .user-status {
+                    //             background-color: $LightDarkPalette;
+                    //         }
+                    //     }
+                    // }
                 }
             }
         }
-    // }
+    }
 
     .sidebar-button {
         display: none;

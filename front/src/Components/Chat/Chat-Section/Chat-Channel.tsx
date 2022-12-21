@@ -36,9 +36,8 @@ function ChatChannel() {
     }
 
     return (
-        // <div className="message-container">
         <>
-        <div className="message-container-main">
+            <div className="message-container-main">
                 <ChatHeader chatItem={channelDatas} showUsersSidebar={showUsersSidebar} changeSidebarStatus={changeSidebarStatus} />
                 <ul id="chat-message-wrapper" className="chat-messages-wrapper" onScroll={(e) => handleOnScroll(e)}>
                     {
@@ -79,9 +78,7 @@ function ChatChannel() {
                 </div>
             </div>
             { showUsersSidebar && <UsersSidebar usersList={channelDatas.channelUsers} /> }
-        </>
-            
-        // </div>
+        </>            
     );
 }
 
