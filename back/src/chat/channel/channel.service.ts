@@ -237,7 +237,7 @@ export class ChannelService {
 			type: TimeoutType.BAN,
 		});
 		await this.channelUserRepo.delete(userToBan.id);
-
+		
 		return this.timeoutRepo.save(bannedUser);
 	}
 
