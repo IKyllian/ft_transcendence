@@ -3,7 +3,6 @@ import { IconDotsVertical } from '@tabler/icons';
 
 import { UserInterface } from "../../../Types/User-Types";
 import FriendListModal from "../Friend-Dropdown";
-import Avatar from "../../../Images-Icons/pp.jpg";
 import { Link } from "react-router-dom";
 import { useAppSelector } from "../../../Redux/Hooks";
 import ExternalImage from "../../External-Image";

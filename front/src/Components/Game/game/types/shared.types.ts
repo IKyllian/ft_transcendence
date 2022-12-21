@@ -162,10 +162,3 @@ export enum PlayerPosition {
 	BACK,
 	FRONT,
 }
-
-export enum RankChange
-{
-	None,
-	Up,
-	Down
-}

@@ -1,7 +1,6 @@
-import { io, Socket } from "socket.io-client";
-import { EndResult, GameState, LobbyStatus, PlayerInput, RoundSetup } from './types/shared.types';
-import { useContext } from "react";
-import { SocketContext } from "../../../App";
+import { Socket } from "socket.io-client";
+import { EndResult, GameState, PlayerInput, RoundSetup } from './types/shared.types';
+
 
 export default class ClientSocketManager
 {
@@ -9,7 +8,6 @@ export default class ClientSocketManager
 	private socket?: Socket;
 	private lobby_triggers: any;
 	private pong_triggers: any;
-	private replay_triggers: any;
 
 	constructor(socket: Socket)
 	{
@@ -27,11 +25,6 @@ export default class ClientSocketManager
         this.pong_triggers = data;
     }
 
-    set_replay_triggers(data: any): void
-	{
-        this.replay_triggers = data;
-    }
-
 	//Listens init
 	private init_listen = () =>
 	{
@@ -42,14 +35,11 @@ export default class ClientSocketManager
 			this.socket.on('lobby_join_response', this.onLobbyJoinResponse.bind(this));
 			this.socket.on('lobby_all_ready', this.onLobbyAllReady.bind(this));
 			this.socket.on('lobby_game_abort', this.onLobbyGameAbort);
-			// this.socket.on('lobby_status', this.onLobbyStatus.bind(this));
 			//Lobby + Game
 			this.socket.on('round_setup', this.onGameGetRoundSetup.bind(this));
 			this.socket.on('match_winner', this.onGameGetMatchWinner.bind(this));
 			//Game
 			this.socket.on('game_state', this.onGameGetState.bind(this));
-			//Replay
-			this.socket.on('replay_state', this.onReplayState.bind(this));
 		}
 	}
 
@@ -123,25 +113,7 @@ export default class ClientSocketManager
 	onGameGetMatchWinner = (result: EndResult) =>
 	{
 		this.pong_triggers?.game_end(result);
-		//remove redirect Lobby->Matchresult
 		this.lobby_triggers?.game_end(result);
-	}
-
-	//Replay Emits
-
-	request_replay = (game_id: string) =>
-	{
-		if (this.socket instanceof Socket)
-		{
-			this.socket.emit('replay_request', game_id);
-		}
-	}
-
-	//Replay Listens
-
-	onReplayState = (gamestate: GameState) =>
-	{
-		this.replay_triggers?.append_server_gamestate(gamestate);
 	}
 
 }

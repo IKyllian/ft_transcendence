@@ -1,6 +1,3 @@
-import { Player } from '../../../Types/Lobby-Types'
-import { RankChange } from './types/shared.types'
-
 export function elo_to_rank_as_string (elo: number) :string  
 {
 	if (elo >= 1500)
@@ -16,19 +13,6 @@ export function elo_to_rank_as_string (elo: number) :string
 	else
 		return 'Silver'
 }
-
-
-
-// export function check_rank_change (oldElo: number, newElo: number): RankChange
-// {
-// 	if (elo_to_rank_as_string(oldElo) === elo_to_rank_as_string(newElo))
-// 		return RankChange.None;
-
-// 	if (newElo > oldElo)
-// 		return RankChange.Up;
-	
-// 	return RankChange.Down;
-// }
 
 export function check_rank_change (oldElo: number, newElo: number): boolean
 {

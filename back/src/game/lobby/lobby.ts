@@ -1,8 +1,7 @@
 import { Socket } from "socket.io";
 import { AuthenticatedSocket } from "src/utils/types/auth-socket";
-import { GameType, TeamSide, PlayerPosition, PlayerStatus, GameSettings, GameState, LobbyStatus, PlayerInput, PlayerType, RoundSetup } from "src/utils/types/game.types";
+import { GameType, TeamSide, PlayerPosition, GameState, PlayerInput, PlayerType, RoundSetup } from "src/utils/types/game.types";
 import { MatchmakingLobby } from "../matchmaking/matchmakingLobby";
-import { UserStatus } from "src/utils/types/types";
 import { PongGame } from "../pong/pong.game";
 import { LobbyFactory } from "./lobby.factory";
 
@@ -146,7 +145,7 @@ export class Lobby
 		}
 		else
 		{
-			// console.log("input incidend", this.game_id);
+			console.log("input incident", this.game_id,"player:",  input.player_type);
 		}
 	}
 

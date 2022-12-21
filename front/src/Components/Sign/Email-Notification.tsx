@@ -1,5 +1,4 @@
 import { IconMailForward } from "@tabler/icons";
-import EmailImage from "../../Images-Icons/emailSend.png";
 
 function EmailNotification() {
     return (

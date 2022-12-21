@@ -1,14 +1,9 @@
 import 'phaser';
 import { EndResult, GameType, PlayerType } from '../types/shared.types';
-import { check_rank_change } from '../elo_tools';
-import { elo_to_rank_as_string } from '../elo_tools';
-import {  await_load_base64, loadAvatar } from '../texture_loader';
-import { make_style } from '../text_tools';
-import { shorten_nickname } from '../text_tools';
-import AssetButton from '../../../../Assets/images/button.png';
-
-import AssetRankUP from '../../../../Assets/images/green_arrow.png';
-import AssetRankDOWN from '../../../../Assets/images/red_arrow.png';
+import { check_rank_change } from '../utils/elo_tools';
+import { elo_to_rank_as_string } from '../utils/elo_tools';
+import { make_style } from '../utils/text_tools';
+import { shorten_nickname } from '../utils/text_tools';
 
 export default class MatchResult extends Phaser.Scene
 {
@@ -21,25 +16,17 @@ export default class MatchResult extends Phaser.Scene
 	me: PlayerType = PlayerType.Spectator;
 	game_type: GameType = GameType.Singles;
 
-	// TeamBlue_Back_avatar?: Phaser.GameObjects.Image;
-	// TeamBlue_Back_rank?: Phaser.GameObjects.Image;
-	// TeamBlue_Back_name?: Phaser.GameObjects.Text;
-	// TeamBlue_Back_elo?: Phaser.GameObjects.Text;
+	TeamBlue_Back_elo?: Phaser.GameObjects.Text;
+	TeamBlue_Back_elo_change?: Phaser.GameObjects.Text;
 
-	// TeamBlue_Front_avatar?: Phaser.GameObjects.Image;
-	// TeamBlue_Front_rank?: Phaser.GameObjects.Image;
-	// TeamBlue_Front_name?: Phaser.GameObjects.Text;
-	// TeamBlue_Front_elo?: Phaser.GameObjects.Text;
+	TeamRed_Back_elo?: Phaser.GameObjects.Text;
+	TeamRed_Back_elo_change?: Phaser.GameObjects.Text;
 
-	// TeamRed_Front_avatar?: Phaser.GameObjects.Image;
-	// TeamRed_Front_rank?: Phaser.GameObjects.Image;
-	// TeamRed_Front_name?: Phaser.GameObjects.Text;
-	// TeamRed_Front_elo?: Phaser.GameObjects.Text;
+	TeamBlue_Front_elo?: Phaser.GameObjects.Text;
+	TeamBlue_Front_elo_change?: Phaser.GameObjects.Text;
 
-	// TeamRed_Back_avatar?: Phaser.GameObjects.Image;
-	// TeamRed_Back_rank?: Phaser.GameObjects.Image;
-	// TeamRed_Back_name?: Phaser.GameObjects.Text;
-	// TeamRed_Back_elo?: Phaser.GameObjects.Text;
+	TeamRed_Front_elo?: Phaser.GameObjects.Text;
+	TeamRed_Front_elo_change?: Phaser.GameObjects.Text;
 
 	TeamBlue_Back_oldElo: number = 0;
 	TeamBlue_Front_oldElo: number = 0;
@@ -58,8 +45,6 @@ export default class MatchResult extends Phaser.Scene
 	{
 		this.scene.remove('Pong');
 		this.game_type = this.game.registry.get('players_data').game_settings.game_type;
-		this.load.image("rank_UP", AssetRankUP);
-		this.load.image("rank_DOWN", AssetRankDOWN);
 	}
 
 	create ()
@@ -67,11 +52,6 @@ export default class MatchResult extends Phaser.Scene
 		this.cameras.main.setBackgroundColor("#415A77");
 		this.me = this.game.registry.get('players_data').player_type;
 		this.winner = this.game.registry.get('winner');
-
-		// this.TeamBlue_Back_name = this.add.text(100, 360, "" +
-		// 						this.game.registry.get('players_data').TeamBlue_Back.user.username, make_style(26));
-		// this.TeamRed_Back_name = this.add.text(700, 360, "" +
-		// 						this.game.registry.get('players_data').TeamRed_Back.user.username, make_style(26));
 
 		this.add.image(100, 130,
 				'TeamBlue_back_avatar')
@@ -82,11 +62,11 @@ export default class MatchResult extends Phaser.Scene
 				.setOrigin(0.5,0.5)
 				.setDisplaySize(175, 175);
 
-		this.add.text(100, 240,
+		this.add.text(100, 290,
 					shorten_nickname(this.game.registry.get('players_data').TeamBlue_Back.user.username),
 					make_style(32))
 					.setOrigin(0.5,0.5);
-		this.add.text(700, 240,
+		this.add.text(700, 290,
 					shorten_nickname(this.game.registry.get('players_data').TeamRed_Back.user.username),
 					make_style(32))
 					.setOrigin(0.5,0.5);
@@ -96,7 +76,7 @@ export default class MatchResult extends Phaser.Scene
 			this.add.image(285, 130, 'TeamBlue_front_avatar')
 						.setOrigin(0.5,0.5)
 						.setDisplaySize(175, 175);
-			this.add.text(285, 240,
+			this.add.text(285, 290,
 						shorten_nickname(this.game.registry.get('players_data').TeamBlue_Front.user.username),
 						make_style(32))
 						.setOrigin(0.5,0.5);
@@ -105,7 +85,7 @@ export default class MatchResult extends Phaser.Scene
 			this.add.image(515, 130, 'TeamRed_front_avatar')
 						.setOrigin(0.5,0.5)
 						.setDisplaySize(175, 175);
-			this.add.text(515, 240,
+			this.add.text(515, 290,
 						shorten_nickname(this.game.registry.get('players_data').TeamRed_Front.user.username),
 						make_style(32))
 						.setOrigin(0.5,0.5);	
@@ -145,17 +125,19 @@ export default class MatchResult extends Phaser.Scene
 			{
 				if (this.winner === EndResult.TeamBlue_Win)
 				{
-					text = "Team"
+					text = "Team "
 						+ this.game.registry.get('players_data').TeamBlue_Back.user.username
 						+ " and " + this.game.registry.get('players_data').TeamBlue_Front.user.username
 						+ " Wins";
+						color = "#0059FF";
 				}
 				else
 				{
-					text = "Team"
+					text = "Team "
 					+ this.game.registry.get('players_data').TeamRed_Back.user.username
 					+ " and " + this.game.registry.get('players_data').TeamRed_Front.user.username
 					+ " Wins";
+					color = "#F91900";
 				}
 			}
 			else if (((this.me === PlayerType.TeamBlue_Back || this.me === PlayerType.TeamBlue_Front)
@@ -206,27 +188,6 @@ export default class MatchResult extends Phaser.Scene
 
 	eloDisplay = () =>
 	{
-		let style_green: Phaser.Types.GameObjects.Text.TextStyle = 
-		{
-			fontSize: '32px',
-			color: '#00FF00',
-			fontFamily: 'Silkscreen'
-		}
-
-		let style_red: Phaser.Types.GameObjects.Text.TextStyle = 
-		{
-			fontSize: '32px',
-			color: '#FF0000',
-			fontFamily: 'Silkscreen'
-		}
-
-		let style: Phaser.Types.GameObjects.Text.TextStyle = 
-		{
-			fontSize: '32px',
-			color: '#000000',
-			fontFamily: 'Silkscreen'
-		}
-
 
 		let blueTeamAverage: number = 0;
 		let redTeamAverage: number = 0;
@@ -241,7 +202,6 @@ export default class MatchResult extends Phaser.Scene
 
 		blueTeamAverage += this.TeamBlue_Back_oldElo;
 		redTeamAverage += this.TeamRed_Back_oldElo;
-
 
 		if (this.game_type === GameType.Doubles)
 		{
@@ -259,7 +219,12 @@ export default class MatchResult extends Phaser.Scene
 		const blueEloLost: number = blueEloWon - 50;
 		const redEloWon: number = Math.abs(blueEloLost);
 		const redEloLost: number = redEloWon - 50;
-		
+
+		this.TeamBlue_Back_elo = this.add.text(100, 380, "" + this.TeamBlue_Back_oldElo,make_style(28,'#000000')).setOrigin(0.5,0.5);
+		this.TeamBlue_Front_elo = this.add.text(285, 380, "" + this.TeamBlue_Front_oldElo,make_style(28,'#000000')).setOrigin(0.5,0.5);
+		this.TeamRed_Front_elo = this.add.text(515, 380, "" + this.TeamRed_Front_oldElo,make_style(28,'#000000')).setOrigin(0.5,0.5);
+		this.TeamRed_Back_elo = this.add.text(700, 380, "" + this.TeamRed_Back_oldElo,make_style(28,'#000000')).setOrigin(0.5,0.5);
+
 		if (this.winner === EndResult.TeamBlue_Win)
 		{
 			this.TeamBlue_Back_newElo += this.TeamBlue_Back_oldElo + blueEloWon;
@@ -267,16 +232,45 @@ export default class MatchResult extends Phaser.Scene
 			this.TeamRed_Front_newElo += this.TeamRed_Front_oldElo + redEloLost;
 			this.TeamRed_Back_newElo += this.TeamRed_Back_oldElo + redEloLost;
 
-			this.add.text(100, 340, "+" + blueEloWon, style_green)
+			this.TeamBlue_Back_elo_change = this.add.text(100, 340, "+" + blueEloWon, make_style(28, '#00FF00'))
 								.setOrigin(0.5,0.5);
-			this.add.text(700, 340, "" + redEloLost, style_red)
+			this.TeamRed_Back_elo_change = this.add.text(700, 340, "" + redEloLost, make_style(28,'#FF0000'))
 								.setOrigin(0.5,0.5);
+					
+			this.eloRollingCount(
+				this.TeamBlue_Back_oldElo,
+				blueEloWon,
+				this.TeamBlue_Back_elo,
+				this.TeamBlue_Back_elo_change
+			);
+
+			this.eloRollingCount(
+				this.TeamRed_Back_oldElo,
+				redEloLost,
+				this.TeamRed_Back_elo,
+				this.TeamRed_Back_elo_change
+			);
+
 			if (this.game_type === GameType.Doubles)
 			{
-				this.add.text(285, 340, "+" + blueEloWon, style_green)
+				this.TeamBlue_Front_elo_change = this.add.text(285, 340, "+" + blueEloWon, make_style(28, '#00FF00'))
 								.setOrigin(0.5,0.5);
-				this.add.text(515, 340, "" + redEloLost, style_red)
+				this.TeamRed_Front_elo_change = this.add.text(515, 340, "" + redEloLost, make_style(28, '#FF0000'))
 								.setOrigin(0.5,0.5);
+
+				this.eloRollingCount(
+					this.TeamBlue_Front_oldElo,
+					blueEloWon,
+					this.TeamBlue_Front_elo,
+					this.TeamBlue_Front_elo_change
+				);
+
+				this.eloRollingCount(
+					this.TeamRed_Front_oldElo,
+					redEloLost,
+					this.TeamRed_Front_elo,
+					this.TeamRed_Front_elo_change
+				);
 			}
 
 		}
@@ -287,32 +281,118 @@ export default class MatchResult extends Phaser.Scene
 			this.TeamRed_Front_newElo += this.TeamRed_Front_oldElo + redEloWon;	
 			this.TeamRed_Back_newElo += this.TeamRed_Back_oldElo + redEloWon;
 
-			this.add.text(100, 340, "" + blueEloLost, style_red).setOrigin(0.5,0.5);
-			this.add.text(700, 340, "+" + redEloWon, style_green).setOrigin(0.5,0.5);
+			this.TeamBlue_Back_elo_change = this.add.text(100, 340, "" + blueEloLost , make_style(28,'#FF0000' )).setOrigin(0.5,0.5);
+			this.TeamRed_Back_elo_change = this.add.text(700, 340, "+" + redEloWon, make_style(28,'#00FF00' )).setOrigin(0.5,0.5);
+
+
+			this.eloRollingCount(
+				this.TeamBlue_Back_oldElo,
+				blueEloLost,
+				this.TeamBlue_Back_elo,
+				this.TeamBlue_Back_elo_change
+			);
+
+			this.eloRollingCount(
+				this.TeamRed_Back_oldElo,
+				redEloWon,
+				this.TeamRed_Back_elo,
+				this.TeamRed_Back_elo_change
+			);
+
 			if (this.game_type === GameType.Doubles)
 			{
-				this.add.text(285, 340, "" + blueEloLost, style_red).setOrigin(0.5,0.5);
-				this.add.text(515, 340, "+" + redEloWon, style_green).setOrigin(0.5,0.5);
+				this.TeamBlue_Front_elo_change = this.add.text(285, 340, "" + blueEloLost, make_style(28,'#FF0000' )).setOrigin(0.5,0.5);
+				this.TeamRed_Front_elo_change = this.add.text(515, 340, "+" + redEloWon, make_style(28,'#00FF00' )).setOrigin(0.5,0.5);
+
+				this.eloRollingCount(
+					this.TeamBlue_Front_oldElo,
+					blueEloLost,
+					this.TeamBlue_Front_elo,
+					this.TeamBlue_Front_elo_change
+				);
+
+				this.eloRollingCount(
+					this.TeamRed_Front_oldElo,
+					redEloWon,
+					this.TeamRed_Front_elo,
+					this.TeamRed_Front_elo_change
+				);
 			}
-
 		}
-
-		this.add.text(100, 380, "" + this.TeamBlue_Back_newElo, style).setOrigin(0.5,0.5);
-		this.add.text(700, 380, "" + this.TeamRed_Back_newElo, style).setOrigin(0.5,0.5);
-
-		if (this.game_type === GameType.Doubles)
-		{
-			this.add.text(285, 380, "" + this.TeamBlue_Front_newElo, style).setOrigin(0.5,0.5);
-			this.add.text(515, 380, "" + this.TeamRed_Front_newElo, style).setOrigin(0.5,0.5);
-		}
-	
-
-
 	}
 
 	rankDisplay = () =>
 	{
+		this.rankPrint(this.TeamBlue_Back_oldElo, this.TeamBlue_Back_newElo, 100);
+		this.rankPrint(this.TeamRed_Back_oldElo, this.TeamRed_Back_newElo, 700);
+		if (this.game_type === GameType.Doubles)
+		{
+			this.rankPrint(this.TeamBlue_Front_oldElo, this.TeamBlue_Front_newElo, 285);
+			this.rankPrint(this.TeamRed_Front_oldElo, this.TeamRed_Front_newElo, 515);
+		}
+	}
 
+	eloRollingCount = (
+		old_elo: number,
+		elo_change:number,
+		target_elo: Phaser.GameObjects.Text,
+		target_change: Phaser.GameObjects.Text
+		) =>
+	{
+		let inter: any;
+
+		if (elo_change > 0)
+		{
+			setTimeout( () => {
+			
+				clearInterval(inter);
+				inter = setInterval(
+					(function(self) { return function()
+					{
+						target_change.setText("+" + elo_change);
+						target_elo.setText("" + old_elo);
+						elo_change--;
+						old_elo++;
+						if (elo_change <= 0)
+						{
+							target_change.destroy();
+							clearInterval(inter);
+						}
+					}; })(this),
+					60);
+				}, 2000);
+		}
+		else
+		{
+			setTimeout( () => {
+			
+				clearInterval(inter);
+				inter = setInterval(
+					(function(self) { return function()
+					{
+						target_change.setText("" + elo_change);
+						target_elo.setText("" + old_elo);
+						elo_change++;
+						old_elo--;
+						if (elo_change >= 0)
+						{
+							target_change.destroy();
+							clearInterval(inter);
+						}
+					}; })(this),
+					60);
+				}, 2000);
+		}
+	}
+
+
+
+	rankPrint = (
+		old_elo: number,
+		new_elo: number,
+		x_pos: number
+		) =>
+	{
 		let style_arrow_green: Phaser.Types.GameObjects.Text.TextStyle = 
 		{
 			fontSize: '34px',
@@ -327,164 +407,35 @@ export default class MatchResult extends Phaser.Scene
 			fontFamily: 'Arial'
 		}
 
-		if (check_rank_change(
-			this.TeamBlue_Back_oldElo,
-			this.TeamBlue_Back_newElo))
+		if (check_rank_change(old_elo,new_elo))
 		{
 
-			this.add.image(60, 450,
-				elo_to_rank_as_string(this.TeamBlue_Back_oldElo))
+			this.add.image(x_pos - 30, 450,
+				elo_to_rank_as_string(old_elo))
 				.setOrigin(0.5,0.5)
 				.setDisplaySize(100, 100);
 
 
-			this.add.image(130, 450,
-				elo_to_rank_as_string(this.TeamBlue_Back_newElo))
+			this.add.image(x_pos + 30, 450,
+				elo_to_rank_as_string(new_elo))
 				.setOrigin(0.5,0.5)
 				.setDisplaySize(100, 100);
 
-			if (this.TeamBlue_Back_newElo > this.TeamBlue_Back_oldElo)
+			if (new_elo > old_elo)
 			{
-				this.add.text(100, 450, "➜", style_arrow_green).setOrigin(0.5,0.5);
+				this.add.text(x_pos, 450, "➜", style_arrow_green).setOrigin(0.5,0.5);
 			}
 			else
 			{
-				this.add.text(100, 450, "➜", style_arrow_red).setOrigin(0.5,0.5);
+				this.add.text(x_pos, 450, "➜", style_arrow_red).setOrigin(0.5,0.5);
 			}
 		}
 		else
 		{
-			this.add.image(100, 450,
-				elo_to_rank_as_string(this.TeamBlue_Back_newElo))
+			this.add.image(x_pos, 450,
+				elo_to_rank_as_string(new_elo))
 				.setOrigin(0.5,0.5)
 				.setDisplaySize(100, 100);
 		}
-
-
-//⬈
-//this.add.text(285, 380, "" + this.TeamBlue_Front_newElo, style).setOrigin(0.5,0.5);
-
-		if (check_rank_change(
-			this.TeamRed_Back_oldElo,
-			this.TeamRed_Back_newElo))
-		{
-
-			//rank changed, display old left, new right, arrow (colored) middle
-			this.add.image(660, 450,
-				elo_to_rank_as_string(this.TeamRed_Back_oldElo))
-				.setOrigin(0.5,0.5)
-				.setDisplaySize(100, 100);
-
-
-			this.add.image(730, 450,
-				elo_to_rank_as_string(this.TeamRed_Back_newElo))
-				.setOrigin(0.5,0.5)
-				.setDisplaySize(100, 100);
-
-			if (this.TeamRed_Back_newElo > this.TeamRed_Back_oldElo)
-			{
-				this.add.text(700, 450, "➜", style_arrow_green).setOrigin(0.5,0.5);
-			}
-			else
-			{
-				this.add.text(700, 450, "➜", style_arrow_red).setOrigin(0.5,0.5);
-			}
-		}
-		else
-		{
-			//rank unchanged, display rank
-			this.add.image(700, 450,
-				elo_to_rank_as_string(this.TeamRed_Back_newElo))
-				.setOrigin(0.5,0.5)
-				.setDisplaySize(100, 100);
-		}
-
-
-
-
-
-
-
-
-
-		if (this.game_type === GameType.Doubles)
-		{
-			if (check_rank_change(
-				this.TeamBlue_Front_oldElo,
-				this.TeamBlue_Front_newElo))
-			{
-
-				this.add.image(245, 450,
-					elo_to_rank_as_string(this.TeamBlue_Front_oldElo))
-					.setOrigin(0.5,0.5)
-					.setDisplaySize(100, 100);
-	
-	
-				this.add.image(315, 450,
-					elo_to_rank_as_string(this.TeamBlue_Front_newElo))
-					.setOrigin(0.5,0.5)
-					.setDisplaySize(100, 100);
-
-				if (this.TeamBlue_Front_newElo > this.TeamBlue_Front_oldElo)
-				{
-					this.add.text(285, 450, "➜", style_arrow_green).setOrigin(0.5,0.5);
-				}
-				else
-				{
-					this.add.text(285, 450, "➜", style_arrow_red).setOrigin(0.5,0.5);
-				}
-			}
-			else
-			{
-				//rank unchanged, display rank
-				this.add.image(285, 450,
-					elo_to_rank_as_string(this.TeamBlue_Front_newElo))
-					.setOrigin(0.5,0.5)
-					.setDisplaySize(100, 100);
-			}
-	
-	
-			if (check_rank_change(
-				this.TeamRed_Front_oldElo,
-				this.TeamRed_Front_newElo))
-			{
-
-				this.add.image(475, 450,
-					elo_to_rank_as_string(this.TeamRed_Front_oldElo))
-					.setOrigin(0.5,0.5)
-					.setDisplaySize(100, 100);
-	
-	
-				this.add.image(545, 450,
-					elo_to_rank_as_string(this.TeamRed_Front_newElo))
-					.setOrigin(0.5,0.5)
-					.setDisplaySize(100, 100);
-
-				if (this.TeamRed_Front_newElo > this.TeamRed_Front_oldElo)
-				{
-					this.add.text(515, 450, "➜", style_arrow_green).setOrigin(0.5,0.5);
-				}
-				else
-				{
-					this.add.text(515, 450, "➜", style_arrow_red).setOrigin(0.5,0.5);
-				}
-			}
-			else
-			{
-				//rank unchanged, display rank
-				this.add.image(285, 450,
-					elo_to_rank_as_string(this.TeamRed_Front_newElo))
-					.setOrigin(0.5,0.5)
-					.setDisplaySize(100, 100);
-			}
-
-
-		}
-
-
-
-
-
 	}
-
 }

@@ -1,4 +1,3 @@
-import Avatar from "../../Images-Icons/pp.jpg";
 import { useAppDispatch, useAppSelector } from "../../Redux/Hooks";
 import { NotificationInterface, notificationType } from "../../Types/Notification-Types";
 import { SocketContext } from "../../App";
