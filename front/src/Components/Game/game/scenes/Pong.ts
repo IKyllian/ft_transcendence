@@ -124,7 +124,9 @@ export default class Pong extends Phaser.Scene
 		}
 
 
-		this.asset_lag_icon = this.add.image(400, 300, 'lag_icon');
+		this.asset_lag_icon = this.add.image(400, 70, 'lag_icon')
+							.setOrigin(0.5, 0.5)
+							.setDisplaySize(50, 50);;
 		this.asset_lag_icon.setAlpha(0);
 
 		if (this.game_settings)
