@@ -1,4 +1,4 @@
-import { IconX, IconMessage, IconEye, IconUserX } from "@tabler/icons";
+import { IconX, IconMessage, IconEye, IconUserX, IconDeviceGamepad2, IconChevronsDownLeft } from "@tabler/icons";
 import { useContext, useEffect, useState } from "react";
 
 import { ModalContext } from "./Utils/ModalProvider";
@@ -17,10 +17,13 @@ function AddFriendModal() {
     const [showFriendList, setShowFriendList] = useState<boolean>(true);
 
     const {friendList} = useAppSelector((state) => state.auth);
+    const {party} = useAppSelector(state => state.party);
     const {handleRemoveFriend} = useFriendHook();
     const modalStatus = useContext(ModalContext);
     const {socket} = useContext(SocketContext);
     const dispatch = useAppDispatch();
+
+    console.log("PARTY", party);
 
     useEffect(() => {
         socket?.on("StatusUpdate", (data: {id: number, status: UserStatus}) => {
@@ -59,6 +62,7 @@ function AddFriendModal() {
                                     <UserFindItem key={index} avatar={elem.avatar} name={elem.username} status={elem.status} userId={elem.id} >
                                         <div className="icons-player-item">
                                             { elem.in_game_id !== null && <IconEye onClick={() => spectateClick(elem.in_game_id!)} className='spectate-icon' /> }
+                                            { !party || (party && !party.players.find(partyUser => partyUser.user.id === elem.id)) && <IconDeviceGamepad2 onClick={() => socket?.emit("PartyInvite", {id: elem.id})} />}
                                             <Link className="send-message-icon" to="/chat" state={{userIdToSend: elem.id}}>
                                                 <IconMessage />
                                             </Link>

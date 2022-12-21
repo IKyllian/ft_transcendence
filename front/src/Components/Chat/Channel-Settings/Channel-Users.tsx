@@ -38,9 +38,12 @@ export function ChannelUserItem(props: {userDatas: ChannelUser}) {
                             senderId={userDatas.user.id}
                         />
                         {
+                            (loggedUserIsOwner) &&
+                            <RoleButton sender={userDatas} />
+                        }
+                        {
                             (loggedUserIsOwner || (loggedUserIsModerator && userDatas.role !== "owner")) &&
                             <> 
-                                <RoleButton sender={userDatas} />
                                 <MuteButton senderId={userDatas.user.id} chanId={channelDatas.id} usersTimeout={channelDatas.usersTimeout} />
                                 <BanButton senderId={userDatas.user.id} chanId={channelDatas.id} />
                             </>

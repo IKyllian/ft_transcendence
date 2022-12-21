@@ -72,7 +72,7 @@ function ChannelsList() {
                 </div>
             }
             <div className="no-target-message">
-                <p> No Channel created yet </p>
+                <p> No Visible Channel </p>
             </div>
         </>        
     )
