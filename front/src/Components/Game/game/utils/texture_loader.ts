@@ -1,9 +1,7 @@
-
 import { Scene, Textures } from "phaser";
-import { UserInterface } from "../../../Types/User-Types"
-import AssetDefaultAvatar from '../../../Images-Icons/pp.jpg'
-import { getPlayerAvatar } from "../../../Api/User-Fetch";
-//import * as sharp from 'sharp';
+import { UserInterface } from "../../../../Types/User-Types"
+import AssetDefaultAvatar from '../../../../Assets/default-avatar.jpg'
+import { getPlayerAvatar } from "../../../../Api/User-Fetch";
 
 const loadBase64Image = (props: {
   data: any;
@@ -32,16 +30,14 @@ export async function loadAvatar (user: UserInterface, key:string, token: string
 
   if (
     user.avatar !== null 
-    && cache !== undefined 
-   // && cache !== null
+    && cache !== undefined
     )
   {
     let result: string | undefined =  await getPlayerAvatar(cache, token, user.id, user.avatar);
     if (result)
     {
-     // sharp(result, { pages: -1 }).toFile(result)
-
-      scene.load.image(key, result);
+   //   scene.load.image(key, result);
+      await_load_base64(result, key, scene);
     }
     else
     {

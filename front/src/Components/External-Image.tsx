@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { getPlayerAvatar } from "../Api/User-Fetch";
 import { CacheContext } from "../App";
-import DefaultAvatar from "../Images-Icons/pp.jpg";
+import DefaultAvatar from "../Assets/default-avatar.jpg";
 import { setUserAvatar } from "../Redux/AuthSlice";
 import { useAppDispatch, useAppSelector } from "../Redux/Hooks";
 import { addStoreAvatar, StoreAvatarInterface } from "../Redux/StoreAvatar";

@@ -2,7 +2,7 @@ import 'phaser';
 import ClientSocketManager from '../client.socket.manager';
 import PongCore from '../pong.core';
 import { GameState, Goal, Movement, PlayerInput, PlayerType, EndResult, RoundSetup, GameType, GameSettings } from '../types/shared.types';
-import { await_load_base64 } from '../texture_loader';
+import { await_load_base64 } from '../utils/texture_loader';
 
 import AssetSoundA from '../../../../Assets/sound/8bit_effect_a.ogg'
 import AssetSoundB from '../../../../Assets/sound/8bit_effect_b.ogg'
@@ -38,6 +38,7 @@ export default class Pong extends Phaser.Scene
 	upper_limit?: Phaser.GameObjects.Shape;
 	lower_limit?: Phaser.GameObjects.Shape;
 	asset_ball?: Phaser.GameObjects.Shape;
+	me_indicator?: Phaser.GameObjects.Shape;
 	asset_TeamBlue_Back?: Phaser.GameObjects.Shape;
 	asset_TeamBlue_Front?: Phaser.GameObjects.Shape;
 	asset_TeamRed_Front?: Phaser.GameObjects.Shape;
@@ -169,13 +170,17 @@ export default class Pong extends Phaser.Scene
 											this.game_settings.paddle_size_front,
 											this.pick_paddle_color(PlayerType.TeamRed_Front))
 											.setOrigin(0,0.5);
-			}	
+			}
+
+			if (this.me !== PlayerType.Spectator)
+			{
+				this.place_me_indicator();
+			}
 		}
 
 		let style: Phaser.Types.GameObjects.Text.TextStyle = 
 		{
 			fontSize: '32px',
-		//	color: '#000000',
 			color: '#E0E1DD',
 			fontFamily: 'Silkscreen'
 		}
@@ -353,7 +358,7 @@ export default class Pong extends Phaser.Scene
 			text = this.game_state.score.TeamBlue.toString() + " - " + this.game_state.score.TeamRed.toString();
 			this.asset_scoreboard?.setText(text);
 		}
-
+		this.refresh_me_indicator();
 		this.lag_check();
 	}
 
@@ -566,13 +571,120 @@ export default class Pong extends Phaser.Scene
 
 	}
 
+	place_me_indicator = () =>
+	{
+		if (this.game_type === GameType.Doubles)
+		{
+			if (this.asset_TeamBlue_Back !== undefined
+				&& this.asset_TeamRed_Back !== undefined
+				&& this.asset_TeamBlue_Front !== undefined
+				&& this.asset_TeamRed_Front !== undefined)
+			{
+				switch(this.me)
+				{
+					case PlayerType.TeamBlue_Back:
+						this.me_indicator = this.add.circle(this.asset_TeamBlue_Back.x, 300, 5, 0x01163d).setOrigin(1, 0.5);
+						break;
+					case PlayerType.TeamBlue_Front:
+						this.me_indicator = this.add.circle(this.asset_TeamBlue_Front.x, 300, 5, 0x01163d).setOrigin(1, 0.5);
+						break;
+					case PlayerType.TeamRed_Front:
+						this.me_indicator = this.add.circle(this.asset_TeamRed_Front.x, 300, 5, 0x4a0a03).setOrigin(0, 0.5);
+						break;
+					case PlayerType.TeamRed_Back:
+						this.me_indicator = this.add.circle(this.asset_TeamRed_Back.x, 300, 5, 0x4a0a03).setOrigin(0, 0.5);
+						break;
+					default:
+						break;
+				}
+			}
+		}
+		else
+		{
+			if (this.asset_TeamBlue_Back !== undefined
+				&& this.asset_TeamRed_Back !== undefined)
+			{
+				switch(this.me)
+				{
+					case PlayerType.TeamBlue_Back:
+						this.me_indicator = this.add.circle(this.asset_TeamBlue_Back.x, 300, 5, 0x01163d).setOrigin(1, 0.5);
+						break;
+					case PlayerType.TeamRed_Back:
+						this.me_indicator = this.add.circle(this.asset_TeamRed_Back.x, 300, 5, 0x4a0a03).setOrigin(0, 0.5);
+						break;
+					default:
+						break;
+				}
+	
+			}
+		}
+
+
+	}
+
+	refresh_me_indicator = () =>
+	{
+		if (this.game_type === GameType.Doubles)
+		{
+			if (this.me_indicator !== undefined
+				&& this.asset_TeamBlue_Back !== undefined
+				&& this.asset_TeamRed_Back !== undefined
+				&& this.asset_TeamBlue_Front !== undefined
+				&& this.asset_TeamRed_Front !== undefined)
+			{
+				switch(this.me)
+				{
+					case PlayerType.TeamBlue_Back:
+						this.me_indicator.y = this.asset_TeamBlue_Back.y;
+						break;
+					case PlayerType.TeamBlue_Front:
+						this.me_indicator.y = this.asset_TeamBlue_Front.y;
+						break;
+					case PlayerType.TeamRed_Front:
+						this.me_indicator.y = this.asset_TeamRed_Front.y;
+						break;
+					case PlayerType.TeamRed_Back:
+						this.me_indicator.y = this.asset_TeamRed_Back.y;
+						break;
+					default:
+						this.me_indicator?.destroy();
+						break;
+				}
+	
+			}
+		}
+		else
+		{
+			if (this.me_indicator !== undefined
+				&& this.asset_TeamBlue_Back !== undefined
+				&& this.asset_TeamRed_Back !== undefined)
+			{
+				switch(this.me)
+				{
+					case PlayerType.TeamBlue_Back:
+						this.me_indicator.y = this.asset_TeamBlue_Back.y;
+						break;
+					case PlayerType.TeamRed_Back:
+						this.me_indicator.y = this.asset_TeamRed_Back.y;
+						break;
+					default:
+						this.me_indicator?.destroy();
+						break;
+				}
+	
+			}
+		}
+	}
+
 
 	pick_paddle_color = (paddle: PlayerType): number =>
 	{
-		if (this.me === paddle)
-			return 0xFF0000;
-		return 0xE0E1DD;
-		//E0E1DD
+
+		if (paddle === PlayerType.TeamBlue_Back 
+			|| paddle === PlayerType.TeamBlue_Front)
+				return 0x0059FF;
+			else
+				return 0xF91900;
 	}
 
 	sound_event_wall = () =>

@@ -9,7 +9,7 @@ $FontSizeTextResponsive: 15px;
     background-color: $LightBluePalette;
 
     .profile-header {
-        background: url('../Images-Icons//Backgrounds/background-42.jpg') no-repeat center fixed;
+        background: url('../Assets/Backgrounds/background-42.jpg') no-repeat center fixed;
         background-size: cover;
         @include width-height(100%, 250px);
         position: relative;

@@ -1,5 +1,4 @@
 import { useContext } from "react";
-import Avatar from "../Images-Icons/pp.jpg";
 import { SocketContext } from "../App";
 import { useAppDispatch, useAppSelector } from "../Redux/Hooks";
 import { removePartyInvite } from "../Redux/PartySlice";

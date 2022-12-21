@@ -1,6 +1,5 @@
 import { useContext } from "react";
 import { IconUsers, IconX, IconPlus, IconMessage } from "@tabler/icons";
-import Avatar from "../../Images-Icons/pp.jpg";
 import { useAppDispatch, useAppSelector } from "../../Redux/Hooks";
 import { SocketContext } from "../../App";
 import { loggedUserIsLeader } from "../../Utils/Utils-Party";

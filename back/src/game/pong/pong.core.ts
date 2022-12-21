@@ -1,10 +1,10 @@
 import { GameType, Goal, ScoreBoard, Coordinates, BallData, PlayerInput, EndResult, RoundSetup, GameSettings, GameState, PlayerType, Movement, PlayerPosition } from "src/utils/types/game.types";
 
 //paddle designations
-//paddle A_back  ( [I] I    I  I  )
-//paddle A_front (  I [I]   I  I  )
-//paddle B_front (  I  I   [I] I  )
-//paddle B_back  (  I  I    I [I] )
+//TeamBlue_Back  ( [I] I    I  I  )
+//TeamBlue_Front (  I [I]   I  I  )
+//TeamRed_Front  (  I  I   [I] I  )
+//TeamRed_Back   (  I  I    I [I] )
 
 export default class PongCore
 {
@@ -84,8 +84,8 @@ export default class PongCore
 		this.up_down_border = game_settings.up_down_border;
 		this.player_back_advance = game_settings.player_back_advance;
 		this.player_front_advance = game_settings.player_front_advance;
-		this.paddle_size_back = game_settings.paddle_size_back;
-		this.paddle_size_front = game_settings.paddle_size_front;
+		this.paddle_size_back = game_settings.paddle_size_back + 5;
+		this.paddle_size_front = game_settings.paddle_size_front + 5;
 		this.paddle_speed = game_settings.paddle_speed;
 		this.ball_start_speed = game_settings.ball_start_speed;
 		this.ball_acceleration = game_settings.ball_acceleration;
@@ -293,8 +293,6 @@ export default class PongCore
 			{
 				this.ball_data.position.x = this.player_back_advance;
 				this.ball_data.vector.x *= -1;	
-//TODO
-//do something cool with vectors for bounce
 				this.doctored_rebound(this.TeamBlue_Back_pos.y, PlayerPosition.BACK);
 				this.ball_data.velocity += this.ball_acceleration;
 			}
@@ -309,8 +307,6 @@ export default class PongCore
 			{
 				this.ball_data.position.x = (this.field_width - this.player_back_advance);
 				this.ball_data.vector.x *= -1;	
-//TODO
-//do something cool with vectors for bounce
 				this.doctored_rebound(this.TeamRed_Back_pos.y, PlayerPosition.BACK);
 				this.ball_data.velocity += this.ball_acceleration;
 			}
@@ -343,8 +339,6 @@ export default class PongCore
 				{
 					this.ball_data.position.x = (this.field_width - this.player_front_advance);
 					this.ball_data.vector.x *= -1;	
-//TODO
-//do something cool with vectors for bounce
 					this.doctored_rebound(this.TeamRed_Front_pos.y, PlayerPosition.FRONT);
 					this.ball_data.velocity += this.ball_acceleration;
 				}

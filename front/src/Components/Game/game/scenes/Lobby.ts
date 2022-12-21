@@ -1,19 +1,18 @@
 import 'phaser';
 import {PlayerType, RoundSetup, EndResult, GameType } from '../types/shared.types';
 import ClientSocketManager from '../client.socket.manager';
-import {  await_load_base64, loadAvatar } from '../texture_loader';
+import {  await_load_base64, loadAvatar } from '../utils/texture_loader';
 
-import { elo_to_rank_as_string } from '../elo_tools';
-import { shorten_nickname } from '../text_tools';
-import { make_style } from '../text_tools';
+import { elo_to_rank_as_string } from '../utils/elo_tools';
+import { shorten_nickname } from '../utils/text_tools';
+import { make_style } from '../utils/text_tools';
 
-import AssetRankSilver from '../../../../Images-Icons/Ranks/silver.png'
-import AssetRankGold from '../../../../Images-Icons/Ranks/gold.png';
-import AssetRankPlatine from '../../../../Images-Icons/Ranks/platine.png';
-import AssetRankDiamond from '../../../../Images-Icons/Ranks/diamond.png';
-import AssetRankChampion from '../../../../Images-Icons/Ranks/champion.png';
-import AssetRankLegend from '../../../../Images-Icons/Ranks/legend.png';
-import AssetButton from '../../../../Assets/images/button.png';
+import AssetRankSilver from '../../../../Assets/Ranks/silver.png'
+import AssetRankGold from '../../../../Assets/Ranks/gold.png';
+import AssetRankPlatine from '../../../../Assets/Ranks/platine.png';
+import AssetRankDiamond from '../../../../Assets/Ranks/diamond.png';
+import AssetRankChampion from '../../../../Assets/Ranks/champion.png';
+import AssetRankLegend from '../../../../Assets/Ranks/legend.png';
 
 export default class Lobby extends Phaser.Scene
 {
@@ -58,17 +57,18 @@ export default class Lobby extends Phaser.Scene
 	wait_delay: number = 0;
 	connected: boolean = false;
 	launching_game: boolean = false;
+	update_interval: any;
 
-	async preload ()
+	preload ()
 	{
-		await loadAvatar(
+		loadAvatar(
 			this.game.registry.get('players_data').TeamBlue_Back.user,
 			'TeamBlue_back_avatar',
 			this.registry.get('token'),
 			this.registry.get('cache'),
 			this);
 
-		await loadAvatar(
+		loadAvatar(
 			this.game.registry.get('players_data').TeamRed_Back.user,
 			'TeamRed_back_avatar',
 			this.registry.get('token'),
@@ -79,13 +79,13 @@ export default class Lobby extends Phaser.Scene
 
 		if (this.game_type === GameType.Doubles)
 		{
-			await loadAvatar(
+			loadAvatar(
 				this.game.registry.get('players_data').TeamBlue_Front.user,
 				'TeamBlue_front_avatar',
 				this.registry.get('token'),
 				this.registry.get('cache'),
 				 this);
-			await loadAvatar(
+			loadAvatar(
 				this.game.registry.get('players_data').TeamRed_Front.user,
 				'TeamRed_front_avatar',
 				this.registry.get('token'),
@@ -93,18 +93,69 @@ export default class Lobby extends Phaser.Scene
 				 this);
 		}
 
-		await await_load_base64(AssetRankSilver, "Silver", this);
-		await await_load_base64(AssetRankGold, "Gold", this);
-		await await_load_base64(AssetRankPlatine, "Platine", this);
-		await await_load_base64(AssetRankDiamond, "Diamond", this);
-		await await_load_base64(AssetRankChampion, "Champion", this);
-		await await_load_base64(AssetRankLegend, "Legend", this);	
-	//	this.load.image('button', AssetButton);
-	}
+		await_load_base64(AssetRankSilver, "Silver", this);
+		await_load_base64(AssetRankGold, "Gold", this);
+		await_load_base64(AssetRankPlatine, "Platine", this);
+		await_load_base64(AssetRankDiamond, "Diamond", this);
+		await_load_base64(AssetRankChampion, "Champion", this);
+		await_load_base64(AssetRankLegend, "Legend", this);	
 
-	create ()
+		let interval: any;
+		interval = setInterval(
+			(function(self) { return function()
+			  {
+
+				if (
+					self.textures.exists('Silver')
+					&& self.textures.exists('Gold')
+					&& self.textures.exists('Platine')
+					&& self.textures.exists('Diamond')
+					&& self.textures.exists('Champion')
+					&& self.textures.exists('Legend')
+				)
+				{
+
+					if (self.game_type === GameType.Doubles)
+					{
+						if (
+							self.textures.exists('TeamBlue_back_avatar')
+							&& self.textures.exists('TeamRed_back_avatar')
+							&& self.textures.exists('TeamBlue_front_avatar')
+							&& self.textures.exists('TeamRed_front_avatar')
+						)
+						{
+							self.display();
+							self.update_interval = setInterval(() => {
+								self.check_status();
+							}, 1000 / 30);
+							clearInterval(interval);
+						}
+					}
+					else
+					{
+						if(
+							self.textures.exists('TeamBlue_back_avatar')
+							&& self.textures.exists('TeamRed_back_avatar')
+						)
+						{
+							self.display();
+							self.update_interval = setInterval(() => {
+								self.check_status();
+							}, 1000 / 30);
+							clearInterval(interval);
+						}
+					}
+				}
+			  }; })(this),
+			50);
+	}
+	// preload ()
+	// create (){}
+	// update (){}
+
+	display ()
 	{
-		// this.game.registry.get('setHasEnded')(true);
+
 		this.cameras.main.setBackgroundColor("#415A77");
 
 		this.me = this.game.registry.get('players_data').player_type;
@@ -119,8 +170,8 @@ export default class Lobby extends Phaser.Scene
 			game_end: this.game_end.bind(this)
         });
 
-		this.message_text = this.add.text(400, 260, "V", make_style(72, "#0062FF")).setOrigin(1,0.5);
-		this.message_text_b = this.add.text(400, 260, "S", make_style(72, "#F71E06")).setOrigin(0,0.5);
+		this.message_text = this.add.text(400, 260, "V", make_style(72, "#0059FF")).setOrigin(1,0.5);
+		this.message_text_b = this.add.text(400, 260, "S", make_style(72, "#F91900")).setOrigin(0,0.5);
 
 		this.TeamBlue_Back_avatar = this.add.image(100, 130,
 								'TeamBlue_back_avatar')
@@ -233,21 +284,24 @@ export default class Lobby extends Phaser.Scene
 		this.socketmanager.lobby_send_request_status(this.registry.get('players_data').game_id);
 	}
 
-	update(): void
+	check_status()
 	{
 		this.anti_spam_count++;
 		if (this.anti_spam_count >= 5)
 		{
-			this.socketmanager!.lobby_send_request_status(this.registry.get('players_data').game_id);
+			if (this.socketmanager instanceof ClientSocketManager)
+			{
+				this.socketmanager.lobby_send_request_status(this.registry.get('players_data').game_id);
+			}
 			this.anti_spam_count = 0;
 		}
 
 		if (!this.connected)
 		{
 			this.wait_delay++;
-			if (this.wait_delay >= 200)
+			if (this.wait_delay >= 300)
 			{
-	
+				clearInterval(this.update_interval);
 				this.server_connect_fail();
 			}
 		}
@@ -259,11 +313,11 @@ export default class Lobby extends Phaser.Scene
 			return;
 		
 		this.launching_game = true;
-		this.socketmanager!.game_get_round_setup(this.game.registry.get('players_data').game_id);
+		this.socketmanager?.game_get_round_setup(this.game.registry.get('players_data').game_id);
+		clearInterval(this.update_interval);
 
 		setTimeout(() => { 
 			this.cameras.main.fadeOut(1000, 0, 0, 0);
-
 		}, 1500);
 
 		setTimeout(() => { 
@@ -274,6 +328,7 @@ export default class Lobby extends Phaser.Scene
 	game_abort = () =>
 	{
 		this.clear_all();
+		clearInterval(this.update_interval);
 
 		this.message_text = this.add.text(400, 100,
 							"Someone Failed\nto join\nGame aborted",
@@ -324,6 +379,7 @@ export default class Lobby extends Phaser.Scene
 	server_connect_fail = () =>
 	{
 		this.clear_all();
+		clearInterval(this.update_interval);
 
 		this.message_text = this.add.text(400, 100,
 			"Error: \nCould not connect to server",
@@ -342,7 +398,8 @@ export default class Lobby extends Phaser.Scene
 		if(!response)
 		{
 			this.clear_all();
-			
+			clearInterval(this.update_interval);
+
 			this.message_text = this.add.text(400, 100,
 								"Error: \nLobby not found",
 								make_style(30))
@@ -358,6 +415,7 @@ export default class Lobby extends Phaser.Scene
 	game_end = (winner: EndResult) =>
 	{
 		this.game.registry.set('winner', winner);
+		clearInterval(this.update_interval);
 
 		this.scene.start('MatchResult');
 	}

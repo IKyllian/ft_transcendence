@@ -18,7 +18,6 @@ import { LobbyFactory } from './lobby/lobby.factory';
 import { AuthenticatedSocket } from '../utils/types/auth-socket';
 import { GatewayExceptionFilter } from 'src/utils/exceptions/filter/Gateway.filter';
 
-
 @UseFilters(GatewayExceptionFilter)
 @UsePipes(new ValidationPipe())
 @WebSocketGateway({ namespace: 'game' })
@@ -43,9 +42,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
 		let user: User = null;
 		client.multi_tab = false;
 		if (client.handshake.headers.authorization) {
-			// console.log("Header -> ", client.handshake.headers.authorization);
 			const token = client.handshake.headers.authorization.split(' ')[1];
-			// console.log("token -> ", token);
 			user = await this.authService.verify(token);
 		}
 		if (user) {
@@ -78,7 +75,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
 		this.lobbyfactory.lobby_quit(socket);
 	}
 		
-		/* ----- Users Lobby Management ----- */
+	/* ----- Users Lobby Management ----- */
 		
 	@SubscribeMessage('user_join_lobby')
 	async onUserJoinLobby(@ConnectedSocket() client: AuthenticatedSocket,
@@ -112,23 +109,4 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
 	{
 		this.lobbyfactory.lobby_game_get_round_setup(client, game_id);
 	}
-
-
-
-
-//commented for now
-
-	/* ----- Replay Handling ----- */
-
-
-	// @SubscribeMessage('replay_request')
-	// async onReplayRequest(@ConnectedSocket() client: Socket,
-	// @MessageBody() game_id: string)
-	// {
-	// 	this.lobbyfactory.send_replay(client, game_id);
-	// }
-
-
-
-
   }
