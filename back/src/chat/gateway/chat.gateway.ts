@@ -167,10 +167,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		const chanInfo = await this.channelService.getChannelById(user.id, room.id);
 		socket.emit('roomData', chanInfo);
 		socket.join(`channel-${ chanInfo.id }`);
-		const deletedNotifId = await this.notificationService.deleteChannelMessageNotif(user.id, room.id);
-		if (deletedNotifId) {
-			this.server.to(`user-${user.id}`).emit('DeleteNotification', deletedNotifId);
-		}
+		await this.notificationService.deleteChannelMessageNotif(user.id, room.id);
 	}
 
 	@UseGuards(WsJwtGuard)
@@ -226,6 +223,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		@MessageBody() dto: BanUserDto,
 	) {
 		const bannedUser: UserTimeout = await this.channelService.banUser(chanUser, dto);
+		await this.notificationService.deleteChannelMessageNotif(dto.userId, dto.chanId);
 		this.server.to(`channel-${bannedUser.channel.id}`).emit('ChannelUpdate', { type: ChannelUpdateType.BAN, data: bannedUser });
 		this.server.to(`user-${dto.userId}`).emit('OnLeave', bannedUser.channel);
 	}
