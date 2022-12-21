@@ -35,10 +35,10 @@ export class User {
 	@JoinTable({ name: 'blocked_users' })
 	blocked: User[];
 
-	@Column({ default: 1000 })
+	@Column({ default: 975 })
 	singles_elo: number;
 
-	@Column({ default: 1000 })
+	@Column({ default: 975 })
 	doubles_elo: number;
 
 	@OneToOne(() => UserAccount, (account) => account.user, { cascade: true })
