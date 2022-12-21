@@ -23,7 +23,7 @@ function ChannelItem(props: {channelData: Channel}) {
             <div className="channel-banner"></div>
             <div className="card-content">
                 <p className="channel-name"> { channelData.name } <span>({ ChannelModesArray[channelData.option] })</span> </p>
-                <p className="channel-description"> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec quis porta libero, vitae feugiat sem. Aenean porttitor diam non sem congue, vitae euismod diam venenatis. </p>
+                {/* <p className="channel-description"> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec quis porta libero, vitae feugiat sem. Aenean porttitor diam non sem congue, vitae euismod diam venenatis. </p> */}
                 <div className="item-bottom">
                     <p> {channelData.channelUsers.length} members </p>
                     <div className="item-bottom-right">

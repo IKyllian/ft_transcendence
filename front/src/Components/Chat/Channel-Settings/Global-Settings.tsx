@@ -1,5 +1,6 @@
 import { useForm } from "react-hook-form";
 import api from "../../../Api/Api";
+import { addAlert, AlertType } from "../../../Redux/AlertSlice";
 import { changeChannelSettings } from "../../../Redux/ChannelSlice";
 import { useAppDispatch, useAppSelector } from "../../../Redux/Hooks";
 import { ChannelModes, ChannelModesArray } from "../../../Types/Chat-Types";
@@ -36,6 +37,7 @@ function FormChanName() {
         .then(response => {
             console.log(response);
             dispatch(changeChannelSettings({chanName: response.data.name, option: response.data.option}));
+            dispatch(addAlert({message: "Channel name updated", type: AlertType.SUCCESS}));
         })
         .catch(err => {
             console.log(err);
@@ -90,6 +92,7 @@ function FormChanType() {
         .then(response => {
             console.log("RESPONSE ", response.data);
             dispatch(changeChannelSettings({chanName: response.data.name, option: response.data.option}));
+            dispatch(addAlert({message: "Channel type updated", type: AlertType.SUCCESS}));
         })
         .catch(err => {
             console.log(err);
@@ -102,7 +105,7 @@ function FormChanType() {
         else if (elem === "private" && channelDatas!.option === ChannelModes.PRIVATE)
             return true;
         else if (elem === "protected" && channelDatas!.option === ChannelModes.PROTECTED)
-            return true;
+            return false;
         return false;
     }
 
@@ -142,7 +145,7 @@ function FormChanType() {
             }
             {
                 !checkMode(channelMode) &&
-                <input className="saveInput" type="submit" value="Save" />
+                <button className="saveInput" type="submit"> Save </button>
             }
         </form>
     );

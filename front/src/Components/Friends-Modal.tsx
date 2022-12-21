@@ -36,7 +36,6 @@ function AddFriendModal() {
     const spectateClick = (gameId: string) => {
         if (gameId)
             socket?.emit("get_gameinfo", gameId);
-        
     }
 
     return modalStatus.modal.isOpen ? (
