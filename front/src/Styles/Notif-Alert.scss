@@ -1,4 +1,5 @@
 @use "./Variables.scss" as *;
+@use "./mixins.scss" as *;
 
 $successLight: #c3f4aa;
 $successDark: rgb(5, 65, 8);

@@ -3,7 +3,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { launch_game } from "./game/libpong";
 import { PlayersGameData } from "./game/types/shared.types";
 import { io, Socket } from "socket.io-client";
-import { baseUrl, socketUrl } from "../../env";
 import { CacheContext } from "../../App"
 import { useContext } from 'react';
 import { TokenStorageInterface } from "../../Types/Utils-Types";
@@ -48,14 +47,14 @@ function Game() {
                     const localToken: string | null = localStorage.getItem("userToken");
                     if (localToken) {
                         const storedToken: TokenStorageInterface = JSON.parse(localToken);  
-                        const refreshResponse = await axios.post(`${baseUrl}/auth/refresh`, {}, {
+                        const refreshResponse = await axios.post(`${process.env.REACT_APP_BASE_URL}/auth/refresh`, {}, {
                             headers: {
                                 "Authorization": `Bearer ${storedToken.refresh_token}`,
                             }
                         });
                         if (refreshResponse && refreshResponse.data) {
                             localStorage.setItem("userToken", JSON.stringify(refreshResponse.data));
-                            const gameSocket: Socket = io(`${socketUrl}/game`, {extraHeaders: {
+                            const gameSocket: Socket = io(`${process.env.REACT_APP_SOCKET_URL}/game`, {extraHeaders: {
                                 "Authorization": `Bearer ${refreshResponse.data.access_token}`,
                             }});
                             setGameSocket(gameSocket);
@@ -82,7 +81,7 @@ function Game() {
         if (localToken !== null && location && location.state) {
             const localTokenParse: TokenStorageInterface = JSON.parse(localToken);
 
-            const gameSocket: Socket = io(`${socketUrl}/game`, {extraHeaders: {
+            const gameSocket: Socket = io(`${process.env.REACT_APP_SOCKET_URL}/game`, {extraHeaders: {
                 "Authorization": `Bearer ${localTokenParse.access_token}`,
             }});
             setGameSocket(gameSocket);

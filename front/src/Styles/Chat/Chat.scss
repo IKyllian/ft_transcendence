@@ -1,4 +1,5 @@
 @use '../Variables.scss' as *;
+@use "../mixins.scss" as *;
 
 .no-target-message {
     font-size: 30px;
@@ -384,17 +385,17 @@
     }
 
     .channels-list-wrapper {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
         gap: 10px;
-        margin: auto;
-        padding: 16px 0;
-        height: 100%;
+        padding: 20px;
+        height: fit-content;
         @include overflowScroll("y");
 
         .channels-card-wrapper {
             background-color: $DarkPalette;
-            @include width-height(300px, 320px);
+            @include width-height(300px, 240px);
             position: relative;
 
             .channel-banner {
@@ -452,17 +453,6 @@
                     }
                 }
             } 
-        }
-    }
-}
-
-@media screen and (max-width: 1230px) {
-    .chat-page-container {
-        .channels-list-wrapper {
-            grid-template-columns: repeat(2, 1fr);
-            .channels-card-wrapper {
-                @include width-height(270px, 290px);
-            }
         }
     }
 }
@@ -614,7 +604,6 @@
 @media screen and (max-width: 470px) {
     .chat-page-container {
         .channels-list-wrapper {
-            grid-template-columns: repeat(1, 1fr);
             .channels-card-wrapper {
                 @include width-height(250px, 270px);
             }

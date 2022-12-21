@@ -1,4 +1,5 @@
 @use "./Variables.scss" as *;
+@use "./mixins.scss" as *;
 
 $FontSizeText: 20px;
 $FontSizeTextResponsive: 15px;

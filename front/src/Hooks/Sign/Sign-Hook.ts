@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useForm } from "react-hook-form";
 import { useAppDispatch, useAppSelector } from '../../Redux/Hooks'
-import { redirectUrl, uid } from "../../env";
 import { fetchSignIn, fetchSignUp, fetchLogin42, fetchVerifyToken } from '../../Api/Sign/Sign-Fetch';
 
 import { loginError, loginPending, loginSuccess, setUsername, stopIsConnectedLoading, verification2fa } from "../../Redux/AuthSlice";
@@ -105,7 +104,7 @@ export function useSignHook() {
         e.preventDefault();
         const url: string = "https://api.intra.42.fr/oauth/authorize";
 		// TODO redirect ip
-        const params: string = `?client_id=${uid}&redirect_uri=${redirectUrl}/sign&response_type=code`;
+        const params: string = `?client_id=${process.env.REACT_APP_API42_CLIENT_ID}&redirect_uri=${process.env.REACT_APP_REDIRECT_URL}/sign&response_type=code`;
         const ret = window.location.replace(url+params);
     }
 

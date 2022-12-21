@@ -1,5 +1,4 @@
 import axios from "axios";
-import { baseUrl } from "../env";
 import { TokenStorageInterface } from "../Types/Utils-Types";
 
 export const fetchInterceptor = () => {
@@ -14,7 +13,7 @@ export const fetchInterceptor = () => {
             if (localToken) {
                 const storedToken: TokenStorageInterface = JSON.parse(localToken);  
                 try {
-                    const refreshResponse = await axios.post(`${baseUrl}/auth/refresh`, {}, {
+                    const refreshResponse = await axios.post(`${process.env.REACT_APP_BASE_URL}/auth/refresh`, {}, {
                         headers: {
                             "Authorization": `Bearer ${storedToken.refresh_token}`,
                         }

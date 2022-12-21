@@ -23,8 +23,6 @@ function AddFriendModal() {
     const {socket} = useContext(SocketContext);
     const dispatch = useAppDispatch();
 
-    console.log("PARTY", party);
-
     useEffect(() => {
         socket?.on("StatusUpdate", (data: {id: number, status: UserStatus}) => {
             dispatch(changeFriendListUserStatus(data));
@@ -38,7 +36,6 @@ function AddFriendModal() {
     const spectateClick = (gameId: string) => {
         if (gameId)
             socket?.emit("get_gameinfo", gameId);
-        
     }
 
     return modalStatus.modal.isOpen ? (
