@@ -1,4 +1,5 @@
 @use '../Variables.scss' as *;
+@use "../mixins.scss" as *;
 
 .channel-setting-container {
     @include page-wrapper();

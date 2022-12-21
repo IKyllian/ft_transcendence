@@ -1,4 +1,5 @@
 @use "./Variables.scss" as *;
+@use "./mixins.scss" as *;
 
 $GreyLobby: rgb(207, 203, 203);
 $TeamBlueColor: rgb(0, 98, 255);

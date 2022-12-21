@@ -1,4 +1,5 @@
 @use "./Variables.scss" as *;
+@use "./mixins.scss" as *;
 
 .home-container {
     @include page-wrapper();

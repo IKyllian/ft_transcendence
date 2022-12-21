@@ -2,7 +2,6 @@ import { IconUpload } from "@tabler/icons";
 import { useContext, useState } from "react";
 import { fetchUploadAvatar } from "../../../Api/Profile/Profile-Fetch";
 import { CacheContext } from "../../../App";
-import { baseUrl } from "../../../env";
 import { addAlert, AlertType } from "../../../Redux/AlertSlice";
 import { setUserAvatar } from "../../../Redux/AuthSlice";
 import { useAppDispatch, useAppSelector } from "../../../Redux/Hooks";
@@ -28,7 +27,7 @@ function SettingsCardAvatar() {
             formData.append("image", inputFile);
             fetchUploadAvatar(localTokenParse.access_token, formData).then(async (response) => {
 				if (currentUser) {
-					const req = new Request(`${baseUrl}/users/${currentUser.id}/avatar`, {method: 'GET', headers: {"Authorization": `Bearer ${localTokenParse.access_token}`}});
+					const req = new Request(`${process.env.REACT_APP_BASE_URL}/users/${currentUser.id}/avatar`, {method: 'GET', headers: {"Authorization": `Bearer ${localTokenParse.access_token}`}});
                     if (!response.ok) {
                         dispatch(addAlert({message: "Failed To Upload", type: AlertType.ERROR}));
                     }

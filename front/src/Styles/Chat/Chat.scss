@@ -1,4 +1,5 @@
 @use '../Variables.scss' as *;
+@use "../mixins.scss" as *;
 
 .no-target-message {
     font-size: 30px;
