@@ -64,9 +64,6 @@
                     .list-item-container {
                         text-decoration: none;
                         display: flex;
-
-                        
-
                         a {
                             width: 100%;
                             padding: 8px;
@@ -239,6 +236,7 @@
                 gap: 15px;
                 padding: 3px 0 3px 20px;
                 position: relative;
+                word-wrap: break-word;
                 &:hover {
                     background-color: $DarkPalette;
                 }
@@ -276,6 +274,10 @@
                 position: relative;
                 margin: 0;
                 font-size: 13px;
+                word-break: break-all;
+                .span-message {
+                    padding-right: 20px;
+                }
                 .date-message {
                     width: 45px;
                     text-align: center;
@@ -484,51 +486,49 @@
             display: flex;
         }
 
-        .message-container {
+        .message-container-main { 
             width: 100%;
-            .message-container-main { 
-                width: 100%;
-                .message-header {
-                    padding: 0 $HeaderResponsive800Marge;
-                    &-right-side {
+            .message-header {
+                padding: 0 $HeaderResponsive800Marge;
+                &-right-side {
+                    margin-right: 0px;
+                    .chat-action-icones {
                         margin-right: 0px;
-                        .chat-action-icones {
-                            margin-right: 0px;
+                    }
+                }
+                .burger-icon-responsive {
+                    display: block;
+                }
+            }
+
+            .header-user-info {
+                padding: 0 $HeaderResponsive800Marge;
+                .burger-icon-responsive {
+                    display: block;
+                    position: absolute;
+                }
+                .player-container {
+                    margin: 0 auto
+                }
+            }
+
+            .ul-container {
+                ul {
+                    .message-item {
+                        img {
+                            @include avatar-player(35px);
                         }
-                    }
-                    .burger-icon-responsive {
-                        display: block;
-                    }
-                }
-
-                .header-user-info {
-                    padding: 0 $HeaderResponsive800Marge;
-                    .burger-icon-responsive {
-                        display: block;
-                        position: absolute;
-                    }
-                    .player-container {
-                        margin: 0 auto
-                    }
-                }
-
-                .ul-container {
-                    ul {
-                        .message-item {
-                            img {
-                                @include avatar-player(35px);
-                            }
-                            &-info {
-                                .message-text {
-                                    font-size: 14px;
-                                    padding: 8px 13px;
-                                }
+                        &-info {
+                            .message-text {
+                                font-size: 14px;
+                                padding: 8px 13px;
                             }
                         }
                     }
                 }
-            } 
-        }
+            }
+        } 
+        
 
         .sidebar-button {
             display: block;
@@ -549,20 +549,18 @@
 
 @media screen and (max-width: $BreakPoint_500) {
     .chat-page-container {
-        .message-container {
-            .message-container-main { 
-                .message-header {
-                    padding: 0 $HeaderResponsive500Marge;
-                }
+        .message-container-main { 
+            .message-header {
+                padding: 0 $HeaderResponsive500Marge;
+            }
 
-                .header-user-info {
-                    padding: 0 $HeaderResponsive500Marge;
-                }            
+            .header-user-info {
+                padding: 0 $HeaderResponsive500Marge;
+            }            
 
-                .ul-container {
-                    ul {
-                    padding-left: $HeaderResponsive500Marge;
-                    }
+            .ul-container {
+                ul {
+                padding-left: $HeaderResponsive500Marge;
                 }
             }
         }
