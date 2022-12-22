@@ -91,20 +91,12 @@ export class GameService {
 		blueTeamAverage /= blueTeamIds.length;
 		redTeamAverage /= redTeamIds.length;
 
-		console.log("blue average: " + blueTeamAverage);
-		console.log("red average: " + redTeamAverage);
-
 		const blueEloWon: number = Math.round(50 / (1 + Math.pow(10, (blueTeamAverage - redTeamAverage) / 400)));
 		const blueEloLost: number = blueEloWon - 50;
 		const redEloWon: number = Math.abs(blueEloLost);
 		const redEloLost: number = redEloWon - 50;
 
-		// console.log("blue elo if win: " + blueEloWon);
-		// console.log("blue elo if lose: " + blueEloLost);
-		// console.log("red elo if win: " + redEloWon);
-		// console.log("red elo if lose: " + redEloLost);
-
-		if (result === EndResult.Team_A_Win) {
+		if (result === EndResult.TeamBlue_Win) {
 			console.log("elo result blue: " + blueEloWon);
 			console.log("elo result red: " + redEloLost);
 			this.saveNewElo(blueTeamIds, blueEloWon, game_type);
@@ -121,19 +113,19 @@ export class GameService {
 		}
 	}
 
-	saveMatch(blueTeam: User[], redTeam: User[], game_type: GameType, score: ScoreBoard) {
+	saveMatch(blueTeam: User[], redTeam: User[], game_type: GameType, score: ScoreBoard, game_id: string) {
 		let match: MatchResult = this.matchRepo.create({
 			game_type,
-			blue_team_goals: score.Team_A,
+			blue_team_goals: score.TeamBlue,
 			blue_team_player1: blueTeam[0],
-			red_team_goals: score.Team_B,
+			red_team_goals: score.TeamRed,
 			red_team_player1: redTeam[0],
+			game_id: game_id
 		});
 		if (game_type === GameType.Doubles) {
 			match.blue_team_player2 = blueTeam[1],
 			match.red_team_player2 = redTeam[1];
 		}
-		console.log("matchResult", match);
 		return this.matchRepo.save(match);
 	}
 

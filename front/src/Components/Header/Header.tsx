@@ -1,8 +1,7 @@
 import { useState, useContext, useEffect } from 'react';
-import { IconLogout, IconMessages, IconUserPlus, IconChevronDown, IconBell } from '@tabler/icons';
+import { IconLogout, IconMessages, IconUsers, IconChevronDown, IconBell } from '@tabler/icons';
 
 import { ModalContext } from '../Utils/ModalProvider';
-import ProfilPic from "../../Images-Icons/pp.jpg"
 import { Link, useLocation } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../Redux/Hooks';
 import DropdownNotification from './Dropdown-Notification';
@@ -10,17 +9,17 @@ import ResponsiveMenu from './Responsive-Menu';
 import PartyButton from './Party-Button';
 import { NotificationInterface, notificationType } from '../../Types/Notification-Types';
 import { logoutSuccess } from '../../Redux/AuthSlice';
-// import { fetchLogout } from '../../Api/Sign/Sign-Fetch';
 import { SocketContext } from '../../App';
+import ExternalImage from '../External-Image';
 
 function NotifIcon(props: {notifications: NotificationInterface[] | undefined ,handleNotifDropdownClick: Function}) {
     const {handleNotifDropdownClick, notifications} = props;
     return (
-        <div className='badge-wrapper'>
+        <div className='badge-wrapper' onClick={() => handleNotifDropdownClick()}>
             { notifications !== undefined
             && notifications.filter(elem => elem.type !== notificationType.CHANNEL_MESSAGE && elem.type !== notificationType.PARTY_INVITE  && elem.type !== notificationType.PRIVATE_MESSAGE).length > 0
             && <div className='badge badge-notif'> {notifications.filter(elem => elem.type !== notificationType.CHANNEL_MESSAGE && elem.type !== notificationType.PARTY_INVITE && elem.type !== notificationType.PRIVATE_MESSAGE).length} </div> }
-            <IconBell onClick={() => handleNotifDropdownClick()} />
+            <IconBell />
         </div>
     );
 }
@@ -29,13 +28,11 @@ function Header() {
     const [showMenu, setShowMenu] = useState<boolean>(false);
     const [showNotifDropdown, setShowNotifDropdown] = useState<boolean>(false);
     const location = useLocation();
-    const { currentUser, token } = useAppSelector(state => state.auth);
+    const { currentUser } = useAppSelector(state => state.auth);
     const {notifications} = useAppSelector(state => state.notification);
     const modalStatus = useContext(ModalContext);
     const dispatch = useAppDispatch();
     const {socket} = useContext(SocketContext);
-
-    console.log("notifications", notifications);
 
     const handleMenuClick = () => {
         if (showNotifDropdown && !showMenu)
@@ -62,7 +59,7 @@ function Header() {
             setShowNotifDropdown(false);
     }, [location.pathname])
 
-    return location.pathname === "/sign" || location.pathname === "/set-username" ? (
+    return !currentUser || location.pathname === "/sign" || location.pathname === "/set-username" ? (
         <> </>
     ) : (
         <header className={`header ${modalStatus.modal.isOpen ? modalStatus.modal.blurClass : ""}`} >
@@ -74,25 +71,29 @@ function Header() {
                 <div className='icons-header'>
                     <PartyButton />
                     <NotifIcon notifications={notifications} handleNotifDropdownClick={handleNotifDropdownClick} />
-                    <IconUserPlus onClick={() => modalStatus.setStatus()} />
+                    <IconUsers onClick={() => modalStatus.setStatus()} />
                     <Link to="/chat" aria-label="Link to the chat">
                         <div className='badge-wrapper'>
-                            { notifications !== undefined && notifications.filter(elem => elem.type === notificationType.CHANNEL_MESSAGE || elem.type === notificationType.PRIVATE_MESSAGE).length > 0 && <div className='badge badge-message'> </div> }
+                            {
+                                notifications !== undefined
+                                && notifications.filter(elem => elem.type === notificationType.CHANNEL_MESSAGE || elem.type === notificationType.PRIVATE_MESSAGE).length > 0
+                                && <div className='badge badge-message'> </div>
+                            }
                             <IconMessages />
                         </div>
                     </Link>
                 </div>
-                <Link className='header-profile' to={`/profile/${currentUser?.username}`}>
-                    <img className='header-picture' src={ProfilPic} alt="profil pic" />
-                    {currentUser?.username}
+                <Link className='header-profile' to={`/profile/${currentUser.username}`}>
+                    <ExternalImage src={currentUser.avatar} alt="User Avatar" className="header-avatar" userId={currentUser.id} />
+                    {currentUser.username}
                 </Link>
                 <IconLogout onClick={() => handleLogout()} />
             </div>
             <div className='header-right-responsive'>
                 <NotifIcon notifications={notifications} handleNotifDropdownClick={handleNotifDropdownClick} />
-                <img className='header-picture' src={ProfilPic} alt="profil pic" />
+                <ExternalImage src={currentUser.avatar} alt="User Avatar" className="header-avatar" userId={currentUser.id} />
                 <IconChevronDown style={{cursor: "pointer"}} onClick={() => handleMenuClick()} />
-                <ResponsiveMenu show={showMenu} handleClick={handleMenuClick} headerModal={modalStatus.setStatus} />
+                <ResponsiveMenu show={showMenu} handleClick={handleMenuClick} headerModal={modalStatus.setStatus} username={currentUser.username} />
             </div>
         </header>
     );

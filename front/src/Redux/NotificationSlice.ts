@@ -28,7 +28,8 @@ export const notificationSlice = createSlice({
             if (state.notifications)
                 state.notifications = state.notifications.filter(elem => elem.id !== payload);
         },
+        resetNotification: () => defaultState,
     }
 });
 
-export const { copyNotificationArray, addNotification, deleteNotification } = notificationSlice.actions;
+export const { copyNotificationArray, addNotification, deleteNotification, resetNotification } = notificationSlice.actions;

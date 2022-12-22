@@ -4,46 +4,47 @@ import { GameType } from "./Lobby-Types";
 export enum UserStatus {
     ONLINE,
     OFFLINE,
-    IN_GAME
 }
 
 export interface ExampleUser {
     id: number,
-    username: string;
-    profilPic: string;
-    gamesPlayed: number;
-    winRate: number;
-    points: number;
-    isOnline: boolean;
-    isInGame: boolean;
+    username: string,
+    profilPic: string,
+    gamesPlayed: number,
+    winRate: number,
+    points: number,
+    isOnline: boolean,
+    isInGame: boolean,
 }
 
 export interface AuthState {
     currentUser: UserInterface | undefined,
     isAuthenticated: boolean,
+    isSign: boolean,
     error?: string,
     loading: boolean,
     loadingIsConnected: boolean,
-    token: string,
     setUsersame: boolean,
-    friendList: UserInterface[];
-}
-
-export interface LoginPayload {
-    user: UserInterface,
-    token: string
+    friendList: UserInterface[],
+    loggedUserAvatar: string | undefined,
+    displayQRCode: boolean,
+    verification2FA: boolean,
 }
 
 export interface UserInterface {
     id: number,
     username: string,
-    avatar: string,
+    email: string,
+    avatar: string | null,
     status: UserStatus,
     statistic: Statistic,
     channelUser: Channel[],
-    blocked: UserInterface[];
-    singles_elo: number;
-	doubles_elo: number;
+    blocked: UserInterface[],
+    singles_elo: number,
+	doubles_elo: number,
+    two_factor_enabled: boolean,
+    in_game_id: string | null,
+    created_at: string,
 }
 
 interface Statistic {

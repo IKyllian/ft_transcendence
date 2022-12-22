@@ -1,12 +1,11 @@
-import { BadRequestException, ForbiddenException, forwardRef, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, forwardRef, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Channel, User, ChannelUser, UserTimeout, ChannelMessage } from 'src/typeorm';
-import { FindManyOptions, FindOneOptions, FindOptionsWhere, In, Like, Not, Repository } from 'typeorm';
-import { ChannelExistException, ChannelNotFoundException, NotInChannelException, UnauthorizedActionException } from 'src/utils/exceptions';
+import { FindManyOptions, FindOneOptions, FindOptionsWhere, Repository } from 'typeorm';
+import { ChannelExistException, ChannelNotFoundException, NotInChannelException } from 'src/utils/exceptions';
 import * as argon from 'argon2';
 import { CreateChannelDto } from './dto/create-channel.dto';
-import { ChannelPasswordDto } from './dto/channel-pwd.dto';
-import { channelOption, channelRole, ChannelUpdateType, FindChannelParams, ResponseType, TimeoutType } from 'src/utils/types/types';
+import { channelOption, channelRole, ChannelUpdateType, ResponseType, TimeoutType } from 'src/utils/types/types';
 import { BanUserDto } from './dto/ban-user.dto';
 import { UserService } from 'src/user/user.service';
 import { NotificationService } from 'src/notification/notification.service';
@@ -14,14 +13,13 @@ import { ResponseDto } from '../gateway/dto/response.dto';
 import { SearchToInviteInChanDto } from './dto/search-user-to-invite.dto';
 import { MuteUserDto } from './dto/mute-user.dto';
 import { ChangeRoleDto } from '../gateway/dto/change-role.dto';
-import { ChannelInviteDto } from '../gateway/dto/channel-invite.dto';
-import { Server } from 'socket.io';
 import { GlobalService } from 'src/utils/global/global.service';
+import { EditChannelNameDto } from './dto/edit-channel-name.dto';
+import { EditChannelOptionDto } from './dto/edit-channel-option.dto';
 
 @Injectable()
 export class ChannelService {
 	constructor(
-		private userService: UserService,
 		@Inject(forwardRef(() => NotificationService))
 		private notifService: NotificationService,
 		private globalService: GlobalService,
@@ -38,8 +36,7 @@ export class ChannelService {
 		private messageRepo: Repository<ChannelMessage>,
 	) {}
 	/**
-	 * TODO C PAS FOU
-	 * @param user_id 
+	 * @param user 
 	 * @returns All the channel that the user did not joined and that is visible
 	 */
 	async searchChannel(user: User) {
@@ -110,7 +107,7 @@ export class ChannelService {
 		return channel.channelUsers.find((chanUser) => chanUser.user.id === id);
 	}
 
-	async join(user: User, chanId: number, pwdDto?: ChannelPasswordDto, isInvited: Boolean = false) {
+	async join(user: User, chanId: number, password?: string, isInvited: Boolean = false) {
 		const channel = await this.findOne({ where: { id: chanId } }, true);
 		if (!channel)
 			throw new ChannelNotFoundException();
@@ -136,9 +133,9 @@ export class ChannelService {
 			if (channel.option === channelOption.PRIVATE)
 				throw new UnauthorizedException('You need an invite to join this channel');
 			else if (channel.option === channelOption.PROTECTED) {
-				if (!pwdDto.password)
+				if (!password)
 					throw new UnauthorizedException('Password is not provided');
-				const pwdMatches = await argon.verify(channel.hash, pwdDto.password);
+				const pwdMatches = await argon.verify(channel.hash, password);
 				if (!pwdMatches)
 					throw new UnauthorizedException('Password incorrect');
 			}
@@ -147,24 +144,30 @@ export class ChannelService {
 		return this.channelUserRepo.save(channelUser);
 	}
 
-	// TODO Change getchannelinvite to find by id
 	async respondInvite(user: User, dto: ResponseDto): Promise<ChannelUser | null> {
 		const invite = await this.notifService.getChannelInvite(user, dto.id);
 		if (!invite)
 			throw new BadRequestException('You are not invite to this channel');
 		await this.notifService.delete(invite.id);
 		if (dto.response === ResponseType.ACCEPTED) {
-			return this.join(user, dto.chanId, {}, true);
+			return this.join(user, dto.chanId, null, true);
 		}
 		return null;
 	}
 
-	async leave(chanUser: ChannelUser) {
-		// console.log('before leave', channel.channelUsers);
-		// channel.channelUsers = channel.channelUsers.filter((chanUser) => chanUser.user.id !== user.id);
-		// console.log('after leave', channel.channelUsers);
-		await this.channelUserRepo.delete({id: chanUser.id});
-		// return this.channelRepo.save(channel);
+	async leave(chanUser: ChannelUser): Promise<Boolean> {
+		const users_in_chan: ChannelUser[] = await this.channelUserRepo.find({
+			where: {
+				channel: { id: chanUser.channelId },
+			}
+		});
+		if (users_in_chan && users_in_chan.length === 1) {
+			await this.channelRepo.delete({ id: chanUser.channelId });
+			return true;
+		} else {
+			await this.channelUserRepo.delete({ id: chanUser.id });
+			return false;
+		}
 	}
 
 	async getChannelById(userId: number, id: number): Promise<Channel> {
@@ -245,7 +248,7 @@ export class ChannelService {
 			type: TimeoutType.BAN,
 		});
 		await this.channelUserRepo.delete(userToBan.id);
-
+		
 		return this.timeoutRepo.save(bannedUser);
 	}
 
@@ -293,7 +296,6 @@ export class ChannelService {
 			if (isMuted.until) {
 				if (isMuted.until.getTime() < new Date().getTime()) {
 					await this.timeoutRepo.delete(isMuted.id);
-					// console.log("is muted", chanUser, this.globalService.server);
 					this.globalService.server.to(`channel-${chanUser.channelId}`).emit('ChannelUpdate', { type: ChannelUpdateType.UNTIMEOUT, data: isMuted.id })
 					return false;
 				} else {
@@ -390,24 +392,21 @@ export class ChannelService {
 	async changeUserRole(chanUser: ChannelUser, dto: ChangeRoleDto) {
 		const userToChange = await this.getChannelUser(dto.chanId, dto.userId);
 		if (!userToChange) { throw new NotInChannelException(); }
+		if (chanUser.role !== channelRole.OWNER) {
+			throw new BadRequestException("You need to be owner to perform this action");
+		}
 		let ownerPassed = false;
 		switch (dto.role) {
 			case channelRole.MODERATOR:
-				if (chanUser.role === channelRole.OWNER && userToChange.role === channelRole.MEMBER) {
-					userToChange.role = dto.role;
-				}
+				userToChange.role = dto.role;
 				break;
 			case channelRole.MEMBER:
-				if (chanUser.role === channelRole.OWNER && userToChange.role === channelRole.MODERATOR) {
 					userToChange.role = dto.role;
-				}
 				break;
 			case channelRole.OWNER:
-				if (chanUser.role === channelRole.OWNER) {
 					userToChange.role = dto.role;
 					ownerPassed = true;
 					chanUser.role = channelRole.MODERATOR;
-				}
 				break;
 			default:
 				break;
@@ -421,8 +420,37 @@ export class ChannelService {
 	}
 
 
-	//TODO DElete
-	getTimedout() {
-		return this.timeoutRepo.find();
+	async editName(dto: EditChannelNameDto) {
+		let channel: Channel = await this.channelRepo.findOne({
+			where: { id: dto.chanId },
+		});
+		if (!channel) {
+			throw new ChannelNotFoundException();
+		}
+		channel.name = dto.name;
+		return this.channelRepo.save(channel);
+	}
+
+	async editOption(dto: EditChannelOptionDto) {
+		let channel: Channel = await this.channelRepo.findOne({
+			where: { id: dto.chanId },
+		});
+		if (!channel) {
+			throw new ChannelNotFoundException();
+		}
+		channel.option = dto.option;
+		if (channel.option === channelOption.PROTECTED) {
+			if (!dto.password) {
+				throw new BadRequestException("You need to include a password");
+			}
+			const hash = await argon.hash(dto.password);
+			this.channelRepo.createQueryBuilder()
+			.update()
+			.where("id = :id", { id: channel.id })
+			.set({ hash: () => ":hash" })
+			.setParameter('hash', hash)
+			.execute()
+		}
+		return this.channelRepo.save(channel);
 	}
 }

@@ -1,16 +1,13 @@
 import { ClassSerializerInterceptor, ForbiddenException, Injectable, UseInterceptors } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { ChannelMessage, ChannelUser } from "src/typeorm";
-import { ChannelNotFoundException, NotInChannelException } from "src/utils/exceptions";
 import { Repository } from "typeorm";
-import { ChannelService } from "../channel.service";
-import { ChannelMessageDto, SkipDto } from "./dto/channelMessage.dto";
+import { ChannelMessageDto } from "./dto/channelMessage.dto";
 
 @Injectable()
 @UseInterceptors(ClassSerializerInterceptor)
 export class ChannelMessageService {
 	constructor(
-		private channelService: ChannelService,
 		@InjectRepository(ChannelMessage)
 		private messagesRepo: Repository<ChannelMessage>,
 	) {}

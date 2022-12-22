@@ -1,18 +1,17 @@
-import { ForbiddenException, UnauthorizedException, UseFilters, UseGuards, UsePipes, ValidationPipe } from "@nestjs/common";
+import { BadRequestException, ForbiddenException, UseFilters, UseGuards, UsePipes, ValidationPipe } from "@nestjs/common";
 import { ConnectedSocket, MessageBody, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
-import { userInfo } from "os";
 import { Server, Socket } from "socket.io";
 import { WsJwtGuard } from "src/auth/guard/ws-jwt.guard";
 import { UserIdDto } from "src/chat/gateway/dto/user-id.dto";
 import { NotificationService } from "src/notification/notification.service";
-import { TaskScheduler } from "src/task-scheduling/task.module";
-import { TaskService } from "src/task-scheduling/task.service";
 import { User } from "src/typeorm";
+import { UserService } from "src/user/user.service";
 import { GetUser } from "src/utils/decorators";
 import { GatewayExceptionFilter } from "src/utils/exceptions/filter/Gateway.filter";
 import { AuthenticatedSocket } from "src/utils/types/auth-socket";
-import { GameMode, GameType, PlayerPosition, TeamSide } from "src/utils/types/game.types";
+import { GameMode, PlayerPosition, TeamSide } from "src/utils/types/game.types";
 import { notificationType } from "src/utils/types/types";
+import { LobbyFactory } from "../lobby/lobby.factory";
 import { IsReadyDto } from "./dto/boolean.dto";
 import { SettingDto } from "./dto/game-settings.dto";
 import { PartyMessageDto } from "./dto/party-message.dto";
@@ -27,9 +26,11 @@ export class MatchmakingGateway implements OnGatewayDisconnect {
 	@WebSocketServer() server: Server;
 
 	constructor(
+		private userService: UserService,
 		private partyService: PartyService,
 		private queueService: QueueService,
 		private notifService: NotificationService,
+		private lobbyFactory: LobbyFactory,
 	) {}
 
 	handleDisconnect(socket: AuthenticatedSocket) {
@@ -43,7 +44,6 @@ export class MatchmakingGateway implements OnGatewayDisconnect {
 	 * PARTY EVENTS
 	 *
 	 */
-
 	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('PartyInvite')
 	async sendGameInvite(
@@ -51,14 +51,12 @@ export class MatchmakingGateway implements OnGatewayDisconnect {
 		@ConnectedSocket() socket: Socket,
 		@MessageBody() dto: UserIdDto,
 	) {
-		console.log("party invite")
 		if (!this.partyService.partyJoined.getParty(user.id)) {
 			const party = this.partyService.createParty(user);
-			// socket.emit("PartyCreated", party);
 			this.server.to(`user-${user.id}`).emit("PartyUpdate", { party, cancelQueue: true });
-			// socket.join(`party-${party.id}`)
 		}
 		const notif = await this.notifService.createPartyInviteNotif(user, dto.id);
+		socket.emit('SendConfirm', "Invitation send");
 		socket.to(`user-${dto.id}`).emit('NewPartyInvite', notif);
 	}
 
@@ -124,14 +122,12 @@ export class MatchmakingGateway implements OnGatewayDisconnect {
 	 * PARTY GAME SETTINGS EVENTS
 	 *
 	 */
-
 	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('SetReadyState')
 	setReadyState(
 		@GetUser() user: User,
 		@MessageBody() data: IsReadyDto,
 	) {
-		console.log('set Ready', data)
 		this.partyService.setReadyState(user, data.isReady);
 	}
 
@@ -158,8 +154,10 @@ export class MatchmakingGateway implements OnGatewayDisconnect {
 	setSetting(
 		@GetUser() user: User,
 		@MessageBody() settings: SettingDto,
+		@ConnectedSocket() socket: AuthenticatedSocket,
 	) {
-		this.partyService.setSettings(user, settings)
+		this.partyService.setSettings(user, settings);
+		socket.emit('SendConfirm', "Submitted");
 	}
 
 	@UseGuards(WsJwtGuard)
@@ -179,11 +177,25 @@ export class MatchmakingGateway implements OnGatewayDisconnect {
 
 	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('StartQueue')
-	startQueue(
+	async startQueue(
 		@GetUser() user: User,
 		@MessageBody() data: StartQueueDto,
 	) {
-		console.log(data)
+		let in_game: Boolean = false;
+		const party = this.partyService.partyJoined.getParty(user.id);
+		if (party) {
+			for (let player of party.players) {
+				player.user = await this.userService.findOne({ where: { id: player.user.id }});
+				if (player.user.in_game_id) {
+					in_game = true;
+				}
+			};
+			if (in_game) {
+				throw new BadRequestException("Someone is already in game");
+			}
+		} else if (user.in_game_id) {
+			throw new BadRequestException("You are already in game");
+		}
 		if (data.isRanked) {
 			this.queueService.joinQueue(user, data.gameType);
 		} else {
@@ -197,5 +209,23 @@ export class MatchmakingGateway implements OnGatewayDisconnect {
 		@GetUser() user: User,
 	) {
 		this.queueService.leaveQueue(user);
+	}
+
+	@UseGuards(WsJwtGuard)
+	@SubscribeMessage('get_gameinfo')
+	async onGetGameInfo(
+		@ConnectedSocket() client: AuthenticatedSocket,
+		@MessageBody() game_id: string
+	) {
+		this.lobbyFactory.get_game_info(client, game_id);
+	}
+
+	@UseGuards(WsJwtGuard)
+	@SubscribeMessage('get_clientinfo')
+	async onGetClientInfo(
+		@ConnectedSocket() client: AuthenticatedSocket,
+		@MessageBody() id: number 
+	) {
+		this.lobbyFactory.get_client_info(client, id);
 	}
 }

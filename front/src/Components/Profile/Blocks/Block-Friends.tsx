@@ -3,12 +3,12 @@ import { IconDotsVertical } from '@tabler/icons';
 
 import { UserInterface } from "../../../Types/User-Types";
 import FriendListModal from "../Friend-Dropdown";
-import Avatar from "../../../Images-Icons/pp.jpg";
 import { Link } from "react-router-dom";
 import { useAppSelector } from "../../../Redux/Hooks";
+import ExternalImage from "../../External-Image";
 
-function FriendItem(props: {name: string, profilPic: string, userProfileId: number}) {
-    const {name, profilPic, userProfileId} = props;
+function FriendItem(props: {name: string, avatar: string | null, friendId: number, userProfileId: number}) {
+    const {name, avatar, friendId, userProfileId} = props;
 
     const [showModal, setShowModal] = useState<boolean>(false);
     const {currentUser} = useAppSelector(state => state.auth);
@@ -20,7 +20,7 @@ function FriendItem(props: {name: string, profilPic: string, userProfileId: numb
     return (
         <div className="friend-item">
             <div className="friend-content">
-                <img className='friend-avatar' src={profilPic} alt="profil pic" />
+                <ExternalImage src={avatar} alt="User Avatar" className="friend-avatar" userId={friendId} />
                 <Link to={`/profile/${name}`}>
                     { name }
                 </Link>
@@ -29,7 +29,7 @@ function FriendItem(props: {name: string, profilPic: string, userProfileId: numb
                 currentUser?.id === userProfileId && 
                 <div className="friend-item-menu">
                     <IconDotsVertical onClick={() => handleClick()} />
-                    <FriendListModal show={showModal} onClickOutside={() => {setShowModal(false)}}/>
+                    <FriendListModal show={showModal} onClickOutside={() => {setShowModal(false)}} userId={friendId} />
                 </div>
             }
         </div>
@@ -42,7 +42,7 @@ function BlockFriends(props: {friendList: UserInterface[], userProfileId: number
         <div className="profile-block-wrapper friends-list">
             {
                 friendList.map((elem, index) =>
-                    <FriendItem key={index} name={elem.username} profilPic={Avatar} userProfileId={userProfileId} />
+                    <FriendItem key={index} name={elem.username} avatar={elem.avatar} friendId={elem.id} userProfileId={userProfileId} />
                 )
             }
         </div>

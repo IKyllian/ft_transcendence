@@ -1,19 +1,29 @@
 @use '../Variables.scss' as *;
+@use "../mixins.scss" as *;
 
 .channel-setting-container {
+    @include page-wrapper();
     display: flex;
     flex-direction: row;
     color: $WhitePalette;
-    @include page-wrapper();
-    .sidebar-setting {
-        background-color: $DarkPalette;
-        width: 500px;
-        padding-top: 30px;
 
+    .sidebar-button {
+        display: none;
+    }
+    
+    .sidebar-setting {
+        padding-top: 30px;
+        background-color: $DarkPalette;
+        width: 350px;
+
+        .sidebar-button {
+            display: none;
+        }
+        
         .sidebar-wrapper {
-            width: 50%;
-            float: right;
-            margin-right: 10px;
+            margin-left: $HeaderMarge;
+            display: flex;
+            flex-direction: column;
 
             p {
                 margin: 0 0 5px 10px;
@@ -31,6 +41,7 @@
                     }
                     padding: 10px;
                     border-radius: 5px;
+                    margin-right: 5px;
                     cursor: pointer;
 
                     &:hover {
@@ -49,9 +60,9 @@
                 all: unset;
                 padding: 10px;
                 border-radius: 5px;
-                width: 100%;
                 cursor: pointer;
                 color: red;
+                margin-right: 5px;
 
                 &:hover {
                     background-color: $LightDarkPalette;
@@ -59,20 +70,63 @@
             }
         } 
     }
-
+   
     .content-setting-container {
         background-color: $LightDarkPalette;
         width: 100%;
         padding-top: 30px;
+        display: flex;
+        flex-direction: row;
+        gap: 15px;
 
         .content-wrapper {
             margin-left: 50px;
             height: 100%;
+            width: 90%;
+
+            form {
+                &:first-child {
+                    margin-bottom: 15px;
+                }
+            }
 
             .radio-form {
                 display: flex;
                 flex-direction: column;
                 gap: 5px;
+
+                button {
+                    @include blue-button(14px, 7px);
+                }
+
+                .saveInput {
+                    margin-top: 10px;
+                    width: 40px;
+                }
+
+                .label-input-wrapper {
+                    @include flex-row-alignCenter();
+                    gap: 5px;
+
+                    input {
+                        all: unset;
+                        width: 200px;
+                        background-color: $DarkPalette;
+                        border: 1px solid white;
+                        border-radius: 3px;
+                        padding: 7px;
+                        color: white;
+                        font-size: 13px;
+                        cursor: text;
+                    }
+                }
+
+                label {
+                    input[type="radio"] {
+                        accent-color: $LightBlueButton;
+                    }
+                }
+                
                 
                 .labelTextInput {
                     display: flex;
@@ -83,7 +137,7 @@
                     input {
                         all: unset;
                         width: 300px;
-                        cursor: pointer;
+                        cursor: text;
                         padding: 8px;
                         border: 1px solid $WhitePalette;
                         margin-top: 2px;
@@ -91,19 +145,6 @@
                             font-size: 12px;
                         }
                     }
-                }
-                .saveInput {
-                    all: unset;
-                    @include width-height(60px, 35px);
-                    text-align: center;
-                    border: none;
-                    font-size: 15px;
-                    font-weight: bold;
-                    cursor: pointer;
-                    border-radius: 10px;
-                    background-color: rgb(255, 123, 0);
-                    color: $WhitePalette;
-                    margin-top: 10px;
                 }
             }
             
@@ -142,40 +183,108 @@
                                 cursor: pointer;
                             }
                         }
-    
-                        .unban-button-wrapper {
-                            display: flex;
-                            flex-direction: column;
-                            gap: 2px;
-                            align-items: center;
+                    }
+                }
+            }
+
+            table {
+                border-collapse: collapse;
+                text-align: left;
+                width: 100%;
+                background-color: $DarkPalette;
+
+                thead {
+                    th {
+                        padding: 25px;
+                        font-size: 14px;
+                        font-weight: bold;
+                    }
+                }
+
+                tbody {
+                    tr {
+                        &:hover td {
+                            background-color: #202d45;
+                        }
+        
+                        td {
+                            padding: 15px 25px;
+                            background: $LightDarkPalette;
+                            font-size: 16px;
+                            border-bottom: 5px solid $DarkPalette;
+        
+                            .user-info {
+                                @include flex-row-alignCenter();
+                                gap: 10px;
+                                .user-avatar {
+                                    @include avatar-player(30px);
+                                }
+                            }
+
                             button {
                                 all: unset;
                                 cursor: pointer;
-                                background-color: $DarkPalette;
-                                padding: 6px;
+                                padding: 5px;
+                                font-size: 14px;
+                                font-weight: bold;
+                                color: $LightBlueButton;
+                                border: 1px solid $LightBlueButton;
                                 border-radius: 5px;
-                                font-size: 12px
-                            }
-                            p {
-                                font-size: 8px;
-                                margin: 0;
+
+                                &:hover {
+                                    color: $LightDarkPalette;
+                                    background-color: $LightBlueButton;
+                                }
                             }
                         }
                     }
                 }
             }
         }
+        .leave-icon-wrapper {
+            width: 10%;
+            display: flex;
+            .leave-icon {
+                margin: 0 auto;
+                @include width-height(40px, 40px);
+                padding: 5px;
+                color: $WhitePalette;
+                cursor: pointer;
+                border: 2px solid $WhitePalette;
+                border-radius: 50%;
+            }
+        }
     }
+}
 
-    .leave-icon {
-        @include width-height(40px, 40px);
-        padding: 5px;
-        color: $WhitePalette;
-        position: absolute;
-        right: 40px;
-        top: 30px;
-        cursor: pointer;
-        border: 2px solid $WhitePalette;
-        border-radius: 50%;
+@media screen and (max-width: $BreakPoint_800) {
+    .channel-setting-container {
+        .sidebar-button {
+        @include sidebar-button();
+    }
+        .sidebar-setting {
+            width: 250px;
+            position: absolute;
+            height: 100%;
+
+            .sidebar-button {
+                @include sidebar-button();
+            }
+            .sidebar-wrapper {
+                margin-left: $HeaderResponsive800Marge;
+            }
+        }
+    }
+}
+
+@media screen and (max-width: $BreakPoint_500) {
+    .channel-setting-container {
+        .sidebar-setting-container {
+            .sidebar-setting {
+                .sidebar-wrapper {
+                    margin-left: $HeaderResponsive500Marge;
+                }
+            }
+        }
     }
 }

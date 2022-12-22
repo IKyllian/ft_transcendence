@@ -1,44 +1,27 @@
-import axios from "axios";
-import { baseUrl } from "../../env";
-import { UserInterface } from "../../Types/User-Types";
+import { AxiosResponse } from "axios";
+import api from "../Api";
+import { fetchInterceptor } from "../Interceptor-Fetch";
 
-export function fetchProfile(username: string, token: string, setUserState: Function) {
-    axios.get(`${baseUrl}/users/name/${username}`, {
-        headers: {
-            "Authorization": `Bearer ${token}`,
-        }
-    })
-    .then(response => {
-        console.log(response);
-        setUserState({
-            isLoggedUser: false,
-            user: response.data.user,
-            friendList: response.data.friendList,
-            match_history: response.data.match_history,
-            relationStatus: response.data.relationStatus,
-        });
-    })
-    .catch(err => {
-        console.log(err);
-    })
+export async function fetchProfile(username: string): Promise<AxiosResponse<any, any>> {
+    return await api.get(`/users/name/${username}`)
 }
 
-export function fetchMe(token: string, setUserState: Function, friendList: UserInterface[]) {
-    axios.get(`${baseUrl}/users/me`, {
+export async function fetchMe(): Promise<AxiosResponse<any, any>> {
+    return await api.get(`/users/me`);
+}
+
+export async function fetchUploadAvatar(token: string, file: FormData): Promise<Response> {
+    fetchInterceptor();
+    return await fetch(`${process.env.REACT_APP_BASE_URL}/users/avatar/upload`, {
+        method: 'POST',
+        body: file,
         headers: {
             "Authorization": `Bearer ${token}`,
         }
-    })
-    .then((response) => {
-        console.log("Response Me", response);
-        setUserState({
-            isLoggedUser: true,
-            user: response.data.user,
-            match_history: response.data.match_history,
-            friendList: friendList,
-        });
-    })
-    .catch((err) => {
-        console.log(err);
-    })
+    });
+}
+
+export async function fetchResponseAvatar(req: Request): Promise<Response> {
+    fetchInterceptor();
+    return await fetch(req);
 }

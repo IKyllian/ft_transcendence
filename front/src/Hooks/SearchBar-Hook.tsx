@@ -15,7 +15,7 @@ export function useSearchBarHook(props: {functionality: SearchBarFunctionality, 
     const { register, formState: {errors}, getValues } = useForm<{textInput: string}>();
     const [usersList, setUsersList] = useState<UsersListInterface[] | undefined>(undefined);
 
-    const {token, currentUser} = useAppSelector(state => state.auth);
+    const {currentUser} = useAppSelector(state => state.auth);
     const {privateConv} = useAppSelector(state => state.chat);
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
@@ -23,26 +23,35 @@ export function useSearchBarHook(props: {functionality: SearchBarFunctionality, 
     const {socket} = useContext(SocketContext);
  
     const handleSendMessage = (userIdToSend: number) => {
-        fetchConvAndRedirect(currentUser!, userIdToSend, token, privateConv, dispatch, navigate);
+        fetchConvAndRedirect(currentUser!, userIdToSend, privateConv, dispatch, navigate);
     }
 
     useEffect(() => {
-        socket?.on("RequestValidation", () => {
-            fetchUserFunction(getValues('textInput'), token, setUsersList);
+        socket?.on("RelationUpdate", (data: {id: number, relation: string}) => {
+            if (data.relation === "friend") {
+                setUsersList((prev: UsersListInterface[] | undefined) => { return prev !== undefined ? [...prev.filter(elem => elem.user.id !== data.id)] : undefined})
+            } else {
+                setUsersList((prev: UsersListInterface[] | undefined) => { return prev !== undefined ? [...prev.map(elem => {
+                    if (elem.user.id === data.id)
+                        return {...elem, relationStatus: data.relation};
+                    else
+                        return elem;   
+                })] : undefined})
+            }
         });
 
         return () => {
-            socket?.off("RequestValidation");
+            socket?.off("RelationUpdate");
         }
     }, [])
 
     const endOfTyping = () => {
         if (getValues('textInput') && getValues('textInput').length > 0) {
             if (functionality !== SearchBarFunctionality.CHAN_INVITE)
-                fetchUserFunction(getValues('textInput'), token, setUsersList);
+                fetchUserFunction(getValues('textInput'), setUsersList);
             else {
                 if (params.channelId)
-                    fetchUserFunction(getValues('textInput'), token, setUsersList, parseInt(params.channelId));
+                    fetchUserFunction(getValues('textInput'), setUsersList, +params.channelId);
             }
         } else {
             setUsersList([]);

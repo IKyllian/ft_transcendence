@@ -1,28 +1,32 @@
 import { Link } from "react-router-dom";
 import { IconEye } from "@tabler/icons";
-import Avatar from "../../Images-Icons/pp.jpg";
-import { UserStatus } from "../../Types/User-Types";
+import { UserInterface, UserStatus } from "../../Types/User-Types";
+import ExternalImage from "../External-Image";
+import DisplayRank from "../Display-Rank";
+import { useContext } from "react";
+import { SocketContext } from "../../App";
 
 interface LeaderboardItemProps {
     pos: number,
-    name: string,
-    status: UserStatus,
+    user: UserInterface
     gamesPlayed: number,
     winRate: string,
     elo: number,
 }
 
 function LeaderboardItem(props: LeaderboardItemProps) {
-    const { pos, name, status, gamesPlayed, winRate, elo } = props;
+    const { pos, user, gamesPlayed, winRate, elo } = props;
+    const {socket} = useContext(SocketContext);
 
     return (
         <tr className={`${pos >= 1 && pos <= 3 ? "raw-top3" : ""} `}>
             <td> { pos } </td>
+            <td> <DisplayRank elo={elo} /> </td>
             <td>
                 <div className="user-info">
-                    <img className='user-avatar' src={Avatar} alt="profil pic" />
-                    <Link to={`/profile/${name}`}>
-                        { name }
+                    <ExternalImage src={user.avatar} alt="User Avatar" className='user-avatar' userId={user.id} />
+                    <Link to={`/profile/${user.username}`}>
+                        { user.username }
                     </Link>
                 </div>
             </td>
@@ -30,11 +34,14 @@ function LeaderboardItem(props: LeaderboardItemProps) {
             <td>  { winRate }% </td>
             <td> { elo } </td>
             <td className="leaderboard-status responsive-column"> 
-                <div className={`player-status player-status-${status === UserStatus.ONLINE ? "online" : "offline"}`}> </div>
+                <div className={`player-status player-status-${user.status === UserStatus.ONLINE ? "online" : "offline"}`}> </div>
+                {
+                    user.in_game_id !== null && 
+                    <div className="spec-icon">
+                        <IconEye onClick={() => socket?.emit("get_gameinfo", user.in_game_id)} />
+                    </div>
+                }
             </td>
-            {/* <td className="leaderboard-spec responsive-column">
-                { isInGame && <Link to="#"> <IconEye /> </Link> }
-            </td> */}
         </tr>
     );
 }

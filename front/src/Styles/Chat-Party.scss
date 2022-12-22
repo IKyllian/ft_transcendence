@@ -6,10 +6,12 @@
     width: 400px;
     right: 0;
     height: 100%;
-    // border-left: 1px solid white;
     z-index: 10000;
     box-shadow: rgb(0, 0, 0) 0px 5px 15px;
-    &-wrapper {
+}
 
+@media screen and (max-width: $BreakPoint_500) {
+    .chat-party-sidebar {
+        width: 90%;
     }
 }

@@ -3,6 +3,7 @@ import { useFriendHook } from '../../Hooks/Friend-Hook';
 
 function FriendButton(props: {secondUserId: number, relationStatus: string}) {
     const { secondUserId, relationStatus } = props;
+    console.log("relationStatus", relationStatus);
     const {
         handleAddFriend,
         handleRemoveFriend,
@@ -15,7 +16,7 @@ function FriendButton(props: {secondUserId: number, relationStatus: string}) {
         );
     } else if (relationStatus === "pending") {
         return (
-            <p className='friend-request-pending'> Friend Request Pending </p>
+            <p className='friend-request-pending'> <IconUser /> Pending </p>
         );
     } else if (relationStatus === "friend") {
         return (

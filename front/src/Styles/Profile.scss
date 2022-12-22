@@ -1,4 +1,5 @@
 @use "./Variables.scss" as *;
+@use "./mixins.scss" as *;
 
 $FontSizeText: 20px;
 $FontSizeTextResponsive: 15px;
@@ -8,7 +9,7 @@ $FontSizeTextResponsive: 15px;
     background-color: $LightBluePalette;
 
     .profile-header {
-        background: url('../Images-Icons//Backgrounds/background-42.jpg') no-repeat center fixed;
+        background: url('../Assets/Backgrounds/background-42.jpg') no-repeat center fixed;
         background-size: cover;
         @include width-height(100%, 250px);
         position: relative;
@@ -40,6 +41,18 @@ $FontSizeTextResponsive: 15px;
         
             .stat-elem {
                 margin: auto;
+                display: flex;
+                flex-direction: column;
+                position: relative;
+                align-items: center;
+                padding-bottom: 20px;
+
+                img {
+                    @include width-height(100px, 100px);
+                    position: absolute;
+                    bottom: -60px;
+                }
+
                 p {
                     margin: 0;
                     text-align: center;
@@ -54,6 +67,11 @@ $FontSizeTextResponsive: 15px;
         
                     &:last-child {
                         font-size: 25px;
+                        position: absolute;
+                        left: 0;
+                        right: 0;
+                        margin: 0 auto;
+                        bottom: -10px;
                     }
                 }
             }
@@ -79,83 +97,82 @@ $FontSizeTextResponsive: 15px;
             }
 
             svg {
-                @include width-height(13px, 13px);
-                margin-left: 5px;
+                @include width-height(22px, 22px);
                 cursor: pointer;
             }
 
-            .friend-request-pending {
-                font-size: 14px;
+            .spectate-icon {
+                @include width-height(20px, 20px);
                 margin-left: 20px;
-                background-color: $LightDarkPalette;
-                color: $OrangeProfile;
-                padding: 5px;
-                border-radius: 5px;
             }
 
-            .buttons-friend-request {
-                margin-left: 20px;
+            .settings-icon {
+                @include width-height(20px, 20px);
+                margin-left: 10px;
+                margin-top: 8px;
+            }
+
+            .icons-wrapper {
                 @include flex-row-alignCenter();
                 gap: 10px;
-                button {
-                    all: unset;
-                    cursor: pointer;
-                    width: 80px;
-                    text-align: center;
-                    font-size: 10px;
-                    padding: 5px;
-                    font-weight: bold;
-                    border-radius: 5px;
-
-                    &:first-child {
-                        background-color: rgb(11, 106, 11);
+                margin-left: 15px;
+                .friend-request-pending {
+                    svg {
+                        margin: 0 3px 0 0;
                     }
-
-                    &:last-child {
-                        background-color: rgb(174, 14, 14);
-                    }
-                }
-            }
-
-            .friend-icone {
-                margin-left: 20px;
-                @include width-height(22px, 22px);
-
-                &-add {
-                    color: white;
-                }
-
-                &-delete {
-                    color: rgb(194, 29, 29);;
-                }
-            }
-
-            .send-message-icon {
-                @include width-height(22px, 22px);
-                margin-left: 10px;
-                svg {
-                    color: white;
-                    height: 22px;
-                    width: 22px;
-                }
-            }
-
-            .fight-button {
-                @include flex-row-alignCenter();
-                justify-content: center;
-                gap: 5px;
-                color: $OrangeProfile;
-                margin-left: 20px;
-                border-radius: 10px;
-                background-color: $LightDarkPalette;
-                padding: 5px;
-                font-weight: 600;
-
-                &:hover {
+                    @include flex-row-alignCenter();
+                    font-size: 14px;
                     background-color: $LightDarkPalette;
                     color: $OrangeProfile;
-                    background-color: $OrangeProfile;
-                    color: $LightDarkPalette;
+                    padding: 5px;
+                    border-radius: 5px;
+                }
+    
+                .buttons-friend-request {
+                    @include flex-row-alignCenter();
+                    gap: 10px;
+                    button {
+                        all: unset;
+                        cursor: pointer;
+                        width: 80px;
+                        text-align: center;
+                        font-size: 10px;
+                        padding: 5px;
+                        font-weight: bold;
+                        border-radius: 5px;
+    
+                        &:first-child {
+                            background-color: rgb(11, 106, 11);
+                        }
+    
+                        &:last-child {
+                            background-color: rgb(174, 14, 14);
+                        }
+                    }
+                }
+    
+                .friend-icone {
+                    &-add {
+                        color: white;
+                    }
+    
+                    &-delete {
+                        color: rgb(194, 29, 29);;
+                    }
+                }
+    
+                .send-message-icon {
+                    margin-top: 3px;
+                    svg {
+                        color: white;
+                        height: 22px;
+                        width: 22px;
+                    }
+                }
+
+                .block-button {
+                    @include width-height(20px, 20px);
+                    margin-top: 3px;
                 }
             }
         }
@@ -180,6 +197,7 @@ $FontSizeTextResponsive: 15px;
                 cursor: pointer;
                 padding: 2px;
                 height: 30px;
+                margin: 20px 0 0 0;
             }
         
             p[is-target="true"] {
@@ -189,21 +207,44 @@ $FontSizeTextResponsive: 15px;
 
         .profile-block-wrapper {
             margin-right: $HeaderMarge;
+            margin-bottom: 20px;
+            margin-top: 15px;
         }
 
         .history-list {
             display: flex;
             flex-direction: column;
             gap: 10px;
+
+            .filter-select {
+                width: 100px;
+                padding: 5px;
+                background: transparent;
+                border: none;
+                cursor: pointer;
+                font-size: 15px;
+                border: 1px solid $LightDarkPalette;
+                border-radius: 5px;
+
+                &:focus-visible {
+                    outline: none;
+                }
+            }
         
             .history-item {
                 @include flex-row-alignCenter();
                 position: relative;
                 justify-content: center;
                 gap: 10px;
-                height: 50px;
+                padding: 5px;
                 background-color: $LightDarkPalette;
                 border-radius: 10px;
+
+                .wrapper-2v2 {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 7px
+                }
 
                 .player-container {
                     @include flex-row-alignCenter();
@@ -212,6 +253,12 @@ $FontSizeTextResponsive: 15px;
                     .avatar-player {  
                         @include avatar-player(40px);
                     }
+                }
+
+                .side-reverse {
+                    display: flex;
+                    flex-direction: row-reverse;
+                    align-items: center;
                 }
         
                 .history-score {
@@ -239,46 +286,46 @@ $FontSizeTextResponsive: 15px;
             }
         }
 
-        .achievement-list {
-            display: flex;
-            flex-direction: row;
-            flex-wrap: wrap;
-            gap: 1em;
+        // .achievement-list {
+        //     display: flex;
+        //     flex-direction: row;
+        //     flex-wrap: wrap;
+        //     gap: 1em;
 
-            .achievement-item {
-                background-color: $LightDarkPalette;
-                @include flex-row-alignCenter();
-                @include width-height(300px, 100px);
+        //     .achievement-item {
+        //         background-color: $LightDarkPalette;
+        //         @include flex-row-alignCenter();
+        //         @include width-height(300px, 100px);
 
-                border-radius: 8px;
+        //         border-radius: 8px;
 
-                svg {
-                    @include width-height(40%, 100%);
-                    color: rgb(211, 210, 210);
-                }
+        //         svg {
+        //             @include width-height(40%, 100%);
+        //             color: rgb(211, 210, 210);
+        //         }
 
-                &-content {
-                    @include width-height(60%, 100%);
-                    margin-right: 5px;
+        //         &-content {
+        //             @include width-height(60%, 100%);
+        //             margin-right: 5px;
 
-                    p {
-                        margin: 0;
-                    }
+        //             p {
+        //                 margin: 0;
+        //             }
                     
-                    p:first-child {
-                        margin-top: 1em;
-                        font-weight: bold;
-                        font-size: $FontSizeText;
-                        color: $OrangeProfile;
-                    }
+        //             p:first-child {
+        //                 margin-top: 1em;
+        //                 font-weight: bold;
+        //                 font-size: $FontSizeText;
+        //                 color: $OrangeProfile;
+        //             }
 
-                    p:last-child {
-                        margin-top: 0.5em;
-                        font-size: 15px;
-                    }
-                }
-            }
-        }
+        //             p:last-child {
+        //                 margin-top: 0.5em;
+        //                 font-size: 15px;
+        //             }
+        //         }
+        //     }
+        // }
 
         .friends-list {
             display: flex;
@@ -330,19 +377,6 @@ $FontSizeTextResponsive: 15px;
                     left: $HeaderResponsive800Marge;
                 }
                 .stat-elem {
-                    p {        
-                        &:first-child {
-                            font-size: 20px;
-                        }
-            
-                        &:last-child {
-                            font-size: 15px;
-                        }
-                    }
-                }
-            }
-            .stats-infos {
-                .stat-elem {
                     p {
                         &:first-child {
                             font-size: 25px;
@@ -352,8 +386,8 @@ $FontSizeTextResponsive: 15px;
                         }
                     }
                 }
+                
             }
-            
             .card-info {
                 margin-left: $HeaderResponsive800Marge;
                 bottom: -33px;
@@ -386,7 +420,7 @@ $FontSizeTextResponsive: 15px;
                     gap: 0;
                     .player-container {
                         font-size: 13px;   
-                        @include overflowScroll("x");
+                        // @include overflowScroll("x");
                         .avatar-player {  
                             @include avatar-player(30px);
                         }
@@ -447,8 +481,28 @@ $FontSizeTextResponsive: 15px;
     .profile-container {
         .profile-header {
             .stats-infos {
+                padding: 27px;
+                gap: 3.5em;
                 .mode-select {
                     left: $HeaderResponsive500Marge;
+                    font-size: 10px;
+                    padding: 2px;
+                    top: 5px;
+                }
+                .stat-elem {
+                    img {
+                        @include width-height(70px, 70px);
+                        bottom: -40px;
+                    }
+                    p {        
+                        &:first-child {
+                            font-size: 15px;
+                        }
+            
+                        &:last-child {
+                            font-size: 15px;
+                        }
+                    }
                 }
             }
             .card-info {
@@ -459,9 +513,22 @@ $FontSizeTextResponsive: 15px;
             margin-top: 20px;
             &-menu {
                 gap: 1em;
+                margin-bottom: 5px;
             }
             .profile-block-wrapper {
                 margin: 0 $HeaderResponsive500Marge;
+            }
+
+            .history-list {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+    
+                .filter-select {
+                    font-size: 12px;
+                    padding: 3px;
+                    width: 80px;
+                }
             }
         }
     }
@@ -472,17 +539,6 @@ $FontSizeTextResponsive: 15px;
         .profile-header {
             .stats-infos {
                 @include width-height(90%, 60%);
-                .stat-elem {
-                    p {        
-                        &:first-child {
-                            font-size: 20px;
-                        }
-            
-                        &:last-child {
-                            font-size: 15px;
-                        }
-                    }
-                }
             }
         }
     }

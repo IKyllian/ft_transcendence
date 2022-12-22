@@ -1,20 +1,23 @@
-import { BadRequestException, ForbiddenException, forwardRef, Inject, Injectable, NotFoundException } from "@nestjs/common";
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { FindManyOptions, FindOneOptions, FindOptionsWhere, IsNull, Like, Not, Repository } from "typeorm";
-import { AuthService } from "src/auth/auth.service";
-import { CreateUserDto } from "./dto/createUser.dto";
+import { FindManyOptions, FindOneOptions, FindOptionsWhere, Repository } from "typeorm";
+import { CreateUserDto } from "./dto/create-user.dto";
 import { MatchResult, Statistic, User } from "src/typeorm";
-import { EditUserDto } from "./dto/editUser.dto";
 import * as argon from 'argon2';
 import { SearchDto } from "./dto/search.dto";
 import { FriendshipService } from "./friendship/friendship.service";
 import { UserStatus } from "src/utils/types/types";
+import { UserAccount } from "src/typeorm/entities/userAccount";
+import { EditPasswordDto } from "./dto/edit-password.dto";
+import * as sharp from 'sharp';
+import * as fs from "fs";
+import { promisify } from "util";
+import * as path from 'path';
+const readFileAsyc = promisify(fs.readFile);
 
 @Injectable()
 export class UserService {
 	constructor(
-		@Inject(forwardRef(() => AuthService))
-		private authService: AuthService,
 		private friendshipService: FriendshipService,
 
 		@InjectRepository(User)
@@ -23,6 +26,8 @@ export class UserService {
 		private statisticRepo: Repository<Statistic>,
 		@InjectRepository(MatchResult)
 		private matchRepo: Repository<MatchResult>,
+		@InjectRepository(UserAccount)
+		private accountRepo: Repository<UserAccount>,
 	) {}
 
 	create(dto: CreateUserDto) {
@@ -32,18 +37,7 @@ export class UserService {
 		return this.userRepo.save(user);
 	}
 
-	findOne(options: FindOneOptions<User>, selectAll: Boolean = false): Promise<User | null> {
-		if (selectAll) {
-			options.select = [
-				'avatar',
-				'id',
-				'id42',
-				'username',
-				"refresh_hash",
-				'status',
-				'hash',
-			];
-		}
+	findOne(options: FindOneOptions<User>): Promise<User | null> {
 		return this.userRepo.findOne(options);
 	}
 
@@ -69,73 +63,110 @@ export class UserService {
 			.createQueryBuilder("user")
 			.where("LOWER(user.username) = :name", { name: name.toLowerCase() })
 			.getOne();
-		return nameTaken ? true : false;
+		return nameTaken;
 	}
 
-	// TODO ask if usefull
-	async editUser(user: User, dto: EditUserDto) {
-		switch (dto) {
-			case dto.username:
-				if (await this.nameTaken(dto.username))
-					throw new ForbiddenException('Username taken');
-				user.username = dto.username;
-			case dto.password:
-				const hash = await argon.hash(dto.password);
-				user.hash = hash; // probably wont work cause hash is not selected
-			case dto.avatar:
-				user.avatar = dto.avatar;
-			default:
-				break;
-		}
-		return this.userRepo.save(user);
+	async mailTaken(email: string) {
+		const mailTaken = await this.userRepo
+			.createQueryBuilder("user")
+			.where("LOWER(user.email) = :email", { email: email.toLowerCase() })
+			.getOne();
+		return mailTaken;
 	}
 
 	async editUsername(user: User, name: string) {
 		if (await this.nameTaken(name))
 			throw new ForbiddenException('Username taken');
 		user.username = name;
-		user = await this.userRepo.save(user);
-		return {
-			access_token: ((await this.authService.signTokens(user.id, user.username)).access_token),
-			user: user,
+		return this.userRepo.save(user);
+	}
+
+	async editPassword(user: User, dto: EditPasswordDto) {
+		let account: UserAccount = await this.accountRepo.findOne({
+			where: { user: { id: user.id } },
+		});
+		if (!account || !account.hash) {
+			throw new BadRequestException("Account or password not set");
 		}
+		
+		const pwdMatches = await argon.verify(
+			account.hash,
+			dto.old,
+		);
+		if (!pwdMatches) {
+			throw new BadRequestException("Old password does not match");
+		}
+
+		const hash = await argon.hash(dto.new);
+		account.hash = hash
+		this.accountRepo.save(account);
 	}
 
 	async setStatus(userId: number, status: UserStatus) {
-		// this.userRepo.createQueryBuilder()
-		// 	.update(User)
-		// 	.where("id = :userId", {userId: userId})
-		// 	.set({ status: () => "status = :status" })
-		// 	.setParameter("status", status)
-		// 	.execute(); // pq ca marche paaas
-
-		let user = await this.userRepo.findOneBy({id: userId});
-		if (user) {
-			user.status = status;
-			this.userRepo.save(user)
-		}
+		this.userRepo.createQueryBuilder()
+			.update(User)
+			.where("id = :userId", {userId: userId})
+			.set({ status: () => ":status" })
+			.setParameter("status", status)
+			.execute();
 	}
 
-	async getUsers() {
-		return await this.userRepo.find();
+	setInGameId(userId: number, game_id: string) {
+		this.userRepo.createQueryBuilder()
+			.update(User)
+			.where("id = :userId", {userId: userId})
+			.set({ in_game_id: () => ":game_id" })
+			.setParameter("game_id", game_id)
+			.execute();
 	}
 
 	async updateAvatar(user: User, fileName: string) {
-		user.avatar = fileName;
-		await this.userRepo.save(user);
+		if (user.avatar) {
+			try {
+				fs.unlinkSync(path.join('uploads', user.avatar));
+			} catch(e) {
+				console.error(e);
+			}
+		}
+		this.userRepo.createQueryBuilder()
+			.update(User)
+			.where('id = :id', { id: user.id })
+			.set({ avatar: () => ":avatar"})
+			.setParameter('avatar', fileName)
+			.execute()
 	}
 
 	logout(user: User) {
-		return this.userRepo.createQueryBuilder()
-		.update(User)
+		return this.accountRepo.createQueryBuilder()
+		.update(UserAccount)
 		.set({ refresh_hash: null })
-		.where("id = :id", { id: user.id })
+		.where("userId = :id", { id: user.id })
 		.execute();
 	}
 
-	async updateRefreshHash(user: User, hash: string) {
-		user.refresh_hash = hash;
-		await this.userRepo.save(user);
+	async updateForgotCode(user: User, code: string) {
+		console.log(user)
+		this.accountRepo.createQueryBuilder()
+		.update()
+		.where("userId = :userId", { userId: user.id })
+		.set({ forgot_code: () => ":code"})
+		.setParameter('code', code)
+		.execute()
+	}
+
+	async updateRefreshHash(account: UserAccount, hash: string) {
+		account.refresh_hash = hash;
+		await this.accountRepo.save(account);
+	}
+
+	async updatePassword(account: UserAccount, hash: string) {
+		this.accountRepo.createQueryBuilder()
+		.update()
+		.where("userId = :userId", { userId: account.id })
+		.set({ hash: () => ":hash" })
+		.set({ forgot_code: () => null })
+		.setParameter('hash', hash)
+		.execute()
 	}
 
 	async deleteUser(id: number) {
@@ -209,5 +240,33 @@ export class UserService {
 		const relationStatus = this.friendshipService.getRelationStatus(user2, relation);
 		const match_history = await this.getMatchHistory(user2.id);
 		return { user: user2, friendList, relationStatus , match_history};
+	}
+
+	async setTwoFactorSecret(user: UserAccount, secret: string) {
+		user.two_factor_secret = secret;
+		this.accountRepo.save(user);
+	}
+
+	async setTwoFactorEnabled(user: User, status: boolean) {
+		user.two_factor_enabled = status;
+		this.userRepo.save(user);
+	}
+
+	async resizeImage(file: Express.Multer.File) {
+		try {
+			const buf = await readFileAsyc(file.path)
+			await sharp(buf, { animated: true })
+			.resize(300, 300)
+			.webp()
+			.toFile(file.path);
+			return true;
+		} catch {
+			try {
+				fs.unlinkSync(file.path);
+			} catch(e) {
+				console.log(e.message);
+			}
+			return false;
+		}
 	}
 }

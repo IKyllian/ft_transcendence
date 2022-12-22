@@ -12,7 +12,9 @@ import { channelOption } from './utils/types/types';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.setGlobalPrefix('api');
-  app.enableCors();
+  app.enableCors({
+    exposedHeaders: 'Content-Disposition'
+  });
   app.useGlobalPipes(new ValidationPipe());
   await app.listen(5000);
 
@@ -69,6 +71,7 @@ async function bootstrap() {
 	// 	.set({ match_lost: () => "match_lost + 1" })
 	// 	.execute();
     // console.log(new Date().toLocaleString())
+	// console.log(process.cwd())
 
 }
 bootstrap();

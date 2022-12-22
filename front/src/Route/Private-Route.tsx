@@ -1,20 +1,21 @@
+import { useContext } from 'react';
 import { Navigate } from 'react-router-dom';
+import { CacheContext, SocketContext } from '../App';
 import IsConnectedLoading from '../Components/Utils/Is-Connected-Loading';
 import { useAppSelector } from '../Redux/Hooks';
-import { IsLog } from '../Utils/Utils-User';
 
 function PrivateRoute({ children }: { children: JSX.Element }) {
-	console.log("PRIVATE ROUTE");
-    const auth = IsLog();
-    const {loadingIsConnected} = useAppSelector(state => state.auth);
-    
-    if (!loadingIsConnected) {
-        return auth ? children : <Navigate to="/sign" />;
-    } else {
-        return (
-            <IsConnectedLoading />
-        )
-    }
+    const {loadingIsConnected, isAuthenticated} = useAppSelector(state => state.auth);
+    const {socket} = useContext(SocketContext);
+    const {cache} = useContext(CacheContext);
+
+    if (loadingIsConnected)
+        return <IsConnectedLoading />;
+    else if (!isAuthenticated)
+        return <Navigate to="/sign" />;
+    else if (isAuthenticated && (!socket || cache === undefined))
+        return <IsConnectedLoading />;
+    return children;
 }
 
 export default PrivateRoute;

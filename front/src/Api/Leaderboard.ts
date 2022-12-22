@@ -1,12 +1,7 @@
-import axios from "axios";
-import { baseUrl } from "../env";
+import api from "./Api";
 
-export function fetchSinglesLeaderBoardDatas(skip: number, token: string, setLeaderboardState: Function) {
-    axios.post(`${baseUrl}/game/singles-leaderboard`, {skip: skip}, {
-        headers: {
-            "Authorization": `Bearer ${token}`,
-        }
-    })
+export function fetchSinglesLeaderBoardDatas(skip: number, setLeaderboardState: Function) {
+    api.post(`/game/singles-leaderboard`, {skip: skip})
     .then(response => {
         console.log("response", response);
         setLeaderboardState((prev: any) => {return {...response.data, loading: false, page: prev.page, mode: prev.mode}});
@@ -16,12 +11,8 @@ export function fetchSinglesLeaderBoardDatas(skip: number, token: string, setLea
     })
 }
 
-export function fetchDoublesLeaderBoardDatas(skip: number, token: string, setLeaderboardState: Function) {
-    axios.post(`${baseUrl}/game/doubles-leaderboard`, {skip: skip}, {
-        headers: {
-            "Authorization": `Bearer ${token}`,
-        }
-    })
+export function fetchDoublesLeaderBoardDatas(skip: number, setLeaderboardState: Function) {
+    api.post(`/game/doubles-leaderboard`, {skip: skip})
     .then(response => {
         console.log("response", response);
         setLeaderboardState((prev: any) => {return {...response.data, loading: false, page: prev.page, mode: prev.mode}});

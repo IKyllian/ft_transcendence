@@ -1,15 +1,22 @@
 import { Navigate } from 'react-router-dom';
 import { useAppSelector } from '../Redux/Hooks';
-import { IsLog } from '../Utils/Utils-User';
 import IsConnectedLoading from '../Components/Utils/Is-Connected-Loading';
+import { useContext } from 'react';
+import { CacheContext, SocketContext } from '../App';
 
 function PublicRoute({ children }: { children: JSX.Element }) {
-	console.log("PUBLIC ROUTE");
-    const auth = IsLog();
-    const {loadingIsConnected} = useAppSelector(state => state.auth);
+    const {loadingIsConnected, isAuthenticated} = useAppSelector(state => state.auth);
+    const {socket} = useContext(SocketContext);
+    const {cache} = useContext(CacheContext);
     
     if (!loadingIsConnected) {
-        return !auth ? children : <Navigate to="/" />;
+        if (!isAuthenticated)
+            return children;
+        else {
+            if (!socket || cache === undefined)
+                return <IsConnectedLoading />;
+            return <Navigate to="/" />;
+        }
     } else {
         return (
             <IsConnectedLoading />

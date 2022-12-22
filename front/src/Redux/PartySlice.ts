@@ -1,18 +1,31 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { PartyInterface, TeamSide, Player, GameMode, PartyMessage } from '../Types/Lobby-Types';
+import { PlayersGameData } from '../Components/Game/game/types/shared.types';
+import { PartyInterface, GameMode, PartyMessage, QueueTimerInterface } from '../Types/Lobby-Types';
+import { NotificationInterface } from '../Types/Notification-Types';
 
 interface PartyState {
     party?: PartyInterface,
     modalIsOpen: boolean,
     chatIsOpen: boolean,
     isInQueue: boolean,
+    queueTimer: QueueTimerInterface,
+    partyInvite: NotificationInterface[],
+    gameFound: {showGameFound: boolean, gameDatas: PlayersGameData} | undefined,
+}
+
+const defaultQueueTimer: QueueTimerInterface = {
+    seconds: 0,
+    minutes: 0
 }
 
 const defaultState: PartyState = {
     party: undefined,
     modalIsOpen: false,
+    queueTimer: defaultQueueTimer,
     isInQueue: false,
     chatIsOpen: false,
+    partyInvite: [],
+    gameFound: undefined,
 }
 
 export const partySlice = createSlice({
@@ -56,8 +69,55 @@ export const partySlice = createSlice({
             if (state.party) {
                 state.party.game_mode = payload;
             }
-        } 
+        },
+        addPartyInvite: (state, { payload }: PayloadAction<NotificationInterface>) => {
+            state.partyInvite = [...state.partyInvite, payload]
+        },
+        removePartyInvite: (state, { payload }: PayloadAction<number>) => {
+            state.partyInvite = [...state.partyInvite.filter(elem => elem.id !== payload)];
+        },
+        incrementQueueTimer: (state) => {
+            if (state.isInQueue) {
+                if (state.queueTimer.seconds === 59)
+                    state.queueTimer = {seconds: 0, minutes: state.queueTimer.minutes + 1};
+                else
+                    state.queueTimer = {...state.queueTimer, seconds: state.queueTimer.seconds + 1};
+            } else
+                state.queueTimer = defaultQueueTimer;
+        },
+        resetQueueTimer: (state) => {
+            state.queueTimer = defaultQueueTimer;
+        },
+        newGameFound: (state, { payload }: PayloadAction<{gameDatas: PlayersGameData, showGameFound: boolean}>) => {
+            state.gameFound = {showGameFound: payload.showGameFound, gameDatas: payload.gameDatas};
+        },
+        stopShowGameFound: (state) => {
+            if (state.gameFound)
+                state.gameFound = {...state.gameFound, showGameFound: false};
+        },
+        unsetGameFound: (state) => {
+            state.gameFound = undefined;
+        },
+        resetParty: () => defaultState,
     }
 });
 
-export const { addParty, leaveParty, addPartyMessage, changeModalStatus, changeSidebarChatStatus, closeSidebarChatStatus, changeQueueStatus, cancelQueue, changePartyGameMode} = partySlice.actions;
+export const {
+    addParty,
+    leaveParty,
+    addPartyMessage,
+    changeModalStatus,
+    changeSidebarChatStatus,
+    closeSidebarChatStatus,
+    changeQueueStatus,
+    cancelQueue,
+    changePartyGameMode,
+    addPartyInvite,
+    removePartyInvite,
+    incrementQueueTimer,
+    resetQueueTimer,
+    newGameFound,
+    stopShowGameFound,
+    unsetGameFound,
+    resetParty,
+} = partySlice.actions;

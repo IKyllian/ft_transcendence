@@ -1,6 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { ChannelsInterfaceFront, ConversationInterfaceFront, ChannelInfoSidebar } from '../Types/Chat-Types';
-import { UserInterface } from '../Types/User-Types';
 
 interface ChatState {
     channels: ChannelsInterfaceFront[],
@@ -41,14 +40,13 @@ export const chatSlice = createSlice({
             }
         },
         addChannel: (state, {payload}: PayloadAction<ChannelsInterfaceFront>) => {
-            if (state.channels)
+            if (state.channels && !state.channels.find(elem => elem.channel.id === payload.channel.id))
                 state.channels = [...state.channels, payload];
             else
                 state.channels = [payload];
-            console.log("state.channels", state.channels);
         },
         addPrivateConv: (state, {payload}: PayloadAction<ConversationInterfaceFront>) => {
-            if (state.privateConv)
+            if (state.privateConv && !state.privateConv.find(elem => elem.conversation.id === payload.conversation.id))
                 state.privateConv = [...state.privateConv, payload];
             else
                 state.privateConv = [payload];
@@ -61,6 +59,12 @@ export const chatSlice = createSlice({
         removePrivateConv: (state, {payload}: PayloadAction<number>) => {
             if (state.privateConv) {                
                 state.privateConv = state.privateConv.filter(elem => elem.conversation.id !== payload);
+            }
+        },
+        changePrivateConvOrder: (state, {payload}: PayloadAction<number>) => {
+            if (state.privateConv.length > 1) {
+                const idx = state.privateConv.findIndex(elem => elem.conversation.id === payload);
+                state.privateConv.splice(0, 0, state.privateConv.splice(idx, 1)[0]);
             }
         },
         changeActiveElement: (state, {payload}: PayloadAction<{id: number, isChannel: boolean}>) => {
@@ -95,7 +99,8 @@ export const chatSlice = createSlice({
                     });
                 }
             }
-        }
+        },
+        resetChat: () => defaultState,
     }
 });
 
@@ -109,5 +114,7 @@ export const {
     addPrivateConv,
     removeChannel,
     removePrivateConv,
+    changePrivateConvOrder,
     changeActiveElement,
+    resetChat,
 } = chatSlice.actions;

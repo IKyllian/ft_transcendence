@@ -1,13 +1,9 @@
 
-import { Exclude } from "class-transformer";
 import { UserStatus } from "src/utils/types/types";
-import { Column, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn, Unique, ManyToMany, JoinTable, ManyToOne, BaseEntity } from "typeorm";
-import { Avatar } from "./avatar";
+import { Column, Entity, OneToMany, OneToOne, PrimaryGeneratedColumn, ManyToMany, JoinTable, CreateDateColumn } from "typeorm";
 import { ChannelUser } from "./channelUser";
-import { Conversation } from "./conversation";
-import { Friendship } from "./friendship";
-import { MatchResult } from "./matchResult";
 import { Statistic } from "./statistic";
+import { UserAccount } from "./userAccount";
 
 @Entity()
 export class User {
@@ -15,15 +11,14 @@ export class User {
 	@PrimaryGeneratedColumn()
 	id: number;
 
-	@Column({ nullable: true })
-	@Exclude()
-	id42?: number;
-
 	@Column({ unique: true, nullable: true })
 	username: string;
 
 	@Column({ type: 'enum', enum: UserStatus, default: UserStatus.OFFLINE })
 	status: UserStatus;
+
+	@Column({ unique: true, select: false })
+  	email: string;
 
 	@Column({ nullable: true })
 	avatar?: string;
@@ -40,18 +35,21 @@ export class User {
 	@JoinTable({ name: 'blocked_users' })
 	blocked: User[];
 
-	@Column({ default: 1000 })
+	@Column({ default: 975 })
 	singles_elo: number;
 
-	@Column({ default: 1000 })
+	@Column({ default: 975 })
 	doubles_elo: number;
 
-	@Exclude()
-	@Column({ nullable: true, select: false })
-	hash?: string
+	@OneToOne(() => UserAccount, (account) => account.user, { cascade: true })
+	account: UserAccount;
 
-	@Exclude()
-	@Column({ nullable: true, select: false })
-	refresh_hash?: string
+	@Column({ default: false })
+	two_factor_enabled: boolean;
 
+	@Column({ default: null, nullable: true })
+	in_game_id: string;
+
+	@CreateDateColumn({ type: 'timestamptz' })
+	created_at: Date;
 } 

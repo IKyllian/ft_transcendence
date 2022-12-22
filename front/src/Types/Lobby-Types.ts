@@ -1,4 +1,3 @@
-import { BlockLike } from "typescript";
 import { UserInterface } from "./User-Types";
 
 export enum GameMode {
@@ -30,17 +29,23 @@ export enum PlayerPosition {
     FRONT,
 }
 
+export interface QueueTimerInterface {
+    seconds: number,
+    minutes: number
+}
+
 export type GameSettings =
 {
-    game_type?: GameType,
-    up_down_border: number,
-    player_back_advance: number,
-    player_front_advance: number,
-    paddle_size_h: number,
-    paddle_speed: number,
-    ball_start_speed: number,
-    ball_acceleration: number,
-    point_for_victory: number,
+    game_type: GameType,
+	up_down_border: number,
+	player_back_advance: number,
+	player_front_advance: number,
+	paddle_size_back: number,
+	paddle_size_front: number,
+	paddle_speed: number,
+	ball_start_speed: number,
+	ball_acceleration: number,
+	point_for_victory: number,
 }
 
 export interface ModeState {

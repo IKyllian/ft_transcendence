@@ -1,40 +1,55 @@
-import Avatar from "../../../Images-Icons/pp.jpg";
-import { UserTimeout } from "../../../Types/Chat-Types";
+import { TimeoutType } from "../../../Types/Chat-Types";
 import { useContext } from "react";
 import { SocketContext } from "../../../App";
+import ExternalImage from "../../External-Image";
+import { useAppSelector } from "../../../Redux/Hooks";
+import { Link } from "react-router-dom";
+import { getBanDateString } from "../../../Utils/Utils-Chat";
 
-function ChannelBanUser(props: {chanId: number, usersBan: UserTimeout[] | undefined}) {
-    const { usersBan, chanId } = props;
+function ChannelBanUser() {
+    const { channelDatas } = useAppSelector((state) => state.channel);
+    const usersBan = channelDatas?.usersTimeout.filter(elem => elem.type === TimeoutType.BAN);
     const {socket} = useContext(SocketContext);
 
     const handleClick = (userBanId: number) => {
         socket?.emit("Unban", {
             userId: userBanId,
-            chanId: chanId,
+            chanId: channelDatas?.id,
         });
     }
 
     return usersBan && usersBan.length > 0 ? (
-        <div className="user-list-container">
-            {
-                usersBan.map(elem => 
-                    <div key={elem.id} className="setting-user-item">
-                        <div className="profil-container">
-                            <img className='profile-avatar' src={Avatar} alt="profil pic" />
-                            <p> { elem.user.username } </p>
-                        </div>
-                        <div className="unban-button-wrapper"> 
-                            <button onClick={() => handleClick(elem.user.id)}> Unban </button>
-                            <p> 
-                                {
-                                    !elem.until ? "Perma ban" : elem.until.toString()
-                                }
-                            </p>
-                        </div>
-                    </div>
-                )
-            }
-        </div>
+        <table> 
+            <thead>
+                <tr>
+                    <th> User </th>
+                    <th> Ban Time </th>
+                </tr>
+            </thead>
+            <tbody>
+                {
+                    usersBan.map(elem => 
+                        <tr key={elem.id}>
+                            <td>
+                                <div className="user-info">
+                                    <ExternalImage src={elem.user.avatar} alt="User Avatar" className='user-avatar' userId={elem.user.id} />
+                                    <Link to={`/profile/${elem.user.username}`}>
+                                        { elem.user.username }
+                                    </Link>
+                                </div>
+                            
+                            </td>
+                            <td>
+                                { !elem.until ? "Perma ban" : getBanDateString(elem.until.toString()) }
+                            </td>
+                            <td>
+                                <button onClick={() => handleClick(elem.user.id)}> Unban </button>
+                            </td>
+                        </tr>
+                    )
+                }
+            </tbody>
+        </table>
     ) : (
         <div className="user-list-container">
             <p> No user ban yet </p>

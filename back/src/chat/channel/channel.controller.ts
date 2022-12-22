@@ -1,15 +1,14 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, Patch, Post, UseGuards } from "@nestjs/common";
 import { JwtGuard } from "src/auth/guard/jwt.guard";
 import { User } from "src/typeorm";
 import { GetUser } from "src/utils/decorators";
-import { ChannelPasswordDto } from "./dto/channel-pwd.dto";
 import { ChannelPermissionGuard } from "./guards/channel-permission.guard";
 import { InChannelGuard } from "./guards/in-channel.guard";
 import { ChannelService } from "./channel.service";
-import { BanUserDto } from "./dto/ban-user.dto";
 import { CreateChannelDto } from "./dto/create-channel.dto";
 import { SearchToInviteInChanDto } from "./dto/search-user-to-invite.dto";
-import { MuteUserDto } from "./dto/mute-user.dto";
+import { EditChannelNameDto } from "./dto/edit-channel-name.dto";
+import { EditChannelOptionDto } from "./dto/edit-channel-option.dto";
 
 @Controller('channel')
 export class ChannelController {
@@ -26,10 +25,7 @@ export class ChannelController {
 	@Get('search')
 	@UseGuards(JwtGuard)
 	async searchChannel(@GetUser() user: User) {
-		console.log('searching channel')
-		const chan =  await this.channelService.searchChannel(user);
-		// console.log(chan)
-		return chan
+		return await this.channelService.searchChannel(user);
 	}
 
 	@Post('users_to_invite')
@@ -46,17 +42,15 @@ export class ChannelController {
 		return await this.channelService.create(user, channelDto);
 	}
 
-	@Delete(':id')
-	async deleteChannel(
-		@Param('id') id: number,
-	) {
-		return await this.channelService.delete(id);
+	@Patch('edit-name')
+	@UseGuards(JwtGuard, InChannelGuard, ChannelPermissionGuard)
+	async editName(@Body() dto: EditChannelNameDto) {
+		return await this.channelService.editName(dto);
 	}
 
-	//TODO delete
-	@Get('get_timedout')
-	// @UseGuards(JwtGuard)
-	async getTimedout() {
-		return await this.channelService.getTimedout()
+	@Patch('edit-option')
+	@UseGuards(JwtGuard, InChannelGuard, ChannelPermissionGuard)
+	async editOption(@Body() dto: EditChannelOptionDto) {
+		return await this.channelService.editOption(dto);
 	}
 }

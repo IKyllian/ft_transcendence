@@ -1,9 +1,8 @@
 import { BadRequestException } from "@nestjs/common";
 import { generate } from "shortid";
-import { Socket } from "socket.io";
 import { SettingsFactory } from "src/game/settings.factory";
 import { User } from "src/typeorm";
-import { GameMode, GameSettings, GameType, PlayerType } from "src/utils/types/game.types";
+import { GameMode, GameSettings, GameType } from "src/utils/types/game.types";
 import { PartyMessage } from "src/utils/types/types";
 import { Player } from "../../player";
 

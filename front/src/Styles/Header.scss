@@ -1,4 +1,5 @@
 @use "./Variables.scss" as *;
+@use "./mixins.scss" as *;
 
 .header {
     background-color: $DarkPalette;
@@ -127,7 +128,7 @@
             font-size: 20px;
             margin-right: 30px;
 
-            .header-picture {
+            .header-avatar {
                 margin-right: 10px;
                 @include avatar-player(50px);
             }
@@ -136,7 +137,7 @@
 
     .header-right-responsive {
         display: none;
-        .header-picture {
+        .header-avatar {
             @include avatar-player(40px);
             margin-left: 8px;
         }
@@ -188,10 +189,12 @@
         }
         .notif-dropdown-item {
             background-color: $LightDarkPalette;
-            padding: 10px;
+            padding: 12px;
             border-radius: 5px;
             @include flex-row-alignCenter();
             justify-content: space-between;
+            position: relative;
+
             .profile-avatar {
                 @include avatar-player(40px);
             }
@@ -212,20 +215,10 @@
             }
             .notif-buttons {
                 display: flex;
-                flex-direction: column;
-                gap: 5px;
-                button {
-                    all: unset;
-                    cursor: pointer;
-                    font-size: 12px;
-                    text-align: center;
-                    padding: 4px;
-                    &:first-child {
-                        background-color: rgb(185, 129, 24);
-                    }
-                    &:last-child {
-                        background-color: #424549;
-                    }
+                flex-direction: row;
+                gap: 7px;
+                svg {
+                    @include circleButtons(20px);
                 }
             }
         }
@@ -261,6 +254,9 @@
 @media screen and (max-width: $BreakPoint_800) {
     .header {
         padding: 0 $HeaderResponsive800Marge;
+        .header-logo {
+            font-size: 30px;
+        }
         .header-right {
             display: none;
         }
@@ -281,5 +277,8 @@
 @media screen and (max-width: $BreakPoint_500) {
     .header {
         padding: 0 $HeaderResponsive500Marge;
+        .header-logo {
+            font-size: 25px;
+        }
     }
 }

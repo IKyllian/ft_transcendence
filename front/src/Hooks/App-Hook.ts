@@ -2,62 +2,107 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { io, Socket } from "socket.io-client";
 import { useAppDispatch, useAppSelector } from '../Redux/Hooks'
-import { socketUrl } from "../env";
 import { NotificationInterface } from "../Types/Notification-Types";
-import { addNotification, deleteNotification } from "../Redux/NotificationSlice";
-import { addChannel, addPrivateConv, removeChannel } from "../Redux/ChatSlice";
+import { addNotification, deleteNotification, resetNotification } from "../Redux/NotificationSlice";
+import { addChannel, addPrivateConv, changePrivateConvOrder, removeChannel, resetChat } from "../Redux/ChatSlice";
 import { Channel, ChannelUpdateType, ChannelUser, Conversation, UserTimeout } from "../Types/Chat-Types";
 import { UserInterface } from "../Types/User-Types";
-import { copyFriendListArray, logoutSuccess, stopIsConnectedLoading } from "../Redux/AuthSlice";
+import { changeFriendListInGameStatus, changeInGameStatus, copyFriendListArray, logoutSuccess, stopIsConnectedLoading, userFullAuthenticated } from "../Redux/AuthSlice";
 import { GameMode, PartyInterface, PartyMessage } from "../Types/Lobby-Types";
 import { copyNotificationArray } from "../Redux/NotificationSlice";
-import { addParty, addPartyMessage, cancelQueue, changePartyGameMode, changeQueueStatus, leaveParty } from "../Redux/PartySlice";
+import { addParty, addPartyInvite, addPartyMessage, cancelQueue, changeModalStatus, changePartyGameMode, changeQueueStatus, incrementQueueTimer, leaveParty, newGameFound, removePartyInvite, resetParty, resetQueueTimer } from "../Redux/PartySlice";
 import { fetchVerifyToken } from "../Api/Sign/Sign-Fetch";
-import { addChannelUser, banChannelUser, muteChannelUser, removeTimeoutChannelUser, removeChannelUser, setChannelDatas, updateChannelUser } from "../Redux/ChannelSlice";
+import { addChannelUser, banChannelUser, muteChannelUser, removeTimeoutChannelUser, removeChannelUser, setChannelDatas, updateChannelUser, unsetChannelDatas, unsetChannelId, channelNotfound, resetChannel, updateChannelUserIngameStatus } from "../Redux/ChannelSlice";
+import { addAlert, AlertType, resetAlert } from "../Redux/AlertSlice";
+import { PlayersGameData } from "../Components/Game/game/types/shared.types";
+import { TokenStorageInterface } from "../Types/Utils-Types";
+import { changeUserIngameStatus, resetConvState } from "../Redux/PrivateConvSlice";
 
 export function useAppHook() {
     const [socket, setSocket] = useState<Socket | undefined>(undefined);
-	const [gameInvite, setGameInvite] = useState<NotificationInterface | undefined>(undefined);
-	const [eventError, setEventError] = useState<string | undefined>(undefined);
-    const { token, isAuthenticated, currentUser } = useAppSelector((state) => state.auth);
-	const { party, chatIsOpen } = useAppSelector(state => state.party);
+    const [cache, setCache] = useState<Cache | undefined | null>(undefined);
+	const [intervalId, setIntervalId] = useState<ReturnType<typeof setInterval> | undefined>(undefined)
+    const { isAuthenticated, currentUser, displayQRCode, isSign, friendList} = useAppSelector((state) => state.auth);
+	const { modalIsOpen } = useAppSelector(state => state.party);
+	const { party, chatIsOpen, isInQueue } = useAppSelector(state => state.party);
 	const { currentChannelId } = useAppSelector((state) => state.channel);
 
 	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
 
-	const closeEventError = () => {
-		setEventError(undefined);
-	}
-
-	const connectSocket = () => {
-		const newSocket: Socket = io(`${socketUrl}`, {extraHeaders: {
-			"Authorization": `Bearer ${token}`,
+	const connectSocket = (access_token: string) => {
+		console.log("new socket")
+		const newSocket: Socket = io(`${process.env.REACT_APP_SOCKET_URL}`, {extraHeaders: {
+			"Authorization": `Bearer ${access_token}`,
 		}});
 		setSocket(newSocket);
 	}
 
-	const gameNotificationLeave = () => {
-		setGameInvite(undefined);
+	const openCache = async () => {
+		if ('caches' in window) {
+			caches.open('avatar-cache').then(cache => {
+				setCache(cache);
+			})
+			.catch(err => {
+				console.log(err);
+				setCache(null);
+			})
+		} else {
+			setCache(null);
+			console.log("Caches not supported");
+		}
 	}
 
+	const deleteCache = () => {
+		console.log("DELETE");
+		caches.delete('avatar-cache').then(isGone => {
+			console.log("Cache is delete", isGone);
+		})
+		.catch(err => {
+			console.log("ERR", err);
+		})
+	}
+	
 	useEffect(() => {
 		console.log("GET ITEM");
-		const localToken: string | null = localStorage.getItem("userToken");
-		if (localToken !== null) {
-			fetchVerifyToken(localToken, dispatch);
+		// localStorage.removeItem("userToken");
+		if (localStorage.getItem("userToken") !== null) {
+			fetchVerifyToken(dispatch);
 		} else {
 			dispatch(stopIsConnectedLoading());
 		}
 	}, [])
 
 	useEffect(() => {
-		if (isAuthenticated && socket === undefined) {
-			console.log("SET SOCKET");
-			localStorage.setItem("userToken", token);
-			connectSocket();
+        if (isInQueue) {
+            setIntervalId(setInterval(() => {
+                dispatch(incrementQueueTimer());
+            }, 1000))
+        } else {
+			if (intervalId) {
+				clearInterval(intervalId);
+				setIntervalId(undefined);
+			}
+            dispatch(resetQueueTimer());
+        }
+
+		return () => {
+			clearInterval(intervalId);
 		}
-	}, [isAuthenticated])
+    }, [isInQueue])
+
+	useEffect(() => {
+		if (!isAuthenticated && isSign && socket === undefined) {
+			// localStorage.setItem("userToken", token);
+			const localToken: string | null = localStorage.getItem("userToken");
+			if (localToken !== null) {
+				const localTokenParse: TokenStorageInterface = JSON.parse(localToken);
+				connectSocket(localTokenParse.access_token);
+				// deleteCache();
+				openCache();
+			}
+		}
+	}, [isSign])
 
 	useEffect(() => {
 		if (currentUser && currentChannelId !== undefined) {
@@ -84,7 +129,7 @@ export function useAppHook() {
 					dispatch(removeTimeoutChannelUser(eventData));
                 } else if (data.type === ChannelUpdateType.CHANUSER) {
                     const eventData = data.data as ChannelUser;
-                    dispatch(updateChannelUser(eventData));
+                    dispatch(updateChannelUser({user: eventData, loggedUserId: currentUser.id}));
                 }
             });
 
@@ -97,14 +142,30 @@ export function useAppHook() {
 	}, [currentChannelId]);
 
 	useEffect(() => {
+		if (socket && currentChannelId !== undefined && !location.pathname.includes("/chat")) {
+            socket.emit("LeaveChannelRoom", {
+                id: currentChannelId,
+            });
+            socket.off("roomData");
+            socket.off("ChannelUpdate");
+			socket.off("StatusUpdate");
+            dispatch(unsetChannelDatas());
+			dispatch(unsetChannelId());
+        }
+		if (modalIsOpen)
+			dispatch(changeModalStatus(false));
+	}, [location.pathname, socket])
+
+	useEffect(() => {
 		if (socket !== undefined) {
-			console.log("SOCKET CONDITION");
 			socket.on("Connection", (data: {friendList: UserInterface[], notification: NotificationInterface[], party: PartyInterface}) => {
 				console.log("data connection", data);
 				dispatch(copyNotificationArray(data.notification));
 				dispatch(copyFriendListArray(data.friendList));
-				if (data.party)
+				if (data.party) {
 					dispatch(addParty(data.party));
+				}
+				dispatch(userFullAuthenticated());
 			});
 
 			socket.on("PartyUpdate", (data: {party: PartyInterface, cancelQueue: boolean}) => {
@@ -132,14 +193,17 @@ export function useAppHook() {
 
 			socket.on("NewNotification", (data: NotificationInterface) => {
 				console.log("NewNotification", data);
+				if (data.conversation) {
+					dispatch(changePrivateConvOrder(data.conversation.id));
+				}
 				dispatch(addNotification(data));
 			});
 
 			socket.on("NewPartyInvite", (data: NotificationInterface) => {
 				console.log("NewPartyInvite", data);
-				setGameInvite(data);
-				setTimeout(function() {
-					setGameInvite(undefined);
+				dispatch(addPartyInvite(data));
+				setTimeout(() => {
+					dispatch(removePartyInvite(data.id));
 				}, 15000);
 			});
 
@@ -147,9 +211,11 @@ export function useAppHook() {
 				dispatch(deleteNotification(data));
 			});
 
-			socket.on("exception", (data) => {
+			socket.on("exception", (data: {message: string, status: string}) => {
 				console.log(data);
-				setEventError(data.message);
+				dispatch(addAlert({message: data.message, type: AlertType.ERROR}));
+				if (data.message === "Channel not found" && data.status === "error")
+					dispatch(channelNotfound());
 			});
 
 			socket.on("FriendListUpdate", (data: UserInterface[]) => {
@@ -170,6 +236,15 @@ export function useAppHook() {
 				navigate(`/chat/channel/${data.id}`);
 			});
 
+			socket?.on("InGameStatusUpdate", (data: {id: number, in_game_id: string | null}) => {
+				if (currentUser && currentUser.id === data.id) {
+					dispatch(changeInGameStatus(data.in_game_id));
+				}
+				dispatch(changeFriendListInGameStatus({id: data.id, in_game_id: data.in_game_id}));
+				dispatch(updateChannelUserIngameStatus({id: data.id, in_game_id: data.in_game_id}));
+				dispatch(changeUserIngameStatus({id: data.id, in_game_id: data.in_game_id}));				
+			});
+
             socket?.on("OnLeave", (data: Channel) => {
                 console.log("OnLeave");
 				
@@ -181,9 +256,42 @@ export function useAppHook() {
                 dispatch(removeChannel(data.id));
             });
 
+			socket?.on("SendConfirm", (data: string) => {
+				dispatch(addAlert({message: data, type: AlertType.SUCCESS}));
+			});
+
+			socket?.on("newgame_data", (data: PlayersGameData) => {
+				console.log("new_game_data", data);
+				dispatch(changeQueueStatus(false));
+				dispatch(newGameFound({gameDatas: data, showGameFound: true}));
+			});
+
+			socket?.on('gameinfo', (data: PlayersGameData | null) => {
+				console.log("gameinfo", data);
+				if (data !== null) {
+					dispatch(newGameFound({gameDatas: data, showGameFound: false}));
+					navigate("/game", {state: data});
+				}
+			})
+
+			socket?.on('user_gameinfo', (data: PlayersGameData | null) => {
+				console.log("user_gameinfo", data);
+				if (data !== null) {
+					dispatch(newGameFound({gameDatas: data, showGameFound: false}));
+					navigate("/game", {state: data});
+				}
+			})
+
 			socket.on("Logout", () => {
 				socket.disconnect();
+				setSocket(undefined);
 				localStorage.removeItem("userToken");
+				dispatch(resetParty());
+				dispatch(resetChannel());
+				dispatch(resetChat());
+				dispatch(resetConvState());
+				dispatch(resetNotification());
+				dispatch(resetAlert());
 				dispatch(logoutSuccess());
 			});
 		}
@@ -201,17 +309,19 @@ export function useAppHook() {
 			socket?.off("exception");
 			socket?.off("OnJoin");
 			socket?.off("OnLeave");
+			socket?.off("newgame_data");
+			socket?.off("SendConfirm");
 			socket?.off("Logout");
+            socket?.off("gameinfo");
 		}
 	}, [socket])
 
     return {
         socket,
-        eventError,
-        closeEventError,
-        gameInvite,
-        gameNotificationLeave,
+		cache,
+		displayQRCode,
 		isAuthenticated,
+		isSign,
 		partyState: {
 			party,
 			chatIsOpen,

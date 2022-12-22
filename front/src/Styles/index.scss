@@ -2,6 +2,7 @@
 @use "./Home.scss";
 @use "./Sign.scss";
 @use "./Profile.scss";
+@use "./Profile-Settings.scss";
 @use "./Leaderboard.scss";
 @use "./Friends-Modal.scss";
 @use "./Chat/Chat.scss";
@@ -10,10 +11,15 @@
 @use "./Chat/Channel-Settings.scss";
 @use "./Loading-Spin.scss";
 @use "./Notif-Game-Invite.scss";
-@use "./Notif-Error.scss";
+@use "./Notif-Alert.scss";
 @use "./Lobby.scss";
 @use "./Chat-Party.scss";
+@use "./Match-Found.scss";
+@use "./Alert-Validation.scss";
+@use "./Resume-Game.scss";
+@use "./Dropdown.scss";
 @use "./Variables.scss" as *;
+@use "./mixins.scss" as *;
 
 body {
 	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -84,111 +90,9 @@ button {
 	filter: blur(5px);
 }
 
-.dropdown-container {
-	background-color: white;
-	position: absolute;
-	left: 20px;
-	top: 30px;
-	width: 200px;
-	border-radius: 5px;
-	background-color: $DarkPalette;
-	z-index: 100;
-
-	.dropdown-wrapper {
-		margin: 10px;
-		display: flex;
-		flex-direction: column;
-		gap: 2px;
-
-		.red-item {
-			color: red;
-		}
-		a {
-			color: #a5abb0;
-		}
-
-		.dropdown-button {
-			position: relative;
-			display: flex;
-			&:hover {
-				.right-menu-dropdown {
-					display: flex;
-				}
-			}
-			span {
-				width: 100%;
-			}
-			.right-menu-dropdown {
-				position: absolute;
-				right: -150px;
-				bottom: -20px;
-				background-color: $DarkPalette;
-				padding: 5px;
-				width: 150px;
-				display: none;
-				flex-direction: column;
-				gap: 3px;
-				&:hover {
-					display: flex;
-				}
-				&-separator {
-					text-align: center;
-					font-size: 10px;
-				}
-				p {
-					text-align: center;
-				}
-				.input-dropdown-wrapper {
-					width: 100%;
-					display: flex;
-					flex-direction: column;
-					padding: 5px;
-					margin: 0 auto;
-
-					.timeout-error {
-						font-size: 10px;
-						color: red;
-					}
-
-					.input-container {
-						@include flex-row-alignCenter();
-						justify-content: space-between;
-						width: 100%;
-
-						input {
-							all: unset;
-							width: 80%;
-						}
-						
-						button {
-							all: unset;
-							display: flex;
-							svg {
-								@include width-height(15px, 15px);
-							}
-						}
-					}
-					&:hover {
-						background-color: $LightDarkPalette;
-					}
-				}
-			}
-		}
-
-		p, .dropdown-button {
-			margin: 0;
-			font-size: 13px;
-			letter-spacing: 1.5px;
-			padding: 5px;
-			border-radius: 5px;
-			cursor: pointer;
-			color: #a5abb0;
-
-			&:hover {
-			background-color: $LightDarkPalette;
-			}
-		}
-	}
+#game_anchor {
+	@include page-wrapper();
+	background-color: $BlueDarkPalette;
 }
 
 .err-no-datas {
@@ -200,19 +104,8 @@ button {
 .txt-form-error {
 	color: red;
 	margin: 0;
-	font-size: 14px;
+	font-size: 11px;
 	letter-spacing: 1px;
-}
-
-.invited-spin {
-	width: 12px;
-	height: 12px;
-	border-radius: 50%;
-	display: inline-block;
-	border-top: 3px solid #FFF;
-	border-right: 3px solid transparent;
-	box-sizing: border-box;
-	animation: rotation 1s linear infinite;
 }
 
 @keyframes rotation {
@@ -230,7 +123,8 @@ button {
 }
 	  
 .is-connected-loader-wrapper {
-	@include page-wrapper();
+	height: 100vh;
+	margin-top: -$headerHeight;
 	background-color: $DarkPalette;
 	display: flex;
 	align-items: center;
@@ -265,3 +159,24 @@ button {
 		left: 3.5em;
 	}
 }
+
+.loader-image {
+	width: 20px;
+	height: 20px;
+	border-radius: 50%;
+	display: inline-block;
+	border-top: 3px solid #FFF;
+	border-right: 3px solid transparent;
+	box-sizing: border-box;
+	animation: rotation 1s linear infinite;
+	margin-right: 10px;
+  }
+  
+  @keyframes rotation {
+	0% {
+	  transform: rotate(0deg);
+	}
+	100% {
+	  transform: rotate(360deg);
+	}
+  } 

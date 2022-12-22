@@ -1,4 +1,5 @@
 @use "./Variables.scss" as *;
+@use "./mixins.scss" as *;
 
 .sign-container {
     min-width: 100%;
@@ -12,7 +13,7 @@
     align-items: center;
     gap: 2em;
     text-align: center;
-    background: url('../Images-Icons//Backgrounds/background-42.jpg') no-repeat center fixed;
+    background: url('../Assets/Backgrounds/background-42.jpg') no-repeat center fixed;
     background-size: cover;
     -ms-overflow-style: none;
     scrollbar-width: none;
@@ -28,7 +29,7 @@
         background-color: $LightDarkPalette;
         padding: 15px;
         width: 300px;
-        min-height: 380px;
+        // min-height: 380px;
         border-radius: 5px;
 
         .auth-separator {
@@ -71,7 +72,7 @@
             display: flex;
             flex-direction: column;
             gap: 6px;
-            height: 320px;
+            // height: 320px;
             justify-content: space-between;
             .txt-verification {
                 margin: 0;
@@ -115,6 +116,14 @@
                 border-radius: 3px;
                 height: 35px;
                 background-color: $LightBluePalette;
+
+                
+            }
+
+            .forgot-password {
+                font-size: 10px;
+                margin: 0;
+                text-align: end;
             }
         }
         .btn-switch-form {
@@ -133,6 +142,26 @@
             border: 1px solid white;
             border-radius: 5px;
             padding: 5px;
+        }
+    }
+
+    .email-notification-wrapper {
+        margin: auto;
+        background-color: $LightDarkPalette;
+        padding: 40px;
+        border-radius: 10px;
+        text-align: center;
+        svg {
+            @include width-height(130px, 130px);
+        }
+        h3 {
+           font-size: 25px;
+        }
+        p {
+            font-size: 15px;
+            span {
+                color: $OrangeProfile;
+            }
         }
     }
 }

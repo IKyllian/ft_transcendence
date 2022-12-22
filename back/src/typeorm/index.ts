@@ -1,4 +1,3 @@
-import { Avatar } from "./entities/avatar"
 import { Channel } from "./entities/channel"
 import { ChannelMessage } from "./entities/channelMessage"
 import { ChannelUser } from "./entities/channelUser"
@@ -10,6 +9,7 @@ import { User } from "./entities/user"
 import { Notification } from "./entities/notification"
 import { UserTimeout } from "./entities/userTimeout"
 import { MatchResult } from "./entities/matchResult"
+import { UserAccount } from "./entities/userAccount"
 
 const entities = [
 	User,
@@ -18,12 +18,12 @@ const entities = [
 	ChannelMessage,
 	Statistic,
 	ChannelUser,
-	Avatar,
 	Conversation,
 	PrivateMessage,
 	Notification,
 	UserTimeout,
 	MatchResult,
+	UserAccount,
 ];
 
 export default entities;
@@ -35,10 +35,10 @@ export {
 	ChannelMessage,
 	Statistic,
 	ChannelUser,
-	Avatar,
 	Conversation,
 	PrivateMessage,
 	Notification,
 	UserTimeout,
 	MatchResult,
+	UserAccount,
 }

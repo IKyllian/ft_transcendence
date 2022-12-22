@@ -1,8 +1,7 @@
-import { Server } from 'socket.io';
 import { generate } from 'shortid'
 import { Lobby } from './lobby';
 import { Socket } from 'socket.io';
-import { GameState, GameType, GameSettings, NewGameData, PlayersGameData, PlayerType, TeamSide, PlayerPosition, EndResult, ScoreBoard } from 'src/utils/types/game.types';
+import { GameType, PlayersGameData, PlayerType, TeamSide, PlayerPosition, EndResult, ScoreBoard } from 'src/utils/types/game.types';
 import { AuthenticatedSocket } from 'src/utils/types/auth-socket';
 import { MatchmakingLobby } from '../matchmaking/matchmakingLobby';
 import { GlobalService } from 'src/utils/global/global.service';
@@ -10,30 +9,24 @@ import { Injectable } from '@nestjs/common';
 import { Player } from '../player';
 import { GameService } from '../game.service';
 import { User } from 'src/typeorm';
-//import  * as Defaultgame_settings from '../game-settings';
+import { UserService } from 'src/user/user.service';
 
-
-//TODO
-//rework client handling
 @Injectable()
 export class LobbyFactory
 {
-	// server: Server;
 	constructor(
-		private globalService: GlobalService,
+		public globalService: GlobalService,
 		private gameService: GameService,
+		public userService: UserService,
 	) {}
 
 	private lobby_list: Map<Lobby['game_id'], Lobby> = new Map<Lobby['game_id'], Lobby>();
 	private client_list: Map<Socket['id'], Lobby['game_id']> = new Map<Socket['id'], Lobby['game_id']>();
-	replay_list: Map<string, Array<GameState>> = new Map <string, Array<GameState>>();
 
-
-	lobby_create(lobby_request: MatchmakingLobby): string
+	lobby_create(lobby_request: MatchmakingLobby)
 	{
 		const game_id: string = generate();
 
-		// const lobby = new Lobby(ret, lobby_request.game_settings,  this);
 		const lobby = new Lobby(lobby_request, game_id,  this);
 		this.lobby_list.set(lobby.game_id, lobby);
 
@@ -46,70 +39,31 @@ export class LobbyFactory
 		lobby_request.players.forEach((player) => {
 			if (player.team === TeamSide.BLUE) {
 				if (player.pos === PlayerPosition.BACK) {
-					dataToFront.Player_A_Back = player;
+					dataToFront.TeamBlue_Back = player;
 				} else {
-					dataToFront.Player_A_Front = player;
+					dataToFront.TeamBlue_Front = player;
 				}
 			} else {
 				if (player.pos === PlayerPosition.BACK) {
-					dataToFront.Player_B_Back = player;
+					dataToFront.TeamRed_Back = player;
 				} else {
-					dataToFront.Player_B_Front = player;
+					dataToFront.TeamRed_Front = player;
 				}
 			}
 		});
 
 		lobby_request.players.forEach((player) => {
-			if (player.team === TeamSide.BLUE) {
-				if (player.pos === PlayerPosition.BACK) {
-					dataToFront.player_type = PlayerType.Player_A_Back;
-				} else {
-					dataToFront.player_type = PlayerType.Player_A_Front;
-				}
-			} else {
-				if (player.pos === PlayerPosition.BACK) {
-					dataToFront.player_type = PlayerType.Player_B_Back;
-				} else {
-					dataToFront.player_type = PlayerType.Player_B_Front;
-				}
-			}
+			dataToFront.player_type = lobby.convert_player_enums(player.team, player.pos);
 			this.globalService.server.to('user-' + player.user.id).emit("newgame_data", dataToFront);
 		});
-		console.log(dataToFront.game_settings)
-
-		// if (lobby_request.game_settings.game_type === GameType.Doubles)
-		// {
-		// 	player_data.Player_A_Front = lobby_request.Player_A_Front;
-		// 	player_data.Player_B_Front = lobby_request.Player_B_Front;
-		// }
-
-		// player_data.player_type = PlayerType.Player_A_Back;
-		// this.globalService.server.to('user-' + lobby_request.Player_A_Back.user.id).emit("newgame_data", player_data);
-		// player_data.player_type = PlayerType.Player_B_Back;
-		// this.globalService.server.to('user-' + lobby_request.Player_B_Back.user.id).emit("newgame_data", player_data);
-
-		// if (lobby_request.game_settings.game_type === GameType.Doubles)
-		// {
-		// 	player_data.player_type = PlayerType.Player_A_Front;
-		// 	this.globalService.server.to('user-' + lobby_request.Player_A_Front.user.id).emit("newgame_data", player_data);
-	
-		// 	player_data.player_type = PlayerType.Player_B_Front;
-		// 	this.globalService.server.to('user-' + lobby_request.Player_B_Front.user.id).emit("newgame_data", player_data);
-		// }
-
-//ajouter une ref au lobby dans le return ? 
-//pour acces a this.already_started & this.already_finished
-		return game_id;
+		//console.log(dataToFront.game_settings)
 	}
-
-
 
 	lobby_delete(game_id: string)
 	{
 		let lobby: Lobby | undefined =  this.lobby_list.get(game_id);
 		if (lobby !== undefined)
 		{
-		//	lobby.lobby_remove_all();
 			this.lobby_list.delete(game_id);
 			console.log("deleted lobby: ", game_id);
 		}
@@ -119,22 +73,8 @@ export class LobbyFactory
 		}		
 	}
 
-	get_lobby_quantity(): number
-	{
-		return this.lobby_list.size;
-	}
-
-	get_lobby_list()
-	{
-//TODO
-		let qt = this.get_lobby_quantity();
-		//need une maniere plus claire de presenter les data
-		//const serializedMap = [...this.lobby_list.entries()];
-	}
-
 	lobby_join(client: AuthenticatedSocket, game_id: string)
 	{
-
 		let lobby: Lobby | undefined =  this.lobby_list.get(game_id);
 		if (lobby !== undefined)
 		{
@@ -165,15 +105,87 @@ export class LobbyFactory
 		return this.client_list.get(client['id']);
 	}
 
+	get_game_info(client: AuthenticatedSocket, game_id: string)
+	{
+		let lobby: Lobby | undefined =  this.lobby_list.get(game_id);
+		let dataToFront: PlayersGameData = null;
+		if (lobby !== undefined)
+		{
+			dataToFront =
+			{
+				game_id: lobby.game_id,
+				player_type: PlayerType.Spectator,
+				game_settings: lobby.lobby_data.game_settings,
+			}
+			lobby.lobby_data.players.forEach((player) =>
+			{
+				if (player.team === TeamSide.BLUE) {
+					if (player.pos === PlayerPosition.BACK) {
+						dataToFront.TeamBlue_Back = player;
+					} else {
+						dataToFront.TeamBlue_Front = player;
+					}
+				} else {
+					if (player.pos === PlayerPosition.BACK) {
+						dataToFront.TeamRed_Back = player;
+					} else {
+						dataToFront.TeamRed_Front = player;
+					}
+				}
+			});
+		}
+		client.emit('gameinfo', dataToFront);
+	}
+
+
+	get_client_info(client: AuthenticatedSocket, id: number)
+	{
+		let dataToFront: PlayersGameData = null;
+		if (client.user.in_game_id !== null)
+		{
+			let lobby: Lobby | undefined =  this.lobby_list.get(client.user.in_game_id);
+			dataToFront =
+			{
+				game_id: lobby.game_id,
+				player_type: PlayerType.Spectator,
+				game_settings: lobby.lobby_data.game_settings,
+			}
+			lobby.lobby_data.players.forEach((player) => {
+				if (player.team === TeamSide.BLUE) {
+					if (player.pos === PlayerPosition.BACK) {
+						dataToFront.TeamBlue_Back = player;
+					//	dataToFront.player_type = PlayerType.TeamBlue_Back;
+					} else {
+						dataToFront.TeamBlue_Front = player;
+					//	dataToFront.player_type = PlayerType.TeamBlue_Front;
+					}
+				} else {
+					if (player.pos === PlayerPosition.BACK) {
+						dataToFront.TeamRed_Back = player;
+					//	dataToFront.player_type = PlayerType.TeamRed_Back;
+					} else {
+						dataToFront.TeamRed_Front = player;
+					//	dataToFront.player_type = PlayerType.TeamRed_Front;
+					}
+				}
+				if (player.user.id === id)
+				{
+					dataToFront.player_type = lobby.convert_player_enums(player.team, player.pos);
+				}
+				//playersocket.user.id === id
+
+			});
+			//dataToFront.player_type = lobby.convert_player_enums(player.team, player.pos);
+		}
+
+		// console.log("datatofront", dataToFront);
+		client.emit('user_gameinfo', dataToFront);
+	}
+
 	lobby_request_status(client: AuthenticatedSocket, game_id: string)
 	{
 		this.lobby_list.get(game_id)?.lobby_send_lobby_status(client);
 	}
-
-	// lobby_player_ready(client: Socket, game_id: string)
-	// {
-	// 	this.lobby_list.get(game_id)?.player_ready(client);
-	// }
 
 	lobby_game_input(client: AuthenticatedSocket, data: any)
 	{
@@ -185,71 +197,14 @@ export class LobbyFactory
 		this.lobby_list.get(game_id)?.game_send_round_setup(client);
 	}
 
-
-	save_replay(game_id: string, save: Array<GameState>)
+	async endGameAttribution(
+					players: Player[],
+					result: EndResult,
+					game_type: GameType,
+					game_id: string,
+					score: ScoreBoard,
+					)
 	{
-		this.replay_list.set(game_id, save);
-	}
-
-
-	send_replay(client: Socket, game_id: string)
-	{
-		let replay :Array<GameState> | undefined = this.replay_list.get(game_id);
-	
-		if (replay !== undefined)
-		{
-			console.log('starting replay send', game_id, 'frame count', replay.length);
-		
-			replay.forEach((gamestate, index) => {
-				setTimeout(() => {
-
-					//TODO investigate date stuff
-					//gamestate.last_processed_time_A = new Date();;
-					client.emit('replay_state', gamestate);
-			
-				}, index * (1000 / 60));
-			  });
-		}
-		else
-		{
-			//emit au client not found
-			console.log('replay not found:', game_id);
-		}
-	}
-
-	replay_debug(game_id: string)
-	{
-		console.log('@@@@@@@@@@@@@@@ replay data in factory @@@@@@@@@@@@@@@@@');
-
-
-		let replay :Array<GameState> | undefined = this.replay_list.get(game_id);
-		if (replay !== undefined)
-		{
-
-			console.log('replay debug', game_id);
-
-
-			replay.forEach((gamestate, index) => {
-
-				// if (!(index % 10))
-				// {
-					console.log('factory frame#', index)
-					console.log(gamestate);
-					console.log('ball position:',gamestate.balldata.position);
-				// }
-
-				// if(index === (replay.length -1))
-				// {
-				// 	console.log('@@@@last one');
-				// 	console.log(gamestate);
-				// 	
-				//}
-			});
-
-		}
-	}
-
-	async endGameAttribution(players: Player[], result: EndResult, game_type: GameType, game_id: string, score: ScoreBoard) {
 		let blueTeam: User[] = [];
 		let redTeam: User[] = [];
 		players.forEach((player) => {
@@ -260,7 +215,7 @@ export class LobbyFactory
 			}
 		})
 		this.gameService.eloAttribution(players, result, game_type);
-		await this.gameService.saveMatch(blueTeam, redTeam, game_type, score);
+		await this.gameService.saveMatch(blueTeam, redTeam, game_type, score, game_id);
 		this.lobby_delete(game_id);
 	}
 }

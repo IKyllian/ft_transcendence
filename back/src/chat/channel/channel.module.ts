@@ -1,4 +1,4 @@
-import { ClassSerializerInterceptor, forwardRef, Module } from "@nestjs/common";
+import { ClassSerializerInterceptor, Module } from "@nestjs/common";
 import { APP_INTERCEPTOR } from "@nestjs/core";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { NotificationModule } from "src/notification/notification.module";

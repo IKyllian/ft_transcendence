@@ -9,7 +9,6 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
 import { ConversationModule } from './conversation/conversation.module';
 import { NotificationModule } from 'src/notification/notification.module';
 import { MatchmakingModule } from 'src/game/matchmaking/matchmaking.module';
-import { TaskScheduler } from 'src/task-scheduling/task.module';
 import { GlobalModule } from 'src/utils/global/global.module';
 
 @Module({
@@ -18,18 +17,9 @@ import { GlobalModule } from 'src/utils/global/global.module';
     ConversationModule,
     NotificationModule,
     UserModule,
-	MatchmakingModule,
+	  MatchmakingModule,
     forwardRef(() => AuthModule),
-	GlobalModule,
-    TypeOrmModule.forFeature([
-      Channel,
-      ChannelUser,
-      ChannelMessage,
-      User,
-      Statistic,
-      // Conversation,
-      // PrivateMessage, // useless?
-    ]),
+	  GlobalModule,
   ],
   providers: [ChatGateway,
     {

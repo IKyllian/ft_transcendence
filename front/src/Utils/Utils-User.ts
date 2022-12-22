@@ -1,5 +1,8 @@
 import { UserInterface } from "../Types/User-Types";
-import { useAppSelector } from "../Redux/Hooks";
+
+const monthNames = ["January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December"
+];
 
 export function getMatchPlayed(match_won: number, match_lost: number): number {
     return (match_won + match_lost);
@@ -23,11 +26,8 @@ export function userIdIsBlocked(connectedUser: UserInterface, secondUserId: numb
     return (connectedUser.blocked.find(elem => elem.id === secondUserId) ? true : false);
 }
 
-export function IsLog() {
-    let authDatas = useAppSelector((state) => state.auth);
-    
-    if (authDatas.currentUser === undefined)
-        return false;
-    else
-        return true;
+export function createdAccountDate(date: string) {
+    const dateCreated = new Date(date);
+
+    return `${dateCreated.getDay()} ${monthNames[dateCreated.getMonth()]} ${dateCreated.getFullYear()}`
 }

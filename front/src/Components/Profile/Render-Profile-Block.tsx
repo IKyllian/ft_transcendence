@@ -7,13 +7,14 @@ import { MatchResult, UserInterface } from "../../Types/User-Types";
 function RenderProfileBlock(props: {blockTitle: string, userDatas: UserInterface, friendList: UserInterface[], matchHistory: MatchResult[]}) {
     const {blockTitle, userDatas, friendList, matchHistory} = props;
 
-    if (blockTitle === "Achievements") {
+    // if (blockTitle === "Achievements") {
+    //     return (
+    //         <BlockAchievement />
+    //     );
+    // } else
+     if (blockTitle === "Matches") {
         return (
-            <BlockAchievement />
-        );
-    } else if (blockTitle === "Matches") {
-        return (
-            <BlockMatchHistory userDatas={userDatas} matchHistory={matchHistory} />
+            <BlockMatchHistory matchHistory={matchHistory} />
         );
     } else {
         return (

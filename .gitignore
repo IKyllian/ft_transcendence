@@ -3,5 +3,7 @@
 *.env
 *.env.db
 .vscode
-
+back/src/updloads
 package-lock.json
+TODO.TOASK.txt
+uploads/

@@ -1,14 +1,13 @@
 import { AnyAction, Dispatch } from "@reduxjs/toolkit";
-import axios from "axios";
-import { Channel } from "diagnostics_channel";
 import { UseFormSetError } from "react-hook-form";
 import { NavigateFunction } from "react-router-dom";
 import { Socket } from "socket.io-client";
-import { baseUrl } from "../../env";
 import { replaceChannelMessages } from "../../Redux/ChannelSlice";
 import { addChannel } from "../../Redux/ChatSlice";
-import { ChatMessage, PreviousMessagesState, CreateChanBodyRequest } from "../../Types/Chat-Types";
+import { loadNewMessages } from "../../Redux/PrivateConvSlice";
+import { ChatMessage, CreateChanBodyRequest, PrivateMessage } from "../../Types/Chat-Types";
 import { UserInterface } from "../../Types/User-Types";
+import api from "../Api";
 
 type FormValues = {
     chanMode: string,
@@ -20,18 +19,13 @@ type FormValues = {
 export function fetchCreateChannel(
     body: CreateChanBodyRequest,
     usersInvited: UserInterface[] | undefined,
-    token: string,
     dispatch: Dispatch<AnyAction>,
     navigate: NavigateFunction,
     onCloseModal: Function,
     socket: Socket,
     setError: UseFormSetError<FormValues>) {
     
-    axios.post(`${baseUrl}/channel`, body, {
-        headers: {
-            "Authorization": `Bearer ${token}`,
-        }
-    })
+    api.post(`/channel`, body)
     .then((response) => {
         console.log(response);
         dispatch(addChannel({channel: response.data, isActive: "true"}));
@@ -51,12 +45,8 @@ export function fetchCreateChannel(
     })
 }
 
-export function fetchLeaveChannel(channelId: number, token: string, navigate: NavigateFunction) {
-    axios.post(`${baseUrl}/channel/${channelId}/leave`, {}, {
-        headers: {
-            "Authorization": `Bearer ${token}`,
-        }
-    })
+export function fetchLeaveChannel(channelId: number, navigate: NavigateFunction) {
+    api.post(`/channel/${channelId}/leave`, {})
     .then((response) => {
         navigate("/chat");
     })
@@ -65,12 +55,8 @@ export function fetchLeaveChannel(channelId: number, token: string, navigate: Na
     })
 }
 
-export function fetchLoadPrevMessages(channelId: number, token: string, dispatch: Dispatch<AnyAction>, currentMessages: ChatMessage[], setPreviousMessages: Function) {
-    axios.post(`${baseUrl}/channel/${channelId}/messages`, {skip: currentMessages.length}, {
-        headers: {
-            "Authorization": `Bearer ${token}`,
-        }
-    })
+export function fetchLoadPrevChatMessages(channelId: number, dispatch: Dispatch<AnyAction>, currentMessages: ChatMessage[], setPreviousMessages: Function) {
+    api.post(`/channel/${channelId}/messages`, {skip: currentMessages.length})
     .then((response) => {
         console.log("response", response.data);
         if (response.data.length > 0) {
@@ -79,6 +65,21 @@ export function fetchLoadPrevMessages(channelId: number, token: string, dispatch
             setPreviousMessages({loadPreviousMessages: false, reachedMax: true});
         }
         
+    })
+    .catch((err) => {
+        console.log(err);
+    })
+}
+
+export function fetchLoadPrevConvMessages(convId: number, dispatch: Dispatch<AnyAction>, currentMessages: PrivateMessage[], setPreviousMessages: Function) {
+    api.post(`/conversation/${convId}/messages`, {skip: currentMessages.length})
+    .then((response) => {
+        console.log("response", response.data);
+        if (response.data.length > 0) {
+            dispatch(loadNewMessages(response.data));
+        } else {
+            setPreviousMessages({loadPreviousMessages: false, reachedMax: true});
+        }  
     })
     .catch((err) => {
         console.log(err);

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import SearchBarPlayers from "../Search-Bar/SearchBarPlayers";
 import { useForm } from 'react-hook-form';
-import { useAppSelector, useAppDispatch } from '../../Redux/Hooks'
+import { useAppDispatch } from '../../Redux/Hooks'
 import { IconX } from '@tabler/icons';
 import { useNavigate, useParams } from "react-router-dom";
 import { fetchCreateChannel } from "../../Api/Chat/Chat-Action";
@@ -12,6 +12,7 @@ import { fetchSearchAllUsers } from "../../Api/User-Fetch";
 import { fetchSearchUsersToInvite } from "../../Api/Chat/Chat-Fetch";
 import { SearchBarFunctionality } from "../../Types/Utils-Types";
 import { ChannelModes, CreateChanBodyRequest, ChannelModesArray } from "../../Types/Chat-Types"
+import { selectChanMode } from "../../Utils/Utils-Chat";
 
 type FormValues = {
     chanMode: string,
@@ -27,7 +28,6 @@ function ChatModal(props: {onCloseModal: Function, showModal: number}) {
 
     const channelMode = watch('chanMode');
     const navigate = useNavigate();
-    const authDatas = useAppSelector((state) => state.auth);
     const dispatch = useAppDispatch();
     const {socket} = useContext(SocketContext);
     const params = useParams();
@@ -39,14 +39,6 @@ function ChatModal(props: {onCloseModal: Function, showModal: number}) {
             setUsersInvited(prev => [...prev, val]);
     }
 
-    const selectChanMode = (modeString: string): ChannelModes => {
-        if (modeString === "public")
-            return ChannelModes.PUBLIC;
-        else if (modeString === "protected")
-            return ChannelModes.PROTECTED;
-        return ChannelModes.PRIVATE;
-    }
-
     const formSubmit = handleSubmit((data, e) => {
         e?.preventDefault();
         if (showModal === 1) {
@@ -56,12 +48,12 @@ function ChatModal(props: {onCloseModal: Function, showModal: number}) {
             }
             if (body.option === ChannelModes.PROTECTED)
                 body = {...body, password: data.password}
-            fetchCreateChannel(body, usersInvited, authDatas.token, dispatch, navigate, onCloseModal, socket!, setError);
+            fetchCreateChannel(body, usersInvited, dispatch, navigate, onCloseModal, socket!, setError);
         } else {
             if (usersInvited.length > 0 && params.channelId) {
                 usersInvited.forEach(element => {
                     socket?.emit("ChannelInvite", {
-                        chanId: parseInt(params.channelId!),
+                        chanId: +params.channelId!,
                         userId: element.id,
                     });
                 });
@@ -79,7 +71,7 @@ function ChatModal(props: {onCloseModal: Function, showModal: number}) {
                 <div className="form-modal-wrapper">
                     <h3> {showModal === 1 ? "Create Channel" : "Inviter des gens"}  </h3>
                     <form onSubmit={formSubmit}>
-                        {   showModal === 1 && 
+                        { showModal === 1 && 
                             <>
                                 <div className="checkbox-container">
                                     {
@@ -101,6 +93,7 @@ function ChatModal(props: {onCloseModal: Function, showModal: number}) {
                                     Channel name:
                                     <input
                                         type="text"
+                                        maxLength={15}
                                         placeholder="Channel name..."
                                         {...register("chanName", {
                                             required: "Channel name is required",
@@ -116,7 +109,19 @@ function ChatModal(props: {onCloseModal: Function, showModal: number}) {
                                     channelMode === "protected" && 
                                     <label className="labelTextInput">
                                         Password :
-                                        <input type="password" placeholder="password" {...register("password")} />
+                                        <input
+                                            type="password"
+                                            maxLength={256}
+                                            placeholder="password"
+                                            {...register("password", {
+                                                required: "Password is required",
+                                                minLength: {
+                                                    value: 5,
+                                                    message: "Min length is 5"
+                                                }
+                                            })}
+                                        />
+                                        {errors.password && <p className="txt-form-error"> {errors.password.message} </p>}
                                     </label>
                                 }
                             </>

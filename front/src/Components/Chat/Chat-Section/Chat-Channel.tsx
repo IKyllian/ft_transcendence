@@ -8,7 +8,6 @@ import { UserInterface } from "../../../Types/User-Types";
 
 function ChatChannel() {
     const {
-        loggedUserIsOwner,
         changeSidebarStatus,
         handleSubmit,
         messagesEndRef,
@@ -22,12 +21,22 @@ function ChatChannel() {
         previousMessages,
     } = useChannelHook();
 
-    return (channelDatas === undefined) ? (
-        <div style={{width: "100%"}}>
-            <LoadingSpin classContainer="chat-page-container"/>
-        </div>
-    ) : (
-        <div className="message-container">
+    if (channelDatas === undefined) {
+        return (
+            <div style={{width: "100%"}}>
+                <LoadingSpin classContainer="chat-page-container"/>
+            </div>
+        );
+    } else if (channelDatas === null) {
+        return (
+            <div className="no-target-message">
+                <p> Channel Not Found </p>
+            </div>
+        );
+    }
+
+    return (
+        <>
             <div className="message-container-main">
                 <ChatHeader chatItem={channelDatas} showUsersSidebar={showUsersSidebar} changeSidebarStatus={changeSidebarStatus} />
                 <ul id="chat-message-wrapper" className="chat-messages-wrapper" onScroll={(e) => handleOnScroll(e)}>
@@ -41,9 +50,9 @@ function ChatChannel() {
                         channelDatas.messages.map((elem, index) => {
                             const dateMessage = new Date(elem.send_at);
                             if (index === 0 || !elem.sender || channelDatas.messages[index - 1].sender?.id !== elem.sender?.id || (dateMessage.getDate() !== (new Date(channelDatas.messages[index - 1].send_at).getDate())))
-                                return <MessageItem key={index} isFromChan={true} message={elem} loggedUserIsOwner={loggedUserIsOwner} chan={channelDatas} isNewSender={true} index={index} />
+                                return <MessageItem key={index} isFromChan={true} message={elem} isNewSender={true} index={index} />
                             else
-                                return <MessageItem key={index} isFromChan={true} message={elem} loggedUserIsOwner={loggedUserIsOwner} chan={channelDatas} isNewSender={false} index={index} />
+                                return <MessageItem key={index} isFromChan={true} message={elem} isNewSender={false} index={index} />
                         }
                         )
                     }
@@ -68,8 +77,8 @@ function ChatChannel() {
                     
                 </div>
             </div>
-            { showUsersSidebar && <UsersSidebar usersList={channelDatas.channelUsers} usersTimeout={channelDatas.usersTimeout} loggedUserIsOwner={loggedUserIsOwner} /> }
-        </div>
+            { showUsersSidebar && <UsersSidebar usersList={channelDatas.channelUsers} /> }
+        </>            
     );
 }
 

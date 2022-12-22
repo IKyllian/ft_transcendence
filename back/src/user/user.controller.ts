@@ -1,18 +1,22 @@
-import { Body, ClassSerializerInterceptor, Controller, Delete, FileTypeValidator, ForbiddenException, Get, HttpStatus, MaxFileSizeValidator, Param, ParseFilePipe, ParseFilePipeBuilder, ParseIntPipe, Patch, Post, Req, Request, Res, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
+import { BadRequestException, Body, Controller, Delete, Get, NotFoundException, Param, ParseIntPipe, Patch, Post, Req, Res, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
-import { Observable, of } from "rxjs";
 import { JwtGuard } from "src/auth/guard/jwt.guard";
-import { Statistic, User } from "src/typeorm";
+import { User } from "src/typeorm";
 import { diskStorage } from "multer";
 import { v4 as uuidv4 } from "uuid";
 import * as path from 'path';
 import { UserService } from "./user.service";
 import { GetUser } from "src/utils/decorators";
 import { SearchDto } from "./dto/search.dto";
-import { Response } from "express";
-import { join } from "path";
+import { Request, Response } from "express";
+import { EditUsernameDto } from "./dto/edit-username.dto";
+import { EditPasswordDto } from "./dto/edit-password.dto";
 
 export const avatarStorage = {
+	limits: {
+		files: 1,
+		fileSize: 10485760, // 10 mo
+	},
 	storage: diskStorage({
 		destination: './uploads/',
 		filename: (_req, file, cb) => {
@@ -23,12 +27,12 @@ export const avatarStorage = {
 		},
 	}),
 	fileFilter: (_req, file, cb) => {
-		if (file.mimetype.match(/\/(jpg|jpeg|png)$/)) {
+		if (file.mimetype.match(/\/(jpg|jpeg|png|gif)$/)) {
 			cb(null, true);
 		} else {
 			cb(null, false)
 		}
-	}
+	},
 }
 
 @Controller('users')
@@ -38,10 +42,9 @@ export class UserController {
 	@UseGuards(JwtGuard)
 	@Get('me')
 	async getMe(@GetUser() user: User) {
-		console.log('me')
 		const match_history = await this.userService.getMatchHistory(user.id);
 		return {
-			user,
+			user: user,
 			match_history,
 		}
 	}
@@ -49,48 +52,41 @@ export class UserController {
 	@UseGuards(JwtGuard)
 	@Post('avatar/upload')
 	@UseInterceptors(FileInterceptor('image', avatarStorage))
-	uploadFile(@UploadedFile() file: Express.Multer.File, @GetUser() user: User, @Req() req: any) : Observable<Object> {
-		// TODO use file-type to check magic number?
-		console.log(req.file);
-
-		if (!file) return of ({error: 'file does not match valid extention'})
-		this.userService.updateAvatar(user, file.filename);
-		return of({imagePath: file.path})
+	async uploadFile(@UploadedFile() file: Express.Multer.File, @GetUser() user: User, @Res() res: Response, @Req() req: Request) {
+		if (!file) {
+			throw new BadRequestException("file does not match valid extention");
+		}
+		if (!await this.userService.resizeImage(file)) {
+			throw new BadRequestException("Error occured in file upload");
+		}
+		await this.userService.updateAvatar(user, file.filename);
+		res.sendFile(file.filename, { root: 'uploads', headers: {"Content-Disposition": file.filename}});
 	}
 
 	@UseGuards(JwtGuard)
-	@Get('avatar')
-	serveAvatar(@GetUser() user: User, @Res() res: Response) {
-		console.log("avatar path ", user.avatar)
-		if (!user.avatar) { return; }
-		// res.sendFile(user.avatar, { root: 'uploads' });
-		return of(res.sendFile(join(process.cwd(), 'uploads/' + user.avatar)));
+	@Get(':id/avatar')
+	async getAvatar(
+		@Res() res: Response,
+		@Param('id', ParseIntPipe) id: number,
+		) {
+			const user = await this.userService.findOneBy({ id });
+			if (!user) {
+				throw new NotFoundException('User not found');
+			}
+			if (!user.avatar) { return undefined; }
+			res.sendFile(user.avatar, { root: 'uploads', headers: {"Content-Disposition": user.avatar}});
 	}
 
 	@UseGuards(JwtGuard)
 	@Patch('edit-username')
-	//TODO validation body
-	async editUser(@GetUser() user: User, @Body() body) {
-		return await this.userService.editUsername(user, body.username);
+	async editUser(@GetUser() user: User, @Body() data: EditUsernameDto) {
+		return await this.userService.editUsername(user, data.username);
 	}
 
 	@UseGuards(JwtGuard)
-	@Get()
-	getUsers() {
-		return this.userService.getUsers();
-	}
-
-	// test
- 	// @UseGuards(JwtGuard)
-	@Get(':id')
-	async getUserById(@Param('id', ParseIntPipe) id: number) {
-		console.log('get user by id route')
-		return await this.userService.findOne({
-			relations: {
-				statistic: true,
-			},
-			where: { id },
-		});
+	@Patch('edit-password')
+	async editPassword(@GetUser() user: User, @Body() data: EditPasswordDto) {
+		return await this.userService.editPassword(user, data);
 	}
 
 	@UseGuards(JwtGuard)
@@ -105,6 +101,9 @@ export class UserController {
 			},
 			where: { username },
 		});
+		if (!user2) {
+			throw new BadRequestException('User not found');
+		}
 		return await this.userService.getUserInfo(user, user2);
 	}
 
@@ -133,13 +132,5 @@ export class UserController {
 		@Body() searchDto: SearchDto,
 	) {
 		return await this.userService.search(user, searchDto);
-	}
-
-	//test
-	// @UseGuards(JwtGuard)
-	@Delete(':id')
-	deleteUser(@Param('id', ParseIntPipe) id: number) {
-		this.userService.deleteUser(id);
-		console.log('deleting user')
 	}
 }

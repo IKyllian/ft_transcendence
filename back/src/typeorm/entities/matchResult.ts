@@ -8,6 +8,9 @@ export class MatchResult {
 	id: number;
 
 	@Column()
+	game_id: string;
+
+	@Column()
 	game_type: GameType;
 
 	@Column()

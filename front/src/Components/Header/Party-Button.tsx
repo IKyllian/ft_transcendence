@@ -1,10 +1,10 @@
 import { useContext } from "react";
 import { IconUsers, IconX, IconPlus, IconMessage } from "@tabler/icons";
-import Avatar from "../../Images-Icons/pp.jpg";
 import { useAppDispatch, useAppSelector } from "../../Redux/Hooks";
 import { SocketContext } from "../../App";
 import { loggedUserIsLeader } from "../../Utils/Utils-Party";
 import { changeModalStatus, changeSidebarChatStatus } from "../../Redux/PartySlice";
+import ExternalImage from "../External-Image";
 
 function PartyButton() {
     const { currentUser } = useAppSelector(state => state.auth);
@@ -32,18 +32,18 @@ function PartyButton() {
             <div className="header-party-wrapper">
                 {
                     party.players.map((elem) => 
-                        <div key={elem.user.id} className="fill-item">
-                            { elem.isLeader &&
-                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" height="16" width="16" className="crown-svg">
-                                    <path fillRule="evenodd" clipRule="evenodd" d="M5 19L3 7h2l3.5 5L12 5l3.5 7L19 7h2l-2 12H5z" fill="currentColor">
-                                    </path>
-                                </svg>
-                            }
-                            { userIsLeader && !elem.isLeader && <IconX className="party-kick" onClick={() => onKick(elem.user.id)} /> }
-                            <img className="player-avatar" src={Avatar} alt="profil pic" />
-                        </div>
-                    )
-                }
+                            <div key={elem.user.id} className="fill-item">
+                                { elem.isLeader &&
+                                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" height="16" width="16" className="crown-svg">
+                                        <path fillRule="evenodd" clipRule="evenodd" d="M5 19L3 7h2l3.5 5L12 5l3.5 7L19 7h2l-2 12H5z" fill="currentColor">
+                                        </path>
+                                    </svg>
+                                }
+                                { userIsLeader && !elem.isLeader && <IconX className="party-kick" onClick={() => onKick(elem.user.id)} /> }
+                                <ExternalImage src={elem.user.avatar} alt="User Avatar" className="player-avatar" userId={elem.user.id} />
+                            </div>
+                        )
+                    }   
                 {
                     Array.from({length: 4 - party.players.length}, (elem, index) => 
                         <div key={index} className="party-item">

@@ -1,4 +1,5 @@
 @use "./Variables.scss" as *;
+@use "./mixins.scss" as *;
 
 .modal-wrapper-container {
     position: absolute;
@@ -6,6 +7,7 @@
     background-color: $DarkPalette;
     .add-friend-modal-wrapper {
         @include modal-container(500px, 500px, $LightDarkPalette); // Params => Height, Width, Background-color
+        box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
 
         .modal-header {
             width: 100%;
@@ -15,7 +17,7 @@
             margin-bottom: 20px;
 
             &-selected {
-                color: $OrangeProfile;
+                color: $LightBlueButton;
             }
             div {
                 @include width-height(50%, 100%);
@@ -33,6 +35,10 @@
 
         .modal-friend-list {
             height: 400px;
+            p {
+                margin: auto;
+                font-size: 22px;
+            }
         }
 
         .search-player-container {
@@ -57,44 +63,37 @@
         .item-player-info {
             display: flex;
             align-items: center;
-            .modal-picture {
-                @include avatar-player(50px);
-                margin-right: 10px;
-            }
+            gap: 10px;
+            @include avatar-status-container($LightDarkPalette);
         }
+
         button {
-            cursor: pointer;
-            border: none;
-            min-width: 90px;
-            height: 35px;
-            font-size: 15px;
-            border-radius: 4px;
-            background-color: $LightDarkPalette;
+            @include blue-button(11px, 7px);
+        }
+
+        .pending-button {
+            font-size: 14px;
+            color: $LightBlueButton;
+            padding: 7px;
+            margin-top: 5px;
         }
 
         .friendship-action-wrapper {
             @include flex-row-alignCenter();
             gap: 10px;
             svg {
-                cursor: pointer;
-                border-radius: 50%;
-                @include width-height(25px, 25px);
-                padding: 2px;
-                &:first-child {
-                    color: green;
-                    border: 1px solid green;
-                }
-                &:last-child {
-                    color: red;
-                    border: 1px solid red;
-                }
+                @include circleButtons(25px);
             }
         }
 
         .icons-player-item {
             @include flex-row-alignCenter;
-            gap: 5px;
+            gap: 10px;
             cursor: pointer;
+
+            .send-message-icon {
+                margin-top: 4px;
+            }
         }
 
         input {

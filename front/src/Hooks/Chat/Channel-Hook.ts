@@ -1,18 +1,13 @@
 import { useEffect, useState, useRef, useContext, useCallback } from "react";
 import { useParams } from "react-router-dom";
-import { PreviousMessagesState, ChatMessage } from "../../Types/Chat-Types";
+import { PreviousMessagesState, ChatMessage, defaultMessagesState } from "../../Types/Chat-Types";
 import { useAppDispatch, useAppSelector } from '../../Redux/Hooks'
 import { SocketContext } from "../../App";
 import { UserInterface } from "../../Types/User-Types";
 import { debounce } from "../../Utils/Utils-Chat";
 import { useForm } from "react-hook-form";
-import { fetchLoadPrevMessages } from "../../Api/Chat/Chat-Action";
+import { fetchLoadPrevChatMessages } from "../../Api/Chat/Chat-Action";
 import { addChannelMessage } from "../../Redux/ChannelSlice";
-
-const defaultMessagesState: PreviousMessagesState = {
-    loadPreviousMessages: false,
-    reachedMax: false
-}
 
 export function useChannelHook() {
     const [showUsersSidebar, setShowUsersSidebar] = useState<boolean>(true);
@@ -24,11 +19,10 @@ export function useChannelHook() {
     const [prevLength, setPrevLength] = useState<number>(0);
 
     const messagesEndRef = useRef<null | HTMLDivElement>(null);
-    const authDatas = useAppSelector((state) => state.auth);
     const {channelDatas, loggedUserIsOwner} = useAppSelector((state) => state.channel);
     const params = useParams();
     const {socket} = useContext(SocketContext);
-    const channelId: number | undefined = params.channelId ? parseInt(params.channelId!, 10) : undefined;
+    const channelId: number | undefined = params.channelId ? +params.channelId! : undefined;
     const dispatch = useAppDispatch();
 
     console.log("Chan Component", params.channelId);
@@ -66,7 +60,7 @@ export function useChannelHook() {
     useEffect(() => {
         if (haveToLoad && channelId && channelDatas && !previousMessages.loadPreviousMessages && !previousMessages.reachedMax) {
             setPreviousMessages(prev => { return {...prev, loadPreviousMessages: true}});
-            fetchLoadPrevMessages(channelId, authDatas.token, dispatch, channelDatas?.messages, setPreviousMessages);
+            fetchLoadPrevChatMessages(channelId, dispatch, channelDatas?.messages, setPreviousMessages);
         }
     }, [haveToLoad])
 
@@ -76,7 +70,7 @@ export function useChannelHook() {
         if (div.length > 0){
             var hasVerticalScrollbar = div[0].scrollHeight > div[0].clientHeight;
             if (!hasVerticalScrollbar && channelId && channelDatas) {
-                fetchLoadPrevMessages(channelId, authDatas.token, dispatch, channelDatas?.messages, setPreviousMessages);
+                fetchLoadPrevChatMessages(channelId, dispatch, channelDatas?.messages, setPreviousMessages);
             }
         } 
         messagesEndRef.current?.scrollIntoView();
@@ -110,7 +104,6 @@ export function useChannelHook() {
             socket?.on('NewChannelMessage', listener);
     
             socket?.on("OnTypingChannel", (data: {user: UserInterface, isTyping: boolean}) => {
-                console.log("!!!!!!!!!!!!!!! OnTypingChannel !!!!!!!!!!!!!!!", data);
                 setUsersTyping(prev => [...prev.filter(elem => elem.id !== data.user.id)]);
                 if (data.isTyping)
                     setUsersTyping(prev => [...prev, data.user]);
@@ -128,7 +121,7 @@ export function useChannelHook() {
                 socket?.off("NewChannelMessage");
             }
         }
-    }, [socket, channelId])
+    }, [channelId])
 
     const handleSubmitMessage = handleSubmit((data, e: any) => {
         e.preventDefault();

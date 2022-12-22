@@ -1,4 +1,5 @@
 @use "./Variables.scss" as *;
+@use "./mixins.scss" as *;
 
 .leaderboard-page-container {
     background-color: $LightBluePalette;
@@ -69,8 +70,22 @@
                     background-color: #202d45;
                 }
 
-                .leaderboard-status .player-status {
-                    @include player-status;
+                .leaderboard-status {
+                    .player-status {
+                        @include player-status;
+                    }
+
+                    .spec-icon {
+                        position: relative;
+                        margin-left: 50px;
+                        svg {
+                            cursor: pointer;
+                            position: absolute;
+                            top: -12.6px;
+                            bottom: 0;
+                            margin: auto 0;
+                        }
+                    }
                 }
 
                 td {
@@ -78,6 +93,10 @@
                     background: $LightDarkPalette;
                     font-size: 16px;
                     border-bottom: 5px solid $DarkPalette;
+
+                    img {
+                        @include width-height(40px, 40px);
+                    }
 
                     // span {
                         // width: 60%;

@@ -5,7 +5,7 @@ import { LobbyFactory } from "src/game/lobby/lobby.factory";
 import { MatchmakingLobby } from "src/game/matchmaking/matchmakingLobby";
 import { QueueService } from "src/game/matchmaking/queue/queue.service";
 import { SettingsFactory } from "src/game/settings.factory";
-import { Notification, UserTimeout } from "src/typeorm";
+import { Notification, User, UserTimeout } from "src/typeorm";
 import { GlobalService } from "src/utils/global/global.service";
 import { GameType } from "src/utils/types/game.types";
 import { ChannelUpdateType, EloRange, notificationType, QueueLobby } from "src/utils/types/types";
@@ -23,7 +23,15 @@ export class TaskService {
 		private notifRepo: Repository<Notification>,
 		@InjectRepository(UserTimeout)
 		private timeoutRepo: Repository<UserTimeout>,
-	) {};
+		@InjectRepository(User)
+		private userRepo: Repository<User>,
+	) {
+		this.userRepo.createQueryBuilder("user")
+		.update()
+		.set({ in_game_id: () => ":id" })
+		.setParameter("id", null)
+		.execute();
+	};
 
 	getCronJob() {
 		return this.schedulerRegistry.getCronJobs();
@@ -57,7 +65,6 @@ export class TaskService {
 	adjustLobbyEloRange(queue: QueueLobby[], serverRange: EloRange) {
 		queue.forEach((party) => {
 			const timeInQueue: number = (Date.now() - party.timeInQueue) / 1000;
-			// console.log(timeInQueue, this.queueService.queue1v1.length);
 			if (timeInQueue > 120)
 				party.range = serverRange.max;
 			else if (timeInQueue > 60)
@@ -69,9 +76,8 @@ export class TaskService {
 		});
 	}
 
-	@Interval('singles-queue', 3000)
+	@Interval('singles-queue', 5000)
 	async handleSinglesQueue() {
-		// console.log("nb of players in 1v1 queue: " + this.queueService.queue1v1.length);
 		if (this.queueService.queue1v1.length < 2) { return; }
 		let matchFound: MatchmakingLobby[] = [];
 		this.queueService.queue1v1.sort((a, b) => a.averageMmr - b.averageMmr);
@@ -93,10 +99,9 @@ export class TaskService {
 		matchFound.forEach((match) => this.lobbyFactory.lobby_create(match));
 	}
 
-	@Interval('doubles-queue', 3000)
+	@Interval('doubles-queue', 5000)
 	async handleDoublesQueue() {
 		if (this.queueService.queue2v2.length < 2) { return; }
-		let matchesFound: MatchmakingLobby[] = [];
 		let potentialLobby: QueueLobby[] = [];
 		let matchFound: boolean;
 
@@ -138,20 +143,15 @@ export class TaskService {
 							if (lobby.id !== potentialLobby[0].id && lobby.players.length === 2) {
 								lobby.players.forEach((player) => this.queueService.leaveQueue(player.user));
 								potentialLobby[0].players.forEach((player) => this.queueService.leaveQueue(player.user));
-								matchesFound.push(new MatchmakingLobby(potentialLobby[0], lobby, new SettingsFactory().defaultSetting(GameType.Doubles)));
-								matchFound = true;
+								this.lobbyFactory.lobby_create(new MatchmakingLobby(potentialLobby[0], lobby, new SettingsFactory().defaultSetting(GameType.Doubles)));
+								console.log("GAME FOUND")
 								break;
 							}
 						}
-						console.log("GAME FOUND")
 					}
-				}
-				if (matchFound) {
-					break;
 				}
 			}
 		}
-		matchesFound.forEach((match) => this.lobbyFactory.lobby_create(match));
 	}
 
 	@Interval('timedout-user', 30000)
