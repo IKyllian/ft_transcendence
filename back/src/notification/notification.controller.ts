@@ -15,13 +15,4 @@ export class NotificationController {
 	) {
 		return await this.notifService.getNotifications(user);
 	}
-
-	@UseGuards(JwtGuard)
-	@Post()
-	async create(
-		@GetUser() user: User,
-		@Body() dto: any,
-	) {
-		return await this.notifService.createChanInviteNotif(user, dto)
-	}
 }

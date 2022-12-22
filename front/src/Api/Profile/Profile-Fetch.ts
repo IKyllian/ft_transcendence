@@ -1,5 +1,4 @@
 import { AxiosResponse } from "axios";
-import { baseUrl } from "../../env";
 import api from "../Api";
 import { fetchInterceptor } from "../Interceptor-Fetch";
 
@@ -13,7 +12,7 @@ export async function fetchMe(): Promise<AxiosResponse<any, any>> {
 
 export async function fetchUploadAvatar(token: string, file: FormData): Promise<Response> {
     fetchInterceptor();
-    return await fetch(`${baseUrl}/users/avatar/upload`, {
+    return await fetch(`${process.env.REACT_APP_BASE_URL}/users/avatar/upload`, {
         method: 'POST',
         body: file,
         headers: {

@@ -2,7 +2,6 @@ import axios from "axios";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useLocation, useNavigate } from "react-router-dom";
-import { baseUrl } from "../../env";
 import { leave2fa, loginSuccess } from "../../Redux/AuthSlice";
 import { useAppDispatch, useAppSelector } from "../../Redux/Hooks";
 import { TokenStorageInterface } from "../../Types/Utils-Types";
@@ -27,7 +26,7 @@ function CodeVerification() {
 
     useEffect(() => {
         if (codeWatch && codeWatch.length === 6) {
-            axios.post(`${baseUrl}/2fa/authenticate`, {code: codeWatch}, {
+            axios.post(`${process.env.REACT_APP_BASE_URL}/2fa/authenticate`, {code: codeWatch}, {
                 headers: {
                     "Authorization": `Bearer ${locationState.access_2fa_token}`,
                 }

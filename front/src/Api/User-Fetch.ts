@@ -3,7 +3,6 @@ import { copyNotificationArray } from "../Redux/NotificationSlice";
 import { copyFriendListArray } from "../Redux/AuthSlice";
 import { UserInterface } from "../Types/User-Types";
 import api from "./Api";
-import { baseUrl } from "../env";
 import { fetchResponseAvatar } from "./Profile/Profile-Fetch";
 import { AxiosResponse } from "axios";
 
@@ -80,7 +79,7 @@ export async function fetchIsAlreadyInGame(): Promise<boolean> {
 }
 
 export async function getPlayerAvatar(cache: Cache | null, token: string, userId: number, userAvatar: string): Promise<string | undefined> {
-    const req = new Request(`${baseUrl}/users/${userId}/avatar`, {method: 'GET', headers: {"Authorization": `Bearer ${token}`}});
+    const req = new Request(`${process.env.REACT_APP_BASE_URL}/users/${userId}/avatar`, {method: 'GET', headers: {"Authorization": `Bearer ${token}`}});
     let avatarResponse: Response | undefined;
     let headerFileName: string | null = null;
     if (cache !== null) {
@@ -122,7 +121,7 @@ export async function getPlayerAvatar(cache: Cache | null, token: string, userId
 }
 
 export async function updatePlayerAvatar(cache: Cache | null, token: string, userId: number): Promise<string | undefined> {
-    const req = new Request(`${baseUrl}/users/${userId}/avatar`, {method: 'GET', headers: {"Authorization": `Bearer ${token}`}});
+    const req = new Request(`${process.env.REACT_APP_BASE_URL}/users/${userId}/avatar`, {method: 'GET', headers: {"Authorization": `Bearer ${token}`}});
     let avatarResponse: Response | undefined;
     if (cache !== null) {
         cache.delete(req);

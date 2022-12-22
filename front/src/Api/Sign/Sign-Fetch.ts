@@ -1,6 +1,5 @@
 import { Dispatch, AnyAction } from "@reduxjs/toolkit";
 import axios from "axios";
-import { baseUrl } from "../../env";
 import { loginSuccess, loginError, stopIsConnectedLoading } from "../../Redux/AuthSlice";
 import { TokenStorageInterface } from "../../Types/Utils-Types";
 import api from "../Api";
@@ -13,11 +12,11 @@ interface SignParameter {
 }
 
 export async function fetchSignIn(username: string, password: string) {
-    return await axios.post(`${baseUrl}/auth/login`, {username: username, password: password});
+    return await axios.post(`${process.env.REACT_APP_BASE_URL}/auth/login`, {username: username, password: password});
 }
 
 export function fetchSignUp({username, email, password, dispatch}: SignParameter) {
-    axios.post(`${baseUrl}/auth/signup`, {username: username, email: email, password: password})
+    axios.post(`${process.env.REACT_APP_BASE_URL}/auth/signup`, {username: username, email: email, password: password})
     .then((response) => {
         console.log('JWT =>', response.data);
         const tokenStorage: TokenStorageInterface = {
@@ -37,11 +36,11 @@ export function fetchSignUp({username, email, password, dispatch}: SignParameter
 }
 
 export async function fetchLogin42(authorizationCode: string) {
-    return await axios.post(`${baseUrl}/auth/login42`, { authorizationCode });
+    return await axios.post(`${process.env.REACT_APP_BASE_URL}/auth/login42`, { authorizationCode });
 }
 
 export function fetchSetUsername(username: string, tokens: TokenStorageInterface, dispatch: Dispatch<AnyAction>) {
-    axios.patch(`${baseUrl}/users/edit-username`, {username: username}, {
+    axios.patch(`${process.env.REACT_APP_BASE_URL}/users/edit-username`, {username: username}, {
         headers: {
             "Authorization": `Bearer ${tokens.access_token}`,
         }

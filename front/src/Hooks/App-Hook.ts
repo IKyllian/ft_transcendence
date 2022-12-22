@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { io, Socket } from "socket.io-client";
 import { useAppDispatch, useAppSelector } from '../Redux/Hooks'
-import { socketUrl } from "../env";
 import { NotificationInterface } from "../Types/Notification-Types";
 import { addNotification, deleteNotification, resetNotification } from "../Redux/NotificationSlice";
 import { addChannel, addPrivateConv, changePrivateConvOrder, removeChannel, resetChat } from "../Redux/ChatSlice";
@@ -33,7 +32,7 @@ export function useAppHook() {
 
 	const connectSocket = (access_token: string) => {
 		console.log("new socket")
-		const newSocket: Socket = io(`${socketUrl}`, {extraHeaders: {
+		const newSocket: Socket = io(`${process.env.REACT_APP_SOCKET_URL}`, {extraHeaders: {
 			"Authorization": `Bearer ${access_token}`,
 		}});
 		setSocket(newSocket);
@@ -130,7 +129,7 @@ export function useAppHook() {
 					dispatch(removeTimeoutChannelUser(eventData));
                 } else if (data.type === ChannelUpdateType.CHANUSER) {
                     const eventData = data.data as ChannelUser;
-                    dispatch(updateChannelUser(eventData));
+                    dispatch(updateChannelUser({user: eventData, loggedUserId: currentUser.id}));
                 }
             });
 

@@ -19,18 +19,6 @@ export class FriendshipService {
 		private userService: UserService,
 		) {}
 
-	getFriendRequest(user: User) {
-		return this.friendshipRepo.find({
-			relations: {
-				requester: true,
-			},
-			where: {
-				addressee: { id: user.id },
-				status: 'requested',
-			},
-		});
-	}
-
 	getRelationStatus(user: User, relation: Friendship) {
 		let relationStatus: RelationStatus = RelationStatus.NONE;
 		if (relation) {

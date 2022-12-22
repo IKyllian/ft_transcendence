@@ -174,6 +174,7 @@ export class NotificationService {
 		
 		if (notif) {
 			await this.delete(notif.id);
+			this.globalService.server.to(`user-${userId}`).emit('DeleteNotification', notif.id);
 			return notif.id;
 		}
 		return null;

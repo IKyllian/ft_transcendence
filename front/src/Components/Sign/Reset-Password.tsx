@@ -2,7 +2,6 @@ import axios from "axios";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { baseUrl } from "../../env";
 
 function ResetPassword() {
     const {register, handleSubmit, setError, formState: {errors}, reset} = useForm<{password: string, passwordConfirm: string, error: string}>();
@@ -24,7 +23,7 @@ function ResetPassword() {
         else {
             // setError("error", {message: undefined});
             if (authorizationCode) {
-                axios.post(`${baseUrl}/auth/reset-password`, {code: authorizationCode, newPassword: data.password})
+                axios.post(`${process.env.REACT_APP_BASE_URL}/auth/reset-password`, {code: authorizationCode, newPassword: data.password})
                 .then(response => {
                     console.log(response);
                     navigate("/sign");

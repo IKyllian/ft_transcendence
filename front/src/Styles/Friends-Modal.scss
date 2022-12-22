@@ -1,4 +1,5 @@
 @use "./Variables.scss" as *;
+@use "./mixins.scss" as *;
 
 .modal-wrapper-container {
     position: absolute;
@@ -87,8 +88,12 @@
 
         .icons-player-item {
             @include flex-row-alignCenter;
-            gap: 5px;
+            gap: 10px;
             cursor: pointer;
+
+            .send-message-icon {
+                margin-top: 4px;
+            }
         }
 
         input {

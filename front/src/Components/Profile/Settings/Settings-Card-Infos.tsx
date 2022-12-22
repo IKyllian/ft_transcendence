@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import api from "../../../Api/Api";
 import { fetchInterceptor } from "../../../Api/Interceptor-Fetch";
-import { baseUrl } from "../../../env";
 import { addAlert, AlertType } from "../../../Redux/AlertSlice";
 import { change2faStatus, replaceUserObject } from "../../../Redux/AuthSlice";
 import { useAppDispatch } from "../../../Redux/Hooks";
@@ -29,7 +28,7 @@ function TwoFactor(props: {user: UserInterface}) {
         const localToken: string | null = localStorage.getItem("userToken");
 		if (localToken !== null) {
 			const localTokenParse: TokenStorageInterface = JSON.parse(localToken);
-            const req = new Request(`${baseUrl}/2fa/generate`, {method: 'POST', body: undefined ,headers: {"Authorization": `Bearer ${localTokenParse.access_token}`}});
+            const req = new Request(`${process.env.REACT_APP_BASE_URL}/2fa/generate`, {method: 'POST', body: undefined ,headers: {"Authorization": `Bearer ${localTokenParse.access_token}`}});
             fetchInterceptor();
             fetch(req)
             .then(async (response) => {

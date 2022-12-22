@@ -1,13 +1,12 @@
 import axios from "axios";
 import { useForm } from "react-hook-form";
-import { baseUrl } from "../../env";
 
 function SendMailPassword() {
     const {register, handleSubmit, setError, formState: {errors}, reset} = useForm<{email: string}>();
 
     const formSubmit = handleSubmit((data, e) => {
         e?.preventDefault();
-        axios.post(`${baseUrl}/auth/forgot-password`, {email: data.email})
+        axios.post(`${process.env.REACT_APP_BASE_URL}/auth/forgot-password`, {email: data.email})
         .then(response => {
             console.log(response);
         })

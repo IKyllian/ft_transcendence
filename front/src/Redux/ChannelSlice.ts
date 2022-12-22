@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import userEvent from '@testing-library/user-event';
 import { Channel, ChannelUser, UserTimeout, ChatMessage, ChannelModes } from '../Types/Chat-Types';
 import { UserStatus } from '../Types/User-Types';
 
@@ -64,11 +65,21 @@ export const channelSlice = createSlice({
             if (state.channelDatas)
                 state.channelDatas.usersTimeout = [...state.channelDatas.usersTimeout.filter((elem: UserTimeout) => elem.id !== payload)];
         },
-        updateChannelUser: (state, {payload}: PayloadAction<ChannelUser>) => {
+        updateChannelUser: (state, {payload}: PayloadAction<{user: ChannelUser, loggedUserId: number}>) => {
             if (state.channelDatas) {
                 state.channelDatas.channelUsers = [...state.channelDatas.channelUsers.map((elem: ChannelUser) => {
-                    if (elem.user.id === payload.user.id)
-                        return elem = payload;
+                    if (elem.user.id === payload.user.user.id && payload.user.role === "owner" && payload.loggedUserId === elem.user.id)
+                        state.loggedUserIsOwner = true;
+                    if (elem.user.id === payload.user.user.id && payload.user.role === "moderator" && payload.loggedUserId === elem.user.id) {
+                        state.loggedUserIsOwner = false;
+                        state.loggedUserIsModerator = true;
+                    }
+                    if (elem.user.id === payload.user.user.id && payload.user.role === "clampin" && payload.loggedUserId === elem.user.id) {
+                        state.loggedUserIsOwner = false;
+                        state.loggedUserIsModerator = false;
+                    }
+                    if (elem.user.id === payload.user.user.id)
+                        return elem = payload.user;
                     return elem
                 })]
             }
@@ -110,6 +121,9 @@ export const channelSlice = createSlice({
         unsetChannelId: (state) => {
             state.currentChannelId = undefined;
         },
+        unsetOwner: (state) => {
+            state.loggedUserIsOwner = false;
+        },
         resetChannel: () => defaultState,
     }
 });
@@ -133,4 +147,5 @@ export const {
     replaceChannelMessages,
     unsetChannelId,
     resetChannel,
+    unsetOwner,
 } = channelSlice.actions;
