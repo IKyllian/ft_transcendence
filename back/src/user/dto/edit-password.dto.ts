@@ -1,11 +1,12 @@
-import { IsNotEmpty, IsString } from "class-validator";
+import { IsNotEmpty, IsString, MaxLength, MinLength } from "class-validator";
 
 export class EditPasswordDto {
 	@IsString()
 	old: string;
 
-	//TODO validator
 	@IsString()
 	@IsNotEmpty()
+	@MinLength(5)
+	@MaxLength(256)
 	new: string;
 }

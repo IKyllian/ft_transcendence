@@ -9,6 +9,6 @@ export class EditChannelNameDto {
 	@IsNotEmpty()
 	@IsAlphanumeric()
 	@MinLength(2)
-	@MaxLength(20)
+	@MaxLength(15)
 	name: string;
 }

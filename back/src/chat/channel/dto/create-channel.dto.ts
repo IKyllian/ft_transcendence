@@ -7,7 +7,7 @@ export class CreateChannelDto {
 	@IsNotEmpty()
 	@IsAlphanumeric()
 	@MinLength(2)
-	@MaxLength(20)
+	@MaxLength(15)
 	name: string;
 
 	@IsEnum(channelOption)
@@ -16,7 +16,7 @@ export class CreateChannelDto {
 	@IsString()
 	@IsOptional()
 	@IsNotEmpty()
-	@MinLength(3)
-	@MaxLength(50)
+	@MinLength(5)
+	@MaxLength(256)
 	password?: string;
 }
