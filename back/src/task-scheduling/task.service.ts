@@ -5,7 +5,7 @@ import { LobbyFactory } from "src/game/lobby/lobby.factory";
 import { MatchmakingLobby } from "src/game/matchmaking/matchmakingLobby";
 import { QueueService } from "src/game/matchmaking/queue/queue.service";
 import { SettingsFactory } from "src/game/settings.factory";
-import { Notification, UserTimeout } from "src/typeorm";
+import { Notification, User, UserTimeout } from "src/typeorm";
 import { GlobalService } from "src/utils/global/global.service";
 import { GameType } from "src/utils/types/game.types";
 import { ChannelUpdateType, EloRange, notificationType, QueueLobby } from "src/utils/types/types";
@@ -23,7 +23,15 @@ export class TaskService {
 		private notifRepo: Repository<Notification>,
 		@InjectRepository(UserTimeout)
 		private timeoutRepo: Repository<UserTimeout>,
-	) {};
+		@InjectRepository(User)
+		private userRepo: Repository<User>,
+	) {
+		this.userRepo.createQueryBuilder("user")
+		.update()
+		.set({ in_game_id: () => ":id" })
+		.setParameter("id", null)
+		.execute();
+	};
 
 	getCronJob() {
 		return this.schedulerRegistry.getCronJobs();

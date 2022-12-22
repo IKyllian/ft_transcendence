@@ -34,7 +34,7 @@ function CardInfo(props: {userState: ProfileState}) {
                     <Link className="send-message-icon" to="/chat" state={{userIdToSend: userState.user.id}}>
                         <IconMessage />
                     </Link>
-                    { !party || (party && !party.players.find(partyUser => partyUser.user.id === userState.user.id)) && <IconDeviceGamepad2 onClick={() => socket?.emit("PartyInvite", {id: userState.user.id})} />}
+                    { (!party || (party && !party.players.find(partyUser => partyUser.user.id === userState.user.id))) && <IconDeviceGamepad2 onClick={() => socket?.emit("PartyInvite", {id: userState.user.id})} />}
                     <BlockButton senderId={userState.user.id} isIconButton={true} />
                     { userState.user.in_game_id !== null && <IconEye onClick={() => spectateClick()} className='spectate-icon' /> }
                 </div>

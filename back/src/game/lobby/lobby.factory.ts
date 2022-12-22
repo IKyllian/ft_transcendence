@@ -178,46 +178,8 @@ export class LobbyFactory
 			//dataToFront.player_type = lobby.convert_player_enums(player.team, player.pos);
 		}
 
-		console.log("datatofront", dataToFront);
-		client.emit('user_gameinfo', dataToFront);
-
-		//let dataToFront: PlayersGameData = null;
-
-		// this.lobby_list.forEach((lobby) => {
-		// 	lobby.lobby_data.players.forEach((playersocket) => {
-		// 		if (playersocket.user.id === id)
-		// 		{
-				
-		// 			dataToFront =
-		// 			{
-		// 				game_id: lobby.game_id,
-		// 				player_type: PlayerType.Spectator,
-		// 				game_settings: lobby.lobby_data.game_settings,
-		// 			}
-		// 			lobby.lobby_data.players.forEach((player) => {
-		// 				if (player.team === TeamSide.BLUE) {
-		// 					if (player.pos === PlayerPosition.BACK) {
-		// 						dataToFront.TeamBlue_Back = player;
-		// 						dataToFront.player_type = PlayerType.TeamBlue_Back;
-		// 					} else {
-		// 						dataToFront.TeamBlue_Front = player;
-		// 						dataToFront.player_type = PlayerType.TeamBlue_Front;
-		// 					}
-		// 				} else {
-		// 					if (player.pos === PlayerPosition.BACK) {
-		// 						dataToFront.TeamRed_Back = player;
-		// 						dataToFront.player_type = PlayerType.TeamRed_Back;
-		// 					} else {
-		// 						dataToFront.TeamRed_Front = player;
-		// 						dataToFront.player_type = PlayerType.TeamRed_Front;
-		// 					}
-		// 				}
-		// 			});
-		// 		}
-		// 	});
-		// });
 		// console.log("datatofront", dataToFront);
-		// client.emit('user_gameinfo', dataToFront);
+		client.emit('user_gameinfo', dataToFront);
 	}
 
 	lobby_request_status(client: AuthenticatedSocket, game_id: string)

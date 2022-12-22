@@ -1,4 +1,4 @@
-import { ForbiddenException, UseFilters, UseGuards, UsePipes, ValidationPipe } from "@nestjs/common";
+import { BadRequestException, ForbiddenException, UseFilters, UseGuards, UsePipes, ValidationPipe } from "@nestjs/common";
 import { ConnectedSocket, MessageBody, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
 import { WsJwtGuard } from "src/auth/guard/ws-jwt.guard";
@@ -9,7 +9,7 @@ import { UserService } from "src/user/user.service";
 import { GetUser } from "src/utils/decorators";
 import { GatewayExceptionFilter } from "src/utils/exceptions/filter/Gateway.filter";
 import { AuthenticatedSocket } from "src/utils/types/auth-socket";
-import { GameMode, GameType, PlayerPosition, TeamSide } from "src/utils/types/game.types";
+import { GameMode, PlayerPosition, TeamSide } from "src/utils/types/game.types";
 import { notificationType } from "src/utils/types/types";
 import { LobbyFactory } from "../lobby/lobby.factory";
 import { IsReadyDto } from "./dto/boolean.dto";
@@ -177,16 +177,24 @@ export class MatchmakingGateway implements OnGatewayDisconnect {
 
 	@UseGuards(WsJwtGuard)
 	@SubscribeMessage('StartQueue')
-	startQueue(
+	async startQueue(
 		@GetUser() user: User,
 		@MessageBody() data: StartQueueDto,
 	) {
-		console.log("start queue data: ", data)
+		let in_game: Boolean = false;
 		const party = this.partyService.partyJoined.getParty(user.id);
 		if (party) {
-			party.players.forEach(async player => {
+			for (let player of party.players) {
 				player.user = await this.userService.findOne({ where: { id: player.user.id }});
-			});
+				if (player.user.in_game_id) {
+					in_game = true;
+				}
+			};
+			if (in_game) {
+				throw new BadRequestException("Someone is already in game");
+			}
+		} else if (user.in_game_id) {
+			throw new BadRequestException("You are already in game");
 		}
 		if (data.isRanked) {
 			this.queueService.joinQueue(user, data.gameType);

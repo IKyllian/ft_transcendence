@@ -59,7 +59,7 @@ function AddFriendModal() {
                                     <UserFindItem key={index} avatar={elem.avatar} name={elem.username} status={elem.status} userId={elem.id} >
                                         <div className="icons-player-item">
                                             { elem.in_game_id !== null && <IconEye onClick={() => spectateClick(elem.in_game_id!)} className='spectate-icon' /> }
-                                            { !party || (party && !party.players.find(partyUser => partyUser.user.id === elem.id)) && <IconDeviceGamepad2 onClick={() => socket?.emit("PartyInvite", {id: elem.id})} />}
+                                            { (!party || (party && !party.players.find(partyUser => partyUser.user.id === elem.id))) && <IconDeviceGamepad2 onClick={() => socket?.emit("PartyInvite", {id: elem.id})} />}
                                             <Link className="send-message-icon" to="/chat" state={{userIdToSend: elem.id}}>
                                                 <IconMessage />
                                             </Link>

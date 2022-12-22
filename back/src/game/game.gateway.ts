@@ -72,6 +72,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
 				this.userSession.removeUser(user.id)
 			}
 		}
+		console.log("Game Gateway deconnection: ", socket.user.username);
 		this.lobbyfactory.lobby_quit(socket);
 	}
 		

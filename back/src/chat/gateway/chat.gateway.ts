@@ -77,7 +77,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		socket.join(`user-${user.id}`);
 		if (user.status === UserStatus.OFFLINE) {
 			this.userService.setStatus(user.id, UserStatus.ONLINE);
-			console.log('user status: ' + user.status)
 			this.server.emit('StatusUpdate', { id: user.id, status: UserStatus.ONLINE });
 		}
 		let party = this.partyService.partyJoined.getParty(user.id);
@@ -140,14 +139,16 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		@GetChannelUser() chanUser: ChannelUser,
 		@MessageBody() channel: ChanIdDto,
 	) {
-		await this.channelService.leave(chanUser);
+		const chan_deleted: Boolean = await this.channelService.leave(chanUser);
 		this.server.to(`channel-${channel.chanId}`).emit('ChannelUpdate', { type: ChannelUpdateType.LEAVE, data: chanUser.id});
 		this.server.to(`user-${chanUser.userId}`).emit('OnLeave', channel.chanId);
-		const servMsg = await this.channelMsgService.createServer({
-				chanId: channel.chanId,
-				content: `${chanUser.user.username} just left.`,
-		});
-		this.server.to(`channel-${channel.chanId}`).emit('NewChannelMessage', servMsg);
+		if (!chan_deleted) {
+			const servMsg = await this.channelMsgService.createServer({
+					chanId: channel.chanId,
+					content: `${chanUser.user.username} just left.`,
+			});
+			this.server.to(`channel-${channel.chanId}`).emit('NewChannelMessage', servMsg);
+		}
 	}
 
 	/**
@@ -212,6 +213,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		if (chanUser) {
 			this.server.to(`channel-${dto.chanId}`).emit('ChannelUpdate', { type: ChannelUpdateType.JOIN, data: chanUser });
 			this.server.to(`user-${user.id}`).emit('OnJoin', chanUser.channel);
+			const servMsg = await this.channelMsgService.createServer({
+				chanId: chanUser.channelId,
+				content: `Welcome ${user.username}, say hi!`,
+			});
+			this.server.to(`channel-${dto.chanId}`).emit('NewChannelMessage', servMsg);
 		}
 		this.server.to(`user-${user.id}`).emit('DeleteNotification', dto.id);
 	}
@@ -226,6 +232,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		await this.notificationService.deleteChannelMessageNotif(dto.userId, dto.chanId);
 		this.server.to(`channel-${bannedUser.channel.id}`).emit('ChannelUpdate', { type: ChannelUpdateType.BAN, data: bannedUser });
 		this.server.to(`user-${dto.userId}`).emit('OnLeave', bannedUser.channel);
+		const servMsg = await this.channelMsgService.createServer({
+				chanId: dto.chanId,
+				content: `${bannedUser.user.username} is banned from this channel${dto.time ? ` for ${dto.time} seconds.` : '.'}`,
+		});
+		this.server.to(`channel-${dto.chanId}`).emit('NewChannelMessage', servMsg);
 	}
 
 	@UseGuards(WsJwtGuard, WsInChannelGuard, ChannelPermissionGuard)

@@ -52,7 +52,7 @@ function MessageItem(props: {isFromChan: boolean, message: ChatMessage | Private
                                 <p> profile </p>
                             </Link>
                             {
-                                !party || (party && !party.players.find(elem => elem.user.id === message.sender?.id)) &&
+                                (!party || (party && !party.players.find(elem => elem.user.id === message.sender?.id))) &&
                                 <p onClick={() => socket?.emit("PartyInvite", {id: message.sender?.id})}> invite to party </p>
                             }
                             <BlockButton senderId={message.sender.id} />
