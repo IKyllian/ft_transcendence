@@ -9,10 +9,13 @@ import { TokenStorageInterface } from "../../Types/Utils-Types";
 import { useAppDispatch } from "../../Redux/Hooks";
 import { unsetGameFound } from "../../Redux/PartySlice";
 import axios from "axios";
+import 'phaser';
+import { game_destroy } from "./game/utils/clean_exit";
 
 function Game() {
     const [gameDatas, setGameDatas] = useState<PlayersGameData | undefined>(undefined);
     const [gameSocket, setGameSocket] = useState<Socket | undefined>(undefined);
+    const [game, setGame] = useState<Phaser.Game | undefined>(undefined);
     const [hasEnded, setHasEnded] = useState<boolean>(false);
     const location = useLocation();
     const navigate = useNavigate();
@@ -27,6 +30,16 @@ function Game() {
     }, [hasEnded])
 
     useEffect(() => {
+        console.log("UseEffect Game", game);
+        return () => {
+            console.log(" REturn GAME", game)
+            if (game)
+                game_destroy(game);
+        }
+
+    }, [game])
+
+    useEffect(() => {
         if (gameSocket) {
             const localToken: string | null = localStorage.getItem("userToken");
             if (localToken !== null) {
@@ -39,7 +52,9 @@ function Game() {
                 gameSocket.on("Connected", () => {
                     console.log("CONNECTED");
                     setGameDatas(locationState);
-                    launch_game(locationState, gameSocket, localTokenParse.access_token, cache, setHasEnded);
+                    const gameReturn: Phaser.Game = launch_game(locationState, gameSocket, localTokenParse.access_token, cache, setHasEnded);
+                    console.log("gameReturn", gameReturn);
+                    setGame(gameReturn);
                 })
 
                 gameSocket.on("Unauthorized", async () => {

@@ -39,7 +39,10 @@ export default class MatchResult extends Phaser.Scene
 	TeamRed_Back_newElo: number = 0;
 
 	result_text?: Phaser.GameObjects.Text;
-	close_button?: Phaser.GameObjects.Image;
+
+	close_timeout: any;
+	elo_timeouts: any[] = [];
+	elo_intervals: any[] = [];
 
 	preload ()
 	{
@@ -166,7 +169,8 @@ export default class MatchResult extends Phaser.Scene
 		this.result_text = this.add.text(400, 240, text, make_style(40, color)).setOrigin(0.5, 0.5);
 		this.input.on('gameobjectdown',this.click_event);
 
-		setTimeout(() => {
+		clearTimeout(this.close_timeout);
+		this.close_timeout = setTimeout(() => {
 			this.game.registry.get('setHasEnded')(true);
 			this.game.destroy(true, false);
 		}, 10000);
@@ -343,24 +347,24 @@ export default class MatchResult extends Phaser.Scene
 
 		if (elo_change > 0)
 		{
-			setTimeout( () => {
-			
-				clearInterval(inter);
-				inter = setInterval(
-					(function(self) { return function()
-					{
-						target_change.setText("+" + elo_change);
-						target_elo.setText("" + old_elo);
-						elo_change--;
-						old_elo++;
-						if (elo_change <= 0)
+			this.elo_timeouts.push(
+				setTimeout( () => {
+					inter = setInterval(
+						(function(self) { return function()
 						{
-							target_change.destroy();
-							clearInterval(inter);
-						}
-					}; })(this),
-					60);
-				}, 2000);
+							target_change.setText("+" + elo_change);
+							target_elo.setText("" + old_elo);
+							elo_change--;
+							old_elo++;
+							if (elo_change <= 0)
+							{
+								target_change.destroy();
+								clearInterval(inter);
+							}
+						}; })(this),
+						60);
+					this.elo_intervals.push(inter);
+					}, 2000));
 		}
 		else
 		{
@@ -381,6 +385,7 @@ export default class MatchResult extends Phaser.Scene
 						}
 					}; })(this),
 					60);
+					this.elo_intervals.push(inter);
 				}, 2000);
 		}
 	}

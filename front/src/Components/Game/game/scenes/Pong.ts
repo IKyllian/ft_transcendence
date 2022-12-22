@@ -84,6 +84,8 @@ export default class Pong extends Phaser.Scene
 		send_date: new Date()
 	};
 	update_interval: any;
+	pong_timeout: any;
+
 	is_lagging: boolean = true;
 	lag_count: number = 0;
 
@@ -124,7 +126,9 @@ export default class Pong extends Phaser.Scene
 		}
 
 
-		this.asset_lag_icon = this.add.image(400, 300, 'lag_icon');
+		this.asset_lag_icon = this.add.image(400, 70, 'lag_icon')
+							.setOrigin(0.5, 0.5)
+							.setDisplaySize(50, 50);;
 		this.asset_lag_icon.setAlpha(0);
 
 		if (this.game_settings)
@@ -206,7 +210,8 @@ export default class Pong extends Phaser.Scene
 			});
 		}
 
-		setTimeout(() => {
+		clearTimeout(this.pong_timeout);
+		this.pong_timeout = setTimeout(() => {
 			clearInterval(this.update_interval);
 			this.update_interval = setInterval(
 			  (function(self) { return function()
@@ -705,4 +710,6 @@ export default class Pong extends Phaser.Scene
 		this.sound_clapping!.play();
 		this.cameras.main.flash(250, 0 , 0, 0);
 	}
+
+
 }
