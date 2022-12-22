@@ -121,6 +121,7 @@ function ChatModal(props: {onCloseModal: Function, showModal: number}) {
                                                 }
                                             })}
                                         />
+                                        {errors.password && <p className="txt-form-error"> {errors.password.message} </p>}
                                     </label>
                                 }
                             </>

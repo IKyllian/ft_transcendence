@@ -14,9 +14,9 @@
     flex-direction: row;
     flex-flow: row;
     .chat-sidebar {
-        @include width-height(300px, 100%);
-        min-width: 280px;
-        max-width: 280px;
+        @include width-height(260px, 100%);
+        // min-width: 280px;
+        // max-width: 280px;
         background-color: $LightDarkPalette;
         border-right: 1px solid $WhitePalette;
         position: relative;
@@ -111,7 +111,7 @@
     }
 
     .message-container-main {
-        @include width-height(100%, 100%);
+        @include width-height(85%, 100%);
         display: flex;
         flex-direction: column;
         justify-content: space-between;
@@ -341,6 +341,9 @@
         &-wrapper {
             margin: 10px;
             position: absolute;
+            height: 95%;
+            overflow-y: scroll;
+            overflow-x: hidden;
             h3 {
                 margin: 0;
                 color: #a5abb0;
