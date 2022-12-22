@@ -232,6 +232,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		await this.notificationService.deleteChannelMessageNotif(dto.userId, dto.chanId);
 		this.server.to(`channel-${bannedUser.channel.id}`).emit('ChannelUpdate', { type: ChannelUpdateType.BAN, data: bannedUser });
 		this.server.to(`user-${dto.userId}`).emit('OnLeave', bannedUser.channel);
+		const servMsg = await this.channelMsgService.createServer({
+				chanId: dto.chanId,
+				content: `${bannedUser.user.username} is banned from this channel${dto.time ? ` for ${dto.time} seconds.` : '.'}`,
+		});
+		this.server.to(`channel-${dto.chanId}`).emit('NewChannelMessage', servMsg);
 	}
 
 	@UseGuards(WsJwtGuard, WsInChannelGuard, ChannelPermissionGuard)

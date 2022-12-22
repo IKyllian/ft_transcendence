@@ -190,7 +190,6 @@ export class MatchmakingGateway implements OnGatewayDisconnect {
 					in_game = true;
 				}
 			};
-			console.log("in game", in_game)
 			if (in_game) {
 				throw new BadRequestException("Someone is already in game");
 			}
