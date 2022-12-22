@@ -14,9 +14,9 @@
     flex-direction: row;
     flex-flow: row;
     .chat-sidebar {
-        @include width-height(260px, 100%);
-        // min-width: 280px;
-        // max-width: 280px;
+        @include width-height(270px, 100%);
+        min-width: 270px;
+        max-width: 270px;
         background-color: $LightDarkPalette;
         border-right: 1px solid $WhitePalette;
         position: relative;
