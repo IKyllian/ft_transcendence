@@ -50,7 +50,7 @@ function SidebarSettings(props: {setSidebarItem: Function}) {
                 <ul>
                     {loggedUserIsOwner && <li onClick={() => setSidebarItem("Settings")}> Settings </li>}
                     <li onClick={() => setSidebarItem("Users")}> Users ({channelDatas!.channelUsers.length}) </li>
-                    {loggedUserIsOwner && loggedUserIsModerator && <li onClick={() => setSidebarItem("Invitations")}> Banned User </li>}
+                    {(loggedUserIsOwner || loggedUserIsModerator) && <li onClick={() => setSidebarItem("Invitations")}> Banned User </li>}
                 </ul>
                 <div className="separate-line"> </div>
                 <button onClick={() => leaveChannel()}> Leave Channel </button>
