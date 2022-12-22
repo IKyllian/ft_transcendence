@@ -33,12 +33,17 @@ function Sign() {
                     <input
                         id="username"
                         type="text"
+                        maxLength={15}
                         {...hookForm.register("username", {
                             required: "Username is required",
                             minLength: {
-                                value: 2,
-                                message: "Min length is 2"
-                            }
+                                value: 1,
+                                message: "Min length is 1"
+                            },
+                            // pattern: {
+                            //     message: "invalid username",
+                            //     value: new RegExp(/^[A-Za-z0-9_.-—]+$/),
+                            // }
                         })}
                     />
                     {
@@ -65,6 +70,7 @@ function Sign() {
                     <input
                         id="password"
                         type="password"
+                        maxLength={256}
                         {...hookForm.register("password", {
                             required: "Password is required",
                             minLength: !isSignIn ? { 

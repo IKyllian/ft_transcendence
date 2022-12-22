@@ -82,6 +82,7 @@ function PasswordForm() {
                 { errors && errors.oldPassword && <p className='txt-form-error'> {errors.oldPassword.message} </p> }
                 <input
                     type="password"
+                    maxLength={256}
                     {...register("oldPassword", {
                         required: "Old password is required",
                         minLength: {
@@ -96,6 +97,7 @@ function PasswordForm() {
                 { errors && errors.newPassword && <p className='txt-form-error'> {errors.newPassword.message} </p> }
                 <input
                     type="password"
+                    maxLength={256}
                     {...register("newPassword", {
                         required: "New password is required",
                         minLength: {
@@ -146,12 +148,15 @@ function UsernameForm(props: {user: UserInterface}) {
                             <input
                                 type="text"
                                 {...register("username", {
+                                    required: "Username is required",
                                     minLength: {
-                                        value: 2,
-                                        message: "Min length is 2"
+                                        value: 1,
+                                        message: "Min length is 1"
                                     },
-                                    required: "Username is required"
-                                    
+                                    // pattern: {
+                                    //     message: "invalid username",
+                                    //     value: new RegExp(/^[A-Za-z0-9_.-—]+$/),
+                                    // }
                                 })}
                             />
                             { watchUsersame !== user.username && <button className="username-save" type="submit"> Save </button> }

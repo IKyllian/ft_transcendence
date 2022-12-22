@@ -4,19 +4,27 @@ function UsernameForm() {
     const {
         register,
         onSubmit,
+        errors,
     } = useUsernameFormHook();
 
     return (
         <div className="sign-container">
             <form className="username-form" onSubmit={onSubmit}>
                 <label htmlFor="username"> Choose a username </label>
-                <input id="username" type="text" placeholder="Username..." {...register("username", {
-                    required: true,
-                    minLength: {
-                        value: 2,
-                        message: "Min length is 2"
-                    }
-                })} />
+                { errors.username && errors.username.message && <p className="txt-form-error"> {errors.username.message} </p> }
+                <input
+                    id="username"
+                    type="text"
+                    placeholder="Username..."
+                    maxLength={15}
+                    {...register("username", {
+                        required: "Username is required",
+                        minLength: {
+                            value: 1,
+                            message: "Min length is 1"
+                        },
+                    })}
+                />
             </form>
         </div>
     );

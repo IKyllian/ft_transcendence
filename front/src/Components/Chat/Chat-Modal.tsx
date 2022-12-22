@@ -93,6 +93,7 @@ function ChatModal(props: {onCloseModal: Function, showModal: number}) {
                                     Channel name:
                                     <input
                                         type="text"
+                                        maxLength={15}
                                         placeholder="Channel name..."
                                         {...register("chanName", {
                                             required: "Channel name is required",
@@ -108,7 +109,18 @@ function ChatModal(props: {onCloseModal: Function, showModal: number}) {
                                     channelMode === "protected" && 
                                     <label className="labelTextInput">
                                         Password :
-                                        <input type="password" placeholder="password" {...register("password")} />
+                                        <input
+                                            type="password"
+                                            maxLength={256}
+                                            placeholder="password"
+                                            {...register("password", {
+                                                required: "Password is required",
+                                                minLength: {
+                                                    value: 5,
+                                                    message: "Min length is 5"
+                                                }
+                                            })}
+                                        />
                                     </label>
                                 }
                             </>

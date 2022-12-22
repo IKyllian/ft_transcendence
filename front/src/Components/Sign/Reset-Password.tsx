@@ -46,6 +46,7 @@ function ResetPassword() {
                     <input
                         id="password"
                         type="password"
+                        maxLength={256}
                         {...register("password", {
                             required: "Password is required",
                             minLength: {
@@ -59,8 +60,13 @@ function ResetPassword() {
                     <input
                         id="password-confirm"
                         type="password"
+                        maxLength={256}
                         {...register("passwordConfirm", {
                             required: "Password is required",
+                            minLength: {
+                                value: 5,
+                                message: "Min length is 5"
+                            }
                         })}
                     />
                     <button type='submit'> Change password </button>

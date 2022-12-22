@@ -1,7 +1,6 @@
 import { useEffect, useState, useContext } from "react";
 import { Channel, ChannelModesArray, ChannelModes } from "../../Types/Chat-Types";
 import LoadingSpin from "../Utils/Loading-Spin";
-import { useAppSelector } from "../../Redux/Hooks";
 import { IconPlus, IconChevronRight } from "@tabler/icons";
 import { useForm } from "react-hook-form";
 import { SidebarContext } from "./Chat";
@@ -23,13 +22,22 @@ function ChannelItem(props: {channelData: Channel}) {
             <div className="channel-banner"></div>
             <div className="card-content">
                 <p className="channel-name"> { channelData.name } <span>({ ChannelModesArray[channelData.option] })</span> </p>
-                {/* <p className="channel-description"> Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec quis porta libero, vitae feugiat sem. Aenean porttitor diam non sem congue, vitae euismod diam venenatis. </p> */}
                 <div className="item-bottom">
-                    <p> {channelData.channelUsers.length} members </p>
+                    <p> {channelData.channelUsers.length} member(s) </p>
                     <div className="item-bottom-right">
                         {
                             channelData.option === ChannelModes.PROTECTED &&
-                            <input type="password" placeholder="password" {...register("password")} />
+                            <input 
+                                type="password"
+                                placeholder="password"
+                                maxLength={256}
+                                {...register("password", {
+                                    minLength: {
+                                        value: 5,
+                                        message: "Min length is 5"
+                                    }
+                                })}
+                            />
                         }
                         <IconPlus onClick={() => handleClick()} />
                     </div>

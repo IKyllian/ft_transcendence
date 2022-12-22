@@ -27,11 +27,13 @@ export function fetchSignUp({username, email, password, dispatch}: SignParameter
         dispatch(loginSuccess({...response.data.user, blocked: [], channelUser: []}));
     }).catch(err => {
         console.log("Error", err);
-        if (err.response.status === 403) {
-            dispatch(loginError("Username or email already use"));
-        } else {
-            dispatch(loginError("Error while Signup"));
-        }
+        // if (err.response.status === 403) {
+            
+            dispatch(loginError(err.response.data.message));
+        //     dispatch(loginError("Username or email already use"));
+        // } else {
+        //     dispatch(loginError("Error while Signup"));
+        // }
     })
 }
 
@@ -39,21 +41,21 @@ export async function fetchLogin42(authorizationCode: string) {
     return await axios.post(`${process.env.REACT_APP_BASE_URL}/auth/login42`, { authorizationCode });
 }
 
-export function fetchSetUsername(username: string, tokens: TokenStorageInterface, dispatch: Dispatch<AnyAction>) {
-    axios.patch(`${process.env.REACT_APP_BASE_URL}/users/edit-username`, {username: username}, {
+export async function fetchSetUsername(username: string, token: string,) {
+    return await axios.patch(`${process.env.REACT_APP_BASE_URL}/users/edit-username`, {username: username}, {
         headers: {
-            "Authorization": `Bearer ${tokens.access_token}`,
+            "Authorization": `Bearer ${token}`,
         }
     })
-    .then((response) => {
-		console.log("response,", response);
-        localStorage.setItem("userToken", JSON.stringify(tokens));
-        dispatch(loginSuccess(response.data));
-    })
-    .catch(err => {
-        console.log(err);
-        // TODO Handle error: Display error message on login page
-    });
+    // .then((response) => {
+	// 	console.log("response,", response);
+    //     localStorage.setItem("userToken", JSON.stringify(tokens));
+    //     dispatch(loginSuccess(response.data));
+    // })
+    // .catch(err => {
+    //     console.log(err);
+    //     // TODO Handle error: Display error message on login page
+    // });
 }
 
 export function fetchVerifyToken(dispatch: Dispatch<AnyAction>) {
