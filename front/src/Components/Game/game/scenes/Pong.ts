@@ -84,6 +84,8 @@ export default class Pong extends Phaser.Scene
 		send_date: new Date()
 	};
 	update_interval: any;
+	pong_timeout: any;
+
 	is_lagging: boolean = true;
 	lag_count: number = 0;
 
@@ -208,7 +210,8 @@ export default class Pong extends Phaser.Scene
 			});
 		}
 
-		setTimeout(() => {
+		clearTimeout(this.pong_timeout);
+		this.pong_timeout = setTimeout(() => {
 			clearInterval(this.update_interval);
 			this.update_interval = setInterval(
 			  (function(self) { return function()
@@ -219,18 +222,8 @@ export default class Pong extends Phaser.Scene
 		}, 50);
 	}
 
-	count: number = 0;
-
 	frame_advance()
 	{
-
-		this.count++;
-		if(this.count == 20)
-		{
-			this.count = 0;
-			console.log(this.game.hasFocus)
-		}
-
 		if (this.next_round_setup === undefined)
 		{
 			this.socketmanager?.game_get_round_setup(this.game_id!);
@@ -717,4 +710,6 @@ export default class Pong extends Phaser.Scene
 		this.sound_clapping!.play();
 		this.cameras.main.flash(250, 0 , 0, 0);
 	}
+
+
 }

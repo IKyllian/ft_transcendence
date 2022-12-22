@@ -13,6 +13,7 @@ import AssetRankPlatine from '../../../../Assets/Ranks/platine.png';
 import AssetRankDiamond from '../../../../Assets/Ranks/diamond.png';
 import AssetRankChampion from '../../../../Assets/Ranks/champion.png';
 import AssetRankLegend from '../../../../Assets/Ranks/legend.png';
+import Pong from './Pong';
 
 export default class Lobby extends Phaser.Scene
 {
@@ -57,7 +58,13 @@ export default class Lobby extends Phaser.Scene
 	wait_delay: number = 0;
 	connected: boolean = false;
 	launching_game: boolean = false;
+
 	update_interval: any;
+	load_interval: any;
+
+	fadeout_timeout: any;
+	pongstart_timeout: any;
+	error_timeout: any;
 
 	preload ()
 	{
@@ -100,8 +107,8 @@ export default class Lobby extends Phaser.Scene
 		await_load_base64(AssetRankChampion, "Champion", this);
 		await_load_base64(AssetRankLegend, "Legend", this);	
 
-		let interval: any;
-		interval = setInterval(
+		clearInterval(this.load_interval);
+		this.load_interval = setInterval(
 			(function(self) { return function()
 			  {
 
@@ -124,11 +131,11 @@ export default class Lobby extends Phaser.Scene
 							&& self.textures.exists('TeamRed_front_avatar')
 						)
 						{
-							self.display();
+								self.display();
 							self.update_interval = setInterval(() => {
 								self.check_status();
 							}, 1000 / 30);
-							clearInterval(interval);
+							clearInterval(self.load_interval);
 						}
 					}
 					else
@@ -138,20 +145,17 @@ export default class Lobby extends Phaser.Scene
 							&& self.textures.exists('TeamRed_back_avatar')
 						)
 						{
-							self.display();
+								self.display();
 							self.update_interval = setInterval(() => {
 								self.check_status();
 							}, 1000 / 30);
-							clearInterval(interval);
+							clearInterval(self.load_interval);
 						}
 					}
 				}
 			  }; })(this),
 			50);
 	}
-	// preload ()
-	// create (){}
-	// update (){}
 
 	display ()
 	{
@@ -316,12 +320,14 @@ export default class Lobby extends Phaser.Scene
 		this.socketmanager?.game_get_round_setup(this.game.registry.get('players_data').game_id);
 		clearInterval(this.update_interval);
 
-		setTimeout(() => { 
-			this.cameras.main.fadeOut(1000, 0, 0, 0);
+		clearTimeout(this.fadeout_timeout);
+		this.fadeout_timeout = setTimeout(() => { 
+				this.cameras.main.fadeOut(1000, 0, 0, 0);
 		}, 1500);
 
-		setTimeout(() => { 
-			this.scene.start('Pong');
+		clearTimeout(this.pongstart_timeout);
+		this.pongstart_timeout = setTimeout(() => { 
+				this.scene.start('Pong');
 		}, 2500);
 	}
 
@@ -335,7 +341,8 @@ export default class Lobby extends Phaser.Scene
 							make_style(30))
 							.setOrigin(0.5,0.5);
 
-		setTimeout(() => {
+		clearTimeout(this.error_timeout);
+		this.error_timeout = setTimeout(() => {
 			this.game.registry.get('setHasEnded')(true);
 			this.game.destroy(true, false);
 		}, 5000);
@@ -386,7 +393,8 @@ export default class Lobby extends Phaser.Scene
 			 make_style(30))
 			 .setOrigin(0.5,0.5);
 
-		setTimeout(() => {
+		clearTimeout(this.error_timeout);
+		this.error_timeout = setTimeout(() => {
 			this.game.registry.get('setHasEnded')(true);
 			this.game.destroy(true, false);
 		}, 5000);
@@ -405,7 +413,8 @@ export default class Lobby extends Phaser.Scene
 								make_style(30))
 								.setOrigin(0.5,0.5);
 
-			setTimeout(() => {
+			clearTimeout(this.error_timeout);
+			this.error_timeout = setTimeout(() => {
 				this.game.registry.get('setHasEnded')(true);
 				this.game.destroy(true, false);
 			}, 5000);
