@@ -5,7 +5,7 @@ import Pong from './scenes/Pong';
 import Lobby from './scenes/Lobby';
 import MatchResult from './scenes/MatchResult';
 
-export function launch_game(players_data: PlayersGameData, socket: Socket, token: string, cache: Cache | null | undefined, setHasEnded: Function): void
+export function launch_game(players_data: PlayersGameData, socket: Socket, token: string, cache: Cache | null | undefined, setHasEnded: Function): Phaser.Game
 {
 	const config = {
 		type: Phaser.AUTO,
@@ -32,4 +32,6 @@ export function launch_game(players_data: PlayersGameData, socket: Socket, token
 		scene: [ Lobby, Pong, MatchResult ]
 	};
 	const game = new Phaser.Game(config);
+	console.log(game);
+	return game;
 }

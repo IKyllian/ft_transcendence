@@ -219,8 +219,18 @@ export default class Pong extends Phaser.Scene
 		}, 50);
 	}
 
+	count: number = 0;
+
 	frame_advance()
 	{
+
+		this.count++;
+		if(this.count == 20)
+		{
+			this.count = 0;
+			console.log(this.game.hasFocus)
+		}
+
 		if (this.next_round_setup === undefined)
 		{
 			this.socketmanager?.game_get_round_setup(this.game_id!);
