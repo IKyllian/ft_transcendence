@@ -71,10 +71,9 @@ function MessageItem(props: {isFromChan: boolean, message: ChatMessage | Private
                 !isNewSender && !senderIsBlock &&
                 <li className="message-item-container-2">
                     <span className="date-message">  {getMessageHour(message.send_at)} </span>
-                    <span> { message.content } </span>
+                    <span className="span-message"> { message.content } </span>
                 </li>
             }
-           
         </>
     ) : (
         <div className="message-server">
