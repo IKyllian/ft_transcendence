@@ -34,7 +34,6 @@ function Leaderboard() {
         fetchSinglesLeaderBoardDatas(0, setLeaderboardState);
 
         socket?.on("InGameStatusUpdate", (data: {id: number, in_game_id: string | null}) => {
-            console.log("InGameStatusUpdate LEaderboard");
             setLeaderboardState(prev => { return {...prev, users: [...prev.users.map((elem: UserInterface) => {
                 if (elem.id === data.id)
                     return {...elem, in_game_id: data.in_game_id};
@@ -43,7 +42,6 @@ function Leaderboard() {
         });
 
         socket?.on("StatusUpdate", (data: {id: number, status: UserStatus}) => {
-            console.log("StatusUpdate");
             setLeaderboardState(prev => { return {...prev, users: [...prev.users.map((elem: UserInterface) => {
                 if (elem.id === data.id)
                     return {...elem, status: data.status};

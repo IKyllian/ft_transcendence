@@ -27,7 +27,6 @@ export function fetchCreateChannel(
     
     api.post(`/channel`, body)
     .then((response) => {
-        console.log(response);
         dispatch(addChannel({channel: response.data, isActive: "true"}));
         if (usersInvited) {
             usersInvited.forEach(element => {
@@ -58,7 +57,6 @@ export function fetchLeaveChannel(channelId: number, navigate: NavigateFunction)
 export function fetchLoadPrevChatMessages(channelId: number, dispatch: Dispatch<AnyAction>, currentMessages: ChatMessage[], setPreviousMessages: Function) {
     api.post(`/channel/${channelId}/messages`, {skip: currentMessages.length})
     .then((response) => {
-        console.log("response", response.data);
         if (response.data.length > 0) {
             dispatch(replaceChannelMessages([...response.data, ...currentMessages]));
         } else {
@@ -74,7 +72,6 @@ export function fetchLoadPrevChatMessages(channelId: number, dispatch: Dispatch<
 export function fetchLoadPrevConvMessages(convId: number, dispatch: Dispatch<AnyAction>, currentMessages: PrivateMessage[], setPreviousMessages: Function) {
     api.post(`/conversation/${convId}/messages`, {skip: currentMessages.length})
     .then((response) => {
-        console.log("response", response.data);
         if (response.data.length > 0) {
             dispatch(loadNewMessages(response.data));
         } else {

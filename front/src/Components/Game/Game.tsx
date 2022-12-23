@@ -30,9 +30,7 @@ function Game() {
     }, [hasEnded])
 
     useEffect(() => {
-        console.log("UseEffect Game", game);
         return () => {
-            console.log(" REturn GAME", game)
             if (game)
                 game_destroy(game);
         }
@@ -50,15 +48,12 @@ function Game() {
                 });
                 
                 gameSocket.on("Connected", () => {
-                    console.log("CONNECTED");
                     setGameDatas(locationState);
                     const gameReturn: Phaser.Game = launch_game(locationState, gameSocket, localTokenParse.access_token, cache, setHasEnded);
-                    console.log("gameReturn", gameReturn);
                     setGame(gameReturn);
                 })
 
                 gameSocket.on("Unauthorized", async () => {
-                    console.log("Unauthorized");
                     const localToken: string | null = localStorage.getItem("userToken");
                     if (localToken) {
                         const storedToken: TokenStorageInterface = JSON.parse(localToken);  
@@ -81,7 +76,6 @@ function Game() {
 
         return () => {
             if (gameSocket) {
-                console.log("DISCONEECT GAME SOCKET");
                 gameSocket.off("MultiTabError");
                 gameSocket.off("Connected");
                 gameSocket.off("Unauthorized");

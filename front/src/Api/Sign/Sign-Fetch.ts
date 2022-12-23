@@ -18,7 +18,6 @@ export async function fetchSignIn(username: string, password: string) {
 export function fetchSignUp({username, email, password, dispatch}: SignParameter) {
     axios.post(`${process.env.REACT_APP_BASE_URL}/auth/signup`, {username: username, email: email, password: password})
     .then((response) => {
-        console.log('JWT =>', response.data);
         const tokenStorage: TokenStorageInterface = {
             access_token: response.data.access_token,
             refresh_token: response.data.refresh_token,
@@ -27,13 +26,7 @@ export function fetchSignUp({username, email, password, dispatch}: SignParameter
         dispatch(loginSuccess({...response.data.user, blocked: [], channelUser: []}));
     }).catch(err => {
         console.log("Error", err);
-        // if (err.response.status === 403) {
-            
             dispatch(loginError(err.response.data.message));
-        //     dispatch(loginError("Username or email already use"));
-        // } else {
-        //     dispatch(loginError("Error while Signup"));
-        // }
     })
 }
 
@@ -46,22 +39,12 @@ export async function fetchSetUsername(username: string, token: string,) {
         headers: {
             "Authorization": `Bearer ${token}`,
         }
-    })
-    // .then((response) => {
-	// 	console.log("response,", response);
-    //     localStorage.setItem("userToken", JSON.stringify(tokens));
-    //     dispatch(loginSuccess(response.data));
-    // })
-    // .catch(err => {
-    //     console.log(err);
-    //     // TODO Handle error: Display error message on login page
-    // });
+    });
 }
 
 export function fetchVerifyToken(dispatch: Dispatch<AnyAction>) {
     api.post(`/auth/verify-token`, {})
     .then((response) => {
-        console.log("Response VerifyToken", response);
         dispatch(loginSuccess(response.data));
     })
     .catch((err) => {

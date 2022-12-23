@@ -5,7 +5,6 @@ export function useFriendHook() {
     const {socket} = useContext(SocketContext);
 
     const handleAddFriend = (userIdToAccept: number) => {
-        console.log("userIdToAccept", userIdToAccept);
             socket?.emit("FriendRequest", {
                 id: userIdToAccept,
             });        

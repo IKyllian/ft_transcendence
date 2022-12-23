@@ -25,7 +25,6 @@ function ResetPassword() {
             if (authorizationCode) {
                 axios.post(`${process.env.REACT_APP_BASE_URL}/auth/reset-password`, {code: authorizationCode, newPassword: data.password})
                 .then(response => {
-                    console.log(response);
                     navigate("/sign");
                 })
                 .catch(err => {

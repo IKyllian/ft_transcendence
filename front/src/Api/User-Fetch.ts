@@ -23,7 +23,6 @@ export async function fetchOnUnblockUser(senderId: number): Promise<AxiosRespons
 export function fetchNotifications(dispatch: Dispatch<AnyAction>) {
     api.get(`/notification`)
     .then(response => {
-        console.log("Notification", response);
         dispatch(copyNotificationArray(response.data));
     })
     .catch(err => {
@@ -34,7 +33,6 @@ export function fetchNotifications(dispatch: Dispatch<AnyAction>) {
 export function fetchFriendList(dispatch: Dispatch<AnyAction>) {
     api.get(`/friend`)
     .then(response => {
-        console.log(response);
         dispatch(copyFriendListArray(response.data));
     })
     .catch(err => {
@@ -56,7 +54,6 @@ export function fetchSearchAllUsers(inputText: string, setUsersList: Function) {
 export function fetchSearchUsersToAdd(inputText: string, setUsersList: Function) {
     api.post(`/friend/search`, {str: inputText})
     .then(response => {
-        console.log("Response Search", response);
         const newArray: UsersListInterface[] = response.data.map((elem: any) => { return {user: elem.user, relationStatus: elem.relationStatus}});
         setUsersList(newArray);
     })
@@ -69,7 +66,6 @@ export async function fetchIsAlreadyInGame(): Promise<boolean> {
     let isInGame: boolean = false;
    await api.get(`/game/is-playing`)
     .then(response => {
-        console.log("response", response.data);
         isInGame = response.data;
     })
     .catch(err => {
@@ -89,8 +85,6 @@ export async function getPlayerAvatar(cache: Cache | null, token: string, userId
                 return cacheResponse;
             } else {
                 return await fetchResponseAvatar(req).then(fetchResponse => {
-                    // console.log("fetchResponse", fetchResponse);
-                    console.log('Response Headers:', fetchResponse.headers);
                     if (!fetchResponse.ok)
                         return undefined;
                     headerFileName = fetchResponse.headers.get("Content-Disposition");
@@ -108,7 +102,6 @@ export async function getPlayerAvatar(cache: Cache | null, token: string, userId
         })
     }
     if (headerFileName !== null && userAvatar.match("base64") === null && headerFileName !== userAvatar) {
-        console.log("NEED TO UPDATE CACHE");
         return await updatePlayerAvatar(cache, token, userId);
     }
     if (avatarResponse !== undefined) {

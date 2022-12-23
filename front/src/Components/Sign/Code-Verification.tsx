@@ -32,7 +32,6 @@ function CodeVerification() {
                 }
             })
             .then(response => {
-                console.log("Response Authenticate", response);
                 const tokenStorage: TokenStorageInterface = {
                     access_token: response.data.access_token,
                     refresh_token: response.data.refresh_token,

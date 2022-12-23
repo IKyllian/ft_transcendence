@@ -25,8 +25,6 @@ export function useChannelHook() {
     const channelId: number | undefined = params.channelId ? +params.channelId! : undefined;
     const dispatch = useAppDispatch();
 
-    console.log("Chan Component", params.channelId);
-
     const changeSidebarStatus = () => {
         setShowUsersSidebar(!showUsersSidebar);
     };

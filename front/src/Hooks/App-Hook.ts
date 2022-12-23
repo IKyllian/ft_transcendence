@@ -31,7 +31,6 @@ export function useAppHook() {
 	const navigate = useNavigate();
 
 	const connectSocket = (access_token: string) => {
-		console.log("new socket")
 		const newSocket: Socket = io(`${process.env.REACT_APP_SOCKET_URL}`, {extraHeaders: {
 			"Authorization": `Bearer ${access_token}`,
 		}});
@@ -54,9 +53,8 @@ export function useAppHook() {
 	}
 
 	const deleteCache = () => {
-		console.log("DELETE");
 		caches.delete('avatar-cache').then(isGone => {
-			console.log("Cache is delete", isGone);
+			console.log("Cache deleted", isGone);
 		})
 		.catch(err => {
 			console.log("ERR", err);
@@ -64,7 +62,6 @@ export function useAppHook() {
 	}
 	
 	useEffect(() => {
-		console.log("GET ITEM");
 		// localStorage.removeItem("userToken");
 		if (localStorage.getItem("userToken") !== null) {
 			fetchVerifyToken(dispatch);
@@ -111,7 +108,6 @@ export function useAppHook() {
             });
 
 			socket?.on('ChannelUpdate', (data: {type: ChannelUpdateType, data: ChannelUser | UserTimeout | number}) => {
-                console.log("ChannelUpdate", data);
                 if (data.type === ChannelUpdateType.JOIN) {
                     const eventData = data.data as ChannelUser;
                     dispatch(addChannelUser(eventData));
@@ -159,7 +155,6 @@ export function useAppHook() {
 	useEffect(() => {
 		if (socket !== undefined) {
 			socket.on("Connection", (data: {friendList: UserInterface[], notification: NotificationInterface[], party: PartyInterface}) => {
-				console.log("data connection", data);
 				dispatch(copyNotificationArray(data.notification));
 				dispatch(copyFriendListArray(data.friendList));
 				if (data.party) {
@@ -169,7 +164,6 @@ export function useAppHook() {
 			});
 
 			socket.on("PartyUpdate", (data: {party: PartyInterface, cancelQueue: boolean}) => {
-				console.log("PartyUpdate", data);
 				dispatch(addParty(data.party));
 				dispatch(cancelQueue(data.cancelQueue));
 			});
@@ -183,7 +177,6 @@ export function useAppHook() {
 			})
 
 			socket.on("PartyLeave", () => {
-				console.log("PartyLeave");
 				dispatch(leaveParty());
 			});
 
@@ -192,7 +185,6 @@ export function useAppHook() {
 			})
 
 			socket.on("NewNotification", (data: NotificationInterface) => {
-				console.log("NewNotification", data);
 				if (data.conversation) {
 					dispatch(changePrivateConvOrder(data.conversation.id));
 				}
@@ -200,7 +192,6 @@ export function useAppHook() {
 			});
 
 			socket.on("NewPartyInvite", (data: NotificationInterface) => {
-				console.log("NewPartyInvite", data);
 				dispatch(addPartyInvite(data));
 				setTimeout(() => {
 					dispatch(removePartyInvite(data.id));
@@ -212,26 +203,22 @@ export function useAppHook() {
 			});
 
 			socket.on("exception", (data: {message: string, status: string}) => {
-				console.log(data);
 				dispatch(addAlert({message: data.message, type: AlertType.ERROR}));
 				if (data.message === "Channel not found" && data.status === "error")
 					dispatch(channelNotfound());
 			});
 
 			socket.on("FriendListUpdate", (data: UserInterface[]) => {
-				console.log("FriendListUpdate", data);
 				dispatch(copyFriendListArray(data));
 			});
 
 			socket.on("NewConversation", (data : {conv: Conversation, socketId: string}) => {
-				console.log("NewConversation", data);
 				dispatch(addPrivateConv({isActive: 'false', conversation: {id: data.conv.id, user1: data.conv.user1, user2: data.conv.user2}}));
 				if (data.socketId === socket.id)
 					navigate(`/chat/private-message/${data.conv.id}`);
 			});
 
 			socket.on("OnJoin", (data: Channel) => {
-				console.log("ON JOIN");
 				dispatch(addChannel({isActive: 'true', channel: data}));
 				navigate(`/chat/channel/${data.id}`);
 			});
@@ -245,9 +232,7 @@ export function useAppHook() {
 				dispatch(changeUserIngameStatus({id: data.id, in_game_id: data.in_game_id}));				
 			});
 
-            socket?.on("OnLeave", (data: Channel) => {
-                console.log("OnLeave");
-				
+            socket?.on("OnLeave", (data: Channel) => {				
                 // Sert à ne pas redirect si le user est sur une autre page que le channel leave (pour le multitab)
                 // Si on veut faire ca il faut que j'envoie l'url ou juste le params du channel à l'event LeaveChannel et que Jojo me le revoie sur cet event
                 // if (params.channelId && parseInt(params.channelId) === data.id) {
@@ -261,13 +246,11 @@ export function useAppHook() {
 			});
 
 			socket?.on("newgame_data", (data: PlayersGameData) => {
-				console.log("new_game_data", data);
 				dispatch(changeQueueStatus(false));
 				dispatch(newGameFound({gameDatas: data, showGameFound: true}));
 			});
 
 			socket?.on('gameinfo', (data: PlayersGameData | null) => {
-				console.log("gameinfo", data);
 				if (data !== null) {
 					dispatch(newGameFound({gameDatas: data, showGameFound: false}));
 					navigate("/game", {state: data});
@@ -275,7 +258,6 @@ export function useAppHook() {
 			})
 
 			socket?.on('user_gameinfo', (data: PlayersGameData | null) => {
-				console.log("user_gameinfo", data);
 				if (data !== null) {
 					dispatch(newGameFound({gameDatas: data, showGameFound: false}));
 					navigate("/game", {state: data});

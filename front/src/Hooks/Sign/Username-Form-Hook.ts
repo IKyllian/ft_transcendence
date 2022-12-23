@@ -16,8 +16,6 @@ export function useUsernameFormHook() {
 
     const locationState = location.state as TokenStorageInterface;
 
-	console.log("locationState", locationState);
-
     const onSubmit = handleSubmit(async (data, e) => {
         e?.preventDefault();
         fetchSetUsername(data.username, locationState.access_token)

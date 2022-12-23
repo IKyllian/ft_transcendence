@@ -3,7 +3,6 @@ import { useFriendHook } from '../../Hooks/Friend-Hook';
 
 function FriendButton(props: {secondUserId: number, relationStatus: string}) {
     const { secondUserId, relationStatus } = props;
-    console.log("relationStatus", relationStatus);
     const {
         handleAddFriend,
         handleRemoveFriend,

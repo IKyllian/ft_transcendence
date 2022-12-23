@@ -14,7 +14,6 @@ export async function fetchUserChannels(channelId: number | undefined): Promise<
     let datasArray: ChannelsInterfaceFront[] = [];
     await api.get(`/channel/my_channels`)
     .then((response) => {
-        console.log("fetchUserChannels", response);
         const channelArray: Channel[] = response.data;
 
         channelArray.forEach((elem: Channel) => {
@@ -40,7 +39,6 @@ export async function fetchUserConvs(): Promise<ConversationInterfaceFront[]> {
     let datasArray: ConversationInterfaceFront[] = [];
    await api.get(`/conversation`)
     .then((response) => {
-        console.log("fetchUserConvs", response);
         const convArray: Conversation[] = response.data;
         
         convArray.forEach(elem => {
@@ -63,17 +61,14 @@ export async function fetchConvAndRedirect(
         navigate: NavigateFunction
     ): Promise<void>{
     
-    console.log("userIdToSend", userIdToSend);
     await api.get(`/conversation/user/${userIdToSend}`)
     .then(response => {
-        console.log("conversation/user", response);
         const responseDatas: Conversation | UserInterface = response.data;
         if ((responseDatas as Conversation).messages) {
             if (!privateConvs?.find(elem => elem.conversation.id === response.data.id))
                 dispatch(addPrivateConv({isActive: 'false', conversation: {id: response.data.id, user1: response.data.user1, user2: response.data.user2}}));
             navigate(`/chat/private-message/${response.data.id}`, {state: {isTemp: false, conv: response.data}});
         } else {
-            console.log("User");
             const tempId: number = Math.floor(Math.random() * 10000);;
             navigate(`/chat/private-message/${tempId}`, {state: {isTemp: true, conv: {id: tempId, user1: loggedUser, user2: response.data, messages: []}}});
         }
@@ -87,7 +82,6 @@ export async function fetchConvAndRedirect(
 export function fetchVisibleChannels(setChannelsList: Function) {
     api.get(`/channel/search`)
     .then((response) => {
-        console.log(response);
         setChannelsList([...response.data]);
     })
     .catch((err) => {
@@ -98,7 +92,6 @@ export function fetchVisibleChannels(setChannelsList: Function) {
 export function fetchPrivateConvDatas(convId: number, setConvDatas: Function) {
     api.get(`/conversation/${convId}`)
     .then(response => {
-        console.log(response);
         setConvDatas({temporary: false, conv: response.data});
     })
     .catch(err => {

@@ -13,7 +13,6 @@ function SendMailPassword() {
         e?.preventDefault();
         axios.post(`${process.env.REACT_APP_BASE_URL}/auth/forgot-password`, {email: data.email})
         .then(response => {
-            console.log(response);
             dispatch(addAlert({message: "Email has been sent", type: AlertType.SUCCESS}));
             reset();
             setMailSend(true);

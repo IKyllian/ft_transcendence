@@ -53,7 +53,6 @@ export function useProfileHook() {
             const promiseProfileFetch: Promise<AxiosResponse<any, any>> = isLoggedUser ? fetchMe() : fetchProfile(params.username);
             promiseProfileFetch.then(fetchResponse => {
                 if (fetchResponse) {
-                    console.log("fetchResponse", fetchResponse);
                     setUserState({
                         isLoggedUser: isLoggedUser ? true : false,
                         user: {...fetchResponse.data.user},
@@ -87,7 +86,6 @@ export function useProfileHook() {
         });
 
         socket?.on("InGameStatusUpdate", (data: {id: number, in_game_id: string | null}) => {
-            console.log("InGameStatusUpdate", data);
             setUserState(prev => {
                 if (prev && prev.user)
                     return {...prev, user: {...prev.user, in_game_id: data.in_game_id}};
@@ -96,7 +94,6 @@ export function useProfileHook() {
         });
 
         socket?.on("StatusUpdate", (data: {id: number, status: UserStatus}) => {
-            console.log("StatusUpdate", data);
             setUserState(prev => {
                 if (prev && prev.user)
                     return {...prev, user: {...prev.user, status: data.status}};

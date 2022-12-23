@@ -35,7 +35,6 @@ function FormChanName() {
         
         api.patch(`/channel/edit-name`, {chanId: channelDatas!.id, name: data.chanName})
         .then(response => {
-            console.log(response);
             dispatch(changeChannelSettings({chanName: response.data.name, option: response.data.option}));
             dispatch(addAlert({message: "Channel name updated", type: AlertType.SUCCESS}));
         })
@@ -90,7 +89,6 @@ function FormChanType() {
 
         api.patch(`/channel/edit-option`, payload)
         .then(response => {
-            console.log("RESPONSE ", response.data);
             dispatch(changeChannelSettings({chanName: response.data.name, option: response.data.option}));
             dispatch(addAlert({message: "Channel type updated", type: AlertType.SUCCESS}));
         })

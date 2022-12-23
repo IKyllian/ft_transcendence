@@ -1,5 +1,5 @@
 @use '../Variables.scss' as *;
-@use "../mixins.scss" as *;
+@use "../Mixins.scss" as *;
 
 .chat-modal {
     @include modal-container(620px, 600px, $DarkPalette); // Params => Height, Width, Background-color

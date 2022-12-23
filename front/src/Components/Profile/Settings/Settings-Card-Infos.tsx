@@ -64,7 +64,6 @@ function PasswordForm() {
         e?.preventDefault();
         api.patch(`/users/edit-password`, {old: data.oldPassword, new: data.newPassword})
         .then(response => {
-            console.log("Response Edit PAssword", response);
             resetField("oldPassword");
             resetField("newPassword");
             dispatch(addAlert({message: "Password changed", type: AlertType.SUCCESS}));
@@ -127,7 +126,6 @@ function UsernameForm(props: {user: UserInterface}) {
         e?.preventDefault();
         api.patch(`/users/edit-username`, {username: data.username})
         .then(response => {
-            console.log("response Edit username", response.data);
             dispatch(replaceUserObject(response.data));
             dispatch(addAlert({message: "Username changed", type: AlertType.SUCCESS}));
         })
@@ -180,7 +178,6 @@ function Disable2fa() {
         e?.preventDefault();
         api.post(`/2fa/disable`, {code: data.code})
         .then((response) => {
-            console.log("response 2fa enable", response);
             dispatch(addAlert({message: "Two-Factor Authentication Disabled", type: AlertType.SUCCESS}));
             dispatch(change2faStatus(false));
         })
@@ -218,7 +215,6 @@ function QRCodeValidation(props: {qrcode: string, setDisplayQRCode: Function}) {
         e?.preventDefault();
         api.post(`/2fa/enable`, {code: data.code})
         .then((response) => {
-            console.log("response 2fa enable", response);
             dispatch(addAlert({message: "Two-Factor Authentication Activated", type: AlertType.SUCCESS}));
             setDisplayQRCode({show: false, qrcode: undefined});
             dispatch(change2faStatus(true));

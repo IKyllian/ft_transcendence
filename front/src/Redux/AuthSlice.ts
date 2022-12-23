@@ -33,12 +33,10 @@ export const authSlice = createSlice({
                 state.currentUser.in_game_id = payload;
         },
         loginSuccess: (state, {payload}: PayloadAction<UserInterface>) => {
-			console.log("payload", payload);
             state.currentUser = payload;
             state.isSign = true;
             state.loading = false;
-            state.loadingIsConnected = false,
-            console.log("state", state);
+            state.loadingIsConnected = false;
         },
         loginError: (state, {payload}: PayloadAction<string>) => {
             state.error = payload;

@@ -126,7 +126,6 @@ export function usePrivateConvHook() {
             setPrevLength(0);
             
             socket?.on('NewPrivateMessage', (data: PrivateMessage) => {
-                console.log("NewPrivateMessage", data);
                 dispatch(addNewMessage(data));
             });
 

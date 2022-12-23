@@ -39,7 +39,6 @@ export function useSignHook() {
         e?.preventDefault();
         dispatch(loginPending());
         fetchSignIn(data.username, data.password).then(response => {
-            console.log('JWT =>', response.data);
             if (response.data.access_2fa_token) {
                 dispatch(verification2fa());
                 navigate("/2fa-verification", {state: {access_2fa_token: response.data.access_2fa_token}});
@@ -71,7 +70,6 @@ export function useSignHook() {
                 navigate("/sign");
             dispatch(loginPending());
             fetchLogin42(authorizationCode).then(response => {
-                console.log("Response Sign in 42", response);
                 if (response.data.access_2fa_token) {
                     dispatch(verification2fa());
                     navigate("/2fa-verification", {state: {access_2fa_token: response.data.access_2fa_token}});
