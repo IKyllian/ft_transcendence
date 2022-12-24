@@ -90,6 +90,7 @@ function Header() {
                 <IconLogout onClick={() => handleLogout()} />
             </div>
             <div className='header-right-responsive'>
+                <PartyButton />
                 <NotifIcon notifications={notifications} handleNotifDropdownClick={handleNotifDropdownClick} />
                 <ExternalImage src={currentUser.avatar} alt="User Avatar" className="header-avatar" userId={currentUser.id} />
                 <IconChevronDown style={{cursor: "pointer"}} onClick={() => handleMenuClick()} />
