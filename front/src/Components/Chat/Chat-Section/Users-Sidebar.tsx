@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ChannelUser } from "../../../Types/Chat-Types";
 import { UserStatus } from "../../../Types/User-Types";
@@ -87,7 +87,7 @@ function UsersSidebar(props: {usersList: ChannelUser[]}) {
                     {
                         usersList.filter((elem) => elem.role === "clampin")
                         .map((elem) =>
-                            <UserSidebarItem key={elem.user.id} user={elem} />
+                            <UserSidebarItem key={elem.user.id} user={elem} />   
                         )
                     }
                 </ul>

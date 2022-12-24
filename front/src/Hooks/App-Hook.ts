@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { io, Socket } from "socket.io-client";
 import { useAppDispatch, useAppSelector } from '../Redux/Hooks'
 import { NotificationInterface } from "../Types/Notification-Types";
@@ -29,6 +29,8 @@ export function useAppHook() {
 
 	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
+	const location = useLocation();
+	const params = useParams();
 
 	const connectSocket = (access_token: string) => {
 		const newSocket: Socket = io(`${process.env.REACT_APP_SOCKET_URL}`, {extraHeaders: {
@@ -232,15 +234,6 @@ export function useAppHook() {
 				dispatch(changeUserIngameStatus({id: data.id, in_game_id: data.in_game_id}));				
 			});
 
-            socket?.on("OnLeave", (data: Channel) => {				
-                // Sert à ne pas redirect si le user est sur une autre page que le channel leave (pour le multitab)
-                // Si on veut faire ca il faut que j'envoie l'url ou juste le params du channel à l'event LeaveChannel et que Jojo me le revoie sur cet event
-                // if (params.channelId && parseInt(params.channelId) === data.id) {
-                    navigate(`/chat`);
-                // }
-                dispatch(removeChannel(data.id));
-            });
-
 			socket?.on("SendConfirm", (data: string) => {
 				dispatch(addAlert({message: data, type: AlertType.SUCCESS}));
 			});
@@ -297,6 +290,21 @@ export function useAppHook() {
             socket?.off("gameinfo");
 		}
 	}, [socket])
+
+	useEffect(() => {
+		if (socket !== undefined) {
+			socket?.on("OnLeave", (data: Channel) => {				
+                if (currentChannelId !== undefined && +currentChannelId === data.id)
+                    navigate(`/chat`);
+                dispatch(removeChannel(data.id));
+            });
+		}
+		return () => {
+			if (socket !== undefined)
+				socket.off("OnLeave");
+		}
+
+	}, [socket, currentChannelId])
 
     return {
         socket,
