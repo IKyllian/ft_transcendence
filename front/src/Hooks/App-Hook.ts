@@ -220,9 +220,10 @@ export function useAppHook() {
 					navigate(`/chat/private-message/${data.conv.id}`);
 			});
 
-			socket.on("OnJoin", (data: Channel) => {
-				dispatch(addChannel({isActive: 'true', channel: data}));
-				navigate(`/chat/channel/${data.id}`);
+			socket.on("OnJoin", (data: {channel: Channel, socketId: string}) => {
+				dispatch(addChannel({isActive: 'true', channel: data.channel}));
+				if (data.socketId === socket.id)
+					navigate(`/chat/channel/${data.channel.id}`);
 			});
 
 			socket?.on("InGameStatusUpdate", (data: {id: number, in_game_id: string | null}) => {
@@ -293,10 +294,10 @@ export function useAppHook() {
 
 	useEffect(() => {
 		if (socket !== undefined) {
-			socket?.on("OnLeave", (data: Channel) => {				
-                if (currentChannelId !== undefined && +currentChannelId === data.id)
+			socket?.on("OnLeave", (data: number) => {		
+                if (currentChannelId !== undefined && +currentChannelId === data)
                     navigate(`/chat`);
-                dispatch(removeChannel(data.id));
+                dispatch(removeChannel(data));
             });
 		}
 		return () => {

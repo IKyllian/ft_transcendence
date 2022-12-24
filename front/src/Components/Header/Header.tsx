@@ -1,5 +1,5 @@
 import { useState, useContext, useEffect } from 'react';
-import { IconLogout, IconMessages, IconUsers, IconChevronDown, IconBell } from '@tabler/icons';
+import { IconLogout, IconMessages, IconUsers, IconChevronDown, IconBell, IconX } from '@tabler/icons';
 
 import { ModalContext } from '../Utils/ModalProvider';
 import { Link, useLocation } from 'react-router-dom';
@@ -11,6 +11,7 @@ import { NotificationInterface, notificationType } from '../../Types/Notificatio
 import { logoutSuccess } from '../../Redux/AuthSlice';
 import { SocketContext } from '../../App';
 import ExternalImage from '../External-Image';
+import { partyQueueString } from '../../Utils/Utils-Party';
 
 function NotifIcon(props: {notifications: NotificationInterface[] | undefined ,handleNotifDropdownClick: Function}) {
     const {handleNotifDropdownClick, notifications} = props;
@@ -30,6 +31,7 @@ function Header() {
     const location = useLocation();
     const { currentUser } = useAppSelector(state => state.auth);
     const {notifications} = useAppSelector(state => state.notification);
+    // const {queueTimer} = useAppSelector(state => state.party);
     const modalStatus = useContext(ModalContext);
     const dispatch = useAppDispatch();
     const {socket} = useContext(SocketContext);
@@ -69,6 +71,7 @@ function Header() {
             </Link>
             <div className='header-right'>
                 <div className='icons-header'>
+                    {/* <p> <IconX /> In Queue: {partyQueueString(queueTimer)} </p> */}
                     <PartyButton />
                     <NotifIcon notifications={notifications} handleNotifDropdownClick={handleNotifDropdownClick} />
                     <IconUsers onClick={() => modalStatus.setStatus()} />
