@@ -6,14 +6,14 @@ import { ChannelService } from "../channel.service";
 export class WsInChannelGuard implements CanActivate {
 	constructor(private channelService: ChannelService) {}
 	async canActivate(context: ExecutionContext): Promise<boolean> {
-		const client = context.switchToWs();
-		const data = client.getData();
-		const user = client.getClient().user;
+		const ws_context = context.switchToWs();
+		const data = ws_context.getData();
+		const user = ws_context.getClient().user;
 		const channelUser = await this.channelService.getChannelUser(data.chanId, user.id);
 		if (!channelUser) {
 			throw new NotInChannelException();
 		}
-		client.getClient().channelUser = channelUser;
+		ws_context.getClient().channelUser = channelUser;
 		return true;
 	}
 }
