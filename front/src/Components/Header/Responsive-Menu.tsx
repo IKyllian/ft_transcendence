@@ -25,7 +25,7 @@ function ResponsiveMenu(props: {show: boolean, handleClick:Function, headerModal
                 </li>
                 <li> 
                     <Link to="/chat" onClick={() => handleClick()}>
-                        Message
+                        Chat
                     </Link>
                 </li>
                 <li onClick={() => { headerModal(); handleClick() }}> Friends / Users </li>

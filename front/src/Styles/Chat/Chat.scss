@@ -337,13 +337,12 @@
     .users-sidebar {
         @include width-height(300px, 100%);
         background-color: $DarkPalette;
-        @include overflowScroll("y");
+        position: relative;
+        
         &-wrapper {
             margin: 10px;
-            position: absolute;
             height: 95%;
-            overflow-y: scroll;
-            overflow-x: hidden;
+            @include overflowScroll("y");
             h3 {
                 margin: 0;
                 color: #a5abb0;
@@ -357,9 +356,8 @@
                     display: flex;
                     align-items: center;
                     gap: 10px;
-                    padding: 8px;
+                    padding: 5px;
                     @include avatar-status-container($DarkPalette);
-                    position: relative;
 
                     p {
                         cursor: pointer;
@@ -370,14 +368,14 @@
                         cursor: pointer;
                     }
 
-                    // &:hover {
-                    //     background-color: $LightDarkPalette;
-                    //     .avatar-container {
-                    //         .user-status {
-                    //             background-color: $LightDarkPalette;
-                    //         }
-                    //     }
-                    // }
+                    &:hover {
+                        background-color: $LightDarkPalette;
+                        .avatar-container {
+                            .user-status {
+                                background-color: $LightDarkPalette;
+                            }
+                        }
+                    }
                 }
             }
         }

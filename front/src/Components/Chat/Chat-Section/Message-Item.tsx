@@ -76,9 +76,9 @@ function MessageItem(props: {isFromChan: boolean, message: ChatMessage | Private
             }
         </>
     ) : (
-        <div className="message-server">
+        <li className="message-server">
             { !senderIsBlock && <p> {message.content} </p> }
-        </div>
+        </li>
     );
 }
 
