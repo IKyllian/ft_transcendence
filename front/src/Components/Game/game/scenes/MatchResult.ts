@@ -225,9 +225,13 @@ export default class MatchResult extends Phaser.Scene
 		const redEloLost: number = redEloWon - 50;
 
 		this.TeamBlue_Back_elo = this.add.text(100, 380, "" + this.TeamBlue_Back_oldElo,make_style(28,'#000000')).setOrigin(0.5,0.5);
-		this.TeamBlue_Front_elo = this.add.text(285, 380, "" + this.TeamBlue_Front_oldElo,make_style(28,'#000000')).setOrigin(0.5,0.5);
-		this.TeamRed_Front_elo = this.add.text(515, 380, "" + this.TeamRed_Front_oldElo,make_style(28,'#000000')).setOrigin(0.5,0.5);
 		this.TeamRed_Back_elo = this.add.text(700, 380, "" + this.TeamRed_Back_oldElo,make_style(28,'#000000')).setOrigin(0.5,0.5);
+		
+		// if (this.game_type === GameType.Doubles)
+		// {
+		// 	this.TeamBlue_Front_elo = this.add.text(285, 380, "" + this.TeamBlue_Front_oldElo,make_style(28,'#000000')).setOrigin(0.5,0.5);
+		// 	this.TeamRed_Front_elo = this.add.text(515, 380, "" + this.TeamRed_Front_oldElo,make_style(28,'#000000')).setOrigin(0.5,0.5);
+		// }
 
 		if (this.winner === EndResult.TeamBlue_Win)
 		{
@@ -257,6 +261,9 @@ export default class MatchResult extends Phaser.Scene
 
 			if (this.game_type === GameType.Doubles)
 			{
+				this.TeamBlue_Front_elo = this.add.text(285, 380, "" + this.TeamBlue_Front_oldElo,make_style(28,'#000000')).setOrigin(0.5,0.5);
+				this.TeamRed_Front_elo = this.add.text(515, 380, "" + this.TeamRed_Front_oldElo,make_style(28,'#000000')).setOrigin(0.5,0.5);
+
 				this.TeamBlue_Front_elo_change = this.add.text(285, 340, "+" + blueEloWon, make_style(28, '#00FF00'))
 								.setOrigin(0.5,0.5);
 				this.TeamRed_Front_elo_change = this.add.text(515, 340, "" + redEloLost, make_style(28, '#FF0000'))
@@ -305,6 +312,9 @@ export default class MatchResult extends Phaser.Scene
 
 			if (this.game_type === GameType.Doubles)
 			{
+				this.TeamBlue_Front_elo = this.add.text(285, 380, "" + this.TeamBlue_Front_oldElo,make_style(28,'#000000')).setOrigin(0.5,0.5);
+				this.TeamRed_Front_elo = this.add.text(515, 380, "" + this.TeamRed_Front_oldElo,make_style(28,'#000000')).setOrigin(0.5,0.5);
+
 				this.TeamBlue_Front_elo_change = this.add.text(285, 340, "" + blueEloLost, make_style(28,'#FF0000' )).setOrigin(0.5,0.5);
 				this.TeamRed_Front_elo_change = this.add.text(515, 340, "+" + redEloWon, make_style(28,'#00FF00' )).setOrigin(0.5,0.5);
 
