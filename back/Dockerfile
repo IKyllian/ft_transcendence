@@ -8,6 +8,4 @@ RUN npm i
 
 RUN npm run build
 
-EXPOSE 80
-
 ENTRYPOINT [ "npm", "start" ]
