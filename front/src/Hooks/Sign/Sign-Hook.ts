@@ -102,7 +102,7 @@ export function useSignHook() {
         e.preventDefault();
         const url: string = "https://api.intra.42.fr/oauth/authorize";
 		// TODO redirect ip
-        const params: string = `?client_id=${process.env.REACT_APP_API42_CLIENT_ID}&redirect_uri=${process.env.REACT_APP_REDIRECT_URL}/sign&response_type=code`;
+        const params: string = `?client_id=${process.env.REACT_APP_API42_CLIENT_ID}&redirect_uri=${process.env.REACT_APP_REDIRECT_URL}&response_type=code`;
         const ret = window.location.replace(url+params);
     }
 
