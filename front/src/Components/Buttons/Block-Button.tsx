@@ -39,7 +39,7 @@ function BlockButton(props: {senderId: number, isIconButton?: boolean}) {
     return !isIconButton ? (
         <p onClick={() => senderIsBlock ? onUnblock() : onBlock()}> {senderIsBlock ? "unblock" : "block"} </p>
     ) : (
-        <div title={`${senderIsBlock ? "Unblock" : "Block"}`}>
+        <div data-tooltips={`${senderIsBlock ? "Unblock" : "Block"}`}>
             <IconBan className='block-button' onClick={() => senderIsBlock ? onUnblock() : onBlock()} style={senderIsBlock ? {color: "red"} : {}} />
         </div>
     );

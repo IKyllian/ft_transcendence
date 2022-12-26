@@ -23,6 +23,19 @@
     }
 }
 
+@mixin tooltip {
+    cursor: auto;
+    position: absolute;
+    height: 0;
+    background-color: $LightDarkPalette;
+    border-radius: 5px;
+    font-size: 11px;
+    z-index: 9999;
+    opacity: 0;
+    transition: 0s;
+    text-align: center;
+}
+
 @mixin player-status {
     height: 13px;
     width: 13px;

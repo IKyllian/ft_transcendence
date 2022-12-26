@@ -40,10 +40,10 @@ function Sign() {
                                 value: 1,
                                 message: "Min length is 1"
                             },
-                            // pattern: {
-                            //     message: "invalid username",
-                            //     value: new RegExp(/^[A-Za-z0-9_.-—]+$/),
-                            // }
+                            pattern: {
+                                message: "invalid username",
+                                value: new RegExp(/^[a-zA-Z0-9-_.]+$/),
+                            }
                         })}
                     />
                     {
