@@ -463,10 +463,10 @@ export default class PongCore
 		if (this.fancy_rebound)
 		{
 			let dist = (paddle_y - this.ball_data.position.y);
-			if (dist < 0)
-			{
+			// if (dist < 0)
+			// {
 				dist *= -1;
-			}
+			// }
 
 			let ratio;// = dist / (this.paddle_size_h / 2);
 			if (pos === PlayerPosition.BACK)
@@ -478,13 +478,13 @@ export default class PongCore
 				ratio = dist / (this.paddle_size_front / 2)
 			}
 
-			if (ratio > 0.5)
+			if (ratio > 0.5 || ratio < -0.5)
 			{
 				this.ball_data.vector.y += ratio / 1.5;
 			}
-			else if (ratio < 0.10)
+			else if (ratio < 0.30 || ratio > -0.30)
 			{
-				this.ball_data.vector.y = ratio * 1.5;
+				this.ball_data.vector.y = ratio * 1.7;
 			}
 		}	
 	}
