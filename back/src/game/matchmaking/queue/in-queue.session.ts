@@ -1,5 +1,4 @@
 import { Injectable } from "@nestjs/common";
-import { User } from "src/typeorm";
 import { QueueLobby } from "src/utils/types/types";
 
 @Injectable()

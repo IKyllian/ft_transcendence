@@ -12,7 +12,7 @@ export class SignupDto {
 	@IsNotEmpty()
 	@MinLength(1)
 	@MaxLength(15)
-	@Matches(/^[A-Za-z0-9_.-—]+$/)
+	@Matches(/^[a-zA-Z0-9-_.]+$/)
 	username: string;
   
   	@IsEmail()
