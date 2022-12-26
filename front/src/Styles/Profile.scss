@@ -47,14 +47,10 @@ $FontSizeTextResponsive: 15px;
                 align-items: center;
                 padding-bottom: 20px;
 
-                .rank-icon {
+                img {
                     @include width-height(100px, 100px);
                     position: absolute;
                     bottom: -60px;
-
-                    img {
-                        @include width-height(100%, 100%);
-                    }
                 }
 
                 p {
@@ -494,12 +490,9 @@ $FontSizeTextResponsive: 15px;
                     top: 5px;
                 }
                 .stat-elem {
-                    .rank-icon {
+                    img {
                         @include width-height(70px, 70px);
                         bottom: -40px;
-                        img {
-                            @include width-height(100%, 100%);
-                        }
                     }
                     p {        
                         &:first-child {
