@@ -7,3 +7,4 @@ back/src/updloads
 package-lock.json
 TODO.TOASK.txt
 uploads/
+postgres-data/
