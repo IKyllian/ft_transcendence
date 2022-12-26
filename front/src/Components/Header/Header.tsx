@@ -73,9 +73,13 @@ function Header() {
                 <div className='icons-header'>
                     {/* <p> <IconX /> In Queue: {partyQueueString(queueTimer)} </p> */}
                     <PartyButton />
-                    <NotifIcon notifications={notifications} handleNotifDropdownClick={handleNotifDropdownClick} />
-                    <IconUsers onClick={() => modalStatus.setStatus()} />
-                    <Link to="/chat" aria-label="Link to the chat">
+                    <div data-tooltips="Notifications">
+                        <NotifIcon notifications={notifications} handleNotifDropdownClick={handleNotifDropdownClick}   />
+                    </div>
+                    <div data-tooltips="Social" className='social-icon'>
+                        <IconUsers onClick={() => modalStatus.setStatus()} />
+                    </div>
+                    <Link to="/chat" aria-label="Link to the chat" data-tooltips="Chat">
                         <div className='badge-wrapper'>
                             {
                                 notifications !== undefined
