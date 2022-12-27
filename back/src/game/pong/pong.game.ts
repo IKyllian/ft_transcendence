@@ -54,8 +54,13 @@ export class PongGame
 				this.lobby.game_set_finished();
 				clearInterval(this.update_interval);
 				this.lobby.playerSockets.forEach((socket) => {
-					console.log("disconnecting: " + socket.id)
-					socket.disconnect()
+					console.log("disconnecting: " + socket.id);
+					socket.disconnect();
+				});
+
+				this.lobby.spectators.forEach((spec) =>
+				{
+					spec.disconnect();
 				});
 
 				if (this.game_settings.is_ranked) {
