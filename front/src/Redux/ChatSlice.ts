@@ -100,6 +100,16 @@ export const chatSlice = createSlice({
                 }
             }
         },
+        resetActiveElement: (state) => {
+            const activeChan : ChannelsInterfaceFront | undefined = state.channels.find(elem => elem.isActive === 'true');
+            if (activeChan)
+                activeChan.isActive = 'false';
+            else {
+                const activeConv : ConversationInterfaceFront | undefined = state.privateConv.find(elem => elem.isActive === 'true');
+                if (activeConv)
+                    activeConv.isActive = 'false';
+            }
+        },
         resetChat: () => defaultState,
     }
 });
@@ -116,5 +126,6 @@ export const {
     removePrivateConv,
     changePrivateConvOrder,
     changeActiveElement,
+    resetActiveElement,
     resetChat,
 } = chatSlice.actions;

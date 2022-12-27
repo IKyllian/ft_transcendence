@@ -40,7 +40,7 @@ function UserSidebarItem(props: {user: ChannelUser}) {
                         <p> profile </p>
                     </Link>
                     { 
-                        !party || (party && !party.players.find(elem => elem.user.id === user.user.id)) &&
+                        (!party || (party && !party.players.find(elem => elem.user.id === user.user.id))) &&
                         <p onClick={() => socket?.emit("PartyInvite", {id: user.user?.id})}> invite to party </p>
                     }
                     <BlockButton senderId={user.user.id} />

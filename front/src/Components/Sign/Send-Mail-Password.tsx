@@ -21,7 +21,10 @@ function SendMailPassword() {
             console.log(err);
             if (mailSend)
                 setMailSend(false);
-            setError("email", {message: err.response.data.message});
+            if (err && err.response && err.response.data && err.response.data.message)
+                setError("email", {message: err.response.data.message});
+            else
+                setError("email", {message: "Email not found"});
         })
     });
     

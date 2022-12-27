@@ -1,5 +1,5 @@
 import { Dispatch, AnyAction } from "@reduxjs/toolkit";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { loginSuccess, loginError, stopIsConnectedLoading } from "../../Redux/AuthSlice";
 import { TokenStorageInterface } from "../../Types/Utils-Types";
 import api from "../Api";
@@ -26,7 +26,10 @@ export function fetchSignUp({username, email, password, dispatch}: SignParameter
         dispatch(loginSuccess({...response.data.user, blocked: [], channelUser: []}));
     }).catch(err => {
         console.log("Error", err);
+        if (err && err.response && err.response.data && err.response.data.message)
             dispatch(loginError(err.response.data.message));
+        else
+            dispatch(loginError("Error while signup"));
     })
 }
 

@@ -31,6 +31,7 @@ function GameSettingsWrapper(props: Props) {
                             <label>
                                 Paddle Back Size
                                 <input disabled={!loggedUserIsLeader} type="range" min={10} max={200} onChange={(e) => onInputChange(e, "paddle_size_back")} value={value} />
+                                <div className="input-value"> {value} </div>
                             </label>
                             
                         )}
@@ -43,6 +44,7 @@ function GameSettingsWrapper(props: Props) {
                             <label>
                                 Paddle Front Size
                                 <input disabled={!loggedUserIsLeader} type="range" min={10} max={200} onChange={(e) => onInputChange(e, "paddle_size_front")} value={value} />
+                                <div className="input-value"> {value} </div>
                             </label>
                             
                         )}
@@ -55,6 +57,7 @@ function GameSettingsWrapper(props: Props) {
                             <label>
                                 Player Back Advance
                                 <input disabled={!loggedUserIsLeader} type="range" min={10} max={180} onChange={(e) => onInputChange(e, "player_back_advance")} value={value} />
+                                <div className="input-value"> {value} </div>
                             </label>
                             
                         )}
@@ -67,6 +70,7 @@ function GameSettingsWrapper(props: Props) {
                             <label>
                                 Player Front Advance
                                 <input disabled={!loggedUserIsLeader} type="range" min={60} max={350} onChange={(e) => onInputChange(e, "player_front_advance")} value={value} />
+                                <div className="input-value"> {value} </div>
                             </label>
                             
                         )}
@@ -79,6 +83,7 @@ function GameSettingsWrapper(props: Props) {
                             <label>
                                 Paddle Speed
                                 <input disabled={!loggedUserIsLeader} type="range" min={5} max={25} onChange={(e) => onInputChange(e, "paddle_speed")} value={value} />
+                                <div className="input-value"> {value} </div>
                             </label>
                             
                         )}
@@ -91,6 +96,7 @@ function GameSettingsWrapper(props: Props) {
                             <label>
                                 Ball Start Speed
                                 <input disabled={!loggedUserIsLeader} type="range" min={5} max={10} onChange={(e) => onInputChange(e, "ball_start_speed")} value={value} />
+                                <div className="input-value"> {value} </div>
                             </label>
                             
                         )}
@@ -102,9 +108,9 @@ function GameSettingsWrapper(props: Props) {
                         render={({ field: { value }}) => (
                             <label>
                                 Ball Acceleration
-                                <input disabled={!loggedUserIsLeader} type="range" min={0.5} max={3} onChange={(e) => onInputChange(e, "ball_acceleration")} value={value} />
+                                <input disabled={!loggedUserIsLeader} step="0.5" type="range" min={0.5} max={3} onChange={(e) => onInputChange(e, "ball_acceleration")} value={value} />
+                                <div className="input-value"> {value} </div>
                             </label>
-                            
                         )}
                     />
                     <Controller
@@ -115,6 +121,7 @@ function GameSettingsWrapper(props: Props) {
                             <label>
                                 Point For Victory
                                 <input disabled={!loggedUserIsLeader} type="range" min={1} max={10} onChange={(e) => onInputChange(e, "point_for_victory")} value={value} />
+                                <div className="input-value"> {value} </div>
                             </label>
                             
                         )}

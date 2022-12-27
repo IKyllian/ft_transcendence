@@ -25,7 +25,10 @@ export function useUsernameFormHook() {
         })
         .catch(err => {
             console.log(err);
-            setError("username", {message: err.response.data.message})
+            if (err && err.response && err.response.data && err.response.data.message)
+                setError("username", {message: err.response.data.message});
+            else
+                setError("username", {message: "Username already exist"});
         })
     });
     

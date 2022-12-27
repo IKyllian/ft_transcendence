@@ -5,13 +5,6 @@ $GreyLobby: rgb(207, 203, 203);
 $TeamBlueColor: rgb(0, 98, 255);
 $TeamRedColor: rgb(247, 30, 6);
 
-#root {
-    $PaddleBackSize: 150px;
-    $PaddleFrontSize: 150px;
-    $PlayerBackAdvance: 10px;
-    $PlayerFrontAdvance: 40px;
-}
-
 .lobby-container {
     background-color: $LightDarkPalette;
     @include page-wrapper();
@@ -139,7 +132,6 @@ $TeamRedColor: rgb(247, 30, 6);
 
             .game-settings {
                 @include width-height(350px, 350px);
-                // padding: 10px 20px 10px 10px;
                 padding: 10px ;
                 display: flex;
                 flex-direction: column;
@@ -171,16 +163,22 @@ $TeamRedColor: rgb(247, 30, 6);
 
                         input[type="range"] {
                             accent-color: $LightBlueButton;
-                            
                         }
 
-                        input:after {
-                            content: attr(value);
+                        .input-value {
                             position: absolute;
-                            font-size: 15px;
                             right: -25px;
                             color: $LightBlueButton;
+                            font-size: 15px;
                         }
+
+                        // input::after {
+                        //     content: attr(value);
+                        //     position: absolute;
+                        //     font-size: 15px;
+                        //     right: -25px;
+                        //     color: $LightBlueButton;
+                        // }
                     }
 
                     .setting-submit {
@@ -191,6 +189,10 @@ $TeamRedColor: rgb(247, 30, 6);
             }
 
             .board-game-wrapper {
+                $PaddleBackSize: 150px;
+                $PaddleFrontSize: 150px;
+                $PlayerBackAdvance: 10px;
+                $PlayerFrontAdvance: 40px;
                 @include width-height(500px, 350px);
 
                 .game-board {

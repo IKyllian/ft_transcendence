@@ -35,7 +35,7 @@ export async function fetchUserChannels(channelId: number | undefined): Promise<
     return datasArray;
 }
 
-export async function fetchUserConvs(): Promise<ConversationInterfaceFront[]> {
+export async function fetchUserConvs(convId: number | undefined): Promise<ConversationInterfaceFront[]> {
     let datasArray: ConversationInterfaceFront[] = [];
    await api.get(`/conversation`)
     .then((response) => {
@@ -47,6 +47,13 @@ export async function fetchUserConvs(): Promise<ConversationInterfaceFront[]> {
                 isActive: "false",
             });
         })
+
+        if (convId !== undefined) {
+            datasArray.find(elem => {
+                if (elem.conversation.id === convId)
+                    elem.isActive = "true";
+            })
+        }
     }).catch(err => {
         console.log(err);
     })

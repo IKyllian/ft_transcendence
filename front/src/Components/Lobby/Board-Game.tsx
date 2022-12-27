@@ -8,29 +8,32 @@ function BoardGame(props: {hookForm: {watch: any}}) {
     const playerFrontAdvance = hookForm.watch("player_front_advance");
     
     useEffect(() => {
-        const root = document.documentElement;
-        root?.style.setProperty(
-            "--PaddleBackSize",
-            `${paddleBackSize}px`
-        );
-        root?.style.setProperty(
-            "--PaddleFrontSize",
-            `${paddleFrontSize}px`
-        );
-
-        root?.style.setProperty(
-            "--PlayerBackAdvance",
-            `${playerBackAdvance * 0.6}px`
-        );
-
-        root?.style.setProperty(
-            "--PlayerFrontAdvance",
-            `${playerFrontAdvance * 0.6}px`
-        );
+        const boardGame = document.getElementById("board-game-wrapper");
+        if (boardGame) {
+            boardGame.style.setProperty(
+                "--PaddleBackSize",
+                `${paddleBackSize}px`
+            );
+            boardGame.style.setProperty(
+                "--PaddleFrontSize",
+                `${paddleFrontSize}px`
+            );
+    
+            boardGame.style.setProperty(
+                "--PlayerBackAdvance",
+                `${playerBackAdvance * 0.6}px`
+            );
+    
+            boardGame.style.setProperty(
+                "--PlayerFrontAdvance",
+                `${playerFrontAdvance * 0.6}px`
+            );
+        }
+        
     }, [paddleBackSize, paddleFrontSize, playerBackAdvance, playerFrontAdvance])
 
     return (
-        <div className="setting-wrapper board-game-wrapper">
+        <div id="board-game-wrapper" className="setting-wrapper board-game-wrapper">
             <div className="game-board">
                 <div className="paddle-wrapper left-wrapper">
                     <div className="paddle paddle-left paddle-back"> </div>

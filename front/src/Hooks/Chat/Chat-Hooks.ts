@@ -1,6 +1,6 @@
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useAppSelector, useAppDispatch } from "../../Redux/Hooks";
-import { changeActiveElement } from "../../Redux/ChatSlice";
+import { changeActiveElement, resetActiveElement } from "../../Redux/ChatSlice";
 import { useEffect, useState, useCallback, useContext } from "react";
 import { fetchUserChannels, fetchUserConvs, fetchConvAndRedirect } from "../../Api/Chat/Chat-Fetch";
 import { SocketContext } from "../../App";
@@ -81,6 +81,8 @@ export function useLoadChatDatas() {
             dispatch(changeActiveElement({id:channelId, isChannel: true}));
         } else if (convId)
             dispatch(changeActiveElement({id:convId, isChannel: false}));
+        else if (!channelId && !convId)
+            dispatch(resetActiveElement());
         return () => window.removeEventListener('resize', handleResize);
     }, [channelId, convId, location.pathname])
 
@@ -94,7 +96,7 @@ export function useLoadChatDatas() {
             dispatch(copyChannelsAndConvs({channels: channelResolve, convs: convResolve}));
         }
         const channelsUser = fetchUserChannels(channelId); //Recupere les channels d'un user
-        const convsUser = fetchUserConvs(); //Recupere les convs d'un user
+        const convsUser = fetchUserConvs(convId); //Recupere les convs d'un user
         resolvePromises(channelsUser, convsUser);
 
         //Permet de redirect sur une conv (et de la créer si besoin) dans le cas où un user click quelque part pour dm quelqu'un
