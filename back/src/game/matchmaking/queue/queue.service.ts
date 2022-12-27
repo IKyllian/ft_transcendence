@@ -21,6 +21,7 @@ export class QueueService {
 	public queue2v2 = new Array<QueueLobby>();
 
 	joinQueue(user: User, game_mode: GameType) {
+		this.leaveQueue(user);
 		let queueLobby: QueueLobby = new QueueLobby(game_mode);
 		const queue: QueueLobby[] = game_mode === GameType.Singles ? this.queue1v1 : this.queue2v2;
 		const nbOfPayersRequired: number = game_mode === GameType.Singles ? 1 : 2;
@@ -42,9 +43,6 @@ export class QueueService {
 			}
 			party.players.forEach((player) => queueLobby.addPlayer(player));
 		}
-		if (queue.find((e) => e.id === queueLobby.id)) {
-			throw new BadRequestException("Already in queue");
-		}
 		queueLobby.players.forEach((player) => {
 			this.globalService.server.to(`user-${player.user.id}`).emit('InQueue', true);
 		});
@@ -61,7 +59,7 @@ export class QueueService {
 				if (inQueue.game_type === GameType.Singles) {
 					this.queue1v1 = this.queue1v1.filter((queueing) => queueing.id !== inQueue.id);
 				} else {
-					this.queue2v2 = this.queue1v1.filter((queueing) => queueing.id !== inQueue.id);
+					this.queue2v2 = this.queue2v2.filter((queueing) => queueing.id !== inQueue.id);
 				}
 				this.inQueueSession.removeInQueue(party.players[0].user.id);
 				party.players.forEach(player => player.isReady = false);
@@ -73,7 +71,7 @@ export class QueueService {
 				if (inQueue.game_type === GameType.Singles) {
 					this.queue1v1 = this.queue1v1.filter((queueing) => queueing.id !== inQueue.id);
 				} else {
-					this.queue2v2 = this.queue1v1.filter((queueing) => queueing.id !== inQueue.id);
+					this.queue2v2 = this.queue2v2.filter((queueing) => queueing.id !== inQueue.id);
 				}
 				this.inQueueSession.removeInQueue(user.id);
 				this.globalService.server.to('user-' + user.id).emit('InQueue', false);
