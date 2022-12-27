@@ -29,5 +29,5 @@ export function userIdIsBlocked(connectedUser: UserInterface, secondUserId: numb
 export function createdAccountDate(date: string) {
     const dateCreated = new Date(date);
 
-    return `${dateCreated.getDay()} ${monthNames[dateCreated.getMonth()]} ${dateCreated.getFullYear()}`
+    return `${dateCreated.getDate()} ${monthNames[dateCreated.getMonth()]} ${dateCreated.getFullYear()}`
 }

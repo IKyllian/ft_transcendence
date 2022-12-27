@@ -32,7 +32,11 @@
             display: flex;
             flex-direction: row;
             align-items: center;
-            gap: 10px;            
+            gap: 10px;       
+            
+            .social-icon {
+                margin-top: 5px;
+            }
         }
 
         .header-profile {

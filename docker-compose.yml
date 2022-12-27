@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+
+# Front
+
+  transcendence_front:
+    depends_on: 
+      - transcendence_back
+    build: ./front
+    env_file:
+      - .env_front
+    ports:
+      - 80:80
+    networks:
+      - transcendence_network
+    restart: always
+
+
+# Back
+
+  transcendence_back:
+    depends_on: 
+      - transcendence_db
+    build: ./back
+    env_file:
+      - .env_back
+    ports:
+      - 5000:5000
+    volumes:
+      - ./back/uploads:/usr/app/back/uploads
+    networks:
+      - transcendence_network
+    restart: always
+
+
+# Postgres DB
+
+  transcendence_db:
+    image: postgres:latest
+    env_file:
+      - .env_back
+    ports:
+      - '5432:5432'
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+    restart: always
+    networks:
+      - transcendence_network
+
+# Adminer
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+
+networks:
+  transcendence_network:
+    name: transcendence_network
+    driver: bridge

@@ -24,7 +24,7 @@ import { TwoFactorModule } from './2fa/twoFactor.module';
 	GlobalModule,
     MatchmakingModule,
 	TwoFactorModule,
-    ConfigModule.forRoot({ envFilePath: '.env', isGlobal: true }),
+    ConfigModule.forRoot({ isGlobal: true }),
     NotificationModule,
     TaskScheduler,
     ScheduleModule.forRoot(),
