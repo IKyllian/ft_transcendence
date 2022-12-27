@@ -56,7 +56,6 @@ export class LobbyFactory
 			dataToFront.player_type = lobby.convert_player_enums(player.team, player.pos);
 			this.globalService.server.to('user-' + player.user.id).emit("newgame_data", dataToFront);
 		});
-		//console.log(dataToFront.game_settings)
 	}
 
 	lobby_delete(game_id: string)
@@ -154,31 +153,22 @@ export class LobbyFactory
 				if (player.team === TeamSide.BLUE) {
 					if (player.pos === PlayerPosition.BACK) {
 						dataToFront.TeamBlue_Back = player;
-					//	dataToFront.player_type = PlayerType.TeamBlue_Back;
 					} else {
 						dataToFront.TeamBlue_Front = player;
-					//	dataToFront.player_type = PlayerType.TeamBlue_Front;
 					}
 				} else {
 					if (player.pos === PlayerPosition.BACK) {
 						dataToFront.TeamRed_Back = player;
-					//	dataToFront.player_type = PlayerType.TeamRed_Back;
 					} else {
 						dataToFront.TeamRed_Front = player;
-					//	dataToFront.player_type = PlayerType.TeamRed_Front;
 					}
 				}
 				if (player.user.id === id)
 				{
 					dataToFront.player_type = lobby.convert_player_enums(player.team, player.pos);
 				}
-				//playersocket.user.id === id
-
 			});
-			//dataToFront.player_type = lobby.convert_player_enums(player.team, player.pos);
 		}
-
-		// console.log("datatofront", dataToFront);
 		client.emit('user_gameinfo', dataToFront);
 	}
 

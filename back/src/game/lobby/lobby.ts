@@ -174,6 +174,4 @@ export class Lobby
                 return PlayerType.TeamRed_Front
         }
     }
-
-
 }
