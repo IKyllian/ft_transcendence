@@ -64,7 +64,6 @@ export class LobbyFactory
 		if (lobby !== undefined)
 		{
 			this.lobby_list.delete(game_id);
-			console.log("deleted lobby: ", game_id);
 		}
 		else
 		{

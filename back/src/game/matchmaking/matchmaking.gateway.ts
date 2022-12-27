@@ -1,19 +1,19 @@
 import { BadRequestException, ForbiddenException, UseFilters, UseGuards, UsePipes, ValidationPipe } from "@nestjs/common";
 import { ConnectedSocket, MessageBody, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
-import { Server, Socket } from "socket.io";
+import { Server } from "socket.io";
 import { WsJwtGuard } from "src/auth/guard/ws-jwt.guard";
 import { UserIdDto } from "src/chat/gateway/dto/user-id.dto";
 import { NotificationService } from "src/notification/notification.service";
-import { User } from "src/typeorm";
 import { UserService } from "src/user/user.service";
 import { GatewayExceptionFilter } from "src/utils/exceptions/filter/Gateway.filter";
 import { AuthenticatedSocket } from "src/utils/types/auth-socket";
-import { GameMode, PlayerPosition, TeamSide } from "src/utils/types/game.types";
+import { GameMode, TeamSide } from "src/utils/types/game.types";
 import { notificationType } from "src/utils/types/types";
 import { LobbyFactory } from "../lobby/lobby.factory";
 import { IsReadyDto } from "./dto/boolean.dto";
 import { SettingDto } from "./dto/game-settings.dto";
 import { PartyMessageDto } from "./dto/party-message.dto";
+import { PlayerPosDto } from "./dto/player-pos.dto";
 import { StartQueueDto } from "./dto/start-queue.dto";
 import { PartyService } from "./party/party.service";
 import { QueueService } from "./queue/queue.service";
@@ -142,7 +142,7 @@ export class MatchmakingGateway implements OnGatewayDisconnect {
 	@SubscribeMessage('SetPlayerPos')
 	setPlayerPos(
 		@ConnectedSocket() socket: AuthenticatedSocket,
-		@MessageBody() data: { pos: PlayerPosition }, //TODO DTO
+		@MessageBody() data: PlayerPosDto,
 	) {
 		this.partyService.setPlayerPos(socket.user, data.pos);
 	}

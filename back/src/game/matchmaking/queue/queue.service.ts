@@ -58,7 +58,6 @@ export class QueueService {
 		if (party) {
 			const inQueue: QueueLobby = this.inQueueSession.getInQueue(party.players[0].user.id);
 			if (inQueue) {
-				console.log("leaving queue")
 				if (inQueue.game_type === GameType.Singles) {
 					this.queue1v1 = this.queue1v1.filter((queueing) => queueing.id !== inQueue.id);
 				} else {
@@ -71,7 +70,6 @@ export class QueueService {
 		} else {
 			const inQueue: QueueLobby = this.inQueueSession.getInQueue(user.id);
 			if (inQueue) {
-				console.log("leaving queue")
 				if (inQueue.game_type === GameType.Singles) {
 					this.queue1v1 = this.queue1v1.filter((queueing) => queueing.id !== inQueue.id);
 				} else {

@@ -14,7 +14,6 @@ import { Repository } from "typeorm";
 @Injectable()
 export class TaskService {
 	constructor(
-		private schedulerRegistry: SchedulerRegistry,
 		private queueService: QueueService,
 		private globalService: GlobalService,
 		private lobbyFactory: LobbyFactory,
@@ -32,10 +31,6 @@ export class TaskService {
 		.setParameter("id", null)
 		.execute();
 	};
-
-	getCronJob() {
-		return this.schedulerRegistry.getCronJobs();
-	}
 
 	setServerRange(nbQueueing: number): EloRange {
 		if (nbQueueing >= 0 && nbQueueing < 5) {
@@ -103,13 +98,11 @@ export class TaskService {
 	async handleDoublesQueue() {
 		if (this.queueService.queue2v2.length < 2) { return; }
 		let potentialLobby: QueueLobby[] = [];
-		let matchFound: boolean;
 
 		this.queueService.queue2v2.sort((a, b) => a.averageMmr - b.averageMmr);
 		const range: EloRange = this.setServerRange(this.queueService.queue2v2.length);
 		this.adjustLobbyEloRange(this.queueService.queue2v2, range);
 		for (let i: number = 0; i < this.queueService.queue2v2.length; ++i) {
-			matchFound = false;
 			let lobby: QueueLobby;
 			if (this.queueService.queue2v2[i].players.length < 2) {
 				lobby = new QueueLobby(GameType.Doubles);
@@ -144,7 +137,6 @@ export class TaskService {
 								lobby.players.forEach((player) => this.queueService.leaveQueue(player.user));
 								potentialLobby[0].players.forEach((player) => this.queueService.leaveQueue(player.user));
 								this.lobbyFactory.lobby_create(new MatchmakingLobby(potentialLobby[0], lobby, new SettingsFactory().defaultSetting(GameType.Doubles)));
-								console.log("GAME FOUND")
 								break;
 							}
 						}

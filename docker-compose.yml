@@ -48,14 +48,6 @@ services:
     networks:
       - transcendence_network
 
-# Adminer
-
-  adminer:
-    image: adminer
-    restart: always
-    ports:
-      - 8080:8080
-
 networks:
   transcendence_network:
     name: transcendence_network
