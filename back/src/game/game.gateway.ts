@@ -47,7 +47,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
 		}
 		if (user) {
 			client.user = user;
-			console.log("Game Gateway Connection: ", client.user.username);
 			if (this.userSession.getUser(user.id)) {
 				client.multi_tab = true;
 				client.emit('MultiTabError');
@@ -71,7 +70,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
 				this.userSession.removeUser(user.id)
 			}
 		}
-		console.log("Game Gateway deconnection: ", socket.user.username);
 		this.lobbyfactory.lobby_quit(socket);
 	}
 		
