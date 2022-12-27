@@ -40,7 +40,10 @@ export function fetchCreateChannel(
         navigate(`/chat/channel/${response.data.id}`);
     }).catch(err => {
         console.log(err);
-        setError("chanName", {message: "Channel name already exist"});
+        if (err && err.response && err.response.data && err.response.data.message)
+            setError("chanName", {message: err.response.data.message});
+        else
+            setError("chanName", {message: "Channel name already exist or invalid"});
     })
 }
 
