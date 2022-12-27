@@ -57,7 +57,6 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
 				client.emit('Connected')
 			}
 		} else {
-			console.log('invalid credential')
 			client.emit("Unauthorized");
 			client.disconnect();
 		}

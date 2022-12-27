@@ -351,7 +351,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		@ConnectedSocket() socket: AuthenticatedSocket,
 		@MessageBody() dto: OnTypingPrivateDto,
 	) {
-		// TODO check if in conv
 		socket.to(`conversation-${dto.convId}`).emit('OnTypingPrivate', { user: {id: socket.user.id, username: socket.user.username}, isTyping: dto.isTyping, convId: dto.convId });
 	}
 
@@ -395,7 +394,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		this.server.to(`user-${requester.id}`).emit("RelationUpdate", { id: socket.user.id, relation: this.friendshipService.getRelationStatus(socket.user, friendship)});
 		this.server.to(`user-${socket.user.id}`).emit("RelationUpdate", { id: requester.id, relation: this.friendshipService.getRelationStatus(requester, friendship)});
 		if (notif) {
-			console.log('deleting notif')
 			await this.notificationService.delete(notif.id);
 			this.server.to(`user-${socket.user.id}`).emit('DeleteNotification', notif.id);
 		}

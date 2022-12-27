@@ -56,7 +56,6 @@ export class LobbyFactory
 			dataToFront.player_type = lobby.convert_player_enums(player.team, player.pos);
 			this.globalService.server.to('user-' + player.user.id).emit("newgame_data", dataToFront);
 		});
-		//console.log(dataToFront.game_settings)
 	}
 
 	lobby_delete(game_id: string)
@@ -65,7 +64,6 @@ export class LobbyFactory
 		if (lobby !== undefined)
 		{
 			this.lobby_list.delete(game_id);
-			console.log("deleted lobby: ", game_id);
 		}
 		else
 		{

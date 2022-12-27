@@ -97,8 +97,6 @@ export class GameService {
 		const redEloLost: number = redEloWon - 50;
 
 		if (result === EndResult.TeamBlue_Win) {
-			console.log("elo result blue: " + blueEloWon);
-			console.log("elo result red: " + redEloLost);
 			this.saveNewElo(blueTeamIds, blueEloWon, game_type);
 			this.addWin(blueTeamIds, game_type);
 			this.saveNewElo(redTeamIds, redEloLost, game_type);
@@ -108,8 +106,6 @@ export class GameService {
 			this.addWin(redTeamIds, game_type);
 			this.saveNewElo(blueTeamIds, blueEloLost, game_type);
 			this.addLose(blueTeamIds, game_type);
-			console.log("elo result red: " + redEloWon);
-			console.log("elo result blue: " + blueEloLost);
 		}
 	}
 
@@ -130,15 +126,7 @@ export class GameService {
 	}
 
 	async getSinglesLeaderboard(user: User, page: number): Promise<Leaderboard> {
-		const nb_of_users: number = await this.userRepo.createQueryBuilder('user').getCount()
-		// TODO user placement
-		// const user1 = await this.userRepo.createQueryBuilder('user')
-		// 	.orderBy("user.singles_elo", "DESC")
-		// 	.where("user.singles_elo >= :elo", {elo: user.singles_elo})
-		// 	.getCount()
-
-		// console.log(user1)
-		
+		const nb_of_users: number = await this.userRepo.createQueryBuilder('user').getCount();
 		const users: User[] = await this.userRepo.createQueryBuilder('user')
 		.leftJoinAndSelect('user.statistic', 'stats')
 		.orderBy("user.singles_elo", "DESC")
