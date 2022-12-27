@@ -21,6 +21,8 @@ export class QueueService {
 	public queue2v2 = new Array<QueueLobby>();
 
 	joinQueue(user: User, game_mode: GameType) {
+		this.leaveQueue(user);
+		console.log(user.username + " joining queue: " + game_mode);
 		let queueLobby: QueueLobby = new QueueLobby(game_mode);
 		const queue: QueueLobby[] = game_mode === GameType.Singles ? this.queue1v1 : this.queue2v2;
 		const nbOfPayersRequired: number = game_mode === GameType.Singles ? 1 : 2;
@@ -41,9 +43,6 @@ export class QueueService {
 				throw new UnauthorizedException("You are not the leader of this party");
 			}
 			party.players.forEach((player) => queueLobby.addPlayer(player));
-		}
-		if (queue.find((e) => e.id === queueLobby.id)) {
-			throw new BadRequestException("Already in queue");
 		}
 		queueLobby.players.forEach((player) => {
 			this.globalService.server.to(`user-${player.user.id}`).emit('InQueue', true);

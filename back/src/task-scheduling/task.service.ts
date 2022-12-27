@@ -75,7 +75,7 @@ export class TaskService {
 	async handleSinglesQueue() {
 		if (this.queueService.queue1v1.length < 2) { return; }
 		let matchFound: MatchmakingLobby[] = [];
-		this.queueService.queue1v1.sort((a, b) => a.averageMmr - b.averageMmr);
+		// this.queueService.queue1v1.sort((a, b) => a.averageMmr - b.averageMmr);
 		const range: EloRange = this.setServerRange(this.queueService.queue1v1.length);
 		this.adjustLobbyEloRange(this.queueService.queue1v1, range);
 		for (let i: number = 0; i < this.queueService.queue1v1.length; ++i) {
@@ -99,7 +99,8 @@ export class TaskService {
 		if (this.queueService.queue2v2.length < 2) { return; }
 		let potentialLobby: QueueLobby[] = [];
 
-		this.queueService.queue2v2.sort((a, b) => a.averageMmr - b.averageMmr);
+		console.log("number of player in 2v2 queue: ", this.queueService.queue2v2.length);
+		// this.queueService.queue2v2.sort((a, b) => a.averageMmr - b.averageMmr);
 		const range: EloRange = this.setServerRange(this.queueService.queue2v2.length);
 		this.adjustLobbyEloRange(this.queueService.queue2v2, range);
 		for (let i: number = 0; i < this.queueService.queue2v2.length; ++i) {
