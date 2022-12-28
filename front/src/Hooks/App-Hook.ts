@@ -30,7 +30,6 @@ export function useAppHook() {
 	const dispatch = useAppDispatch();
 	const navigate = useNavigate();
 	const location = useLocation();
-	const params = useParams();
 
 	const connectSocket = (access_token: string) => {
 		const newSocket: Socket = io(`${process.env.REACT_APP_SOCKET_URL}`, {extraHeaders: {
@@ -52,6 +51,20 @@ export function useAppHook() {
 			setCache(null);
 			console.log("Caches not supported");
 		}
+	}
+
+	const logout = () => {
+		if (socket)
+			socket.disconnect();
+		setSocket(undefined);
+		localStorage.removeItem("userToken");
+		dispatch(resetParty());
+		dispatch(resetChannel());
+		dispatch(resetChat());
+		dispatch(resetConvState());
+		dispatch(resetNotification());
+		dispatch(resetAlert());
+		dispatch(logoutSuccess());
 	}
 
 	const deleteCache = () => {
@@ -259,16 +272,17 @@ export function useAppHook() {
 			})
 
 			socket.on("Logout", () => {
-				socket.disconnect();
-				setSocket(undefined);
-				localStorage.removeItem("userToken");
-				dispatch(resetParty());
-				dispatch(resetChannel());
-				dispatch(resetChat());
-				dispatch(resetConvState());
-				dispatch(resetNotification());
-				dispatch(resetAlert());
-				dispatch(logoutSuccess());
+				logout();
+				// socket.disconnect();
+				// setSocket(undefined);
+				// localStorage.removeItem("userToken");
+				// dispatch(resetParty());
+				// dispatch(resetChannel());
+				// dispatch(resetChat());
+				// dispatch(resetConvState());
+				// dispatch(resetNotification());
+				// dispatch(resetAlert());
+				// dispatch(logoutSuccess());
 			});
 		}
 
@@ -316,6 +330,7 @@ export function useAppHook() {
 		partyState: {
 			party,
 			chatIsOpen,
-		}
+		},
+		logout,
     };
 }
