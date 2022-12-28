@@ -53,15 +53,14 @@ export class PongGame
 				this.lobby.lobby_broadcast_data('match_winner', gamestate.result);
 				this.lobby.game_set_finished();
 				clearInterval(this.update_interval);
-				this.lobby.playerSockets.forEach((socket) => {
-					console.log("disconnecting: " + socket.id);
-					socket.disconnect();
-				});
+				
+				for (const socket of this.lobby.playerSockets) {
+					socket.disconnect(false);
+				}
 
-				this.lobby.spectators.forEach((spec) =>
-				{
-					spec.disconnect();
-				});
+				for (const [ id, socket ] of this.lobby.spectators) {
+					socket.disconnect(false);
+				}
 
 				if (this.game_settings.is_ranked) {
 					this.lobby.factory.endGameAttribution(

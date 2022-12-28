@@ -17,18 +17,18 @@ import { TwoFactorModule } from './2fa/twoFactor.module';
 
 @Module({
   imports: [
-    AuthModule,
-    UserModule,
-    ChatModule,
+	AuthModule,
+	UserModule,
+	ChatModule,
 	GameModule,
 	GlobalModule,
-    MatchmakingModule,
+	MatchmakingModule,
 	TwoFactorModule,
-    ConfigModule.forRoot({ isGlobal: true }),
-    NotificationModule,
-    TaskScheduler,
-    ScheduleModule.forRoot(),
-    TypeOrmModule.forRoot({
+	ConfigModule.forRoot({ isGlobal: true }),
+	NotificationModule,
+	TaskScheduler,
+	ScheduleModule.forRoot(),
+	TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.POSTGRES_HOST,
       port: Number.parseInt(process.env.POSTGRES_PORT),

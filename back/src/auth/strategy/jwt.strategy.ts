@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { BadRequestException, Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { PassportStrategy } from "@nestjs/passport";
 import { ExtractJwt, Strategy } from "passport-jwt";
@@ -44,6 +44,9 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
 				id: payload.sub,
 			}
 		});
+		if (!user) {
+            throw new BadRequestException('Invalid credential');
+        }
 		return user;
 	}
 }

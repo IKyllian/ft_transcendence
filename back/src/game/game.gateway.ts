@@ -40,6 +40,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
 	async handleConnection(client: AuthenticatedSocket)
 	{
 		let user: User = null;
+		console.log("connecting: " + client.id)
 		client.multi_tab = false;
 		if (client.handshake.headers.authorization) {
 			const token = client.handshake.headers.authorization.split(' ')[1];
@@ -63,6 +64,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
   
 	async handleDisconnect(socket: AuthenticatedSocket)
 	{
+		console.log("disconnecting: " + socket.id)
 		if (socket.handshake.headers.authorization) {
 			const payload = this.authService.decodeJwt(socket.handshake.headers.authorization.split(' ')[1]) as JwtPayload;
 			const user = await this.userService.findOneBy({ id: payload?.sub });
