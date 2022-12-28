@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { launch_game } from "./game/libpong";
 import { PlayersGameData } from "./game/types/shared.types";
 import { io, Socket } from "socket.io-client";
-import { CacheContext } from "../../App"
+import { CacheContext, SocketContext } from "../../App"
 import { useContext } from 'react';
 import { TokenStorageInterface } from "../../Types/Utils-Types";
 import { useAppDispatch } from "../../Redux/Hooks";
@@ -23,6 +23,7 @@ function Game() {
     const {cache} = useContext(CacheContext);
     const dispatch = useAppDispatch();
     const {logout} = useAppHook();
+    const {socket} = useContext(SocketContext);
 
     useEffect(() => {
         if (hasEnded) {
@@ -72,7 +73,7 @@ function Game() {
                                 setGameSocket(gameSocket);
                             }
                         } catch (_err) {
-                            logout();
+                            socket?.emit("Logout");
                         }
                     }
                 })
@@ -88,7 +89,7 @@ function Game() {
                 gameSocket.disconnect();
             }
         }
-    }, [gameSocket])
+    }, [gameSocket, socket])
 
     useEffect(() => {
         const localToken: string | null = localStorage.getItem("userToken");

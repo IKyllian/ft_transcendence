@@ -1,5 +1,4 @@
 import axios from "axios";
-import { useAppHook } from "../Hooks/App-Hook";
 import { TokenStorageInterface } from "../Types/Utils-Types";
 
 export const fetchInterceptor = () => {
@@ -10,7 +9,6 @@ export const fetchInterceptor = () => {
         let response: Response = await originalFetch(resource, config);
 
         if (!response.ok && response.status === 401 && response.statusText === "Unauthorized") {
-            const {logout} = useAppHook();
             const localToken: string | null = localStorage.getItem("userToken");
             if (localToken) {
                 const storedToken: TokenStorageInterface = JSON.parse(localToken);  
@@ -25,7 +23,6 @@ export const fetchInterceptor = () => {
                         return window.fetch(resource, {...config, headers: {"Authorization": `Bearer ${refreshResponse.data.access_token}`}});
                     }
                 } catch (_error) {
-                    logout();
                     return Promise.reject(_error);
                 }
             }

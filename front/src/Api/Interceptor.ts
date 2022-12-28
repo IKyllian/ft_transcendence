@@ -4,7 +4,6 @@ import axios, {
     AxiosRequestConfig,
     AxiosResponse,
   } from "axios";
-import { useAppHook } from "../Hooks/App-Hook";
 import { TokenStorageInterface } from "../Types/Utils-Types";
 
 interface ErrorDataInterface {
@@ -31,7 +30,6 @@ const onResponse = (response: AxiosResponse): AxiosResponse => {
 };
 
 const onResponseError = async (error: AxiosError): Promise<AxiosError | AxiosInstance> => {
-    const {logout} = useAppHook();
     const originalConfig: AxiosRequestConfig<any> = error.config;
     if (error.response) {
         const errorData: ErrorDataInterface = error.response.data as ErrorDataInterface ;
@@ -52,7 +50,6 @@ const onResponseError = async (error: AxiosError): Promise<AxiosError | AxiosIns
                         return axios.create().request(originalConfig);
                     }
                 } catch (_error) {
-                    logout();
                     return Promise.reject(_error);
                 }
             }
