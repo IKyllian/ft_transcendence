@@ -69,12 +69,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 		
 		if (user === null) {
-			console.log("invalid token");
-			socket.emit('Logout');
+			console.log("invalid toto");
+			socket.emit("Unauthorized");
 			return socket.disconnect();
 		}
 		socket.user = user;
-		console.log(user.username + " " + socket.id, 'connected')
 		socket.join(`user-${user.id}`);
 		if (user.status === UserStatus.OFFLINE) {
 			this.userService.setStatus(user.id, UserStatus.ONLINE);
@@ -101,10 +100,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 					this.userService.setStatus(payload.sub, UserStatus.OFFLINE);
 					this.server.emit('StatusUpdate', { id: payload.sub, status: UserStatus.OFFLINE});
 				}
-				console.log(payload?.username, 'disconnected');
 			}
-			} else
-				console.log(socket.id, 'disconnected');
+		}
 	}
 
 	@UseGuards(WsJwtGuard)
