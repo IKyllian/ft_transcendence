@@ -6,22 +6,23 @@ import {
 	OnGatewayConnection,
 	OnGatewayDisconnect,
 	ConnectedSocket,
-	MessageBody
+	MessageBody,
+	OnGatewayInit
   } from '@nestjs/websockets';
 import { Server } from 'socket.io';
 import { AuthService } from 'src/auth/auth.service';
 import { User } from 'src/typeorm';
 import { UserService } from 'src/user/user.service';
 import { JwtPayload } from 'src/utils/types/types';
-import { UserSessionManager } from './user.session';
 import { LobbyFactory } from './lobby/lobby.factory';
 import { AuthenticatedSocket } from '../utils/types/auth-socket';
 import { GatewayExceptionFilter } from 'src/utils/exceptions/filter/Gateway.filter';
+import { GlobalService } from 'src/utils/global/global.service';
 
 @UseFilters(GatewayExceptionFilter)
 @UsePipes(new ValidationPipe())
 @WebSocketGateway({ namespace: 'game' })
-export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
+export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit
 {
 
 	/* ----- Initialisation ----- */
@@ -30,10 +31,14 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
 
 	constructor(
 		private readonly lobbyfactory: LobbyFactory,
-		private readonly userSession: UserSessionManager,
 		private readonly authService: AuthService,
 		private readonly userService: UserService,
+		private global: GlobalService,
 	  ) {}
+
+	  afterInit(server: Server) {
+		this.global.game_server = server;
+	  }
 
 	/* ----- Connect/Disconnect ----- */
 
@@ -41,21 +46,17 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
 	{
 		let user: User = null;
 		console.log("connecting: " + client.id)
-		client.multi_tab = false;
 		if (client.handshake.headers.authorization) {
 			const token = client.handshake.headers.authorization.split(' ')[1];
 			user = await this.authService.verify(token);
 		}
 		if (user) {
 			client.user = user;
-			console.log("user session", this.userSession.getUser(user.id), user.id);
-			if (this.userSession.getUser(user.id)) {
-				client.multi_tab = true;
-				console.log("MultitabError");
+		if (((await this.server.in(`user-in-game-${user.id}`).fetchSockets()).length > 0)) {
 				client.emit('MultiTabError');
 				client.disconnect();
 			} else {
-				this.userSession.setUser(user.id, user);
+				client.join(`user-in-game-${user.id}`);
 				client.emit('Connected')
 			}
 		} else {
@@ -70,9 +71,8 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
 		if (socket.handshake.headers.authorization) {
 			const payload = this.authService.decodeJwt(socket.handshake.headers.authorization.split(' ')[1]) as JwtPayload;
 			const user = await this.userService.findOneBy({ id: payload?.sub });
-			if (user && socket.multi_tab === false) {
-				console.log("multi tab :", socket.multi_tab)
-				this.userSession.removeUser(user.id)
+			if (user) {
+				socket.leave(`user-in-game-${user.id}`);
 			}
 		}
 		this.lobbyfactory.lobby_quit(socket);
