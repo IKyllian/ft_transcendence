@@ -4,10 +4,10 @@ import PongCore from '../pong.core';
 import { GameState, Goal, Movement, PlayerInput, PlayerType, EndResult, RoundSetup, GameType, GameSettings } from '../types/shared.types';
 import { await_load_base64 } from '../utils/texture_loader';
 
-import AssetSoundA from '../../../../Assets/sound/ponghitside.ogg'
-import AssetSoundB from '../../../../Assets/sound/ponghitpad.ogg'
-import AssetSoundClapping from '../../../../Assets/sound/clapping.ogg'
-import AssetImageLagIcon from '../../../../Assets/images/lagicon.png'
+// import AssetSoundA from '../../../../Assets/sound/ponghitside.ogg'
+// import AssetSoundB from '../../../../Assets/sound/ponghitpad.ogg'
+// import AssetSoundClapping from '../../../../Assets/sound/clapping.ogg'
+// import AssetImageLagIcon from '../../../../Assets/images/lagicon.png'
 
 export default class Pong extends Phaser.Scene
 {
@@ -91,10 +91,10 @@ export default class Pong extends Phaser.Scene
 
 	preload ()
 	{
-		await_load_base64(AssetImageLagIcon, 'lag_icon', this);	
-		this.load.audio('sound_a', AssetSoundA);
-		this.load.audio('sound_b', AssetSoundB);
-		this.load.audio('clapping', AssetSoundClapping);
+		// await_load_base64(AssetImageLagIcon, 'lag_icon', this);	
+		// this.load.audio('sound_a', AssetSoundA);
+		// this.load.audio('sound_b', AssetSoundB);
+		// this.load.audio('clapping', AssetSoundClapping);
 	}
 
 	create ()

@@ -15,6 +15,12 @@ import AssetRankChampion from '../../../../Assets/Ranks/champion.png';
 import AssetRankLegend from '../../../../Assets/Ranks/legend.png';
 import Pong from './Pong';
 
+
+import AssetSoundA from '../../../../Assets/sound/ponghitside.ogg'
+import AssetSoundB from '../../../../Assets/sound/ponghitpad.ogg'
+import AssetSoundClapping from '../../../../Assets/sound/clapping.ogg'
+import AssetImageLagIcon from '../../../../Assets/images/lagicon.png'
+
 export default class Lobby extends Phaser.Scene
 {
 	constructor ()
@@ -66,6 +72,10 @@ export default class Lobby extends Phaser.Scene
 	pongstart_timeout: any;
 	error_timeout: any;
 
+	audio_a_loader?: Phaser.Loader.LoaderPlugin;
+	audio_b_loader?: Phaser.Loader.LoaderPlugin;
+	audio_c_loader?: Phaser.Loader.LoaderPlugin;
+
 	preload ()
 	{
 		loadAvatar(
@@ -106,55 +116,69 @@ export default class Lobby extends Phaser.Scene
 		await_load_base64(AssetRankDiamond, "Diamond", this);
 		await_load_base64(AssetRankChampion, "Champion", this);
 		await_load_base64(AssetRankLegend, "Legend", this);	
+		await_load_base64(AssetImageLagIcon, 'lag_icon', this);	
+		this.audio_a_loader = this.load.audio('sound_a', AssetSoundA);
+		this.audio_b_loader = this.load.audio('sound_b', AssetSoundB);
+		this.audio_c_loader = this.load.audio('clapping', AssetSoundClapping);
+
 
 		clearInterval(this.load_interval);
 		this.load_interval = setInterval(
 			(function(self) { return function()
 			  {
-
-				if (
-					self.textures.exists('Silver')
-					&& self.textures.exists('Gold')
-					&& self.textures.exists('Platine')
-					&& self.textures.exists('Diamond')
-					&& self.textures.exists('Champion')
-					&& self.textures.exists('Legend')
-				)
-				{
-
-					if (self.game_type === GameType.Doubles)
+				if (self.audio_a_loader !== undefined
+					&& self.audio_b_loader !== undefined
+					&& self.audio_c_loader !== undefined)
 					{
 						if (
-							self.textures.exists('TeamBlue_back_avatar')
-							&& self.textures.exists('TeamRed_back_avatar')
-							&& self.textures.exists('TeamBlue_front_avatar')
-							&& self.textures.exists('TeamRed_front_avatar')
+							self.textures.exists('Silver')
+							&& self.textures.exists('Gold')
+							&& self.textures.exists('Platine')
+							&& self.textures.exists('Diamond')
+							&& self.textures.exists('Champion')
+							&& self.textures.exists('Legend')
+							&& self.textures.exists('lag_icon')
+							&& !self.audio_a_loader.isLoading()
+							&& !self.audio_b_loader.isLoading()
+							&& !self.audio_c_loader.isLoading()
 						)
 						{
-								self.display();
-							self.update_interval = setInterval(() => {
-								self.check_status();
-							}, 1000 / 30);
-							clearInterval(self.load_interval);
+		
+							if (self.game_type === GameType.Doubles)
+							{
+								if (
+									self.textures.exists('TeamBlue_back_avatar')
+									&& self.textures.exists('TeamRed_back_avatar')
+									&& self.textures.exists('TeamBlue_front_avatar')
+									&& self.textures.exists('TeamRed_front_avatar')
+								)
+								{
+										self.display();
+									self.update_interval = setInterval(() => {
+										self.check_status();
+									}, 1000 / 30);
+									clearInterval(self.load_interval);
+								}
+							}
+							else
+							{
+								if(
+									self.textures.exists('TeamBlue_back_avatar')
+									&& self.textures.exists('TeamRed_back_avatar')
+								)
+								{
+										self.display();
+									self.update_interval = setInterval(() => {
+										self.check_status();
+									}, 1000 / 30);
+									clearInterval(self.load_interval);
+								}
+							}
 						}
 					}
-					else
-					{
-						if(
-							self.textures.exists('TeamBlue_back_avatar')
-							&& self.textures.exists('TeamRed_back_avatar')
-						)
-						{
-								self.display();
-							self.update_interval = setInterval(() => {
-								self.check_status();
-							}, 1000 / 30);
-							clearInterval(self.load_interval);
-						}
-					}
-				}
-			  }; })(this),
-			50);
+
+
+			  }; })(this), 50);
 	}
 
 	display ()
