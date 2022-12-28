@@ -8,4 +8,4 @@ RUN npm i
 
 RUN npm run build
 
-ENTRYPOINT [ "npm", "start" ]
+ENTRYPOINT [ "npm", "run", "start:prod" ]

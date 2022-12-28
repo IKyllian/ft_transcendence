@@ -6,6 +6,8 @@ COPY . .
 
 RUN npm i
 
+RUN npm i -g serve
+
 RUN npm run build
 
-ENTRYPOINT [ "npm", "start" ]
+ENTRYPOINT [ "serve", "-s", "build" ]
