@@ -1,7 +1,7 @@
 import { IconUpload } from "@tabler/icons";
 import { useContext, useState } from "react";
 import { fetchUploadAvatar } from "../../../Api/Profile/Profile-Fetch";
-import { CacheContext } from "../../../App";
+import { CacheContext, SocketContext } from "../../../App";
 import { addAlert, AlertType } from "../../../Redux/AlertSlice";
 import { setUserAvatar } from "../../../Redux/AuthSlice";
 import { useAppDispatch, useAppSelector } from "../../../Redux/Hooks";
@@ -16,6 +16,7 @@ function SettingsCardAvatar() {
     const [urlFile, setUrlFile] = useState<string>("");
     const {cache} = useContext(CacheContext);
     const dispatch = useAppDispatch();
+    const {socket} = useContext(SocketContext);
 
     const onSubmit = async (e: any) => {
         e?.preventDefault();
@@ -25,7 +26,7 @@ function SettingsCardAvatar() {
             let formData = new FormData();
             
             formData.append("image", inputFile);
-            fetchUploadAvatar(localTokenParse.access_token, formData).then(async (response) => {
+            fetchUploadAvatar(localTokenParse.access_token, formData, socket).then(async (response) => {
 				if (currentUser) {
 					const req = new Request(`${process.env.REACT_APP_BASE_URL}/users/${currentUser.id}/avatar`, {method: 'GET', headers: {"Authorization": `Bearer ${localTokenParse.access_token}`}});
                     if (!response.ok) {

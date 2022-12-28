@@ -53,7 +53,7 @@ function Leaderboard() {
             socket?.off("InGameStatusUpdate");
             socket?.off("StatusUpdate");
         }
-    }, [])
+    }, [socket])
 
     const changePage = (index: number) => {
         if (index + 1 !== leaderboardState.page) {

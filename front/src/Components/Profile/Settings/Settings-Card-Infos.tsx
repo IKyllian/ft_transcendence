@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useForm } from "react-hook-form";
 import api from "../../../Api/Api";
 import { fetchInterceptor } from "../../../Api/Interceptor-Fetch";
+import { SocketContext } from "../../../App";
 import { addAlert, AlertType } from "../../../Redux/AlertSlice";
 import { change2faStatus, replaceUserObject } from "../../../Redux/AuthSlice";
 import { useAppDispatch } from "../../../Redux/Hooks";
@@ -23,13 +24,14 @@ function TwoFactor(props: {user: UserInterface}) {
     const { user } = props;
     const [displayQRCode, setDisplayQRCode] = useState<{show: boolean, qrcode: string | undefined}>({show: false, qrcode: undefined});
     const [disable2fa, setDisable2fa] = useState<boolean>(false);
+    const {socket} = useContext(SocketContext);
 
     const enableTwoFactor = () => {
         const localToken: string | null = localStorage.getItem("userToken");
 		if (localToken !== null) {
 			const localTokenParse: TokenStorageInterface = JSON.parse(localToken);
             const req = new Request(`${process.env.REACT_APP_BASE_URL}/2fa/generate`, {method: 'POST', body: undefined ,headers: {"Authorization": `Bearer ${localTokenParse.access_token}`}});
-            fetchInterceptor();
+            fetchInterceptor(socket);
             fetch(req)
             .then(async (response) => {
                 const avatarBlob = await response.blob();

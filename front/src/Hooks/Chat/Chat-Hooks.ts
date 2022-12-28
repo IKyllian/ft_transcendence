@@ -60,7 +60,7 @@ export function useLoadChatDatas() {
             else
                 dispatch(unsetChannelId());
         }
-    }, [channelId, location.pathname]);
+    }, [channelId, location.pathname, socket]);
 
     useEffect(() => {
         function handleResize() {
