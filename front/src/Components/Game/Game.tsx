@@ -11,6 +11,7 @@ import { unsetGameFound } from "../../Redux/PartySlice";
 import axios from "axios";
 import 'phaser';
 import { game_destroy } from "./game/utils/clean_exit";
+import { useAppHook } from "../../Hooks/App-Hook";
 
 function Game() {
     const [gameDatas, setGameDatas] = useState<PlayersGameData | undefined>(undefined);
@@ -21,6 +22,7 @@ function Game() {
     const navigate = useNavigate();
     const {cache} = useContext(CacheContext);
     const dispatch = useAppDispatch();
+    const {logout} = useAppHook();
 
     useEffect(() => {
         if (hasEnded) {
@@ -34,7 +36,6 @@ function Game() {
             if (game)
                 game_destroy(game);
         }
-
     }, [game])
 
     useEffect(() => {
@@ -56,18 +57,22 @@ function Game() {
                 gameSocket.on("Unauthorized", async () => {
                     const localToken: string | null = localStorage.getItem("userToken");
                     if (localToken) {
-                        const storedToken: TokenStorageInterface = JSON.parse(localToken);  
-                        const refreshResponse = await axios.post(`${process.env.REACT_APP_BASE_URL}/auth/refresh`, {}, {
-                            headers: {
-                                "Authorization": `Bearer ${storedToken.refresh_token}`,
+                        const storedToken: TokenStorageInterface = JSON.parse(localToken);
+                        try {
+                            const refreshResponse = await axios.post(`${process.env.REACT_APP_BASE_URL}/auth/refresh`, {}, {
+                                headers: {
+                                    "Authorization": `Bearer ${storedToken.refresh_token}`,
+                                }
+                            });
+                            if (refreshResponse && refreshResponse.data) {
+                                localStorage.setItem("userToken", JSON.stringify(refreshResponse.data));
+                                const gameSocket: Socket = io(`${process.env.REACT_APP_SOCKET_URL}/game`, {extraHeaders: {
+                                    "Authorization": `Bearer ${refreshResponse.data.access_token}`,
+                                }});
+                                setGameSocket(gameSocket);
                             }
-                        });
-                        if (refreshResponse && refreshResponse.data) {
-                            localStorage.setItem("userToken", JSON.stringify(refreshResponse.data));
-                            const gameSocket: Socket = io(`${process.env.REACT_APP_SOCKET_URL}/game`, {extraHeaders: {
-                                "Authorization": `Bearer ${refreshResponse.data.access_token}`,
-                            }});
-                            setGameSocket(gameSocket);
+                        } catch (_err) {
+                            logout();
                         }
                     }
                 })

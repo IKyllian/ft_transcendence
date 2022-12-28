@@ -49,9 +49,9 @@ function Header() {
     }
 
     const handleLogout = () => {
-        localStorage.removeItem("userToken");
+        // localStorage.removeItem("userToken");
         socket?.emit("Logout");
-        dispatch(logoutSuccess());
+        // dispatch(logoutSuccess());
     }
 
     useEffect(() => {
