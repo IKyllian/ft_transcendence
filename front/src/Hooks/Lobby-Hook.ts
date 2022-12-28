@@ -205,7 +205,7 @@ export function useLobbyHook() {
                 })]}
             });
         }
-    }, [party?.players])
+    }, [party?.players, socket])
 
     useEffect(() => {
         const checkGame = async () => {

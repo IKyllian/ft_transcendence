@@ -43,7 +43,7 @@ export function useSearchBarHook(props: {functionality: SearchBarFunctionality, 
         return () => {
             socket?.off("RelationUpdate");
         }
-    }, [])
+    }, [socket])
 
     const endOfTyping = () => {
         if (getValues('textInput') && getValues('textInput').length > 0) {

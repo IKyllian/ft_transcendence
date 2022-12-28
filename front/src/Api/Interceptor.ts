@@ -4,6 +4,8 @@ import axios, {
     AxiosRequestConfig,
     AxiosResponse,
   } from "axios";
+import { useContext } from "react";
+import { SocketContext } from "../App";
 import { TokenStorageInterface } from "../Types/Utils-Types";
 
 interface ErrorDataInterface {
@@ -30,6 +32,7 @@ const onResponse = (response: AxiosResponse): AxiosResponse => {
 };
 
 const onResponseError = async (error: AxiosError): Promise<AxiosError | AxiosInstance> => {
+    const {socket} = useContext(SocketContext);
     const originalConfig: AxiosRequestConfig<any> = error.config;
     if (error.response) {
         const errorData: ErrorDataInterface = error.response.data as ErrorDataInterface ;
@@ -50,6 +53,7 @@ const onResponseError = async (error: AxiosError): Promise<AxiosError | AxiosIns
                         return axios.create().request(originalConfig);
                     }
                 } catch (_error) {
+                    socket?.emit("Logout");
                     return Promise.reject(_error);
                 }
             }

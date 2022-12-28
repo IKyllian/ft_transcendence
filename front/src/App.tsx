@@ -13,6 +13,7 @@ import Alert from "./Components/Alert";
 import LoadingSpin from "./Components/Utils/Loading-Spin";
 import Router from "./Route/Router";
 import ResumeGame from "./Components/Resume-Game";
+import { AxiosInterceptor } from "./Api/Api";
 
 interface SocketContextType {
 	socket: Socket | undefined;
@@ -42,19 +43,21 @@ function App() {
 	<div className="app-container">
 		<SocketContext.Provider value={{socket: socket}} >
 			<CacheContext.Provider value={{cache: cache}} >
-				<ModalProvider>
-					{ isAuthenticated && <Alert /> }
-					{ isAuthenticated && <AddFriendModal/> }
-					{ isAuthenticated && <ModalPartyInvite /> }
-					{ isAuthenticated && <NotifGameInvite /> }
-					{ isAuthenticated && <MatchFound /> }
-					{ isAuthenticated && <Header /> }
-					{ isAuthenticated && <ResumeGame /> }
-					<main className="page-container">
-						{ isAuthenticated && partyState.party && partyState.chatIsOpen && <ChatParty />}
-						<Router />
-					</main>
-				</ModalProvider>
+				<AxiosInterceptor> 
+					<ModalProvider>
+						{ isAuthenticated && <Alert /> }
+						{ isAuthenticated && <AddFriendModal/> }
+						{ isAuthenticated && <ModalPartyInvite /> }
+						{ isAuthenticated && <NotifGameInvite /> }
+						{ isAuthenticated && <MatchFound /> }
+						{ isAuthenticated && <Header /> }
+						{ isAuthenticated && <ResumeGame /> }
+						<main className="page-container">
+							{ isAuthenticated && partyState.party && partyState.chatIsOpen && <ChatParty />}
+							<Router />
+						</main>
+					</ModalProvider>
+				</AxiosInterceptor>
 			</CacheContext.Provider>
 		</SocketContext.Provider>
     </div>
