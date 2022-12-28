@@ -48,8 +48,10 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
 		}
 		if (user) {
 			client.user = user;
+			console.log("user session", this.userSession.getUser(user.id), user.id);
 			if (this.userSession.getUser(user.id)) {
 				client.multi_tab = true;
+				console.log("MultitabError");
 				client.emit('MultiTabError');
 				client.disconnect();
 			} else {
@@ -69,6 +71,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect
 			const payload = this.authService.decodeJwt(socket.handshake.headers.authorization.split(' ')[1]) as JwtPayload;
 			const user = await this.userService.findOneBy({ id: payload?.sub });
 			if (user && socket.multi_tab === false) {
+				console.log("multi tab :", socket.multi_tab)
 				this.userSession.removeUser(user.id)
 			}
 		}

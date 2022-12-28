@@ -71,7 +71,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		if (user === null) {
 			console.log("invalid token");
 			socket.emit('Logout');
-			return ;
+			return socket.disconnect();
 		}
 		socket.user = user;
 		console.log(user.username + " " + socket.id, 'connected')
