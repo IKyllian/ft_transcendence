@@ -1,50 +1,37 @@
 import { useContext, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { SocketContext } from "../App";
-import { useAppSelector } from "../Redux/Hooks";
-import { GameModeState, GameMode, Player, GameType, TeamSide, PlayerPosition, GameSettings } from "../Types/Lobby-Types";
+import { useAppDispatch, useAppSelector } from "../Redux/Hooks";
+import { GameMode, Player, GameType, TeamSide, PlayerPosition, GameSettings } from "../Types/Lobby-Types";
 import { useForm } from "react-hook-form";
 import { fetchIsAlreadyInGame } from "../Api/User-Fetch";
-
-const defaultGameModeState: GameModeState = {
-    gameModes: [
-        {
-            gameMode: GameMode.RANKED,
-            isLock: false,   
-        },  {
-            gameMode: GameMode.PRIVATE_MATCH,
-            isLock: false,   
-        }, {
-            gameMode: GameMode.RANKED_2v2,
-            isLock: false,   
-        }
-    ],
-    indexSelected: 0,
-}
+import { changeMode, lockModeDuo, lockModeQuatuor, unlockAll } from "../Redux/LobbySlice";
 
 const defaultSettings: GameSettings = {
     game_type: GameType.Singles,
-    up_down_border: 20, 
+    up_down_border: 20,
     player_back_advance: 20,
-    player_front_advance: 60,
+    player_front_advance: 300,
+    paddle_size_front: 70,
     paddle_size_back: 150,
-    paddle_size_front: 150,
-    paddle_speed: 13,
+    paddle_speed: 10,
     ball_start_speed: 5,
     ball_acceleration: 1,
-    point_for_victory: 2,
+    point_for_victory: 5,
 }
 
 export function useLobbyHook() {
     const {party, isInQueue, queueTimer} = useAppSelector(state => state.party);
     const [loggedUserIsLeader, setLoggedUserIsLeader] = useState<boolean>(false);
-    const [gameMode, setGameMode] = useState<GameModeState>(defaultGameModeState);
     const [lobbyError, setLobbyError] = useState<string | undefined>(undefined);
     const [multiTabCheck, setMultiTabCheck] = useState<boolean>(false);
     const { handleSubmit, control, watch, setValue, getValues, reset } = useForm<GameSettings>({defaultValues: !party ? defaultSettings : party.game_settings});
+
     const {currentUser} = useAppSelector(state => state.auth)
+    const gameMode = useAppSelector(state => state.lobby);
     const {socket} = useContext(SocketContext);
     const navigate = useNavigate();
+    const dispatch = useAppDispatch();
 
     const startCheck = () : void => {
         setLobbyError(undefined);
@@ -111,9 +98,7 @@ export function useLobbyHook() {
                 socket?.emit("SetGameMode", gameMode);
             }
         } 
-        setGameMode((prev: GameModeState) => {
-            return { ...prev, indexSelected: index };
-        });
+        dispatch(changeMode(index));
     }
 
     const settingsFormSubmit = handleSubmit((data: GameSettings, e) => {
@@ -174,37 +159,16 @@ export function useLobbyHook() {
     useEffect(() => {
         if (party && party.players.length > 1) {
             if (party.players.length > 2) {
-                setGameMode((prev: any) => {
+                if (party.game_mode !== GameMode.PRIVATE_MATCH)
                     socket?.emit("SetGameMode", GameMode.PRIVATE_MATCH);
-                    return {...prev, indexSelected: 1, gameModes: [...gameMode.gameModes.map(elem => {
-                        if (elem.gameMode === GameMode.RANKED)
-                            return  {...elem, isLock: true };
-                        else if (elem.gameMode === GameMode.RANKED_2v2)
-                            return {...elem, isLock: true };
-                        return elem;
-                    })]}
-                });
+                dispatch(lockModeQuatuor());
             } else if (party.players.length === 2){
-                setGameMode((prev: any) => {
-                    if (party.game_mode === GameMode.RANKED)
-                        socket?.emit("SetGameMode", GameMode.PRIVATE_MATCH);
-                    return {...prev, indexSelected: party.game_mode === GameMode.RANKED ? 1 : gameMode.indexSelected ,gameModes: [...gameMode.gameModes.map(elem => {
-                        if (elem.gameMode === GameMode.RANKED)
-                            return  {...elem, isLock: true };
-                        else if (elem.gameMode === GameMode.RANKED_2v2)
-                            return  {...elem, isLock: false };
-                        return elem;
-                    })]}
-                });
+                if (party.game_mode === GameMode.RANKED)
+                    socket?.emit("SetGameMode", GameMode.PRIVATE_MATCH);
+                dispatch(lockModeDuo(party.game_mode === GameMode.RANKED ? 1 : gameMode.indexSelected));
             }          
         } else if ((party && party.players.length === 1) || !party) {
-            setGameMode((prev: any) => {
-                return {...prev, gameModes: [...gameMode.gameModes.map(elem => {
-                    if (elem.isLock)
-                        return  {...elem, isLock: false };
-                    return elem;
-                })]}
-            });
+            dispatch(unlockAll());
         }
     }, [party?.players, socket])
 

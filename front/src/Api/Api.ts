@@ -1,6 +1,5 @@
-import { ReactNode, useContext, useEffect } from "react";
+import { useContext, useEffect } from "react";
 import { SocketContext } from "../App";
-import { setupInterceptorsTo } from "./Interceptor";
 
 import axios, {
     AxiosError,
@@ -9,15 +8,6 @@ import axios, {
     AxiosResponse,
   } from "axios";
 import { TokenStorageInterface } from "../Types/Utils-Types";
-
-// const api = setupInterceptorsTo(
-//   axios.create({
-//     baseURL: process.env.REACT_APP_BASE_URL,
-//     headers: {
-//       "Content-Type": "application/json",
-//     },
-//   })
-// );
 
 interface ErrorDataInterface {
     message: string,
@@ -90,8 +80,10 @@ function AxiosInterceptor({ children }: Props) {
 		const responseInterceptor = api.interceptors.response.use(onResponse, onResponseError);
 
 		return () => {
-			api.interceptors.request.eject(requestInterceptor);
-			api.interceptors.response.eject(responseInterceptor);
+			if (socket) {
+				api.interceptors.request.eject(requestInterceptor);
+				api.interceptors.response.eject(responseInterceptor);
+			}
 		}
 	}, [socket]);
 

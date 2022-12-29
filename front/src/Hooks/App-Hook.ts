@@ -297,16 +297,6 @@ export function useAppHook() {
 
 			socket.on("Logout", () => {
 				logout();
-				// socket.disconnect();
-				// setSocket(undefined);
-				// localStorage.removeItem("userToken");
-				// dispatch(resetParty());
-				// dispatch(resetChannel());
-				// dispatch(resetChat());
-				// dispatch(resetConvState());
-				// dispatch(resetNotification());
-				// dispatch(resetAlert());
-				// dispatch(logoutSuccess());
 			});
 		}
 
