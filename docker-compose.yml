@@ -7,9 +7,15 @@ services:
   transcendence_front:
     depends_on: 
       - transcendence_back
-    build: ./front
-    env_file:
-      - .env_front
+    build:
+      context: ./front
+      args:
+        - REACT_APP_BASE_URL=${REACT_APP_BASE_URL}
+        - REACT_APP_REDIRECT_URL=${REACT_APP_REDIRECT_URL}
+        - REACT_APP_SOCKET_URL=${REACT_APP_SOCKET_URL}
+        - REACT_APP_API42_CLIENT_ID=${API42_CLIENT_ID}
+    environment:
+      - PORT=80
     ports:
       - 80:80
     networks:
@@ -23,8 +29,23 @@ services:
     depends_on: 
       - transcendence_db
     build: ./back
-    env_file:
-      - .env_back
+    environment:
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_PORT=${POSTGRES_PORT}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_NAME=${POSTGRES_NAME}
+      - PORT=5000
+      - FRONT_IP=${FRONT_IP}
+      - ACCESS_SECRET=${ACCESS_SECRET}
+      - REFRESH_SECRET=${REFRESH_SECRET}
+      - ACCESS_2FA_SECRET=${ACCESS_2FA_SECRET}
+      - API42_CLIENT_ID=${API42_CLIENT_ID}
+      - API42_CLIENT_SECRET=${API42_CLIENT_SECRET}
+      - API42_AUTH_REDIRECT=${API42_AUTH_REDIRECT}
+      - TWO_FACTOR_APP_NAME=${TWO_FACTOR_APP_NAME}
+      - MAIL_USER=${MAIL_USER}
+      - MAIL_PASSWORD=${MAIL_PASSWORD}
     ports:
       - 5000:5000
     volumes:
@@ -38,13 +59,25 @@ services:
 
   transcendence_db:
     image: postgres:latest
-    env_file:
-      - .env_back
-    ports:
-      - '5432:5432'
+    environment:
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_PORT=${POSTGRES_PORT}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_NAME=${POSTGRES_NAME}
     volumes:
       - ./postgres-data:/var/lib/postgresql/data
     restart: always
+    networks:
+      - transcendence_network
+
+# Adminer
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
     networks:
       - transcendence_network
 
