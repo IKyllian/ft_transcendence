@@ -1,15 +1,15 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { Link } from "react-router-dom";
 import { ChannelUser } from "../../../Types/Chat-Types";
 import { UserStatus } from "../../../Types/User-Types";
 import ExternalImage from "../../External-Image";
-import { IconEye } from "@tabler/icons";
 import { SocketContext } from "../../../App";
 import DropdownContainer from "../../Utils/Dropdown-Container";
 import BlockButton from "../../Buttons/Block-Button";
 import MuteButton from "../../Buttons/Mute-Button";
 import BanButton from "../../Buttons/Ban-Button";
 import { useAppSelector } from "../../../Redux/Hooks";
+import SpectateButton from "../../Buttons/Spectate-Button";
 
 function UserSidebarItem(props: {user: ChannelUser}) {
     const { user } = props;
@@ -32,7 +32,7 @@ function UserSidebarItem(props: {user: ChannelUser}) {
                 </div>
             </div>
             <p onClick={() => setShowDropdown(prev => !prev) }> { user.user.username } </p>
-            { user.user.in_game_id !== null && <IconEye onClick={() => socket?.emit("get_gameinfo", user.user.in_game_id)} className='spectate-icon' /> }
+            <SpectateButton in_game_id={user.user.in_game_id} className='spectate-icon' />
             {
                 user.user.id !== currentUser?.id &&
                 <DropdownContainer show={showDropdown} onClickOutside={onCloseDropdown} alignToLeft={true} >
