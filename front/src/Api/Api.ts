@@ -90,8 +90,10 @@ function AxiosInterceptor({ children }: Props) {
 		const responseInterceptor = api.interceptors.response.use(onResponse, onResponseError);
 
 		return () => {
-			api.interceptors.request.eject(requestInterceptor);
-			api.interceptors.response.eject(responseInterceptor);
+			if (socket) {
+				api.interceptors.request.eject(requestInterceptor);
+				api.interceptors.response.eject(responseInterceptor);
+			}
 		}
 	}, [socket]);
 
