@@ -91,10 +91,6 @@ export default class Pong extends Phaser.Scene
 
 	preload ()
 	{
-		// await_load_base64(AssetImageLagIcon, 'lag_icon', this);	
-		// this.load.audio('sound_a', AssetSoundA);
-		// this.load.audio('sound_b', AssetSoundB);
-		// this.load.audio('clapping', AssetSoundClapping);
 	}
 
 	create ()

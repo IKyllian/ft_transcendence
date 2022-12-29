@@ -1,4 +1,3 @@
-// import { Game } from "phaser";
 import 'phaser';
 import Pong from '../scenes/Pong';
 import Lobby from '../scenes/Lobby';
@@ -13,7 +12,6 @@ export function game_destroy(game: Phaser.Game)
 
     if (lobby instanceof Lobby)
     {
-        console.log("clearing lobby intervals");
         clearInterval(lobby.load_interval);
         clearInterval(lobby.update_interval);
         clearTimeout(lobby.error_timeout);
@@ -23,7 +21,6 @@ export function game_destroy(game: Phaser.Game)
 
     if (pong instanceof Pong)
     {
-        console.log("clearing pong intervals");
         clearInterval(pong.update_interval);
         clearTimeout(pong.pong_timeout);
     }
