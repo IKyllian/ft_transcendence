@@ -40,6 +40,7 @@ export function useLobbyHook() {
     const [loggedUserIsLeader, setLoggedUserIsLeader] = useState<boolean>(false);
     const [gameMode, setGameMode] = useState<GameModeState>(defaultGameModeState);
     const [lobbyError, setLobbyError] = useState<string | undefined>(undefined);
+    const [multiTabCheck, setMultiTabCheck] = useState<boolean>(false);
     const { handleSubmit, control, watch, setValue, getValues, reset } = useForm<GameSettings>({defaultValues: !party ? defaultSettings : party.game_settings});
     const {currentUser} = useAppSelector(state => state.auth)
     const {socket} = useContext(SocketContext);
@@ -212,11 +213,13 @@ export function useLobbyHook() {
             await fetchIsAlreadyInGame().then(result => { 
                 if (result)
                     navigate("/");
-                return result
+                return result;
             });
+            setMultiTabCheck(true);
         }
-        checkGame();
-    }, [])
+        if (multiTabCheck)
+            checkGame();
+    }, [multiTabCheck])
 
     return {
         currentUser,

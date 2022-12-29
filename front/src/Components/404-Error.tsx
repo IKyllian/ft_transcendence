@@ -1,7 +1,9 @@
-
 function Error404() {
     return (
-        <p style={{textAlign: "center"}}> Error 404 </p>
+        <div className="error-404-wrapper">
+            <h2> 404 </h2>
+            <p> Page Not Found </p>
+        </div>
     );
 }
 
