@@ -17,6 +17,7 @@ import { addAlert, AlertType, resetAlert } from "../Redux/AlertSlice";
 import { PlayersGameData } from "../Components/Game/game/types/shared.types";
 import { TokenStorageInterface } from "../Types/Utils-Types";
 import { changeUserIngameStatus, resetConvState } from "../Redux/PrivateConvSlice";
+import axios from "axios";
 
 export function useAppHook() {
     const [socket, setSocket] = useState<Socket | undefined>(undefined);
@@ -114,7 +115,7 @@ export function useAppHook() {
 				openCache();
 			}
 		}
-	}, [isSign])
+	}, [isSign, socket])
 
 	useEffect(() => {
 		if (currentUser && currentChannelId !== undefined) {
@@ -150,7 +151,7 @@ export function useAppHook() {
                 }
             });
 		}
-	}, [currentChannelId]);
+	}, [currentChannelId, socket]);
 
 	useEffect(() => {
 		if (socket && currentChannelId !== undefined && !location.pathname.includes("/chat")) {
@@ -271,38 +272,55 @@ export function useAppHook() {
 				}
 			})
 
+			socket?.on("Unauthorized", async () => {
+				const localToken: string | null = localStorage.getItem("userToken");
+				if (localToken) {
+					const storedToken: TokenStorageInterface = JSON.parse(localToken);
+					try {
+						const refreshResponse = await axios.post(`${process.env.REACT_APP_BASE_URL}/auth/refresh`, {}, {
+							headers: {
+								"Authorization": `Bearer ${storedToken.refresh_token}`,
+							}
+						});
+						if (refreshResponse && refreshResponse.data) {
+							localStorage.setItem("userToken", JSON.stringify(refreshResponse.data));
+							const newSocket: Socket = io(`${process.env.REACT_APP_SOCKET_URL}`, {extraHeaders: {
+								"Authorization": `Bearer ${refreshResponse.data.access_token}`,
+							}});
+							setSocket(newSocket);
+						}
+					} catch (_err) {
+						socket?.emit("Logout");
+					}
+				}
+			})
+
 			socket.on("Logout", () => {
 				logout();
-				// socket.disconnect();
-				// setSocket(undefined);
-				// localStorage.removeItem("userToken");
-				// dispatch(resetParty());
-				// dispatch(resetChannel());
-				// dispatch(resetChat());
-				// dispatch(resetConvState());
-				// dispatch(resetNotification());
-				// dispatch(resetAlert());
-				// dispatch(logoutSuccess());
 			});
 		}
 
 		return () => {
-			socket?.off("Connection");
-			socket?.off("NewNotification");
-			socket?.off("NewConversation");
-			socket?.off("PartyUpdate");
-			socket?.off("InQueue");
-			socket?.off("PartyLeave");
-			socket?.off("NewPartyInvite");
-			socket?.off("FriendListUpdate");
-			socket?.off("DeleteNotification");
-			socket?.off("exception");
-			socket?.off("OnJoin");
-			socket?.off("OnLeave");
-			socket?.off("newgame_data");
-			socket?.off("SendConfirm");
-			socket?.off("Logout");
-            socket?.off("gameinfo");
+			if (socket) {
+				socket?.off("Connection");
+				socket?.off("NewNotification");
+				socket?.off("NewConversation");
+				socket?.off("PartyUpdate");
+				socket?.off("InQueue");
+				socket?.off("PartyLeave");
+				socket?.off("NewPartyInvite");
+				socket?.off("FriendListUpdate");
+				socket?.off("DeleteNotification");
+				socket?.off("exception");
+				socket?.off("OnJoin");
+				socket?.off("OnLeave");
+				socket?.off("newgame_data");
+				socket?.off("SendConfirm");
+				socket?.off("Logout");
+				socket?.off("gameinfo");
+				socket?.off("Unauthorized");
+				socket.disconnect();
+			}
 		}
 	}, [socket])
 

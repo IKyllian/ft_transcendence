@@ -1,0 +1,36 @@
+@use "./Variables.scss" as *;
+@use "./Mixins.scss" as *;
+
+.error-404-wrapper {
+    @include page-wrapper();
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    gap: 5px;
+    background-color: $LightDarkPalette;
+
+    h2 {
+        font-size: 200px;
+        margin: 0;
+        letter-spacing: 7px;
+    }
+
+    p {
+        margin: 0;
+        font-size: 25px;
+    }
+}
+
+@media screen and (max-width: $BreakPoint_500) {
+    .error-404-wrapper {
+        h2 {
+            font-size: 100px;
+        }
+
+        p {
+            font-size: 20px;
+        }
+    }
+}

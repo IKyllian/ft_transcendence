@@ -69,12 +69,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 		
 		if (user === null) {
-			console.log("invalid token");
-			socket.emit('Logout');
-			return ;
+			console.log("invalid toto");
+			socket.emit("Unauthorized");
+			return socket.disconnect();
 		}
 		socket.user = user;
-		console.log(user.username, 'connected')
 		socket.join(`user-${user.id}`);
 		if (user.status === UserStatus.OFFLINE) {
 			this.userService.setStatus(user.id, UserStatus.ONLINE);
@@ -101,10 +100,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 					this.userService.setStatus(payload.sub, UserStatus.OFFLINE);
 					this.server.emit('StatusUpdate', { id: payload.sub, status: UserStatus.OFFLINE});
 				}
-				console.log(payload?.username, 'disconnected');
 			}
-			} else
-				console.log(socket.id, 'disconnected');
+		}
 	}
 
 	@UseGuards(WsJwtGuard)
@@ -124,6 +121,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		@MessageBody() dto: JoinChannelDto,
 		@ConnectedSocket() socket: AuthenticatedSocket,
 	) {
+		console.log("test");
 		const channelUser = await this.channelService.join(socket.user, dto.id, dto.password);
 		this.server.to(`channel-${dto.id}`).emit('ChannelUpdate', { type: ChannelUpdateType.JOIN, data: channelUser });
 		this.server.to(`user-${socket.user.id}`).emit('OnJoin', { channel: channelUser.channel, socketId: socket.id });

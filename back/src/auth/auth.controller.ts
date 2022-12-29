@@ -17,34 +17,34 @@ export class AuthController {
 
 	@HttpCode(HttpStatus.CREATED)
 	@Post('signup')
-	signup(@Body() dto: SignupDto) {
-		return this.authService.signup(dto);
+	async signup(@Body() dto: SignupDto) {
+		return await this.authService.signup(dto);
 	}
 
 	@HttpCode(HttpStatus.OK)
 	@Post('login')
-	signin(@Body() dto: LoginDto) {
-		return this.authService.login(dto);
+	async signin(@Body() dto: LoginDto) {
+		return await this.authService.login(dto);
 	}
 
 	@HttpCode(HttpStatus.OK)
 	@Post('login42')
-	login42(@Body() dto: Auth42Dto) {
-		return this.authService.login42(dto);
+	async login42(@Body() dto: Auth42Dto) {
+		return await this.authService.login42(dto);
 	}
 
 	@UseGuards(JwtGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('logout')
-	logout(@GetUser() user: User) {
-		return this.authService.logout(user);
+	async logout(@GetUser() user: User) {
+		return await this.authService.logout(user);
 	}
 	
 	@UseGuards(RefreshGuard)
 	@HttpCode(HttpStatus.OK)
 	@Post('refresh')
-	refresh(@Req() req: Request) {
-		return this.authService.refreshTokens(req.body);
+	async refresh(@Req() req: Request) {
+		return await this.authService.refreshTokens(req.body);
 	}
 
 	@UseGuards(JwtGuard)
@@ -58,13 +58,13 @@ export class AuthController {
 
   	@HttpCode(HttpStatus.OK)
 	@Post('forgot-password')
-	forgotPassword(@Body() dto: ForgotPasswordDto) {
-		return this.authService.forgotPassword(dto);
+	async forgotPassword(@Body() dto: ForgotPasswordDto) {
+		return await this.authService.forgotPassword(dto);
 	}
 
 	@HttpCode(HttpStatus.OK)
 	@Post('reset-password')
-	resetPassword(@Body() dto: ResetPasswordDto) {
-		return this.authService.resetPassword(dto);
+	async resetPassword(@Body() dto: ResetPasswordDto) {
+		return await this.authService.resetPassword(dto);
 	}
 }

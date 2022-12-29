@@ -5,6 +5,7 @@ import { UserInterface } from "../Types/User-Types";
 import api from "./Api";
 import { fetchResponseAvatar } from "./Profile/Profile-Fetch";
 import { AxiosResponse } from "axios";
+import { Socket } from "socket.io-client";
 
 interface UsersListInterface {
     user: UserInterface,
@@ -74,7 +75,7 @@ export async function fetchIsAlreadyInGame(): Promise<boolean> {
     return isInGame;
 }
 
-export async function getPlayerAvatar(cache: Cache | null, token: string, userId: number, userAvatar: string): Promise<string | undefined> {
+export async function getPlayerAvatar(cache: Cache | null, token: string, userId: number, userAvatar: string, socket?: Socket | undefined): Promise<string | undefined> {
     const req = new Request(`${process.env.REACT_APP_BASE_URL}/users/${userId}/avatar`, {method: 'GET', headers: {"Authorization": `Bearer ${token}`}});
     let avatarResponse: Response | undefined;
     let headerFileName: string | null = null;
@@ -84,7 +85,7 @@ export async function getPlayerAvatar(cache: Cache | null, token: string, userId
                 headerFileName = cacheResponse.headers.get("Content-Disposition");
                 return cacheResponse;
             } else {
-                return await fetchResponseAvatar(req).then(fetchResponse => {
+                return await fetchResponseAvatar(req, socket).then(fetchResponse => {
                     if (!fetchResponse.ok)
                         return undefined;
                     headerFileName = fetchResponse.headers.get("Content-Disposition");
@@ -94,7 +95,7 @@ export async function getPlayerAvatar(cache: Cache | null, token: string, userId
             }
         })
     } else {
-        avatarResponse = await fetchResponseAvatar(req).then(fetchResponse => {
+        avatarResponse = await fetchResponseAvatar(req, socket).then(fetchResponse => {
             if (!fetchResponse.ok)
                 return undefined;
             headerFileName = fetchResponse.headers.get("Content-Disposition");
@@ -102,7 +103,7 @@ export async function getPlayerAvatar(cache: Cache | null, token: string, userId
         })
     }
     if (headerFileName !== null && userAvatar.match("base64") === null && headerFileName !== userAvatar) {
-        return await updatePlayerAvatar(cache, token, userId);
+        return await updatePlayerAvatar(cache, token, userId, socket);
     }
     if (avatarResponse !== undefined) {
         const avatarBlob = await avatarResponse.blob();
@@ -113,12 +114,12 @@ export async function getPlayerAvatar(cache: Cache | null, token: string, userId
     return undefined;
 }
 
-export async function updatePlayerAvatar(cache: Cache | null, token: string, userId: number): Promise<string | undefined> {
+export async function updatePlayerAvatar(cache: Cache | null, token: string, userId: number, socket?: Socket | undefined): Promise<string | undefined> {
     const req = new Request(`${process.env.REACT_APP_BASE_URL}/users/${userId}/avatar`, {method: 'GET', headers: {"Authorization": `Bearer ${token}`}});
     let avatarResponse: Response | undefined;
     if (cache !== null) {
         cache.delete(req);
-        avatarResponse = await fetchResponseAvatar(req).then(fetchResponse => {
+        avatarResponse = await fetchResponseAvatar(req, socket).then(fetchResponse => {
             if (!fetchResponse.ok)
                 return undefined;
             cache.put(req, fetchResponse.clone());

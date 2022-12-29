@@ -1,7 +1,8 @@
 import axios from "axios";
+import { Socket } from "socket.io-client";
 import { TokenStorageInterface } from "../Types/Utils-Types";
 
-export const fetchInterceptor = () => {
+export const fetchInterceptor = (socket: Socket | undefined) => {
     const { fetch: originalFetch } = window;
 
     window.fetch = async (...args): Promise<Response> => {
@@ -23,6 +24,7 @@ export const fetchInterceptor = () => {
                         return window.fetch(resource, {...config, headers: {"Authorization": `Bearer ${refreshResponse.data.access_token}`}});
                     }
                 } catch (_error) {
+                    socket?.emit("Logout");
                     return Promise.reject(_error);
                 }
             }
