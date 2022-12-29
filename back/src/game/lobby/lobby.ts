@@ -62,7 +62,6 @@ export class Lobby
 		}
 
 		if (this.playerSockets.length === this.lobby_data.players.length) {
-			console.log("all players ready ", this.game_id);
 			this.lobby_broadcast_message('lobby_all_ready');
 			if (!this.already_started)
 			{
