@@ -1,15 +1,15 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { MatchResult, Statistic, User } from "src/typeorm";
+import { GlobalService } from "src/utils/global/global.service";
 import { EndResult, GameType, Leaderboard, ScoreBoard, TeamSide } from "src/utils/types/game.types";
 import { Repository } from "typeorm";
 import { Player } from "./player";
-import { UserSessionManager } from "./user.session";
 
 @Injectable()
 export class GameService {
 	constructor(
-		private userSession: UserSessionManager,
+		private globalService: GlobalService,
 
 		@InjectRepository(User)
 		private userRepo: Repository<User>,
@@ -19,8 +19,8 @@ export class GameService {
 		private matchRepo: Repository<MatchResult>,
 	) {}
 
-	isPlaying(userId: number) : boolean {
-		return this.userSession.getUser(userId) ? true : false;
+	async isPlaying(userId: number): Promise<boolean> {
+		return (await this.globalService.game_server.in(`user-in-game-${userId}`).fetchSockets()).length > 0 ? true : false;
 	}
 
 	saveNewElo(playersId: number[], eloToAdd: number, game_type: GameType) {

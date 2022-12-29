@@ -11,10 +11,10 @@ export class GameController {
 
 	@UseGuards(JwtGuard)
 	@Get('is-playing')
-	isPlaying(
+	async isPlaying(
 		@GetUser('id') userId: number,
 	) {
-		return this.gameService.isPlaying(userId);
+		return await this.gameService.isPlaying(userId);
 	}
 
 	@UseGuards(JwtGuard)
