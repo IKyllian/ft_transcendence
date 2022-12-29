@@ -3,6 +3,7 @@ import { alertSlice } from './AlertSlice'
 import { authSlice } from './AuthSlice'
 import { channelSlice } from './ChannelSlice'
 import { chatSlice } from './ChatSlice'
+import { lobbySlice } from './LobbySlice'
 import { notificationSlice } from './NotificationSlice'
 import { partySlice } from './PartySlice'
 import { privateConvSlice } from './PrivateConvSlice'
@@ -18,6 +19,7 @@ export const store = configureStore({
         alerts: alertSlice.reducer,
         privateConv: privateConvSlice.reducer,
         avatarStored: storeAvatarSlice.reducer,
+        lobby: lobbySlice.reducer,
     }
 })
 

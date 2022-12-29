@@ -16,6 +16,15 @@
         font-family: Silkscreen;
         text-transform: uppercase;
         font-size: 40px;
+        position: relative;
+
+        &::after {
+            content: "v1";
+            position: absolute;
+            font-size: 11px;
+            bottom: 5px;
+            font-family: auto;
+        }
     }
 
     .header-right {
