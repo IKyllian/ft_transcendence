@@ -87,8 +87,8 @@ export default class PongCore
 		this.up_down_border = game_settings.up_down_border;
 		this.player_back_advance = game_settings.player_back_advance;
 		this.player_front_advance = game_settings.player_front_advance;
-		this.paddle_size_back = game_settings.paddle_size_back + 5;
-		this.paddle_size_front = game_settings.paddle_size_front + 5;
+		this.paddle_size_back = game_settings.paddle_size_back;
+		this.paddle_size_front = game_settings.paddle_size_front;
 		this.paddle_speed = game_settings.paddle_speed;
 		this.ball_start_speed = game_settings.ball_start_speed;
 		this.ball_acceleration = game_settings.ball_acceleration;
@@ -299,8 +299,8 @@ export default class PongCore
 		if (this.ball_data.position.x <= this.player_back_advance 
 			&& this.previous_ball_pos.x > this.player_back_advance)
 		{
-			if (this.ball_data.position.y < (this.TeamBlue_Back_pos.y + (this.paddle_size_back / 2))
-			&& this.ball_data.position.y > (this.TeamBlue_Back_pos.y - (this.paddle_size_back / 2)))
+			if (this.ball_data.position.y <= (this.TeamBlue_Back_pos.y + (this.paddle_size_back / 2) + 5)
+			&& this.ball_data.position.y >= (this.TeamBlue_Back_pos.y - (this.paddle_size_back / 2) + 5))
 			{
 				this.ball_data.position.x = this.player_back_advance;
 				this.ball_data.vector.x *= -1;	
@@ -314,8 +314,8 @@ export default class PongCore
 		if (this.ball_data.position.x >= (this.field_width - this.player_back_advance)
 			&& this.previous_ball_pos.x < (this.field_width - this.player_back_advance))
 		{
-			if (this.ball_data.position.y < (this.TeamRed_Back_pos.y + (this.paddle_size_back / 2))
-			&& this.ball_data.position.y > (this.TeamRed_Back_pos.y - (this.paddle_size_back / 2)))
+			if (this.ball_data.position.y <= (this.TeamRed_Back_pos.y + (this.paddle_size_back / 2) + 5)
+			&& this.ball_data.position.y >= (this.TeamRed_Back_pos.y - (this.paddle_size_back / 2) + 5))
 			{
 				this.ball_data.position.x = (this.field_width - this.player_back_advance);
 				this.ball_data.vector.x *= -1;	
@@ -332,8 +332,8 @@ export default class PongCore
 			if (this.ball_data.position.x <= this.player_front_advance 
 				&& this.previous_ball_pos.x > this.player_front_advance)
 			{
-				if (this.ball_data.position.y < (this.TeamBlue_Front_pos.y + (this.paddle_size_front / 2))
-				&& this.ball_data.position.y > (this.TeamBlue_Front_pos.y - (this.paddle_size_front / 2)))
+				if (this.ball_data.position.y <= (this.TeamBlue_Front_pos.y + (this.paddle_size_front / 2) + 5)
+				&& this.ball_data.position.y >= (this.TeamBlue_Front_pos.y - (this.paddle_size_front / 2) + 5))
 				{
 					this.ball_data.position.x = this.player_front_advance;
 					this.ball_data.vector.x *= -1;	
@@ -348,8 +348,8 @@ export default class PongCore
 			if (this.ball_data.position.x >= (this.field_width - this.player_front_advance)
 				&& this.previous_ball_pos.x < (this.field_width - this.player_front_advance))
 			{
-				if (this.ball_data.position.y < (this.TeamRed_Front_pos.y + (this.paddle_size_front / 2))
-				&& this.ball_data.position.y > (this.TeamRed_Front_pos.y - (this.paddle_size_front / 2)))
+				if (this.ball_data.position.y <= (this.TeamRed_Front_pos.y + (this.paddle_size_front / 2) + 5)
+				&& this.ball_data.position.y >= (this.TeamRed_Front_pos.y - (this.paddle_size_front / 2) + 5))
 				{
 					this.ball_data.position.x = (this.field_width - this.player_front_advance);
 					this.ball_data.vector.x *= -1;
