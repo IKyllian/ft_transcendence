@@ -341,6 +341,11 @@ $TeamRedColor: rgb(247, 30, 6);
                     align-items: center;
                     @include width-height(20px, 20px);
                     cursor: pointer;
+
+                    border: 1px solid red;
+                    color: red;
+                    padding: 1.5px;
+                    border-radius: 50%;
                 }
             }
 

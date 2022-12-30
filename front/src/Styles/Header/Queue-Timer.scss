@@ -1,0 +1,33 @@
+@use "../Variables.scss" as *;
+@use "../Mixins.scss" as *;
+
+.queue-timer-wrapper {
+    @include flex-row-alignCenter();
+    gap: 5px;
+
+    .cancel-queue {
+        display: flex;
+        svg {
+            @include width-height(14px, 14px);
+            border: 1px solid red;
+            color: red;
+            padding: 1.5px;
+            border-radius: 50%;
+        }
+    }
+
+    p {
+        display: inline-block;
+        font-size: 13px;
+
+        span {
+            font-size: 11px;
+        }
+    }
+}
+
+@media screen and (max-width: 920px) {
+    .queue-timer-wrapper {
+        display: none;
+    }
+}
