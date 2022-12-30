@@ -14,8 +14,7 @@ function QueueTimer() {
         socket?.emit("StopQueue");
     }
 
-    // return isInQueue && location.pathname != "/lobby" ? ( // Don't display on lobby page
-    return isInQueue ? ( // Display on lobby page
+    return isInQueue && location.pathname != "/lobby" ? (
         <div className="queue-timer-wrapper">
             <div data-tooltips="Cancel" className="cancel-queue" onClick={() => cancelQueue()}>
                 <IconX />

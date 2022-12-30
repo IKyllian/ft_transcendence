@@ -8,7 +8,6 @@ function FriendListModal(props: {show: boolean, onClickOutside: Function, userId
     
     return (
         <DropdownContainer show={show} onClickOutside={onClickOutside} >
-            {/* <p> Send message </p> */}
             <Link className="send-message-icon" to="/chat" state={{userIdToSend: userId}}>
                 <p> Send Message </p>
             </Link>

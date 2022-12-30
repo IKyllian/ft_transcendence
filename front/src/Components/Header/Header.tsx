@@ -1,5 +1,5 @@
 import { useState, useContext, useEffect } from 'react';
-import { IconLogout, IconMessages, IconUsers, IconChevronDown, IconBell, IconX } from '@tabler/icons';
+import { IconLogout, IconMessages, IconUsers, IconChevronDown, IconBell } from '@tabler/icons';
 
 import { ModalContext } from '../Utils/ModalProvider';
 import { Link, useLocation } from 'react-router-dom';
@@ -8,10 +8,8 @@ import DropdownNotification from './Dropdown-Notification';
 import ResponsiveMenu from './Responsive-Menu';
 import PartyButton from './Party-Button';
 import { NotificationInterface, notificationType } from '../../Types/Notification-Types';
-import { logoutSuccess } from '../../Redux/AuthSlice';
 import { SocketContext } from '../../App';
 import ExternalImage from '../External-Image';
-import { partyQueueString } from '../../Utils/Utils-Party';
 import QueueTimer from './Queue-Timer';
 
 function NotifIcon(props: {notifications: NotificationInterface[] | undefined ,handleNotifDropdownClick: Function}) {

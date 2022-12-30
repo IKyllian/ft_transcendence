@@ -1,5 +1,3 @@
-import { useEffect, useState } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useAppSelector } from "../../../Redux/Hooks";
 import LoadingSpin from "../../Utils/Loading-Spin";
 import SettingsCardAvatar from "./Settings-Card-Avatar";

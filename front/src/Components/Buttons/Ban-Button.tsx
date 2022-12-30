@@ -5,7 +5,7 @@ import { IconSend } from "@tabler/icons";
 
 function BanButton(props: {senderId: number, chanId: number}) {
     const { senderId, chanId } = props;
-    const { register, reset, handleSubmit, formState: {errors}} = useForm<{numberInput: string}>();
+    const { register, handleSubmit, formState: {errors}} = useForm<{numberInput: string}>();
 
     const {socket} = useContext(SocketContext);
 
