@@ -12,6 +12,7 @@ import { logoutSuccess } from '../../Redux/AuthSlice';
 import { SocketContext } from '../../App';
 import ExternalImage from '../External-Image';
 import { partyQueueString } from '../../Utils/Utils-Party';
+import QueueTimer from './Queue-Timer';
 
 function NotifIcon(props: {notifications: NotificationInterface[] | undefined ,handleNotifDropdownClick: Function}) {
     const {handleNotifDropdownClick, notifications} = props;
@@ -31,7 +32,6 @@ function Header() {
     const location = useLocation();
     const { currentUser } = useAppSelector(state => state.auth);
     const {notifications} = useAppSelector(state => state.notification);
-    // const {queueTimer} = useAppSelector(state => state.party);
     const modalStatus = useContext(ModalContext);
     const dispatch = useAppDispatch();
     const {socket} = useContext(SocketContext);
@@ -49,9 +49,7 @@ function Header() {
     }
 
     const handleLogout = () => {
-        // localStorage.removeItem("userToken");
         socket?.emit("Logout");
-        // dispatch(logoutSuccess());
     }
 
     useEffect(() => {
@@ -71,7 +69,7 @@ function Header() {
             </Link>
             <div className='header-right'>
                 <div className='icons-header'>
-                    {/* <p> <IconX /> In Queue: {partyQueueString(queueTimer)} </p> */}
+                    <QueueTimer />
                     <PartyButton />
                     <div data-tooltips="Notifications">
                         <NotifIcon notifications={notifications} handleNotifDropdownClick={handleNotifDropdownClick}   />

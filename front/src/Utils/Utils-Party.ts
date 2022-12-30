@@ -5,7 +5,7 @@ export function loggedUserIsLeader(loggedUserId: number, partyUsers: Player[]): 
 }
 
 export function partyQueueString(queueTimer: QueueTimerInterface): string {
-    const minutes: string = queueTimer.minutes > 0 ? `${queueTimer.minutes}:` : "";
+    const minutes: string = queueTimer.minutes < 10 ? `0${queueTimer.minutes}:` : `${queueTimer.minutes}`;
     const seconds: string = queueTimer.seconds < 10 ? `0${queueTimer.seconds}` : `${queueTimer.seconds}`;
     return (minutes+seconds);
 }
