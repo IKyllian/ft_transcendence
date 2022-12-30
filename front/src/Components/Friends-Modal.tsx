@@ -1,4 +1,4 @@
-import { IconX, IconMessage, IconEye, IconUserX, IconDeviceGamepad2, IconChevronsDownLeft } from "@tabler/icons";
+import { IconX, IconMessage, IconUserX, IconDeviceGamepad2 } from "@tabler/icons";
 import { useContext, useEffect, useState } from "react";
 
 import { ModalContext } from "./Utils/ModalProvider";
@@ -12,6 +12,7 @@ import { UserStatus } from "../Types/User-Types";
 import { changeFriendListUserStatus } from "../Redux/AuthSlice";
 import { Link } from "react-router-dom";
 import { useFriendHook } from "../Hooks/Friend-Hook";
+import SpectateButton from "./Buttons/Spectate-Button";
 
 function AddFriendModal() {
     const [showFriendList, setShowFriendList] = useState<boolean>(true);
@@ -33,11 +34,6 @@ function AddFriendModal() {
         }
     }, [socket]);
 
-    const spectateClick = (gameId: string) => {
-        if (gameId)
-            socket?.emit("get_gameinfo", gameId);
-    }
-
     return modalStatus.modal.isOpen ? (
         <>
             <div className="modal-wrapper-container">
@@ -58,7 +54,7 @@ function AddFriendModal() {
                                 friendList.length > 0 && friendList.map((elem, index) =>                    
                                     <UserFindItem key={index} avatar={elem.avatar} name={elem.username} status={elem.status} userId={elem.id} >
                                         <div className="icons-player-item">
-                                            { elem.in_game_id !== null && <IconEye onClick={() => spectateClick(elem.in_game_id!)} className='spectate-icon' /> }
+                                            <SpectateButton in_game_id={elem.in_game_id} className='spectate-icon' />
                                             { 
                                                 (!party || (party && !party.players.find(partyUser => partyUser.user.id === elem.id))) &&
                                                 <div className="party-icon" data-tooltips="invite party">

@@ -1,6 +1,6 @@
 import { useContext, useState } from "react";
 import { Link } from "react-router-dom";
-import { IconSettings, IconMenu2, IconChevronLeft, IconChevronRight, IconUserPlus, IconEye } from "@tabler/icons";
+import { IconSettings, IconMenu2, IconChevronLeft, IconChevronRight, IconUserPlus } from "@tabler/icons";
 import { SidebarContext } from "../Chat";
 import { UserInterface, UserStatus } from "../../../Types/User-Types";
 import { Channel } from "../../../Types/Chat-Types"
@@ -9,7 +9,7 @@ import BlockButton from "../../Buttons/Block-Button";
 import { SetModalContext } from "../Chat";
 import { useAppDispatch } from "../../../Redux/Hooks";
 import { closeSidebarChatStatus } from "../../../Redux/PartySlice";
-import { SocketContext } from "../../../App";
+import SpectateButton from "../../Buttons/Spectate-Button";
 
 interface Props {
     chatItem?: Channel | undefined,
@@ -23,7 +23,6 @@ function ChatHeader(props: Props) {
     const { chatItem, privateConvUser, showUsersSidebar, changeSidebarStatus, isPartyChat } = props;
     const [showDropdown, setShowDropdown] = useState<boolean>(false);
     const dispatch = useAppDispatch();
-    const {socket} = useContext(SocketContext);
 
     const handleClick = () => {
         setShowDropdown(!showDropdown);
@@ -68,7 +67,7 @@ function ChatHeader(props: Props) {
             <div className="player-container">
                 <div className={`player-status player-status-${privateConvUser?.status === UserStatus.ONLINE ? "online" : "offline"}`}> </div>
                 <p onClick={() => handleClick()}> {privateConvUser?.username} </p>
-                { privateConvUser?.in_game_id !== null && <IconEye onClick={() => socket?.emit("get_gameinfo", privateConvUser?.in_game_id)} className='spectate-icon' /> }
+                {privateConvUser &&  <SpectateButton in_game_id={privateConvUser.in_game_id} className='spectate-icon' />}               
                 <DropdownContainer show={showDropdown} onClickOutside={handleClick}>
                     <Link to={`/profile/${privateConvUser?.username}`}>
                         <p> profile </p>

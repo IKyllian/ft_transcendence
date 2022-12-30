@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { io, Socket } from "socket.io-client";
 import { useAppDispatch, useAppSelector } from '../Redux/Hooks'
 import { NotificationInterface } from "../Types/Notification-Types";
@@ -260,6 +260,7 @@ export function useAppHook() {
 
 			socket?.on('gameinfo', (data: PlayersGameData | null) => {
 				if (data !== null) {
+					socket?.emit("StopQueue");
 					dispatch(newGameFound({gameDatas: data, showGameFound: false}));
 					navigate("/game", {state: data});
 				}
