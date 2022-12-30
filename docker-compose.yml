@@ -70,13 +70,6 @@ services:
     restart: always
     networks:
       - transcendence_network
-# Adminer
-
-  adminer:
-    image: adminer
-    restart: always
-    ports:
-      - 8080:8080
 
 # Adminer
 
