@@ -103,13 +103,12 @@ $FontSizeTextResponsive: 15px;
 
             .spectate-icon {
                 @include width-height(20px, 20px);
-                margin-left: 20px;
             }
 
             .settings-icon {
                 @include width-height(20px, 20px);
                 margin-left: 10px;
-                margin-top: 8px;
+                margin-top: 5px;
             }
 
             .icons-wrapper {
@@ -162,7 +161,6 @@ $FontSizeTextResponsive: 15px;
                 }
     
                 .send-message-icon {
-                    margin-top: 3px;
                     svg {
                         color: white;
                         height: 22px;
@@ -172,7 +170,6 @@ $FontSizeTextResponsive: 15px;
 
                 .block-button {
                     @include width-height(20px, 20px);
-                    margin-top: 3px;
                 }
             }
         }

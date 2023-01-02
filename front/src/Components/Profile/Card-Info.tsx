@@ -22,18 +22,18 @@ function CardInfo(props: {userState: ProfileState}) {
             <p> {userState.user.username} </p>
             {
                 userState.isLoggedUser ? 
-                <Link to={`/profile/settings`}>
+                <Link className="tooltip-icon-wrapper" data-tooltips="Settings" to={`/profile/settings`}>
                     <IconSettings className='settings-icon' />
                 </Link>
                 : 
                 <div className='icons-wrapper'>
                     <FriendButton secondUserId={userState.user.id} relationStatus={userState.relationStatus!} />
-                    <Link className="send-message-icon" to="/chat" state={{userIdToSend: userState.user.id}}>
+                    <Link className="send-message-icon tooltip-icon-wrapper"  data-tooltips="Send message" to="/chat" state={{userIdToSend: userState.user.id}}>
                         <IconMessage />
                     </Link>
                     {
                         (!party || (party && !party.players.find(partyUser => partyUser.user.id === userState.user.id))) &&
-                        <div data-tooltips="invite party">
+                        <div className="tooltip-icon-wrapper" data-tooltips="Party Invite">
                             <IconDeviceGamepad2 onClick={() => socket?.emit("PartyInvite", {id: userState.user.id})} />
                         </div>
                     }

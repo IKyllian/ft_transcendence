@@ -49,8 +49,10 @@ function ChatHeader(props: Props) {
             <p className="chan-name"> # {chatItem?.name} </p>
             <div className="message-header-right-side">
                 <div className="chat-action-icones">
-                    <IconUserPlus onClick={() => modalStatus.setModalStatus(3)} />
-                    <Link to={`/chat/channel/${chatItem?.id}/settings`} state={chatItem} >
+                    <div className="tooltip-icon-wrapper" data-tooltips="Invite">
+                        <IconUserPlus onClick={() => modalStatus.setModalStatus(3)} />
+                    </div>
+                    <Link className="tooltip-icon-wrapper" data-tooltips="Settings" to={`/chat/channel/${chatItem?.id}/settings`} state={chatItem} >
                         <IconSettings />
                     </Link> 
                 </div>

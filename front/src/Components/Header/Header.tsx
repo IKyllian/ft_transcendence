@@ -3,7 +3,7 @@ import { IconLogout, IconMessages, IconUsers, IconChevronDown, IconBell } from '
 
 import { ModalContext } from '../Utils/ModalProvider';
 import { Link, useLocation } from 'react-router-dom';
-import { useAppDispatch, useAppSelector } from '../../Redux/Hooks';
+import { useAppSelector } from '../../Redux/Hooks';
 import DropdownNotification from './Dropdown-Notification';
 import ResponsiveMenu from './Responsive-Menu';
 import PartyButton from './Party-Button';
@@ -31,7 +31,6 @@ function Header() {
     const { currentUser } = useAppSelector(state => state.auth);
     const {notifications} = useAppSelector(state => state.notification);
     const modalStatus = useContext(ModalContext);
-    const dispatch = useAppDispatch();
     const {socket} = useContext(SocketContext);
 
     const handleMenuClick = () => {
@@ -72,11 +71,11 @@ function Header() {
                     <div data-tooltips="Notifications">
                         <NotifIcon notifications={notifications} handleNotifDropdownClick={handleNotifDropdownClick}   />
                     </div>
-                    <div data-tooltips="Social" className='social-icon'>
+                    <div data-tooltips="Social" className="tooltip-icon-wrapper">
                         <IconUsers onClick={() => modalStatus.setStatus()} />
                     </div>
-                    <Link to="/chat" aria-label="Link to the chat" data-tooltips="Chat">
-                        <div className='badge-wrapper'>
+                    <Link to="/chat" aria-label="Link to the chat" >
+                        <div data-tooltips="Chat" className='badge-wrapper'>
                             {
                                 notifications !== undefined
                                 && notifications.filter(elem => elem.type === notificationType.CHANNEL_MESSAGE || elem.type === notificationType.PRIVATE_MESSAGE).length > 0
@@ -90,7 +89,9 @@ function Header() {
                     <ExternalImage src={currentUser.avatar} alt="User Avatar" className="header-avatar" userId={currentUser.id} />
                     {currentUser.username}
                 </Link>
-                <IconLogout onClick={() => handleLogout()} />
+                <div className="tooltip-icon-wrapper" data-tooltips="Logout" >
+                    <IconLogout onClick={() => handleLogout()} />
+                </div>
             </div>
             <div className='header-right-responsive'>
                 <PartyButton />

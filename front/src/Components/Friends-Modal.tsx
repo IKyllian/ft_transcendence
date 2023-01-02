@@ -57,14 +57,16 @@ function AddFriendModal() {
                                             <SpectateButton in_game_id={elem.in_game_id} className='spectate-icon' />
                                             { 
                                                 (!party || (party && !party.players.find(partyUser => partyUser.user.id === elem.id))) &&
-                                                <div className="party-icon" data-tooltips="invite party">
+                                                <div className="tooltip-icon-wrapper" data-tooltips="Party Invite">
                                                     <IconDeviceGamepad2 onClick={() => socket?.emit("PartyInvite", {id: elem.id})} />
                                                 </div>
                                             }
-                                            <Link className="send-message-icon" to="/chat" state={{userIdToSend: elem.id}}>
+                                            <Link className="tooltip-icon-wrapper"  data-tooltips="Send message" to="/chat" state={{userIdToSend: elem.id}}>
                                                 <IconMessage />
                                             </Link>
-                                            <IconUserX onClick={() => handleRemoveFriend(elem.id)} />
+                                            <div className="tooltip-icon-wrapper" data-tooltips="Remove friend">
+                                                <IconUserX onClick={() => handleRemoveFriend(elem.id)} />
+                                            </div>
                                         </div>
                                     </UserFindItem>
                                 )

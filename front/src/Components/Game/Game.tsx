@@ -13,7 +13,6 @@ import 'phaser';
 import { game_destroy } from "./game/utils/clean_exit";
 
 function Game() {
-    const [gameDatas, setGameDatas] = useState<PlayersGameData | undefined>(undefined);
     const [gameSocket, setGameSocket] = useState<Socket | undefined>(undefined);
     const [game, setGame] = useState<Phaser.Game | undefined>(undefined);
     const [hasEnded, setHasEnded] = useState<boolean>(false);
@@ -48,7 +47,6 @@ function Game() {
                 });
                 
                 gameSocket.on("Connected", () => {
-                    setGameDatas(locationState);
                     const gameReturn: Phaser.Game = launch_game(locationState, gameSocket, localTokenParse.access_token, cache, setHasEnded);
                     setGame(gameReturn);
                 })
@@ -89,6 +87,9 @@ function Game() {
     }, [gameSocket, socket])
 
     useEffect(() => {
+        if (!location.state)
+            navigate(-1);
+
         const localToken: string | null = localStorage.getItem("userToken");
         if (localToken !== null && location && location.state) {
             const localTokenParse: TokenStorageInterface = JSON.parse(localToken);
@@ -100,14 +101,8 @@ function Game() {
         }
     }, [])
 
-    return !gameDatas ? (
-        <>
-        
-        </>
-    ) : (
-        <div>
-
-        </div> 
+    return (
+        <> </>
     )
 }
 

@@ -11,7 +11,9 @@ function SpectateButton(props: {in_game_id: string | null, className?: string}) 
     }
 
     return in_game_id !== null ? (
-        <IconEye onClick={() => spectateClick()} className={className ? className : ""} />
+        <div className="tooltip-icon-wrapper" data-tooltips="Spectate">
+            <IconEye onClick={() => spectateClick()} className={className ? className : ""} />
+        </div>
     ) : (
         <> </>
     );

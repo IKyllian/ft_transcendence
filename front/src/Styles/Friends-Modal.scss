@@ -90,14 +90,6 @@
             @include flex-row-alignCenter;
             gap: 10px;
             cursor: pointer;
-
-            .party-icon {
-                margin-top: 4px;
-            }
-
-            .send-message-icon {
-                margin-top: 4px;
-            }
         }
 
         input {

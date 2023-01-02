@@ -11,7 +11,9 @@ function FriendButton(props: {secondUserId: number, relationStatus: string}) {
     
     if (relationStatus === "none") {
         return (
-            <IconUserPlus onClick={() => handleAddFriend(secondUserId)} className="friend-icone friend-icone-add" />
+            <div className="tooltip-icon-wrapper" data-tooltips="Add friend">
+                <IconUserPlus onClick={() => handleAddFriend(secondUserId)} className="friend-icone friend-icone-add" />
+            </div>
         );
     } else if (relationStatus === "pending") {
         return (
@@ -19,7 +21,10 @@ function FriendButton(props: {secondUserId: number, relationStatus: string}) {
         );
     } else if (relationStatus === "friend") {
         return (
-            <IconUserX onClick={() => handleRemoveFriend(secondUserId)} className="friend-icone friend-icone-add" />
+            <div className="tooltip-icon-wrapper" data-tooltips="Remove friend">
+                <IconUserX onClick={() => handleRemoveFriend(secondUserId)} className="friend-icone friend-icone-add" />
+            </div>
+            
         );
     } else {
         return (
