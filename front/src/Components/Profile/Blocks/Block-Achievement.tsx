@@ -12,6 +12,7 @@ function AchievementItem() {
     );
 }
 
+// Component not use
 function BlockAchievement() {
     return (
         <div className="profile-block-wrapper achievement-list">

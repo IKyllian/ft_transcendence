@@ -83,7 +83,6 @@ function Game() {
                 gameSocket.off("MultiTabError");
                 gameSocket.off("Connected");
                 gameSocket.off("Unauthorized");
-                gameSocket.off("Disconnect");
                 gameSocket.disconnect();
             }
         }

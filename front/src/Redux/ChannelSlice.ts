@@ -1,5 +1,4 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import userEvent from '@testing-library/user-event';
 import { Channel, ChannelUser, UserTimeout, ChatMessage, ChannelModes } from '../Types/Chat-Types';
 import { UserStatus } from '../Types/User-Types';
 

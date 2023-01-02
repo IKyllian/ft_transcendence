@@ -1,21 +1,22 @@
-import { useContext, useEffect } from "react";
-import { SocketContext } from "../App";
-
 import axios, {
     AxiosError,
     AxiosInstance,
     AxiosRequestConfig,
     AxiosResponse,
-  } from "axios";
+} from "axios";
+import { useContext, useEffect } from "react";
+import { SocketContext } from "../App";
 import { TokenStorageInterface } from "../Types/Utils-Types";
 
 interface ErrorDataInterface {
     message: string,
     statusCode: number,
+
 }
 interface Props {
     children: any,
 }
+
 const api = axios.create({
 	    baseURL: process.env.REACT_APP_BASE_URL,
 	    headers: {

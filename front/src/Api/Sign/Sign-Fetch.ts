@@ -1,5 +1,5 @@
 import { Dispatch, AnyAction } from "@reduxjs/toolkit";
-import axios, { AxiosError } from "axios";
+import axios from "axios";
 import { loginSuccess, loginError, stopIsConnectedLoading } from "../../Redux/AuthSlice";
 import { TokenStorageInterface } from "../../Types/Utils-Types";
 import api from "../Api";

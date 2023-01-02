@@ -23,7 +23,7 @@ export function useAppHook() {
     const [socket, setSocket] = useState<Socket | undefined>(undefined);
     const [cache, setCache] = useState<Cache | undefined | null>(undefined);
 	const [intervalId, setIntervalId] = useState<ReturnType<typeof setInterval> | undefined>(undefined)
-    const { isAuthenticated, currentUser, displayQRCode, isSign, friendList} = useAppSelector((state) => state.auth);
+    const { isAuthenticated, currentUser, displayQRCode, isSign } = useAppSelector((state) => state.auth);
 	const { modalIsOpen } = useAppSelector(state => state.party);
 	const { party, chatIsOpen, isInQueue } = useAppSelector(state => state.party);
 	const { currentChannelId } = useAppSelector((state) => state.channel);
@@ -304,22 +304,25 @@ export function useAppHook() {
 		return () => {
 			if (socket) {
 				socket?.off("Connection");
-				socket?.off("NewNotification");
-				socket?.off("NewConversation");
 				socket?.off("PartyUpdate");
-				socket?.off("InQueue");
+				socket?.off("NewPartyMessage");
+				socket?.off("GameModeUpdate");
 				socket?.off("PartyLeave");
+				socket?.off("InQueue");
+				socket?.off("NewNotification");
 				socket?.off("NewPartyInvite");
-				socket?.off("FriendListUpdate");
 				socket?.off("DeleteNotification");
 				socket?.off("exception");
+				socket?.off("FriendListUpdate");
+				socket?.off("NewConversation");
 				socket?.off("OnJoin");
-				socket?.off("OnLeave");
-				socket?.off("newgame_data");
+				socket?.off("InGameStatusUpdate");
 				socket?.off("SendConfirm");
-				socket?.off("Logout");
+				socket?.off("newgame_data");
 				socket?.off("gameinfo");
+				socket?.off("user_gameinfo");
 				socket?.off("Unauthorized");
+				socket?.off("Logout");
 				socket.disconnect();
 			}
 		}

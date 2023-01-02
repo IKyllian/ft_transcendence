@@ -21,7 +21,6 @@ function ResetPassword() {
             return ;
         }
         else {
-            // setError("error", {message: undefined});
             if (authorizationCode) {
                 axios.post(`${process.env.REACT_APP_BASE_URL}/auth/reset-password`, {code: authorizationCode, newPassword: data.password})
                 .then(response => {

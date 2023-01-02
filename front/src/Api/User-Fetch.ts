@@ -12,7 +12,6 @@ interface UsersListInterface {
     relationStatus?: string,
 }
 
-
 export async function fetchOnBlockUser(senderId: number): Promise<AxiosResponse<any, any>> {
     return await api.post(`/users/${senderId}/block`, {});
 }
