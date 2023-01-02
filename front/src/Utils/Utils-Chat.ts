@@ -38,8 +38,10 @@ export function getMessageDateString(date: string): string {
 
 export function getBanDateString(date: string): string {
     const dateBan = new Date(date);
+    const day = dateBan.getDate();
+    const month = dateBan.getMonth() + 1;
 
-    return `${dateBan.getDate()}/${dateBan.getMonth() + 1} à ${dateBan.getHours()}:${dateBan.getMinutes() >= 0 && dateBan.getMinutes() <= 9 ? '0' : ''}${dateBan.getMinutes() }`
+    return `${day < 10 ? `0${day}` : day}/${month < 10 ? `0${month}` : month} à ${dateBan.getHours()}:${dateBan.getMinutes() >= 0 && dateBan.getMinutes() <= 9 ? '0' : ''}${dateBan.getMinutes() }`
 }
 
 export function getMessageHour(date: string): string {
