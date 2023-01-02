@@ -26,7 +26,6 @@ export interface AuthState {
     loadingIsConnected: boolean,
     setUsersame: boolean,
     friendList: UserInterface[],
-    loggedUserAvatar: string | undefined,
     displayQRCode: boolean,
     verification2FA: boolean,
 }

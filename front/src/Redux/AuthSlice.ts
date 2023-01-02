@@ -11,7 +11,6 @@ const defaultState: AuthState = {
     loading: false,
     loadingIsConnected: true,
     setUsersame: false,
-    loggedUserAvatar: undefined,
     displayQRCode: false,
     verification2FA: false,
 }
@@ -91,9 +90,6 @@ export const authSlice = createSlice({
                 })]
             }
         },
-        setUserAvatar: (state, {payload}: PayloadAction<string>) => {
-            state.loggedUserAvatar = payload;
-        },
         change2faStatus: (state, {payload}: PayloadAction<boolean>) => {
             if (state.currentUser)
                 state.currentUser = {...state.currentUser, two_factor_enabled: payload};
@@ -121,7 +117,6 @@ export const {
     addAvatar,
     copyFriendListArray,
     changeFriendListUserStatus,
-    setUserAvatar,
     change2faStatus,
     changeQRCodeStatus,
 } = authSlice.actions;
