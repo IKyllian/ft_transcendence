@@ -56,7 +56,7 @@ function ChatPrivateMessage() {
             <div className="message-input-container">
                 <form onSubmit={handleSubmit}>
                     { userTyping && <p> {userTyping.username} is typing... </p> }
-                    <input type="text" placeholder="Type Your Message..." {...register('inputMessage', {minLength: 1, onChange: (e) => {optimizedFn(e.target.value); handleInputChange()}})} />
+                    <input autoComplete="false" type="text" placeholder="Type Your Message..." {...register('inputMessage', {minLength: 1, onChange: (e) => {optimizedFn(e.target.value); handleInputChange()}})} />
                     <button type="submit"> <IconSend /> </button>
                 </form>
             </div>

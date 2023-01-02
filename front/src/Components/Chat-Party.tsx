@@ -47,7 +47,7 @@ function ChatParty() {
                 </ul>
                 <div className="message-input-container" onSubmit={messageSubmit}>
                     <form>
-                        <input type="text" placeholder="Type Your Message..." {...register('inputMessage', {minLength: 1})} />
+                        <input autoComplete="false" type="text" placeholder="Type Your Message..." {...register('inputMessage', {minLength: 1})} />
                         <button type="submit"> <IconSend /> </button>
                     </form>
                     

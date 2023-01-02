@@ -71,7 +71,7 @@ function ChatChannel() {
                             usersTyping.length > 3 &&
                             <p> Many users are typing... </p>
                         }
-                        <input type="text" placeholder="Type Your Message..." {...register('inputMessage', {minLength: 1, onChange: (e) => {optimizedFn(e.target.value); handleInputChange()}})} />
+                        <input autoComplete="false" type="text" placeholder="Type Your Message..." {...register('inputMessage', {minLength: 1, onChange: (e) => {optimizedFn(e.target.value); handleInputChange()}})} />
                         <button type="submit"> <IconSend /> </button>
                     </form>
                     
