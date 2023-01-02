@@ -252,7 +252,7 @@ export class AuthService {
             html: `
             <h3>Password Reset</h3>
 			<p>Hi ${user.username}, you have submitted a password reset request on <b>Pong Game</b></p>
-			<p>To set your new password, <a href=http://${process.env.FRONT_IP}/reset-password?code=${validation_code}>Click here</a></p>
+			<p>To set your new password, <a href=${process.env.FRONT_IP}/reset-password?code=${validation_code}>Click here</a></p>
             `,
         }
 
