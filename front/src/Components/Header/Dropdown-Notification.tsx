@@ -1,4 +1,4 @@
-import { useAppDispatch, useAppSelector } from "../../Redux/Hooks";
+import { useAppSelector } from "../../Redux/Hooks";
 import { NotificationInterface, notificationType } from "../../Types/Notification-Types";
 import { SocketContext } from "../../App";
 import { useContext } from "react";
@@ -10,7 +10,6 @@ function NotifItem(props: {notification: NotificationInterface}){
     const { notification } = props;
 
     const {socket} = useContext(SocketContext);
-    const dispatch = useAppDispatch();
     
     const handleClick = (response: string) => {
         if (notification.type === notificationType.CHANNEL_INVITE)

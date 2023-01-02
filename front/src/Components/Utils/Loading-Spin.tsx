@@ -1,4 +1,3 @@
-
 function LoadingSpin(props: {classContainer?: string}) {
     const {classContainer} = props;
     return classContainer ? (

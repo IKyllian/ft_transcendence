@@ -1,4 +1,3 @@
-
 function AlertValidation(props: {closeFunction: Function, validateFunction: Function, textAlert: string}) {
     const { closeFunction, validateFunction, textAlert } = props;
     return (

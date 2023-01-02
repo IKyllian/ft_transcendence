@@ -14,23 +14,6 @@ export interface AlertState {
 
 const defaultState: {alerts: AlertState[]}  = {
     alerts: [],
-
-    //FOR TEST
-    // alerts: [
-    //     {
-    //         id: 0,
-    //         message: "Alert 1",
-    //         type: AlertType.SUCCESS,
-    //     }, {
-    //         id: 1,
-    //         message: "Alert 2",
-    //         type: AlertType.WARNING,
-    //     }, {
-    //         id: 2,
-    //         message: "Alert 3",
-    //         type: AlertType.ERROR,
-    //     },
-    // ],
 }
 
 const selectAlertId = (alerts: AlertState[], newId: number): number => {

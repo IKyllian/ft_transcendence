@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext } from "react";
 import { SocketContext } from "../../App";
 import { unsetOwner } from "../../Redux/ChannelSlice";
 import { useAppDispatch, useAppSelector } from "../../Redux/Hooks";
@@ -6,13 +6,8 @@ import { ChannelUser } from "../../Types/Chat-Types";
 
 function RoleButton(props: {sender: ChannelUser}) {
     const {sender} = props;
-    const [showAlert, setShowAlert] = useState<boolean>(false);
     const {loggedUserIsOwner} = useAppSelector(state => state.channel);
     const dispatch = useAppDispatch();
-
-    const closeAlert = () => {
-        setShowAlert(false);
-    }
 
     const {socket} = useContext(SocketContext);
 
