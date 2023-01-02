@@ -15,7 +15,6 @@ interface ProfileMenuButtons {
 
 export function useProfileHook() {
     const [attributes, setAttributes] = useState<ProfileMenuButtons[]>([
-        // { title: "Achievements", isActive: "true" },
         { title: "Matches", isActive: "false" },
         { title: "Friends", isActive: "false" }
     ]);
@@ -48,6 +47,7 @@ export function useProfileHook() {
     useEffect(() => {
         handleClick(0);
         setUserState(undefined);
+		setLoading(true);
         if (params.username && currentUser) {
             const isLoggedUser: boolean = params.username === currentUser.username ? true : false;
             const promiseProfileFetch: Promise<AxiosResponse<any, any>> = isLoggedUser ? fetchMe() : fetchProfile(params.username);

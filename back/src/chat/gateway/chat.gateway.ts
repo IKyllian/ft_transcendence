@@ -69,7 +69,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 		
 		if (user === null) {
-			console.log("invalid toto");
 			socket.emit("Unauthorized");
 			return socket.disconnect();
 		}
@@ -121,7 +120,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		@MessageBody() dto: JoinChannelDto,
 		@ConnectedSocket() socket: AuthenticatedSocket,
 	) {
-		console.log("test");
 		const channelUser = await this.channelService.join(socket.user, dto.id, dto.password);
 		this.server.to(`channel-${dto.id}`).emit('ChannelUpdate', { type: ChannelUpdateType.JOIN, data: channelUser });
 		this.server.to(`user-${socket.user.id}`).emit('OnJoin', { channel: channelUser.channel, socketId: socket.id });

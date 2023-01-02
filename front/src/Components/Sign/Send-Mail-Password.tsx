@@ -1,19 +1,15 @@
 import axios from "axios";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { addAlert, AlertType } from "../../Redux/AlertSlice";
-import { useAppDispatch } from "../../Redux/Hooks";
 
 function SendMailPassword() {
     const [mailSend, setMailSend] = useState<boolean>(false);
     const {register, handleSubmit, setError, formState: {errors}, reset} = useForm<{email: string}>();
-    const dispatch = useAppDispatch();
 
     const formSubmit = handleSubmit((data, e) => {
         e?.preventDefault();
         axios.post(`${process.env.REACT_APP_BASE_URL}/auth/forgot-password`, {email: data.email})
         .then(response => {
-            dispatch(addAlert({message: "Email has been sent", type: AlertType.SUCCESS}));
             reset();
             setMailSend(true);
         })
@@ -35,7 +31,7 @@ function SendMailPassword() {
                 <form className='form-wrapper' onSubmit={formSubmit}>
                     <label> Email </label>
                     {errors.email && <p className='txt-form-error'> {errors.email.message} </p>}
-                    {mailSend && <p className='txt-form-error' style={{color: 'green'}}> Email has been send </p>}
+                    {mailSend && <p className='txt-form-error' style={{color: 'green'}}> Email has been sent </p>}
                     <input
                         id="email"
                         type="text"

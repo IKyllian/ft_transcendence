@@ -27,9 +27,7 @@ export class TwoFactorService {
 		return toFileStream(stream, optUrl)
 	}
 
-	public verify(code: string, account: UserAccount) {
-		console.log('received code: ', code);
-		
+	public verify(code: string, account: UserAccount) {		
 		try {
 			return authenticator.verify({
 				token: code,

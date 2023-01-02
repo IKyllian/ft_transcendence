@@ -34,6 +34,7 @@ function Lobby() {
                                 user={elem}
                                 lobbyLength={party.players.length}
                                 gameMode={party.game_mode}
+								isInQueue={isInQueue}
                             />
                         )
                         : <PlayerListItem key={currentUser?.id} user={{isLeader: true, isReady: true, user: currentUser!, team: TeamSide.BLUE}} lobbyLength={1} />

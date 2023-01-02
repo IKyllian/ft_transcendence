@@ -254,7 +254,7 @@ export function useAppHook() {
 			});
 
 			socket?.on("newgame_data", (data: PlayersGameData) => {
-				dispatch(changeQueueStatus(false));
+				// dispatch(changeQueueStatus(false));
 				dispatch(newGameFound({gameDatas: data, showGameFound: true}));
 			});
 

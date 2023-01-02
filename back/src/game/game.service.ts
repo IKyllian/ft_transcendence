@@ -69,6 +69,7 @@ export class GameService {
 			.update()
 			.where("userId IN (:...ids)", { ids: playersId })
 			.set({ doubles_match_lost: () => "doubles_match_lost + 1" })
+			.execute();
 		}
 	}
 

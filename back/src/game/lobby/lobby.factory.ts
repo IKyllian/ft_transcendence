@@ -68,7 +68,7 @@ export class LobbyFactory
 		else
 		{
 			console.log("unable to delete room, not found: ", game_id);
-		}		
+		}
 	}
 
 	lobby_join(client: AuthenticatedSocket, game_id: string)

@@ -9,6 +9,7 @@ interface PlayerItemProps {
     user?: Player,
     lobbyLength?: number,
     gameMode?: GameMode,
+	isInQueue?: boolean
 }
 
 function TeamCircles(props: {user: Player}) {
@@ -23,7 +24,7 @@ function TeamCircles(props: {user: Player}) {
 }
 
 function PlayerListItem(props: PlayerItemProps) {
-    const { user, lobbyLength, gameMode } = props;
+    const { user, lobbyLength, gameMode, isInQueue } = props;
     const { onChangePos } = useLobbyHook();
     const {currentUser} = useAppSelector(state => state.auth);
     const dispatch = useAppDispatch();
@@ -38,7 +39,7 @@ function PlayerListItem(props: PlayerItemProps) {
             <p> {user.user.username} </p>
             {
                 user.user.id === currentUser?.id && lobbyLength && onChangePos && displaySelectPos &&
-                <select onChange={(e) => onChangePos(e, user)} value={user.pos === PlayerPosition.BACK ? PlayerPosition.BACK : PlayerPosition.FRONT} className="team-select">
+                <select disabled={isInQueue ? true : false} onChange={(e) => onChangePos(e, user)} value={user.pos === PlayerPosition.BACK ? PlayerPosition.BACK : PlayerPosition.FRONT} className="team-select">
                     <option value={PlayerPosition.BACK} > Paddle Back </option>
                     <option value={PlayerPosition.FRONT} > Paddle Front </option>
                 </select>

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../Redux/Hooks";
-import { stopShowGameFound, unsetGameFound } from "../../Redux/PartySlice";
+import { changeQueueStatus, stopShowGameFound, unsetGameFound } from "../../Redux/PartySlice";
 import { GameType } from "../../Types/Lobby-Types";
 
 function MatchFound() {
@@ -14,6 +14,7 @@ function MatchFound() {
         if (gameFound && gameFound.showGameFound) {
             setTimeoutId(setTimeout(() => {
                 dispatch(unsetGameFound());
+				dispatch(changeQueueStatus(false));
             }, 15000))
         }
     }, [gameFound?.showGameFound]);
@@ -25,6 +26,7 @@ function MatchFound() {
                 setTimeoutId(undefined);
             }
             dispatch(stopShowGameFound());
+			dispatch(changeQueueStatus(false));
             navigate("/game", {state: gameFound.gameDatas});
         }
     }
