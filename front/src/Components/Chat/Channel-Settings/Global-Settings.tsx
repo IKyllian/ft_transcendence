@@ -51,6 +51,7 @@ function FormChanName() {
                 Channel Name
                 <div className="label-input-wrapper">
                     <input
+                        autoComplete="off"
                         type="text"
                         {...register("chanName", {
                             minLength: {

@@ -18,7 +18,7 @@ function SearchBarPlayers(props: {functionality: SearchBarFunctionality, checkbo
         <div className='search-player-container'>
             <div className="modal-search">
                 <IconSearch />
-                <input type="text" placeholder="Search a user" {...formHook.register('textInput', {onChange: () => {optimizedFn()}})} />
+                <input type="text" autoComplete="off" placeholder="Search a user" {...formHook.register('textInput', {onChange: () => {optimizedFn()}})} />
             </div>
             <div className="modal-player-list">
                 {

@@ -92,6 +92,7 @@ function ChatModal(props: {onCloseModal: Function, showModal: number}) {
                                 <label className="labelTextInput">
                                     Channel name:
                                     <input
+                                        autoComplete="off"
                                         type="text"
                                         maxLength={15}
                                         placeholder="Channel name..."

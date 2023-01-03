@@ -60,6 +60,7 @@ function CodeVerification() {
                 <form className="validation-form-wrapper" onSubmit={codeSubmmit}>
                     { errors.code && <p className='txt-form-error'> {errors.code.message} </p> }
                     <input
+                        autoComplete="off"
                         className="code-input"
                         type="text"
                         maxLength={6}

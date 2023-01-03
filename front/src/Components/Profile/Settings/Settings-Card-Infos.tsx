@@ -146,6 +146,7 @@ function UsernameForm(props: {user: UserInterface}) {
                         { errors && errors.username && <p className='txt-form-error'> {errors.username.message} </p> }
                         <div className="label-input-wrapper">
                             <input
+                                autoComplete="off"
                                 type="text"
                                 {...register("username", {
                                     required: "Username is required",
@@ -196,6 +197,7 @@ function Disable2fa() {
                     Enter Your Code
                     { errors && errors.code && <p className='txt-form-error'> {errors.code.message} </p> }
                     <input
+                        autoComplete="off"
                         type="text"
                         {...register("code", {
                             required: "Code is required",
@@ -235,6 +237,7 @@ function QRCodeValidation(props: {qrcode: string, setDisplayQRCode: Function}) {
                     Scan your QRCode on the Google Auth App and enter your code
                     { errors && errors.code && <p className='txt-form-error'> {errors.code.message} </p> }
                     <input
+                        autoComplete="off"
                         type="text"
                         {...register("code", {
                             required: "Code is required",

@@ -13,6 +13,7 @@ function UsernameForm() {
                 <label htmlFor="username"> Choose a username </label>
                 { errors.username && errors.username.message && <p className="txt-form-error"> {errors.username.message} </p> }
                 <input
+                    autoComplete="off"
                     id="username"
                     type="text"
                     placeholder="Username..."
