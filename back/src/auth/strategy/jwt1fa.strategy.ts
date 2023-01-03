@@ -27,6 +27,7 @@ export class Jwt1faStrategy extends PassportStrategy(Strategy, 'jwt-1fa') {
 		const user: User = await this.userRepo
 			.createQueryBuilder("user")
 			.where("user.id = :userId", { userId: payload.sub })
+			.addSelect("user.email")
 			.leftJoinAndSelect("user.account", "account")
 			.leftJoinAndSelect("user.channelUser", "ChannelUser")
 			.leftJoinAndSelect("ChannelUser.channel", "Channel")
