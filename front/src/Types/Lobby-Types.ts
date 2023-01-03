@@ -56,6 +56,7 @@ export interface ModeState {
 export interface GameModeState {
     gameModes: ModeState[],
     indexSelected: number,
+	lockForm: boolean,
 }
 
 export interface Player {

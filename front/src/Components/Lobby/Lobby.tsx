@@ -15,6 +15,7 @@ function Lobby() {
         formHook,
         queueTimer,
         lobbyError,
+        lockForm,
         onInputChange,
         onReady,
         onGameModeChange,
@@ -35,6 +36,7 @@ function Lobby() {
                                 lobbyLength={party.players.length}
                                 gameMode={party.game_mode}
 								isInQueue={isInQueue}
+                                lockForm={lockForm}
                             />
                         )
                         : <PlayerListItem key={currentUser?.id} user={{isLeader: true, isReady: true, user: currentUser!, team: TeamSide.BLUE}} lobbyLength={1} />
@@ -57,6 +59,7 @@ function Lobby() {
                             }}
                             onInputChange={onInputChange}
                             loggedUserIsLeader={loggedUserIsLeader}
+                            lockForm={lockForm}
                         />
                         <BoardGame hookForm={{watch: formHook.watch}} />
                     </div>

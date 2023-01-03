@@ -18,6 +18,7 @@ import { PlayersGameData } from "../Components/Game/game/types/shared.types";
 import { TokenStorageInterface } from "../Types/Utils-Types";
 import { changeUserIngameStatus, resetConvState } from "../Redux/PrivateConvSlice";
 import axios from "axios";
+import { lockForm } from "../Redux/LobbySlice";
 
 export function useAppHook() {
     const [socket, setSocket] = useState<Socket | undefined>(undefined);
@@ -254,7 +255,7 @@ export function useAppHook() {
 			});
 
 			socket?.on("newgame_data", (data: PlayersGameData) => {
-				// dispatch(changeQueueStatus(false));
+				dispatch(lockForm(true));
 				dispatch(newGameFound({gameDatas: data, showGameFound: true}));
 			});
 

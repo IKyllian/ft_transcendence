@@ -31,8 +31,8 @@ function ChatParty() {
 
     return party ? (
         <div className="chat-party-sidebar">
-            <div className="message-container-main">
-            <ChatHeader isPartyChat={true} />
+            <div className="message-container-main" style={{width: '100%'}}>
+                <ChatHeader isPartyChat={true} />
                 <ul id="chat-message-wrapper" className="chat-messages-wrapper" >
                     {
                         party.messages.map((elem, index) => {

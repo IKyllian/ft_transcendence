@@ -15,6 +15,7 @@ const defaultState: GameModeState = {
         }
     ],
     indexSelected: 0,
+    lockForm: false,
 }
 
 export const lobbySlice = createSlice({
@@ -54,6 +55,10 @@ export const lobbySlice = createSlice({
                 })]
             }
         },
+        lockForm: (state,  { payload }: PayloadAction<boolean>) => {
+            if (state.lockForm !== payload)
+                state.lockForm = payload;
+        },
         resetParty: () => defaultState,
     }
 });
@@ -63,5 +68,6 @@ export const {
     lockModeDuo,
     lockModeQuatuor,
     unlockAll,
+    lockForm,
     resetParty
 } = lobbySlice.actions;

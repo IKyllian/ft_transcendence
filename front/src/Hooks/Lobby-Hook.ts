@@ -192,6 +192,7 @@ export function useLobbyHook() {
         gameMode,
         loggedUserIsLeader,
         queueTimer,
+        lockForm: gameMode.lockForm,
         formHook : {
             watch,
             control,

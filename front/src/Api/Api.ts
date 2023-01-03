@@ -63,7 +63,6 @@ function AxiosInterceptor({ children }: Props) {
 							localStorage.setItem("userToken", JSON.stringify(refreshResponse.data));
 							if (originalConfig.headers)
 								originalConfig.headers['Authorization'] = `Bearer ${refreshResponse.data.access_token}`;
-							// return axios.create().request(originalConfig);
 							return api.request(originalConfig);
 						}
 					} catch (_error) {

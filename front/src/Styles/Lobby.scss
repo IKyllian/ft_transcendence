@@ -154,6 +154,10 @@ $TeamRedColor: rgb(247, 30, 6);
                     justify-content: space-between;
                     gap: 5px;
 
+                    fieldset {
+                        all: inherit;
+                    }
+
                     label {
                         @include flex-row-alignCenter();
                         justify-content: space-between;
@@ -171,14 +175,6 @@ $TeamRedColor: rgb(247, 30, 6);
                             color: $LightBlueButton;
                             font-size: 15px;
                         }
-
-                        // input::after {
-                        //     content: attr(value);
-                        //     position: absolute;
-                        //     font-size: 15px;
-                        //     right: -25px;
-                        //     color: $LightBlueButton;
-                        // }
                     }
 
                     .setting-submit {
@@ -244,7 +240,6 @@ $TeamRedColor: rgb(247, 30, 6);
                         }
     
                         .paddle {
-                            // height: var(--PaddleHeight);
                             width: 2px;
                             position: absolute;
                         }
