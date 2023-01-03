@@ -1,4 +1,4 @@
-import { Body, Controller, Param, Post, UseGuards } from "@nestjs/common";
+import { Body, Controller, Param, ParseIntPipe, Post, UseGuards } from "@nestjs/common";
 import { JwtGuard } from "src/auth/guard/jwt.guard";
 import { InChannelGuard } from "../guards";
 import { ChannelMessageService } from "./ChannelMessage.service";
@@ -13,7 +13,7 @@ export class ChannelMessageController {
 	@Post(":chanId/messages")
 	@UseGuards(JwtGuard, InChannelGuard)
 	async getMessages(
-	@Param('chanId') chanId: number,
+	@Param('chanId', ParseIntPipe) chanId: number,
 	@Body() data: SkipDto,
 	) {
 		return await this.messageService.getMessages(chanId, data.skip);
