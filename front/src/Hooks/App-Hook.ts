@@ -261,7 +261,6 @@ export function useAppHook() {
 
 			socket?.on('gameinfo', (data: PlayersGameData | null) => {
 				if (data !== null) {
-					socket?.emit("StopQueue");
 					dispatch(newGameFound({gameDatas: data, showGameFound: false}));
 					navigate("/game", {state: data});
 				}

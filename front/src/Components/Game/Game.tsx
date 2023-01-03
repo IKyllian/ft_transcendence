@@ -99,7 +99,7 @@ function Game() {
             }});
             setGameSocket(gameSocket);
         }
-    }, [])
+    }, [location.state])
 
     return (
         <> </>
