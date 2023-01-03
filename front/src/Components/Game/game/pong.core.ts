@@ -252,22 +252,6 @@ export default class PongCore
 		let now: Date = new Date();
 		if (this.next_round_setup === undefined)
 			return;
-		this.player_inputstock = this.player_inputstock.sort((a, b) => {
-			if (new Date(a.time).getTime() > new Date(b.time).getTime()) {
-				return 1;
-			}	
-			if(new Date(a.time).getTime() < new Date(b.time).getTime())  {
-				return -1;
-			}
-			return 0;
-		});
-
-		this.player_inputstock.forEach((elem: PlayerInput) =>
-		{
-			this.apply_input(elem);
-		}, this);
-		this.player_inputstock = [];
-
 		if (new Date(this.next_round_setup.start_time).getTime() > now.getTime())
 			return;
 
@@ -286,6 +270,7 @@ export default class PongCore
 			this.ball_data.position.y = this.up_down_border;
 			this.ball_data.vector.y *= -1;
 			this.pong_triggers?.sound_event_wall();
+			return;
 		}
 		//check down wall
 		if (this.ball_data.position.y >= (this.field_height - this.up_down_border))
@@ -293,6 +278,7 @@ export default class PongCore
 			this.ball_data.position.y = (this.field_height - this.up_down_border);
 			this.ball_data.vector.y *= -1;
 			this.pong_triggers?.sound_event_wall();
+			return;
 		}
 
 		//check paddle A_back ( [I] I   I I )
@@ -307,6 +293,7 @@ export default class PongCore
 				this.doctored_rebound(this.TeamBlue_Back_pos.y, PlayerPosition.BACK);
 				this.ball_data.velocity += this.ball_acceleration;
 				this.pong_triggers?.sound_event_paddle();
+				return;
 			}
 		}
 
@@ -322,6 +309,7 @@ export default class PongCore
 				this.doctored_rebound(this.TeamRed_Back_pos.y, PlayerPosition.BACK);
 				this.ball_data.velocity += this.ball_acceleration;		
 				this.pong_triggers?.sound_event_paddle();
+				return;
 			}
 		}	
 
@@ -337,10 +325,10 @@ export default class PongCore
 				{
 					this.ball_data.position.x = this.player_front_advance;
 					this.ball_data.vector.x *= -1;	
-
 					this.doctored_rebound(this.TeamBlue_Front_pos.y, PlayerPosition.FRONT);
 					this.ball_data.velocity += this.ball_acceleration;		
 					this.pong_triggers?.sound_event_paddle();
+					return;
 				}
 			}
 	
@@ -356,6 +344,7 @@ export default class PongCore
 					this.doctored_rebound(this.TeamRed_Front_pos.y, PlayerPosition.FRONT);
 					this.ball_data.velocity += this.ball_acceleration;		
 					this.pong_triggers?.sound_event_paddle();
+					return;
 				}
 			}
 		}
