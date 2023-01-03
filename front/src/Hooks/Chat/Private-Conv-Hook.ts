@@ -15,7 +15,7 @@ export function usePrivateConvHook() {
     const [userTyping, setUserTyping] = useState<UserInterface | undefined>(undefined);
     const [hasSendTypingEvent, setHasTypingEvent] = useState<boolean>(false);
     const [previousMessages, setPreviousMessages] = useState<PreviousMessagesState>(defaultMessagesState);
-    const { register, handleSubmit, reset, formState: {errors} } = useForm<{inputMessage: string}>();
+    const { register, handleSubmit, setValue } = useForm<{inputMessage: string}>();
     const [haveToLoad, setHaveToLoad] = useState<boolean>(false);
     const [prevLength, setPrevLength] = useState<number>(0);
 
@@ -99,7 +99,7 @@ export function usePrivateConvHook() {
         }
         if (data.inputMessage.length > 0) {
             submitMessage();
-            reset();
+            setValue("inputMessage", "")
         }
     })
 
@@ -148,7 +148,12 @@ export function usePrivateConvHook() {
 
             if (location && location.state) {
                 const locationState = location.state as {isTemp: boolean, conv: Conversation};
-                dispatch(setConv({conv: {...locationState.conv}, temp: true}));
+                if (!locationState.isTemp) {
+                    socket?.emit('JoinConversationRoom', {
+                        id: locationState.conv.id,
+                    });
+                }
+                dispatch(setConv({conv: {...locationState.conv}, temp: locationState.isTemp}));
             } else {
                 socket?.emit('JoinConversationRoom', {
                     id: convId,

@@ -7,7 +7,7 @@ import ChatHeader from "./Chat/Chat-Section/Chat-Header";
 import MessageItem from "./Chat/Chat-Section/Message-Item";   
 
 function ChatParty() {
-    const { register, handleSubmit, reset } = useForm<{inputMessage: string}>();
+    const { register, handleSubmit, setValue } = useForm<{inputMessage: string}>();
     const messagesEndRef = useRef<null | HTMLDivElement>(null);
     const { party } = useAppSelector(state => state.party);
     const { socket } = useContext(SocketContext);
@@ -17,7 +17,7 @@ function ChatParty() {
             socket?.emit("NewPartyMessage", {
                 content: data.inputMessage,
             });
-            reset();
+            setValue("inputMessage", "");
         }
     })
 

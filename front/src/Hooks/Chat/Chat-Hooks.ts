@@ -102,13 +102,15 @@ export function useLoadChatDatas() {
         //Permet de redirect sur une conv (et de la créer si besoin) dans le cas où un user click quelque part pour dm quelqu'un
         if (location && location.state) {
             const locationState = location.state as {userIdToSend: number};
-            fetchConvAndRedirect(
-                authDatas.currentUser!,
-                locationState.userIdToSend,
-                chatDatas.privateConv!,
-                dispatch,
-                navigate
-            );
+            if (locationState.userIdToSend) {
+                fetchConvAndRedirect(
+                    authDatas.currentUser!,
+                    locationState.userIdToSend,
+                    chatDatas.privateConv!,
+                    dispatch,
+                    navigate
+                );
+            }
         }
     }, [])
 

@@ -13,7 +13,7 @@ export function useChannelHook() {
     const [showUsersSidebar, setShowUsersSidebar] = useState<boolean>(true);
     const [hasSendTypingEvent, setHasTypingEvent] = useState<boolean>(false);
     const [previousMessages, setPreviousMessages] = useState<PreviousMessagesState>(defaultMessagesState);
-    const { register, handleSubmit, reset, formState: {errors} } = useForm<{inputMessage: string}>();
+    const { register, handleSubmit, setValue } = useForm<{inputMessage: string}>();
     const [usersTyping, setUsersTyping] = useState<UserInterface[]>([]);
     const [haveToLoad, setHaveToLoad] = useState<boolean>(false);
     const [prevLength, setPrevLength] = useState<number>(0);
@@ -133,7 +133,7 @@ export function useChannelHook() {
                 isTyping: false,
             })
             setHasTypingEvent(false);
-            reset();
+            setValue("inputMessage", "");
         }
     })
 
