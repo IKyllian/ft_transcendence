@@ -33,8 +33,13 @@ function Sign() {
                     <input
                         id="username"
                         type="text"
-                        maxLength={15}
-                        {...hookForm.register("username", {
+                        {...hookForm.register("username", isSignIn ? {
+                            required: "Username or Email is required",
+                            minLength: {
+                                value: 1,
+                                message: "Min length is 1"
+                            },
+                        } : {
                             required: "Username is required",
                             minLength: {
                                 value: 1,
