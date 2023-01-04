@@ -313,7 +313,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			throw new BadRequestException('Conversation not found');
 		}
 		socket.join(`conversation-${room.id}`);
-		this.server.to(`user-${socket.user.id}`).emit('ConversationData', conv);
+		socket.emit('ConversationData', conv);
 		const deletedNotifId = await this.notificationService.deletePrivateMessageNotif(socket.user.id, room.id);
 		if (deletedNotifId) {
 			this.server.to(`user-${socket.user.id}`).emit('DeleteNotification', deletedNotifId);
