@@ -269,27 +269,12 @@ export default class PongCore
 		this.ball_data.position.x += this.ball_data.vector.x * this.ball_data.velocity;
 		this.ball_data.position.y += this.ball_data.vector.y * this.ball_data.velocity;
 
-		//check up wall
-		if (this.ball_data.position.y <= this.up_down_border)
-		{
-			this.ball_data.position.y = this.up_down_border;
-			this.ball_data.vector.y *= -1;
-			return;
-		}
-		//check down wall
-		if (this.ball_data.position.y >= (this.field_height - this.up_down_border))
-		{
-			this.ball_data.position.y = (this.field_height - this.up_down_border);
-			this.ball_data.vector.y *= -1;
-			return;
-		}
-
 		//check paddle A_back ( [I] I   I I )
 		if (this.ball_data.position.x <= this.player_back_advance 
 			&& this.previous_ball_pos.x > this.player_back_advance)
 		{
 			if (this.ball_data.position.y <= (this.TeamBlue_Back_pos.y + (this.paddle_size_back / 2) + 5)
-			&& this.ball_data.position.y >= (this.TeamBlue_Back_pos.y - (this.paddle_size_back / 2) + 5))
+			&& this.ball_data.position.y >= (this.TeamBlue_Back_pos.y - (this.paddle_size_back / 2) - 5))
 			{
 				this.ball_data.position.x = this.player_back_advance;
 				this.ball_data.vector.x *= -1;	
@@ -304,7 +289,7 @@ export default class PongCore
 			&& this.previous_ball_pos.x < (this.field_width - this.player_back_advance))
 		{
 			if (this.ball_data.position.y <= (this.TeamRed_Back_pos.y + (this.paddle_size_back / 2) + 5)
-			&& this.ball_data.position.y >= (this.TeamRed_Back_pos.y - (this.paddle_size_back / 2) + 5))
+			&& this.ball_data.position.y >= (this.TeamRed_Back_pos.y - (this.paddle_size_back / 2) - 5))
 			{
 				this.ball_data.position.x = (this.field_width - this.player_back_advance);
 				this.ball_data.vector.x *= -1;	
@@ -322,7 +307,7 @@ export default class PongCore
 				&& this.previous_ball_pos.x > this.player_front_advance)
 			{
 				if (this.ball_data.position.y <= (this.TeamBlue_Front_pos.y + (this.paddle_size_front / 2) + 5)
-				&& this.ball_data.position.y >= (this.TeamBlue_Front_pos.y - (this.paddle_size_front / 2) + 5))
+				&& this.ball_data.position.y >= (this.TeamBlue_Front_pos.y - (this.paddle_size_front / 2) - 5))
 				{
 					this.ball_data.position.x = this.player_front_advance;
 					this.ball_data.vector.x *= -1;	
@@ -337,7 +322,7 @@ export default class PongCore
 				&& this.previous_ball_pos.x < (this.field_width - this.player_front_advance))
 			{
 				if (this.ball_data.position.y <= (this.TeamRed_Front_pos.y + (this.paddle_size_front / 2) + 5)
-				&& this.ball_data.position.y >= (this.TeamRed_Front_pos.y - (this.paddle_size_front / 2) + 5))
+				&& this.ball_data.position.y >= (this.TeamRed_Front_pos.y - (this.paddle_size_front / 2) - 5))
 				{
 					this.ball_data.position.x = (this.field_width - this.player_front_advance);
 					this.ball_data.vector.x *= -1;	
@@ -346,6 +331,21 @@ export default class PongCore
 					return;
 				}
 			}
+		}
+
+		//check up wall
+		if (this.ball_data.position.y <= this.up_down_border)
+		{
+			this.ball_data.position.y = this.up_down_border;
+			this.ball_data.vector.y *= -1;
+			return;
+		}
+		//check down wall
+		if (this.ball_data.position.y >= (this.field_height - this.up_down_border))
+		{
+			this.ball_data.position.y = (this.field_height - this.up_down_border);
+			this.ball_data.vector.y *= -1;
+			return;
 		}
 	}
 
@@ -445,7 +445,6 @@ export default class PongCore
 			}
 		}
 	}
-
 
 	doctored_rebound = (paddle_y: number, pos: PlayerPosition) =>
 	{
