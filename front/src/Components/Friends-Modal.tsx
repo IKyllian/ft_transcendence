@@ -51,7 +51,7 @@ function AddFriendModal() {
                         showFriendList ?
                         <div className="modal-player-list modal-friend-list">
                             {
-                                friendList.length > 0 && friendList.map((elem, index) =>                    
+                                friendList.length > 0 && friendList.map((elem, index) =>
                                     <UserFindItem key={index} avatar={elem.avatar} name={elem.username} status={elem.status} userId={elem.id} >
                                         <div className="icons-player-item">
                                             <SpectateButton in_game_id={elem.in_game_id} className='spectate-icon' />
@@ -61,7 +61,7 @@ function AddFriendModal() {
                                                     <IconDeviceGamepad2 onClick={() => socket?.emit("PartyInvite", {id: elem.id})} />
                                                 </div>
                                             }
-                                            <Link className="tooltip-icon-wrapper"  data-tooltips="Send message" to="/chat" state={{userIdToSend: elem.id}}>
+                                            <Link className="tooltip-icon-wrapper" to="/chat" state={{userIdToSend: elem.id}}>
                                                 <IconMessage />
                                             </Link>
                                             <div className="tooltip-icon-wrapper" data-tooltips="Remove friend">

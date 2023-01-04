@@ -11,7 +11,7 @@ interface ChatState {
 const defaultState: ChatState = {
     channels: [],
     privateConv: [],
-    loading: false,
+    loading: true,
     error: undefined,
 }
 
@@ -23,14 +23,9 @@ export const chatSlice = createSlice({
             state.loading = true;
         },
         copyChannelsAndConvs: (state, {payload} : PayloadAction<{channels: ChannelsInterfaceFront[], convs: ConversationInterfaceFront[]}>) => {
-            state.channels = [...payload.channels];
-            state.privateConv = [...payload.convs];
-        },
-        copyChannelsArray: (state, {payload}: PayloadAction<ChannelsInterfaceFront[]>) => {
-            state.channels = [...payload];
-        },
-        copyPrivateConvArray: (state, {payload}: PayloadAction<ConversationInterfaceFront[]>) => {
-            state.privateConv = [...payload];
+            state.channels = payload.channels;
+            state.privateConv = payload.convs;
+            state.loading = false;
         },
         updateChannel: (state, {payload}: PayloadAction<ChannelInfoSidebar>) => {
             if (state.channels) {
@@ -117,8 +112,6 @@ export const chatSlice = createSlice({
 export const {
     loadingDatas,
     copyChannelsAndConvs,
-    copyChannelsArray,
-    copyPrivateConvArray,
     updateChannel,
     addChannel,
     addPrivateConv,

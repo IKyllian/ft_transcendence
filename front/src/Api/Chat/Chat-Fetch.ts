@@ -67,7 +67,7 @@ export async function fetchConvAndRedirect(
         dispatch: Dispatch<AnyAction>,
         navigate: NavigateFunction
     ): Promise<void>{
-    
+        
     await api.get(`/conversation/user/${userIdToSend}`)
     .then(response => {
         const responseDatas: Conversation | UserInterface = response.data;
@@ -76,10 +76,9 @@ export async function fetchConvAndRedirect(
                 dispatch(addPrivateConv({isActive: 'false', conversation: {id: response.data.id, user1: response.data.user1, user2: response.data.user2}}));
             navigate(`/chat/private-message/${response.data.id}`, {state: {isTemp: false, conv: response.data}});
         } else {
-            const tempId: number = Math.floor(Math.random() * 10000);;
+            const tempId: number = Math.floor(Math.random() * 10000);
             navigate(`/chat/private-message/${tempId}`, {state: {isTemp: true, conv: {id: tempId, user1: loggedUser, user2: response.data, messages: []}}});
         }
-        
     })
     .catch(err => {
         console.log(err);

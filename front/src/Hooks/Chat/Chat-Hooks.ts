@@ -87,6 +87,24 @@ export function useLoadChatDatas() {
     }, [channelId, convId, location.pathname])
 
     useEffect(() => {
+        //Permet de redirect sur une conv (et de la créer si besoin) dans le cas où un user click quelque part pour dm quelqu'un
+        if (!chatDatas.loading) {
+            if (location && location.state) {
+                const locationState = location.state as {userIdToSend: number};
+                 if (locationState.userIdToSend) {
+                    fetchConvAndRedirect(
+                        authDatas.currentUser!,
+                        locationState.userIdToSend,
+                        chatDatas.privateConv!,
+                        dispatch,
+                        navigate
+                    );
+                }
+            }
+        }
+    }, [chatDatas.loading])
+
+    useEffect(() => {
         if (channelId !== undefined || convId !== undefined)
             setReponsiveSidebar(false);
 
@@ -98,20 +116,6 @@ export function useLoadChatDatas() {
         const channelsUser = fetchUserChannels(channelId); //Recupere les channels d'un user
         const convsUser = fetchUserConvs(convId); //Recupere les convs d'un user
         resolvePromises(channelsUser, convsUser);
-
-        //Permet de redirect sur une conv (et de la créer si besoin) dans le cas où un user click quelque part pour dm quelqu'un
-        if (location && location.state) {
-            const locationState = location.state as {userIdToSend: number};
-            if (locationState.userIdToSend) {
-                fetchConvAndRedirect(
-                    authDatas.currentUser!,
-                    locationState.userIdToSend,
-                    chatDatas.privateConv!,
-                    dispatch,
-                    navigate
-                );
-            }
-        }
     }, [])
 
     // Return tout ce que j'ai besoin pour le composant

@@ -41,7 +41,7 @@ function MessageItem(props: {isFromChan: boolean, message: ChatMessage | Private
                         </div>
                         {
                             senderIsBlock ? 
-                            <p className="message-text"> User is Block </p> :
+                            <p className="message-text"> User Blocked </p> :
                             <p className="message-text"> { message.content } </p>
                         }
                     </div>
