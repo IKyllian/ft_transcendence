@@ -1,11 +1,12 @@
 import axios from "axios";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
 function ResetPassword() {
-    const {register, handleSubmit, setError, formState: {errors}, reset} = useForm<{password: string, passwordConfirm: string, error: string}>();
+    const {register, handleSubmit, formState: {errors}} = useForm<{password: string, passwordConfirm: string}>();
     const [searchParams] = useSearchParams();
+    const [error, setError] = useState<string | undefined>(undefined);
     const navigate = useNavigate();
     const authorizationCode = searchParams.get('code');
 
@@ -17,8 +18,7 @@ function ResetPassword() {
     const formSubmit = handleSubmit((data, e) => {
         e?.preventDefault();
         if (data.password !== data.passwordConfirm) {
-            setError("error", {message: "Passwords should be same"});
-            return ;
+            setError("Passwords should be same");
         }
         else {
             if (authorizationCode) {
@@ -27,6 +27,10 @@ function ResetPassword() {
                     navigate("/sign");
                 })
                 .catch(err => {
+                    if (err && err.response && err.response.data && err.response.data.message)
+                        setError(err.response.data.message);
+                    else
+                        setError("Invalid Code");
                     console.log(err);
                 })
             }
@@ -38,7 +42,7 @@ function ResetPassword() {
             <div className='auth-wrapper'>
                 <h2> Reset Password </h2>
                 <form className='form-wrapper' onSubmit={formSubmit}>
-                    {errors.error && <p className='txt-form-error'> {errors.error.message} </p>}
+                    {error && <p className='txt-form-error'> {error} </p> }
                     <label> New Password </label>
                     {errors.password && <p className='txt-form-error'> {errors.password.message} </p>}
                     <input
