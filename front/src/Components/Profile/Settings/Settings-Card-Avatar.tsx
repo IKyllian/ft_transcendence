@@ -34,6 +34,7 @@ function SettingsCardAvatar() {
                     else {
 						if (cache)
                         	cache.put(req, response.clone());
+                        setInputFile(undefined);
                         dispatch(addAlert({message: "New Avatar Uploaded (Refresh to see it)", type: AlertType.SUCCESS}));
                     }
                 }
