@@ -4,6 +4,7 @@ import { GameMode, Player, TeamSide, PlayerPosition } from "../../Types/Lobby-Ty
 import { changeModalStatus } from "../../Redux/PartySlice";
 import ExternalImage from "../External-Image";
 import { useLobbyHook } from "../../Hooks/Lobby-Hook";
+import { Link } from "react-router-dom";
 
 interface PlayerItemProps {
     user?: Player,
@@ -37,7 +38,9 @@ function PlayerListItem(props: PlayerItemProps) {
         <li className={`${displayTeam ? `team-${user.team === TeamSide.BLUE ? "blue" : "red" }` : ""}`} >
             { displayTeam && lockForm !== undefined && currentUser?.id === user.user.id && <TeamCircles user={user} disable={lockForm} /> }
             <ExternalImage src={user.user.avatar} alt="User Avatar" className={`player-avatar ${displayTeam ? "avatar-shadow" : ""}`} userId={user.user.id} />
-            <p> {user.user.username} </p>
+            <Link to={`/profile/${user.user.username}`}>
+                <p> {user.user.username} </p>
+            </Link>
             {
                 user.user.id === currentUser?.id && lobbyLength && onChangePos && displaySelectPos &&
                 <select disabled={(isInQueue || lockForm) ? true : false} onChange={(e) => onChangePos(e, user)} value={user.pos === PlayerPosition.BACK ? PlayerPosition.BACK : PlayerPosition.FRONT} className="team-select">
