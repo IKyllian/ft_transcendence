@@ -20,7 +20,8 @@ export const chatSlice = createSlice({
     initialState: defaultState,
     reducers: {
         loadingDatas: (state) => {
-            state.loading = true;
+            if (!state.loading)
+                state.loading = true;
         },
         copyChannelsAndConvs: (state, {payload} : PayloadAction<{channels: ChannelsInterfaceFront[], convs: ConversationInterfaceFront[]}>) => {
             state.channels = payload.channels;

@@ -1,6 +1,6 @@
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useAppSelector, useAppDispatch } from "../../Redux/Hooks";
-import { changeActiveElement, resetActiveElement } from "../../Redux/ChatSlice";
+import { changeActiveElement, loadingDatas, resetActiveElement } from "../../Redux/ChatSlice";
 import { useEffect, useState, useCallback, useContext } from "react";
 import { fetchUserChannels, fetchUserConvs, fetchConvAndRedirect } from "../../Api/Chat/Chat-Fetch";
 import { SocketContext } from "../../App";
@@ -77,14 +77,17 @@ export function useLoadChatDatas() {
         if (!channelId && !convId && !responsiveSidebar)
             setReponsiveSidebar(true);
         // Permet de mettre en couleur le channel ou la conv selectionner
-        if (channelId) {
-            dispatch(changeActiveElement({id:channelId, isChannel: true}));
-        } else if (convId)
-            dispatch(changeActiveElement({id:convId, isChannel: false}));
-        else if (!channelId && !convId)
-            dispatch(resetActiveElement());
+
+        if (!chatDatas.loading) {
+            if (channelId) {
+                dispatch(changeActiveElement({id:channelId, isChannel: true}));
+            } else if (convId)
+                dispatch(changeActiveElement({id:convId, isChannel: false}));
+            else if (!channelId && !convId)
+                dispatch(resetActiveElement());
+        }
         return () => window.removeEventListener('resize', handleResize);
-    }, [channelId, convId, location.pathname])
+    }, [channelId, convId, location.pathname, chatDatas.loading])
 
     useEffect(() => {
         //Permet de redirect sur une conv (et de la créer si besoin) dans le cas où un user click quelque part pour dm quelqu'un
@@ -105,6 +108,7 @@ export function useLoadChatDatas() {
     }, [chatDatas.loading])
 
     useEffect(() => {
+        dispatch(loadingDatas());
         if (channelId !== undefined || convId !== undefined)
             setReponsiveSidebar(false);
 
