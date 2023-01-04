@@ -105,7 +105,7 @@ export function useLoadChatDatas() {
                 }
             }
         }
-    }, [chatDatas.loading])
+    }, [chatDatas.loading, location.state])
 
     useEffect(() => {
         dispatch(loadingDatas());
