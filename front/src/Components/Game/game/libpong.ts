@@ -32,6 +32,5 @@ export function launch_game(players_data: PlayersGameData, socket: Socket, token
 		scene: [ Lobby, Pong, MatchResult ]
 	};
 	const game = new Phaser.Game(config);
-	console.log(game);
 	return game;
 }

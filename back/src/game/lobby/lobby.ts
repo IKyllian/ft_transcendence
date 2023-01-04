@@ -52,7 +52,6 @@ export class Lobby
 		})
 		if (!is_player) {
 			this.spectators.set(client.id, client);
-			console.log('room', this.game_id, 'spectator joined, total:', this.spectators.size);
 		}
 
 		if (this.already_started)
