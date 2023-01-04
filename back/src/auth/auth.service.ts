@@ -273,7 +273,7 @@ export class AuthService {
 
 		const hash = await argon.hash(dto.newPassword);
 
-		this.userService.updatePassword(user_account, hash);
+		await this.userService.updatePassword(user_account, hash);
 		return { success: true }
 	}
 }

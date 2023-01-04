@@ -181,7 +181,6 @@ export default class MatchResult extends Phaser.Scene
 	{
 		pointer;
 		
-		console.log("click", gameobject);
 		if (gameobject.name === 'close')
 		{
 			gameobject.destroy();
