@@ -14,7 +14,7 @@ const defaultSettings: GameSettings = {
     player_front_advance: 300,
     paddle_size_front: 70,
     paddle_size_back: 150,
-    paddle_speed: 10,
+    paddle_speed: 11,
     ball_start_speed: 5,
     ball_acceleration: 1,
     point_for_victory: 5,
