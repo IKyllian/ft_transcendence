@@ -149,6 +149,7 @@ export class ChannelService {
 		if (!invite)
 			throw new BadRequestException('You are not invited to this channel');
 		await this.notifService.delete(invite.id);
+		this.globalService.server.to(`user-${user.id}`).emit('DeleteNotification', dto.id);
 		if (dto.response === ResponseType.ACCEPTED) {
 			return this.join(user, dto.chanId, null, true);
 		}

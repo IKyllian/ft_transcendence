@@ -204,10 +204,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		@ConnectedSocket() socket: AuthenticatedSocket,
 		@MessageBody() dto: ResponseDto,
 		) {
-		this.server.to(`user-${socket.user.id}`).emit('DeleteNotification', dto.id);
-		const chanUser: ChannelUser = await this.channelService.respondInvite(socket.user, dto);
-		if (chanUser) {
-			this.server.to(`channel-${dto.chanId}`).emit('ChannelUpdate', { type: ChannelUpdateType.JOIN, data: chanUser });
+			const chanUser: ChannelUser = await this.channelService.respondInvite(socket.user, dto);
+			if (chanUser) {
+				this.server.to(`channel-${dto.chanId}`).emit('ChannelUpdate', { type: ChannelUpdateType.JOIN, data: chanUser });
 			this.server.to(`user-${socket.user.id}`).emit('OnJoin', { channel: chanUser.channel, socketId: socket.id });
 			const servMsg = await this.channelMsgService.createServer({
 				chanId: chanUser.channelId,
