@@ -133,7 +133,7 @@ function UsernameForm(props: {user: UserInterface}) {
         })
         .catch(err => {
             console.log(err);
-            setError("username", {message: "Username already exist"});
+            setError("username", {message: "Username already exist or invalid"});
         })
     })
     return (
