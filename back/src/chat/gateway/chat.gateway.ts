@@ -203,7 +203,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	async respondToChannelInvite(
 		@ConnectedSocket() socket: AuthenticatedSocket,
 		@MessageBody() dto: ResponseDto,
-	) {
+		) {
+		this.server.to(`user-${socket.user.id}`).emit('DeleteNotification', dto.id);
 		const chanUser: ChannelUser = await this.channelService.respondInvite(socket.user, dto);
 		if (chanUser) {
 			this.server.to(`channel-${dto.chanId}`).emit('ChannelUpdate', { type: ChannelUpdateType.JOIN, data: chanUser });
@@ -214,7 +215,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			});
 			this.server.to(`channel-${dto.chanId}`).emit('NewChannelMessage', servMsg);
 		}
-		this.server.to(`user-${socket.user.id}`).emit('DeleteNotification', dto.id);
 	}
 
 	@UseGuards(WsJwtGuard, WsInChannelGuard, ChannelPermissionGuard)
