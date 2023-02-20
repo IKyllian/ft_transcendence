@@ -87,3 +87,5 @@ networks:
   transcendence_network:
     name: transcendence_network
     driver: bridge
+  proxy:
+    external: true
