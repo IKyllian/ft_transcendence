@@ -14,14 +14,16 @@ services:
         - REACT_APP_REDIRECT_URL=${REACT_APP_REDIRECT_URL}
         - REACT_APP_SOCKET_URL=${REACT_APP_SOCKET_URL}
         - REACT_APP_API42_CLIENT_ID=${API42_CLIENT_ID}
-    environment:
-      - PORT=80
-    ports:
-      - 80:80
     networks:
       - transcendence_network
+      - proxy
     restart: always
-
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.routers.lessgofront.rule=Host(`www.transcendance.site`, `transcendance.site`)"
+      - "traefik.http.routers.lessgofront.entrypoints=websecure"
+      - "traefik.http.services.lessgofront.loadbalancer.server.port=3000"
 
 # Back
 
